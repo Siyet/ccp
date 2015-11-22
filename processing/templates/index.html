@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        .container {
+            width: 700px;
+            text-align: center;
+            position:absolute;
+            left: 50%;
+            margin-left: -350px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="{% url 'image' %}" height="480" width="640" />
+    <br />
+    <button class="refresh" onClick="window.location.reload();">Ещё раз</button>
+</div>
+</body>
+</html>

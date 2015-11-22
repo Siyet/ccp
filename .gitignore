@@ -1,0 +1,18 @@
+# IDE Settings
+.idea/
+
+# DB Settings
+core/settings/local_db.py
+
+# Compiled files
+*.pyc
+
+# static
+media
+/static
+
+# mac files
+.DS_Store
+
+# database
+*.sql
