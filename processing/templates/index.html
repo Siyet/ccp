@@ -5,19 +5,16 @@
     <title></title>
     <style type="text/css">
         .container {
-            width: 700px;
+            width: 100%;
             text-align: center;
             position:absolute;
-            left: 50%;
-            margin-left: -350px;
+            left: auto;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <img src="{% url 'image' %}" height="480" width="640" />
-    <br />
-    <button class="refresh" onClick="window.location.reload();">Ещё раз</button>
+    <img src="{% url 'image' %}" />
 </div>
 </body>
 </html>
