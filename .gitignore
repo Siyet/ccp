@@ -2,7 +2,7 @@
 .idea/
 
 # DB Settings
-core/settings/local_db.py
+core/settings/database.py
 
 # Compiled files
 *.pyc

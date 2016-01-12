@@ -1,6 +1,6 @@
-from base import *
+from .base import *
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['shirts.wecreateapps.ru']
 
