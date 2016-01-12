@@ -1,1 +1,1 @@
-__author__ = 'cloud'
+default_app_config = 'backend.apps.BackendConfig'

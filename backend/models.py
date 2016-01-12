@@ -20,48 +20,65 @@ class Collection(models.Model):
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
 
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Коллекция')
+        verbose_name_plural = _(u'Коллекции')
+
 
 class Storehouse(models.Model):
     title = models.CharField(_(u'Название'), max_length=255)
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'))
 
+    def __unicode__(self):
+        return self.title
 
-class FabricColor(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
-    value = RGBColorField(_(u'Значение'))
-
-
-class FabricDesign(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
+    class Meta:
+        verbose_name = _(u'Склад')
+        verbose_name_plural = _(u'Склады')
 
 
 class FabricPrice(models.Model):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='prices')
     fabric = models.ForeignKey('Fabric', verbose_name=_(u'Ткань'), related_name='prices')
-    price = models.DecimalField(_(u'Цена'))
+    price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
+
+    def __unicode__(self):
+        return self.fabric.code
+
+    class Meta:
+        verbose_name = _(u'Цена ткани')
+        verbose_name_plural = _(u'Цены тканей')
 
 
 class Fabric(models.Model):
-    code = models.CharField(_(u'Артикул'), max_length=10)
+    code = models.CharField(_(u'Артикул'), max_length=20)
     description = models.TextField(_(u'Описание'))
-    colors = models.ManyToManyField(FabricColor, verbose_name=_(u'Цвета'), related_name='fabrics')
-    designs = models.ManyToManyField(FabricColor, verbose_name=_(u'Дизайн'), related_name='fabrics')
+    colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
+    designs = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
     texture = models.ImageField(_(u'Текстура'))
+
+    def __unicode__(self):
+        return self.code
+
+    class Meta:
+        verbose_name = _(u'Ткань')
+        verbose_name_plural = _(u'Ткани')
 
 
 class FabricResidual(models.Model):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='residuals')
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), related_name='residuals')
-    amount = models.DecimalField(_(u'Остаток'))
+    amount = models.DecimalField(_(u'Остаток'), max_digits=10, decimal_places=2)
 
+    def __unicode__(self):
+        return u'%s %s %s' % (self.fabric.code, _(u'на складе'), self.storehouse.title)
 
-class CollarButtons(models.Model):
-    title = models.CharField(_(u'Название'))
-
-
-class CollarType(models.Model):
-    title = models.CharField(_(u'Название'))
-    buttons = models.ManyToManyField(CollarButtons, verbose_name=_(u'Варианты пуговиц'))
+    class Meta:
+        verbose_name = _(u'Остаток ткани')
+        verbose_name_plural = _(u'Остатки тканей')
 
 
 class Collar(models.Model):
@@ -70,29 +87,95 @@ class Collar(models.Model):
 
     hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
 
-    type = models.ForeignKey(CollarType, verbose_name=_(u'Тип'))
+    type = models.ForeignKey('dictionaries.CollarType', verbose_name=_(u'Тип'))
 
+    def __unicode__(self):
+        return self.type.title
 
-class CuffRounding(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
-
-
-class CuffType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
-    rounding = models.ManyToManyField(CuffRounding, verbose_name=_(u'Варианты закругления'))
+    class Meta:
+        verbose_name = _(u'Воротник')
+        verbose_name_plural = _(u'Воротники')
 
 
 class Cuff(models.Model):
     hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
     sleeve = models.BooleanField(_(u'Рукав'))
-    type = models.ForeignKey(CuffType, verbose_name=_(u'Тип'))
+    type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'))
+
+    def __unicode__(self):
+        return self.type.title
+
+    class Meta:
+        verbose_name = _(u'Манжета')
+        verbose_name_plural = _(u'Манжеты')
 
 
 class CustomButtons(models.Model):
-    # TODO
-    pass
+    title = models.CharField(_(u'Название'), max_length=255)
+    picture = models.ImageField(_(u'Изображение'))
+    type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип'))
 
-class ShirtDetails(models.Model):
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Кастомные пуговицы')
+        verbose_name_plural = _(u'Кастомные пуговицы')
+
+
+class ShawlOptions(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    extra_price = models.DecimalField(_(u'Добавочная стоимость'), max_digits=10, decimal_places=2)
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Настройки платка')
+        verbose_name_plural = _(u'Настройки платка')
+
+
+class Dickey(models.Model):
+    type = models.ForeignKey('dictionaries.DickeyType')
+    fabric = models.ForeignKey(Fabric)
+
+    def __unicode__(self):
+        return self.type.title
+
+    class Meta:
+        verbose_name = _(u'Манишка')
+        verbose_name_plural = _(u'Манишки')
+
+
+class Initials(models.Model):
+    FONTS = (('script', 'Script'), ('arial', 'Arial'), ('free', 'Free'))
+    font = models.CharField(_(u'Шрифт'), choices=FONTS, max_length=10)
+
+    LOCATION = (('button2', _(u'2 пуговица')),
+                ('button3', _(u'3 пуговица')),
+                ('button4', _(u'4 пуговица')),
+                ('button5', _(u'5 пуговица')),
+                ('hem', _(u'Низ (л)')),
+                ('pocket', _(u'Карман (л)')),
+                ('cuff', _(u'Манжета (л)')))
+    location = models.CharField(_(u'Местоположение'), choices=LOCATION, max_length=10)
+    text = models.CharField(_(u'Текст'), max_length=255)
+    color = models.ForeignKey('dictionaries.Color', verbose_name=_(u'Цвет'))
+
+    def __unicode__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = _(u'Инициалы')
+        verbose_name_plural = _(u'Инициалы')
+
+
+class Shirt(models.Model):
+    SIZES = Choices(35, 36, 37, 38, 39, 40, 41, 42)
+    is_template = models.BooleanField(_(u'Используется как шаблон'))
+    fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
+    size = models.CharField(_(u'Размер'), choices=SIZES, max_length=2)
+
     HEM = Choices(('straight', _(u'Прямой')), ('figured', _(u'Фигурный')))
     hem = models.CharField(_(u'Низ'), choices=HEM, max_length=10)
 
@@ -106,3 +189,59 @@ class ShirtDetails(models.Model):
 
     BACK = Choices(('no_folds', _(u'Без складок')), ('one_fold', _(u'Одна складка')), ('two_folds', _(u'Две складки')))
     back = models.CharField(_(u'Спинка'), choices=BACK, max_length=10)
+
+    custom_buttons = models.ForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), null=True, blank=True)
+    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'))
+    yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'))
+    clasp = models.BooleanField(_(u'Застежка под штифты'))
+
+    STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')), ('5mm', _(u'5 мм')))
+    stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
+
+    collar = models.OneToOneField(Collar, verbose_name=_(u'Воротник'))
+    cuffs = models.OneToOneField(Cuff, verbose_name=_(u'Манжеты'))
+    dickey =  models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
+    initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
+
+    def __unicode__(self):
+        return u"%s #%s" %(_(u"Рубашка"), self.id)
+
+    class Meta:
+        verbose_name = _(u'Рубашка')
+        verbose_name_plural = _(u'Рубашки')
+
+
+class ContrastDetails(models.Model):
+    ELEMENTS = (('collar_face', _(u'Воротник лицевая сторона')),
+                ('collar_bottom', _(u'Воротник низ')),
+                ('collar_outer', _(u'Воротник внешняя стойка')),
+                ('collar_inner', _(u'Воротник внутрення стойка')),
+                ('cuff_outer', _(u'Манжета внешняя')),
+                ('cuff_inner', _(u'Манжета внутрення')))
+    element = models.CharField(_(u'Элемент'), choices=ELEMENTS, max_length=20)
+    fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
+    shirt = models.ForeignKey(Shirt, verbose_name=_(u'Рубашка'))
+
+    def __unicode__(self):
+        return self.get_element_display()
+
+    class Meta:
+        verbose_name = _(u'Контрастная деталь')
+        verbose_name_plural = _(u'Контрастные детали')
+
+
+class ContrastStitch(models.Model):
+    ELEMENT = Choices(('shirt', _(u'Сорочка')),
+                      ('cuffs', _(u'Манжеты')),
+                      ('collar', _(u'Воротник')),
+                      ('thread', _(u'Петель/ниток')))
+    element = models.CharField(_(u'Элемент'), choices=ELEMENT, max_length=10)
+    color = models.ForeignKey('dictionaries.StitchColor', verbose_name=_(u'Цвет отстрочки'))
+    shirt = models.ForeignKey(Shirt)
+
+    def __unicode__(self):
+        return self.get_element_display()
+
+    class Meta:
+        verbose_name = _(u'Контрастная отстрочка')
+        verbose_name_plural = _(u'Контрастные отстрочки')
