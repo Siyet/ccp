@@ -45,11 +45,11 @@ def compose_shirt():
     source_file = ComposingSource.objects.filter(type='EXR').first().file
     source = OpenEXR.InputFile(source_file.path)
 
-    shadow_file = ComposingSource.objects.filter(type='SHADOW').first().file
-    shadow = Image.open(shadow_file.path)
+    shadow_file = ComposingSource.objects.filter(type='SHADOW').first()
+    shadow = Image.open(shadow_file.file.path) if shadow_file is not None else None
 
-    light_file = ComposingSource.objects.filter(type='LIGHT').first().file
-    light = Image.open(light_file.path)
+    light_file = ComposingSource.objects.filter(type='LIGHT').first()
+    light = Image.open(light_file.file.path) if light_file is not None else None
 
     texture_file = ComposingSource.objects.filter(type='TEXTURE').first().file
     texture = Image.open(texture_file.path)
@@ -73,6 +73,10 @@ def compose_shirt():
         px = texture_pxls[x, y]
         result_pxls[i % sz[0], i / sz[0]] = (px[0], px[1], px[2], int(round(a * 255)))
 
-    result = ImageChops.multiply(result, shadow)
-    result = ImageChops.add(result, light)
+    if shadow is not None:
+        result = ImageChops.multiply(result, shadow)
+
+    if light is not None:
+        result = ImageChops.add(result, light)
+
     return result
