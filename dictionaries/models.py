@@ -51,7 +51,7 @@ class FabricDesign(models.Model):
 
 
 class CollarType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
     buttons = models.ManyToManyField(CollarButtons, verbose_name=_(u'Варианты пуговиц'))
 
     def __unicode__(self):
@@ -63,7 +63,7 @@ class CollarType(models.Model):
 
 
 class CuffRounding(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
 
     def __unicode__(self):
         return self.title
@@ -74,7 +74,7 @@ class CuffRounding(models.Model):
 
 
 class CuffType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
     rounding = models.ManyToManyField(CuffRounding, verbose_name=_(u'Варианты закругления'))
 
     def __unicode__(self):
@@ -122,7 +122,7 @@ class StitchColor(models.Model):
 
 
 class DickeyType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
     picture = models.ImageField(_(u'Изображение'))
 
     def __unicode__(self):
