@@ -75,7 +75,7 @@ class CuffRounding(models.Model):
 
 class CuffType(models.Model):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
-    rounding = models.ManyToManyField(CuffRounding, verbose_name=_(u'Варианты закругления'))
+    rounding = models.ManyToManyField(CuffRounding, verbose_name=_(u'Варианты закругления'), blank=True)
 
     def __unicode__(self):
         return self.title

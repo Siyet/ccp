@@ -174,7 +174,7 @@ class Shirt(models.Model):
     SIZES = Choices(35, 36, 37, 38, 39, 40, 41, 42)
     is_template = models.BooleanField(_(u'Используется как шаблон'))
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
-    size = models.CharField(_(u'Размер'), choices=SIZES, max_length=2)
+    size = models.IntegerField(_(u'Размер'), choices=SIZES)
 
     HEM = Choices(('straight', _(u'Прямой')), ('figured', _(u'Фигурный')))
     hem = models.CharField(_(u'Низ'), choices=HEM, max_length=10)
