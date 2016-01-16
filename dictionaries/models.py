@@ -27,6 +27,16 @@ class FabricColor(models.Model):
         verbose_name_plural = _(u'Цвета тканей')
 
 
+class FabricCategory(models.Model):
+    title = models.CharField(_(u'Категория'), unique=True, max_length=1)
+
+    def __unicode__(self):
+        return u"%s %s" % (_(u'Категория'), self.title)
+    class Meta:
+        verbose_name = _(u'Категория ткани')
+        verbose_name_plural = _(u'Категории тканей')
+
+
 class CollarButtons(models.Model):
     title = models.CharField(_(u'Название'), max_length=255)
 

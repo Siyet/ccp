@@ -4,6 +4,7 @@ from .models import (
     Color,
     FabricColor,
     FabricDesign,
+    FabricCategory,
     CollarButtons,
     CollarType,
     CuffRounding,
@@ -12,13 +13,17 @@ from .models import (
     YokeType,
     StitchColor,
     DickeyType,
+
 )
+
 
 admin.site.register([
     Color,
     FabricColor,
     FabricDesign,
+    FabricCategory,
     CollarButtons,
+
     CollarType,
     CuffRounding,
     CuffType,

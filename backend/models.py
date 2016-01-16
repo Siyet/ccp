@@ -30,7 +30,7 @@ class Collection(models.Model):
 
 class Storehouse(models.Model):
     title = models.CharField(_(u'Название'), max_length=255)
-    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'))
+    collection = models.ManyToManyField(Collection, verbose_name=_(u'Коллекция'))
 
     def __unicode__(self):
         return self.title
@@ -42,7 +42,7 @@ class Storehouse(models.Model):
 
 class FabricPrice(models.Model):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='prices')
-    fabric = models.ForeignKey('Fabric', verbose_name=_(u'Ткань'), related_name='prices')
+    fabric_category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория тканей'), related_name='prices')
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
 
     def __unicode__(self):
@@ -57,7 +57,7 @@ class Fabric(models.Model):
     code = models.CharField(_(u'Артикул'), max_length=20)
     description = models.TextField(_(u'Описание'))
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
-    designs = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
+    designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
     texture = models.ImageField(_(u'Текстура'))
 
     def __unicode__(self):
@@ -79,6 +79,7 @@ class FabricResidual(models.Model):
     class Meta:
         verbose_name = _(u'Остаток ткани')
         verbose_name_plural = _(u'Остатки тканей')
+        unique_together = ('fabric', 'storehouse')
 
 
 class Collar(models.Model):
@@ -88,6 +89,8 @@ class Collar(models.Model):
     hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
 
     type = models.ForeignKey('dictionaries.CollarType', verbose_name=_(u'Тип'))
+
+    shirt = models.OneToOneField('backend.Shirt', related_name='collar')
 
     def __unicode__(self):
         return self.type.title
@@ -100,7 +103,10 @@ class Collar(models.Model):
 class Cuff(models.Model):
     hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
     sleeve = models.BooleanField(_(u'Рукав'))
+
     type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'))
+
+    shirt = models.OneToOneField('backend.Shirt', related_name='cuff')
 
     def __unicode__(self):
         return self.type.title
@@ -174,7 +180,7 @@ class Shirt(models.Model):
     SIZES = Choices(35, 36, 37, 38, 39, 40, 41, 42)
     is_template = models.BooleanField(_(u'Используется как шаблон'))
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
-    size = models.IntegerField(_(u'Размер'), choices=SIZES)
+    size = models.IntegerField(_(u'Размер'), choices=SIZES, blank=True, null=True)
 
     HEM = Choices(('straight', _(u'Прямой')), ('figured', _(u'Фигурный')))
     hem = models.CharField(_(u'Низ'), choices=HEM, max_length=10)
@@ -198,8 +204,6 @@ class Shirt(models.Model):
     STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')), ('5mm', _(u'5 мм')))
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
 
-    collar = models.OneToOneField(Collar, verbose_name=_(u'Воротник'))
-    cuffs = models.OneToOneField(Cuff, verbose_name=_(u'Манжеты'))
     dickey =  models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
     initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
 
@@ -209,6 +213,15 @@ class Shirt(models.Model):
     class Meta:
         verbose_name = _(u'Рубашка')
         verbose_name_plural = _(u'Рубашки')
+
+
+class ShirtImage(models.Model):
+    image = models.ImageField(_(u'Изображение'))
+    shirt = models.ForeignKey(Shirt)
+
+    class Meta:
+        verbose_name = _(u'Изображение')
+        verbose_name_plural = _(u'Изображения')
 
 
 class ContrastDetails(models.Model):

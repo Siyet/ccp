@@ -14,14 +14,28 @@ from .models import (
     Initials,
     ContrastDetails,
     ContrastStitch,
-    Shirt
+    Shirt,
+    ShirtImage
 )
 
-class CollarAdmin(admin.ModelAdmin):
-    list_display = ['type', 'hardness', 'stays']
 
-class CuffAdmin(admin.ModelAdmin):
-    list_display = ['type', 'hardness', 'sleeve']
+class ShirtImageInline(admin.TabularInline):
+    model = ShirtImage
+    extra = 1
+
+
+class CuffInline(admin.StackedInline):
+    model = Cuff
+    inline_classes = ('grp-open',)
+
+
+class CollarInline(admin.StackedInline):
+    model = Collar
+    inline_classes = ('grp-open',)
+
+
+class ShirtAdmin(admin.ModelAdmin):
+    inlines = [CollarInline, CuffInline, ShirtImageInline]
 
 admin.site.register([
     Collection,
@@ -34,9 +48,7 @@ admin.site.register([
     Dickey,
     Initials,
     ContrastDetails,
-    ContrastStitch,
-    Shirt
+    ContrastStitch
 ])
 
-admin.site.register(Collar, CollarAdmin)
-admin.site.register(Cuff, CuffAdmin)
+admin.site.register(Shirt, ShirtAdmin)
