@@ -14,7 +14,9 @@ from .models import (
     StitchColor,
     DickeyType,
     ShirtInfo,
-    ShirtInfoImage
+    ShirtInfoImage,
+    SizeOptions,
+    Size
 )
 
 
@@ -41,5 +43,7 @@ admin.site.register([
     CustomButtonsType,
     YokeType,
     StitchColor,
-    DickeyType
+    DickeyType,
+    SizeOptions,
+    Size
 ])
