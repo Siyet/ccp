@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.utils.text import ugettext_lazy as _
+from model_utils import Choices
 from colorful.fields import RGBColorField
 
 class Color(models.Model):
@@ -141,3 +142,47 @@ class DickeyType(models.Model):
     class Meta:
         verbose_name = _(u'Тип манишки')
         verbose_name_plural = _(u'Типы манишки')
+
+
+class ShirtInfo(models.Model):
+    title = models.CharField(_(u'Заголовок'), max_length=255, unique=True)
+    text = models.TextField(_(u'Текст под заголовком'))
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Информация о рубашках')
+        verbose_name_plural = _(u'Информация о рубашках')
+
+class ShirtInfoImage(models.Model):
+    image = models.ImageField(_(u'Файл'))
+    text = models.TextField(_(u'Текст под изображением'))
+    shirt_info = models.ForeignKey(ShirtInfo, related_name='images')
+
+    class Meta:
+        verbose_name = _(u'Изображение')
+        verbose_name_plural = _(u'Изображения')
+
+
+class SizeOptions(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    show_sizes = models.BooleanField(_(u'Показывать размеры'), default=True)
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Вариант размера')
+        verbose_name_plural = _(u'Варианты размеров')
+
+
+class Size(models.Model):
+    size = models.PositiveIntegerField(_(u'Размер'), unique=True, primary_key=True)
+
+    def __unicode__(self):
+        return "%s" % self.size
+
+    class Meta:
+        verbose_name = _(u'Размер рубашки')
+        verbose_name_plural = _(u'Размеры рубашек')

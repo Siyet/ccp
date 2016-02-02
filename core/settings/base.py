@@ -21,6 +21,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+    'rest_framework_swagger',
+
     'backend',
     'dictionaries',
     'processing'
@@ -72,4 +76,7 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
-from .database import *
+try:
+    from .database import *
+except:
+    raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")

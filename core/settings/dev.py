@@ -1,5 +1,4 @@
 from .base import *
-from .database import *
 import os
 
 # INSTALLED_APPS += (

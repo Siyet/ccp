@@ -13,10 +13,21 @@ from .models import (
     YokeType,
     StitchColor,
     DickeyType,
-
+    ShirtInfo,
+    ShirtInfoImage
 )
 
 
+class ShirtInfoImageInline(admin.TabularInline):
+    model = ShirtInfoImage
+    extra = 0
+
+
+class ShirtInfoAdmin(admin.ModelAdmin):
+    inlines = [ShirtInfoImageInline]
+
+
+admin.site.register(ShirtInfo, ShirtInfoAdmin)
 admin.site.register([
     Color,
     FabricColor,

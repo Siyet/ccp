@@ -15,6 +15,8 @@ HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
 
 class Collection(models.Model):
     title = models.CharField(_(u'Название'), max_length=255)
+    text = models.TextField(_(u'Описание'))
+    image = models.ImageField(_(u'Изображение'))
     dickey = models.BooleanField(_(u'Манишка'))
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
@@ -177,10 +179,12 @@ class Initials(models.Model):
 
 
 class Shirt(models.Model):
-    SIZES = Choices(35, 36, 37, 38, 39, 40, 41, 42)
+
     is_template = models.BooleanField(_(u'Используется как шаблон'))
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
-    size = models.IntegerField(_(u'Размер'), choices=SIZES, blank=True, null=True)
+
+    size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
+    size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
 
     HEM = Choices(('straight', _(u'Прямой')), ('figured', _(u'Фигурный')))
     hem = models.CharField(_(u'Низ'), choices=HEM, max_length=10)
