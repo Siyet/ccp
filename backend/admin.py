@@ -37,11 +37,20 @@ class CollarInline(admin.StackedInline):
 class ShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ShirtImageInline]
 
+
+class FabricPriceAdmin(admin.ModelAdmin):
+    list_display = ['fabric_category', 'storehouse', 'price']
+    list_display_links = ['price']
+
+    def get_queryset(self, request):
+        queryset = super(FabricPriceAdmin, self).get_queryset(request)
+        return queryset.select_related('fabric_category', 'storehouse')
+
+
 admin.site.register([
     Collection,
     Storehouse,
     Fabric,
-    FabricPrice,
     FabricResidual,
     CustomButtons,
     ShawlOptions,
@@ -51,4 +60,5 @@ admin.site.register([
     ContrastStitch
 ])
 
+admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(Shirt, ShirtAdmin)

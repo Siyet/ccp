@@ -48,7 +48,7 @@ class FabricPrice(models.Model):
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
 
     def __unicode__(self):
-        return self.fabric.code
+        return self.fabric_category.title
 
     class Meta:
         verbose_name = _(u'Цена ткани')
