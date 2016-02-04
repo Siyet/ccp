@@ -2,9 +2,13 @@
 __author__ = 'cloud'
 
 from django.db import models
+from django.db.models import Q
 from django.utils.text import ugettext_lazy as _
-from colorful.fields import RGBColorField
+from django.conf import settings
+
 from model_utils import Choices
+
+from dictionaries.models import FabricCategory
 
 HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
                    ('soft', _(u'Мягкий')),
@@ -28,6 +32,11 @@ class Collection(models.Model):
     class Meta:
         verbose_name = _(u'Коллекция')
         verbose_name_plural = _(u'Коллекции')
+
+    def fabrics(self):
+        filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
+        filter_predicate &= Q(residuals__storehouse__collection=self.pk)
+        return Fabric.objects.prefetch_related('residuals', 'residuals__storehouse').filter(filter_predicate)
 
 
 class Storehouse(models.Model):
@@ -57,6 +66,7 @@ class FabricPrice(models.Model):
 
 class Fabric(models.Model):
     code = models.CharField(_(u'Артикул'), max_length=20)
+    category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics', blank=True, null=True)
     description = models.TextField(_(u'Описание'))
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
@@ -64,6 +74,16 @@ class Fabric(models.Model):
 
     def __unicode__(self):
         return self.code
+
+    def save(self, *args, **kwargs):
+        category_letter = self.code[0]
+        try:
+            category = FabricCategory.objects.get(title=category_letter)
+            self.category = category
+        except:
+            pass
+
+        super(Fabric, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _(u'Ткань')
@@ -104,11 +124,11 @@ class Collar(models.Model):
 
 class Cuff(models.Model):
     hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
-    sleeve = models.BooleanField(_(u'Рукав'))
+    sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_cuff')
 
-    type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'))
+    type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='cuff')
 
-    shirt = models.OneToOneField('backend.Shirt', related_name='cuff')
+    shirt = models.OneToOneField('backend.Shirt', related_name='shirt_cuff')
 
     def __unicode__(self):
         return self.type.title
@@ -186,19 +206,13 @@ class Shirt(models.Model):
     size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
     size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
 
-    HEM = Choices(('straight', _(u'Прямой')), ('figured', _(u'Фигурный')))
-    hem = models.CharField(_(u'Низ'), choices=HEM, max_length=10)
-
-    PLACKET = Choices(('plank', _(u'С планкой')), ('hidden', _(u'Скрытая застежка')), ('no_plank', _(u'Без планки')))
-    placket = models.CharField(_(u'Полочка'), choices=PLACKET, max_length=10)
-
-    POCKET = Choices(('none', _(u'Без кармана')), ('rounded', _(u'Закругленные углы')), ('straight', _(u'Прямые углы')))
-    pocket = models.CharField(_(u'Карман'), choices=POCKET, max_length=10)
+    hem = models.ForeignKey('dictionaries.HemType', verbose_name=_(u'Низ'), related_name='hem_shirts')
+    placket = models.ForeignKey('dictionaries.PlacketType', verbose_name=_(u'Полочка'), related_name='placket_shirts')
+    pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
 
     tuck = models.BooleanField(_(u'Вытачки'))
 
-    BACK = Choices(('no_folds', _(u'Без складок')), ('one_fold', _(u'Одна складка')), ('two_folds', _(u'Две складки')))
-    back = models.CharField(_(u'Спинка'), choices=BACK, max_length=10)
+    back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
 
     custom_buttons = models.ForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), null=True, blank=True)
     shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'))

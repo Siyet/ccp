@@ -47,10 +47,13 @@ class FabricPriceAdmin(admin.ModelAdmin):
         return queryset.select_related('fabric_category', 'storehouse')
 
 
+class FabricAdmin(admin.ModelAdmin):
+    readonly_fields = ['category']
+
+
 admin.site.register([
     Collection,
     Storehouse,
-    Fabric,
     FabricResidual,
     CustomButtons,
     ShawlOptions,
@@ -60,5 +63,6 @@ admin.site.register([
     ContrastStitch
 ])
 
+admin.site.register(Fabric, FabricAdmin)
 admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(Shirt, ShirtAdmin)

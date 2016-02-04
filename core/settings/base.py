@@ -22,11 +22,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'dictionaries',
+
     'rest_framework',
     'rest_framework_swagger',
+    'colorful',
 
     'backend',
-    'dictionaries',
     'processing'
 )
 
@@ -80,3 +82,8 @@ try:
     from .database import *
 except:
     raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")
+
+
+# Application settings
+
+MIN_FABRIC_RESIDUAL = 10

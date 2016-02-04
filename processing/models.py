@@ -4,7 +4,7 @@ from django.db import models
 
 class ComposingSource(models.Model):
 
-    type = models.CharField(u'Тип', max_length='10', choices=(
+    type = models.CharField(u'Тип', max_length=10, choices=(
         ('EXR', u'UV (в формате EXR)'),
         ('LIGHT', u'Свет (png)'),
         ('SHADOW', u'Тень (png)'),

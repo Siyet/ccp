@@ -1,4 +1,4 @@
-Django==1.8.5
+Django==1.9
 Pillow
 OpenEXR
 mysql
@@ -9,3 +9,4 @@ djoser
 django-colorful
 django-model-utils
 django-admin-sortable2
+django-debug-toolbar

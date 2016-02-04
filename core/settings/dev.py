@@ -1,9 +1,9 @@
 from .base import *
 import os
 
-# INSTALLED_APPS += (
-#     'debug_toolbar',
-# )
+INSTALLED_APPS += (
+    'debug_toolbar',
+)
 
 DEBUG = True
 

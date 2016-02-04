@@ -16,7 +16,8 @@ from .models import (
     ShirtInfo,
     ShirtInfoImage,
     SizeOptions,
-    Size
+    Size,
+    HemType, BackType, PlacketType, PocketType, SleeveType
 )
 
 
@@ -45,5 +46,6 @@ admin.site.register([
     StitchColor,
     DickeyType,
     SizeOptions,
-    Size
+    Size,
+    HemType, BackType, PlacketType, PocketType, SleeveType
 ])

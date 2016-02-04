@@ -4,6 +4,19 @@ from django.db import models
 from django.utils.text import ugettext_lazy as _
 from model_utils import Choices
 from colorful.fields import RGBColorField
+from django.db.models import Count
+
+
+class ComponentModel(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+    picture = models.ImageField(_(u'Изображение'))
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        abstract = True
+
 
 class Color(models.Model):
     color = RGBColorField(_(u'Значение'))
@@ -27,9 +40,13 @@ class FabricColor(models.Model):
         verbose_name = _(u'Цвет ткани')
         verbose_name_plural = _(u'Цвета тканей')
 
+    @staticmethod
+    def used():
+        return FabricColor.objects.prefetch_related('color_fabrics').annotate(fabrics_count=Count('color_fabrics')).filter(fabrics_count__gt=0)
+
 
 class FabricCategory(models.Model):
-    title = models.CharField(_(u'Категория'), unique=True, max_length=1)
+    title = models.CharField(_(u'Категория'), unique=True, max_length=1, db_index=True)
 
     def __unicode__(self):
         return u"%s %s" % (_(u'Категория'), self.title)
@@ -49,24 +66,18 @@ class CollarButtons(models.Model):
         verbose_name_plural = _(u'Пуговицы воротника')
 
 
-class FabricDesign(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
-    picture = models.ImageField(_(u'Изображение'))
-
-    def __unicode__(self):
-        return self.title
-
+class FabricDesign(ComponentModel):
     class Meta:
         verbose_name = _(u'Паттерн ткани')
         verbose_name_plural = _(u'Паттерны тканей')
 
+    @staticmethod
+    def used():
+        return FabricDesign.objects.prefetch_related('design_fabrics').annotate(fabrics_count=Count('design_fabrics')).filter(fabrics_count__gt=0)
 
-class CollarType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+
+class CollarType(ComponentModel):
     buttons = models.ManyToManyField(CollarButtons, verbose_name=_(u'Варианты пуговиц'))
-
-    def __unicode__(self):
-        return self.title
 
     class Meta:
         verbose_name = _(u'Тип воротника')
@@ -84,12 +95,8 @@ class CuffRounding(models.Model):
         verbose_name_plural = _(u'Типы закругления манжеты')
 
 
-class CuffType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+class CuffType(ComponentModel):
     rounding = models.ManyToManyField(CuffRounding, verbose_name=_(u'Варианты закругления'), blank=True)
-
-    def __unicode__(self):
-        return self.title
 
     class Meta:
         verbose_name = _(u'Тип манжеты')
@@ -108,13 +115,7 @@ class CustomButtonsType(models.Model):
         verbose_name_plural = _(u'Типы пуговиц')
 
 
-class YokeType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
-    picture = models.ImageField(_(u'Изображение'))
-
-    def __unicode__(self):
-        return self.title
-
+class YokeType(ComponentModel):
     class Meta:
         verbose_name = _(u'Тип кокетки')
         verbose_name_plural = _(u'Типы кокетки')
@@ -132,13 +133,7 @@ class StitchColor(models.Model):
         verbose_name_plural = _(u'Цвета отстрочки')
 
 
-class DickeyType(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255, unique=True)
-    picture = models.ImageField(_(u'Изображение'))
-
-    def __unicode__(self):
-        return self.title
-
+class DickeyType(ComponentModel):
     class Meta:
         verbose_name = _(u'Тип манишки')
         verbose_name_plural = _(u'Типы манишки')
@@ -186,3 +181,35 @@ class Size(models.Model):
     class Meta:
         verbose_name = _(u'Размер рубашки')
         verbose_name_plural = _(u'Размеры рубашек')
+
+
+class HemType(ComponentModel):
+    class Meta:
+        verbose_name = _(u'Тип низа')
+        verbose_name_plural = _(u'Типы низа')
+
+
+class SleeveType(ComponentModel):
+    class Meta:
+        verbose_name = _(u'Тип рукава')
+        verbose_name_plural = _(u'Типы рукавов')
+
+
+class PlacketType(ComponentModel):
+    class Meta:
+        verbose_name = _(u'Тип полочки')
+        verbose_name_plural = _(u'Типы полочек')
+
+
+class PocketType(ComponentModel):
+    class Meta:
+        verbose_name = _(u'Тип кармана')
+        verbose_name_plural = _(u'Типы карманов')
+
+
+class BackType(ComponentModel):
+    class Meta:
+        verbose_name = _(u'Тип спинки')
+        verbose_name_plural = _(u'Типы спинок')
+
+
