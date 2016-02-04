@@ -6,7 +6,7 @@ from dictionaries import models as dictionaries
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Collection
-        fields = ('title', 'text', 'image')
+        fields = ('id', 'title', 'text', 'image')
 
 
 class ShirtInfoImageSerializer(serializers.ModelSerializer):
