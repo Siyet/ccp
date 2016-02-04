@@ -37,7 +37,6 @@ admin.site.register([
     FabricDesign,
     FabricCategory,
     CollarButtons,
-
     CollarType,
     CuffRounding,
     CuffType,
@@ -47,5 +46,9 @@ admin.site.register([
     DickeyType,
     SizeOptions,
     Size,
-    HemType, BackType, PlacketType, PocketType, SleeveType
+    HemType,
+    BackType,
+    PlacketType,
+    PocketType,
+    SleeveType
 ])

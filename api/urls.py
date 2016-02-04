@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^collection/(?P<pk>[0-9]+)/', include(collection_urls)),
     url(r'^components/', include(components)),
     url(r'^shirt_info/', ShirtInfoListView.as_view()),
-    url(r'^size/', SizesList.as_view()),
-    url(r'^size/option/', SizeOptionsList.as_view()),
+    url(r'^size/$', SizesList.as_view()),
+    url(r'^size/option/$', SizeOptionsList.as_view()),
     url(r'^docs/', include('rest_framework_swagger.urls')),
 ]
