@@ -201,7 +201,12 @@ class Initials(models.Model):
 class Shirt(models.Model):
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
+    code = models.CharField(_(u'Артикул'), max_length=255, null=True)
+    material = models.CharField(_(u'Материал'), max_length=255)
+
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
+
+    showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True)
 
     size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
     size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
@@ -225,12 +230,34 @@ class Shirt(models.Model):
     dickey =  models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
     initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
 
+
+class CustomShirt(Shirt):
+
+    def save(self, *args, **kwargs):
+        self.is_template = False
+        super(CustomShirt, self).save(*args, **kwargs)
+
+    class Meta:
+        proxy = True
+        verbose_name = _(u'Рубашка')
+        verbose_name_plural = _(u'Рубашки')
+
     def __unicode__(self):
         return u"%s #%s" %(_(u"Рубашка"), self.id)
 
+class TemplateShirt(Shirt):
+
+    def save(self, *args, **kwargs):
+        self.is_template = True
+        super(TemplateShirt, self).save(*args, **kwargs)
+
     class Meta:
-        verbose_name = _(u'Рубашка')
-        verbose_name_plural = _(u'Рубашки')
+        proxy = True
+        verbose_name = _(u'Шаблон рубашки')
+        verbose_name_plural = _(u'Шаблоны рубашек')
+
+    def __unicode__(self):
+        return u"%s #%s" %(_(u"Шаблон"), self.code)
 
 
 class ShirtImage(models.Model):
