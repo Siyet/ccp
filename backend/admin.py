@@ -36,7 +36,7 @@ class CollarInline(admin.StackedInline):
 
 class CustomShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline]
-    exclude = ['is_template', 'code', 'material', 'showcase_image']
+    exclude = ['is_template', 'code', 'material', 'showcase_image', 'individualization', 'description']
 
     def get_queryset(self, request):
         return super(CustomShirtAdmin, self).get_queryset(request).filter(is_template=False)

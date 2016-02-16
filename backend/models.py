@@ -203,10 +203,12 @@ class Shirt(models.Model):
     is_template = models.BooleanField(_(u'Используется как шаблон'))
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     material = models.CharField(_(u'Материал'), max_length=255)
+    individualization = models.TextField(_(u'Индивидуализация'))
+    description = models.TextField(_(u'Описание'))
 
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
 
-    showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True)
+    showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True, upload_to='showcase')
 
     size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
     size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
@@ -261,8 +263,8 @@ class TemplateShirt(Shirt):
 
 
 class ShirtImage(models.Model):
-    image = models.ImageField(_(u'Изображение'))
-    shirt = models.ForeignKey(Shirt)
+    image = models.ImageField(_(u'Изображение'), upload_to='showcase')
+    shirt = models.ForeignKey(Shirt, related_name='shirt_images')
 
     class Meta:
         verbose_name = _(u'Изображение')

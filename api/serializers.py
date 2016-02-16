@@ -97,3 +97,39 @@ class PlacketTypeSerializer(serializers.ModelSerializer):
 class PocketTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.PocketType
+
+
+class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
+    fabric = serializers.StringRelatedField()
+
+    price = serializers.SerializerMethodField()
+
+    def get_price(self, object):
+        return 0.0
+
+    class Meta:
+        model = models.TemplateShirt
+        fields = ['url', 'code', 'material', 'showcase_image', 'fabric', 'price']
+
+
+class ShirtImageSerializer(serializers.ModelSerializer):
+    url = serializers.URLField(read_only=True, source='image.url')
+
+    class Meta:
+        model = models.ShirtImage
+        fields = ['url']
+
+class TemplateShirtSerializer(serializers.ModelSerializer):
+    fabric = serializers.StringRelatedField()
+    price = serializers.SerializerMethodField()
+    shirt_images = serializers.SerializerMethodField()
+
+    def get_shirt_images(self, object):
+        return [self.context['view'].request.build_absolute_uri(shirt_image.image.url) for shirt_image in object.shirt_images.all()]
+
+    def get_price(self, object):
+        return 0.0
+
+    class Meta:
+        model = models.TemplateShirt
+        fields = ['code', 'price', 'fabric', 'individualization', 'description', 'showcase_image', 'shirt_images']
