@@ -214,11 +214,13 @@ class Shirt(models.Model):
     showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True, upload_to='showcase')
     showcase_image_list = ImageSpecField(source='showcase_image',
                                       processors=[ResizeToFill(200, 300)],
-                                      format='PNG')
+                                       format='JPEG',
+                                      options={'quality': 80})
 
     showcase_image_detail = ImageSpecField(source='showcase_image',
                                       processors=[ResizeToFill(400, 600)],
-                                      format='PNG')
+                                      format='JPEG',
+                                      options={'quality': 80})
 
     size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
     size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
