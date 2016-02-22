@@ -10,3 +10,4 @@ django-colorful
 django-model-utils
 django-admin-sortable2
 django-debug-toolbar
+django-imagekit

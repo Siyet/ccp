@@ -6,6 +6,9 @@ from django.db.models import Q
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
 
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+
 from model_utils import Choices
 
 from dictionaries.models import FabricCategory
@@ -209,6 +212,13 @@ class Shirt(models.Model):
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
 
     showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True, upload_to='showcase')
+    showcase_image_list = ImageSpecField(source='showcase_image',
+                                      processors=[ResizeToFill(200, 300)],
+                                      format='PNG')
+
+    showcase_image_detail = ImageSpecField(source='showcase_image',
+                                      processors=[ResizeToFill(400, 600)],
+                                      format='PNG')
 
     size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
     size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
