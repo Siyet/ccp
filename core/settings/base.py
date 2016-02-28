@@ -28,12 +28,15 @@ INSTALLED_APPS = (
     'rest_framework_swagger',
     'colorful',
 
+    'corsheaders',
+
     'backend',
     'processing'
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -44,6 +47,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'core.urls'
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 CACHES = {
     'default': {
