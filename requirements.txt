@@ -1,14 +1,27 @@
 Django==1.9
+
+# Graphics
 Pillow
 OpenEXR
+django-imagekit
+
 mysql
-django-grappelli
+
+django-grappelli==2.7.3
 djangorestframework
 django-rest-swagger
+
+# REST authentication
 djoser
+
 django-colorful
+# Choice fields
 django-model-utils
 django-admin-sortable2
 django-debug-toolbar
-django-imagekit
+
+# Cross-domain requests
 django-cors-headers
+
+# Cascade dropdowns
+git+https://github.com/digi604/django-smart-selects.git@master
