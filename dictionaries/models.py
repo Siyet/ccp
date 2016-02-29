@@ -55,17 +55,6 @@ class FabricCategory(models.Model):
         verbose_name_plural = _(u'Категории тканей')
 
 
-class CollarButtons(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
-
-    def __unicode__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = _(u'Пуговицы воротника')
-        verbose_name_plural = _(u'Пуговицы воротника')
-
-
 class FabricDesign(ComponentModel):
     class Meta:
         verbose_name = _(u'Паттерн ткани')
@@ -77,15 +66,37 @@ class FabricDesign(ComponentModel):
 
 
 class CollarType(ComponentModel):
-    buttons = models.ManyToManyField(CollarButtons, verbose_name=_(u'Варианты пуговиц'))
+    buttons = models.ManyToManyField('CollarButtons', verbose_name=_(u'Варианты пуговиц'))
 
     class Meta:
         verbose_name = _(u'Тип воротника')
         verbose_name_plural = _(u'Типы воротников')
 
 
+class CollarButtons(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    types = models.ManyToManyField('CollarType', verbose_name=_(u'Типы воротников'), through=CollarType.buttons.through,
+                                   blank=True)
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Пуговицы воротника')
+        verbose_name_plural = _(u'Пуговицы воротника')
+
+
+class CuffType(ComponentModel):
+    rounding = models.ManyToManyField('CuffRounding', verbose_name=_(u'Варианты закругления'), blank=True)
+
+    class Meta:
+        verbose_name = _(u'Тип манжеты')
+        verbose_name_plural = _(u'Типы манжет')
+
+
 class CuffRounding(models.Model):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
+    types = models.ManyToManyField('CuffType', verbose_name=_(u'Типы'), through=CuffType.rounding.through, blank=True)
 
     def __unicode__(self):
         return self.title
@@ -93,14 +104,6 @@ class CuffRounding(models.Model):
     class Meta:
         verbose_name = _(u'Тип закругления манжеты')
         verbose_name_plural = _(u'Типы закругления манжеты')
-
-
-class CuffType(ComponentModel):
-    rounding = models.ManyToManyField(CuffRounding, verbose_name=_(u'Варианты закругления'), blank=True)
-
-    class Meta:
-        verbose_name = _(u'Тип манжеты')
-        verbose_name_plural = _(u'Типы манжет')
 
 
 class CustomButtonsType(models.Model):

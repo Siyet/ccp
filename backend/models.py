@@ -9,6 +9,7 @@ from django.conf import settings
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
+from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 
 from dictionaries.models import FabricCategory
@@ -114,7 +115,8 @@ class Collar(models.Model):
     hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
 
     type = models.ForeignKey('dictionaries.CollarType', verbose_name=_(u'Тип'))
-
+    size = ChainedForeignKey('dictionaries.CollarButtons', chained_field='type', chained_model_field='types',
+                             verbose_name=_(u'Пуговицы'), null=True)
     shirt = models.OneToOneField('backend.Shirt', related_name='collar')
 
     def __unicode__(self):
@@ -130,6 +132,8 @@ class Cuff(models.Model):
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_cuff')
 
     type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='cuff')
+    rounding = ChainedForeignKey('dictionaries.CuffRounding', verbose_name=_(u'Тип закругления'), chained_field='type',
+                                 chained_model_field='types', show_all=False, null=True)
 
     shirt = models.OneToOneField('backend.Shirt', related_name='shirt_cuff')
 
