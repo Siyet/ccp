@@ -34,8 +34,16 @@ class CollarInline(admin.StackedInline):
     inline_classes = ('grp-open',)
 
 
+class ContrastDetailsInline(admin.TabularInline):
+    model = ContrastDetails
+
+
+class ContrastStitchInline(admin.TabularInline):
+    model = ContrastStitch
+
+
 class CustomShirtAdmin(admin.ModelAdmin):
-    inlines = [CollarInline, CuffInline]
+    inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
     exclude = ['is_template', 'code', 'material', 'showcase_image', 'individualization', 'description']
 
     def get_queryset(self, request):
@@ -43,7 +51,7 @@ class CustomShirtAdmin(admin.ModelAdmin):
 
 class TemplateShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template']
-    inlines = [CollarInline, CuffInline, ShirtImageInline]
+    inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
 
     def get_queryset(self, request):
         return super(TemplateShirtAdmin, self).get_queryset(request).filter(is_template=True)
@@ -70,8 +78,6 @@ admin.site.register([
     ShawlOptions,
     Dickey,
     Initials,
-    ContrastDetails,
-    ContrastStitch
 ])
 
 admin.site.register(Fabric, FabricAdmin)

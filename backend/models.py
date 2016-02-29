@@ -300,6 +300,7 @@ class ContrastDetails(models.Model):
     class Meta:
         verbose_name = _(u'Контрастная деталь')
         verbose_name_plural = _(u'Контрастные детали')
+        unique_together = ['shirt', 'element']
 
 
 class ContrastStitch(models.Model):
