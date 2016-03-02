@@ -3,13 +3,19 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import pagination
-from dictionaries import models as dictionaries
 from backend import models
 from api import serializers
 
+select_price = {
+    'price': 'SELECT price FROM backend_fabricprice WHERE '
+             'backend_fabricprice.storehouse_id = backend_storehouse.id '
+             'AND backend_fabricprice.fabric_category_id=dictionaries_fabriccategory.id'
+}
+
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric')
+    queryset = models.Shirt.objects.filter(is_template=True).\
+        select_related('fabric', 'collection__storehouse', 'fabric__category').extra(select=select_price)
     pagination_class = pagination.LimitOffsetPagination
 
     def get(self, request, *args, **kwargs):
@@ -31,4 +37,6 @@ class TemplateShirtsList(ListAPIView):
 
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
-    queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric').prefetch_related('shirt_images')
+    queryset = models.Shirt.objects.filter(is_template=True).\
+        select_related('fabric', 'collection', 'collection__storehouse', 'fabric__category').\
+        extra(select=select_price).prefetch_related('shirt_images')

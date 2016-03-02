@@ -22,6 +22,7 @@ HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
 
 
 class Collection(models.Model):
+    storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections', blank=True, null=True)
     title = models.CharField(_(u'Название'), max_length=255)
     text = models.TextField(_(u'Описание'))
     image = models.ImageField(_(u'Изображение'))
@@ -44,11 +45,10 @@ class Collection(models.Model):
 
 
 class Storehouse(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
-    collection = models.ManyToManyField(Collection, verbose_name=_(u'Коллекция'))
+    country = models.CharField(_(u'Страна'), max_length=255)
 
     def __unicode__(self):
-        return self.title
+        return self.country
 
     class Meta:
         verbose_name = _(u'Склад')
@@ -208,6 +208,7 @@ class Initials(models.Model):
 class Shirt(models.Model):
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
+    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=True, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     material = models.CharField(_(u'Материал'), max_length=255)
     individualization = models.TextField(_(u'Индивидуализация'))
