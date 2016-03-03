@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from backend import models
+from backend.models import FabricPrice
 from dictionaries import models as dictionaries
 
 
@@ -101,11 +102,7 @@ class PocketTypeSerializer(serializers.ModelSerializer):
 
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
-    price = serializers.SerializerMethodField()
-
     showcase_image = serializers.ImageField(source='showcase_image_list')
-    def get_price(self, object):
-        return 0.0
 
     class Meta:
         model = models.TemplateShirt
@@ -123,12 +120,21 @@ class ShirtImageSerializer(serializers.ModelSerializer):
 class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
 
     shirt_images = serializers.SerializerMethodField()
+    collection = CollectionSerializer()
+    country = serializers.SerializerMethodField()
+
     def get_shirt_images(self, object):
         return [self.context['view'].request.build_absolute_uri(shirt_image.image.url) for shirt_image in object.shirt_images.all()]
 
+    def get_country(self, object):
+        try:
+            return object.collection.storehouse.country
+        except AttributeError:
+            return None
+
     class Meta:
         model = models.TemplateShirt
-        fields = ['individualization', 'description', 'shirt_images']
+        fields = ['individualization', 'description', 'shirt_images', 'collection', 'country']
 
 class TemplateShirtSerializer(TemplateShirtListSerializer):
 

@@ -49,6 +49,7 @@ class CustomShirtAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super(CustomShirtAdmin, self).get_queryset(request).filter(is_template=False)
 
+
 class TemplateShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]

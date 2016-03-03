@@ -3,13 +3,14 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import pagination
-from dictionaries import models as dictionaries
 from backend import models
 from api import serializers
 
+
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric')
+    queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric', 'collection__storehouse').\
+        prefetch_related('collection__storehouse__prices')
     pagination_class = pagination.LimitOffsetPagination
 
     def get(self, request, *args, **kwargs):
@@ -31,4 +32,5 @@ class TemplateShirtsList(ListAPIView):
 
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
-    queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric').prefetch_related('shirt_images')
+    queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric', 'collection__storehouse').\
+        prefetch_related('shirt_images', 'collection__storehouse__prices')
