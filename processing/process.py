@@ -57,8 +57,8 @@ def compose_shirt():
     dw = source.header()['dataWindow']
     sz = (dw.max.x - dw.min.x + 1, dw.max.y - dw.min.y + 1)
 
-    (R, G, A) = [array.array('f', source.channel(Chan, FLOAT)).tolist() for Chan in ("R", "G", "A")]
-    zipped = zip(R,G,A)
+    (R, G) = [array.array('f', source.channel(Chan, FLOAT)).tolist() for Chan in ("R", "G")]
+    zipped = zip(R,G)
 
     texture_pxls = texture.load()
     texture_sz = texture.size
@@ -66,12 +66,12 @@ def compose_shirt():
     result = Image.new("RGBA", sz, (0, 0, 0, 1))
     result_pxls = result.load()
 
-    for (i, (r, g, a)) in enumerate(zipped):
-        if a == 0:
+    for (i, (r, g)) in enumerate(zipped):
+        if r == 0 and g == 0:
             continue
         x, y = round(r * texture_sz[0]), round((1.0 - g) * texture_sz[1] - 1)
         px = texture_pxls[x, y]
-        result_pxls[i % sz[0], i / sz[0]] = (px[0], px[1], px[2], int(round(a * 255)))
+        result_pxls[i % sz[0], i / sz[0]] = (px[0], px[1], px[2], 255)
 
     if shadow is not None:
         result = ImageChops.multiply(result, shadow)
@@ -79,4 +79,4 @@ def compose_shirt():
     if light is not None:
         result = ImageChops.add(result, light)
 
-    return result
+    return result.resize(tuple(x / 2 for x in result.size), Image.LANCZOS)
