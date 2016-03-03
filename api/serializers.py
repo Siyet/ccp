@@ -135,7 +135,10 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
         return CollectionSerializer(instance=object.collection, context=self.context).data
 
     def get_country(self, object):
-        return object.collection.storehouse.country
+        try:
+            return object.collection.storehouse.country
+        except AttributeError:
+            return None
 
     class Meta:
         model = models.TemplateShirt

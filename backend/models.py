@@ -22,7 +22,7 @@ HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
 
 
 class Collection(models.Model):
-    storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections', blank=True, null=True)
+    storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections', blank=False, null=True)
     title = models.CharField(_(u'Название'), max_length=255)
     text = models.TextField(_(u'Описание'))
     image = models.ImageField(_(u'Изображение'))
@@ -208,7 +208,7 @@ class Initials(models.Model):
 class Shirt(models.Model):
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
-    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=True, null=True)
+    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     material = models.CharField(_(u'Материал'), max_length=255)
     individualization = models.TextField(_(u'Индивидуализация'))
@@ -246,8 +246,16 @@ class Shirt(models.Model):
     STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')), ('5mm', _(u'5 мм')))
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
 
-    dickey =  models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
+    dickey = models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
     initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
+
+    @property
+    def price(self):
+        fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)
+        try:
+            return next(fabric_prices).price
+        except StopIteration:
+            return None
 
 
 class CustomShirt(Shirt):

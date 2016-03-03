@@ -1,5 +1,4 @@
 # coding: utf-8
-from django import forms
 from django.contrib import admin
 from .models import (
     Collection,
@@ -51,21 +50,9 @@ class CustomShirtAdmin(admin.ModelAdmin):
         return super(CustomShirtAdmin, self).get_queryset(request).filter(is_template=False)
 
 
-class TemplateShirtAdminForm(forms.ModelForm):
-
-    class Meta:
-        model = TemplateShirt
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(TemplateShirtAdminForm, self).__init__(*args, **kwargs)
-        self.fields['collection'].required = True
-
-
 class TemplateShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
-    form = TemplateShirtAdminForm
 
     def get_queryset(self, request):
         return super(TemplateShirtAdmin, self).get_queryset(request).filter(is_template=True)
@@ -84,22 +71,8 @@ class FabricAdmin(admin.ModelAdmin):
     readonly_fields = ['category']
 
 
-class CollectionAdminForm(forms.ModelForm):
-
-    class Meta:
-        model = Collection
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(CollectionAdminForm, self).__init__(*args, **kwargs)
-        self.fields['storehouse'].required = True
-
-
-class CollectionAdmin(admin.ModelAdmin):
-    form = CollectionAdminForm
-
-
 admin.site.register([
+    Collection,
     Storehouse,
     FabricResidual,
     CustomButtons,
@@ -108,7 +81,6 @@ admin.site.register([
     Initials,
 ])
 
-admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Fabric, FabricAdmin)
 admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(CustomShirt, CustomShirtAdmin)
