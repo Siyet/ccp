@@ -2,6 +2,7 @@ import OpenEXR
 import Imath
 from PIL import Image, ImageChops
 import array
+import itertools
 
 from .models import ComposingSource
 
@@ -57,19 +58,20 @@ def compose_shirt():
     dw = source.header()['dataWindow']
     sz = (dw.max.x - dw.min.x + 1, dw.max.y - dw.min.y + 1)
 
-    (R, G) = [array.array('f', source.channel(Chan, FLOAT)).tolist() for Chan in ("R", "G")]
-    zipped = zip(R,G)
+    (R, G) = [array.array('f', source.channel(Chan, FLOAT)) for Chan in ("R", "G")]
+    zipped = itertools.izip(R, G)
 
     texture_pxls = texture.load()
     texture_sz = texture.size
 
     result = Image.new("RGBA", sz, (0, 0, 0, 1))
     result_pxls = result.load()
-
-    for (i, (r, g)) in enumerate(zipped):
+    i = -1
+    for r, g in zipped:
+        i += 1
         if r == 0 and g == 0:
             continue
-        x, y = round(r * texture_sz[0]), round((1.0 - g) * texture_sz[1] - 1)
+        x, y = round(r * texture_sz[0]), max(round((1.0 - g) * texture_sz[1] - 1), 0)
         px = texture_pxls[x, y]
         result_pxls[i % sz[0], i / sz[0]] = (px[0], px[1], px[2], 255)
 
