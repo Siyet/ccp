@@ -27,6 +27,9 @@ INSTALLED_APPS = (
 
     'rest_framework',
     'rest_framework_swagger',
+    'django_filters',
+    'crispy_forms',
+    'drf_multiple_model',
     'colorful',
 
     'corsheaders',
@@ -50,6 +53,12 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'core.urls'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.DjangoFilterBackend',
+    )
+}
 
 CACHES = {
     'default': {

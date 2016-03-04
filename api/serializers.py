@@ -5,6 +5,7 @@ from dictionaries import models as dictionaries
 
 
 class CollectionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Collection
         fields = ('id', 'title', 'text', 'image')
@@ -18,6 +19,7 @@ class ShirtInfoImageSerializer(serializers.ModelSerializer):
 
 class ShirtInfoSerializer(serializers.ModelSerializer):
     images = ShirtInfoImageSerializer(many=True)
+
     class Meta:
         model = dictionaries.ShirtInfo
         fields = ('title', 'text', 'images')
@@ -57,6 +59,7 @@ class CollarButtonsSerializer(serializers.ModelSerializer):
 
 class CollarTypeSerializer(serializers.ModelSerializer):
     buttons = CollarButtonsSerializer(many=True)
+
     class Meta:
         model = dictionaries.CollarType
         fields = ('id', 'title', 'picture', 'buttons')
