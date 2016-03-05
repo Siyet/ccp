@@ -11,6 +11,20 @@ class CollectionSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'text', 'image')
 
 
+class CollectionSexSerializer(serializers.ModelSerializer):
+    sex = serializers.SerializerMethodField()
+
+    def get_sex(self, object):
+        try:
+            return models.SEX[object.get('sex')]
+        except KeyError:
+            return object.get('sex')
+
+    class Meta:
+        model = models.Collection
+        fields = ('sex', )
+
+
 class ShirtInfoImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.ShirtInfoImage
@@ -106,10 +120,17 @@ class PocketTypeSerializer(serializers.ModelSerializer):
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     showcase_image = serializers.ImageField(source='showcase_image_list')
+    sex = serializers.SerializerMethodField()
+
+    def get_sex(self, object):
+        try:
+            return object.collection.get_sex_display()
+        except AttributeError:
+            return None
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'price']
+        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'price', 'sex']
 
 
 class ShirtImageSerializer(serializers.ModelSerializer):

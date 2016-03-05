@@ -12,10 +12,11 @@ from api import serializers
 
 class TemplateShirtsFilter(filters.FilterSet):
     fabric = django_filters.ModelMultipleChoiceFilter(queryset=models.Fabric.objects.all())
+    collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
 
     class Meta:
         model = models.Shirt
-        fields = ['fabric', 'fabric__colors', 'fabric__designs']
+        fields = ['fabric', 'fabric__colors', 'fabric__designs', 'collection__sex']
 
 
 class TemplateShirtsList(ListAPIView):
@@ -48,12 +49,13 @@ class TemplateShirtDetails(RetrieveAPIView):
         prefetch_related('shirt_images', 'collection__storehouse__prices')
 
 
-class TemplateShirtFilter(MultipleModelAPIView):
+class TemplateShirtsFiltersList(MultipleModelAPIView):
 
     def get_queryList(self):
         queryList = (
-            (models.Fabric.objects.filter(shirt__isnull=False).distinct(), serializers.FabricSerializer),
-            (dictionaries.FabricColor.objects.filter(color_fabrics__shirt__isnull=False).distinct(), serializers.FabricColorSerializer),
-            (dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__isnull=False).distinct(), serializers.FabricDesignSerializer),
+            (models.Fabric.objects.filter(shirt__is_template=True).distinct(), serializers.FabricSerializer, 'fabric'),
+            (dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True).distinct(), serializers.FabricColorSerializer, 'fabric__colors'),
+            (dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True).distinct(), serializers.FabricDesignSerializer, 'fabric__designs'),
+            (models.Collection.objects.filter(shirts__is_template=True).values('sex').distinct(), serializers.CollectionSexSerializer, 'collection__sex'),
         )
         return queryList

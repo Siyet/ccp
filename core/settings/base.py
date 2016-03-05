@@ -28,7 +28,6 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework_swagger',
     'django_filters',
-    'crispy_forms',
     'drf_multiple_model',
     'colorful',
 
