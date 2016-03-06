@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from backend import models
-from backend.models import FabricPrice
 from dictionaries import models as dictionaries
 
 
@@ -9,20 +8,6 @@ class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Collection
         fields = ('id', 'title', 'text', 'image')
-
-
-class CollectionSexSerializer(serializers.ModelSerializer):
-    sex = serializers.SerializerMethodField()
-
-    def get_sex(self, object):
-        try:
-            return models.SEX[object.get('sex')]
-        except KeyError:
-            return object.get('sex')
-
-    class Meta:
-        model = models.Collection
-        fields = ('sex', )
 
 
 class ShirtInfoImageSerializer(serializers.ModelSerializer):

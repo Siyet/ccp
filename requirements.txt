@@ -29,4 +29,3 @@ git+https://github.com/digi604/django-smart-selects.git@master
 # filters
 django-filter
 django-crispy-forms
-django-rest-multiple-models

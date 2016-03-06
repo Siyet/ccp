@@ -1,10 +1,11 @@
 # coding: utf-8
 import django_filters
-from drf_multiple_model.views import MultipleModelAPIView
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import pagination
 from rest_framework import filters
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
@@ -49,13 +50,12 @@ class TemplateShirtDetails(RetrieveAPIView):
         prefetch_related('shirt_images', 'collection__storehouse__prices')
 
 
-class TemplateShirtsFiltersList(MultipleModelAPIView):
+class TemplateShirtsFiltersList(APIView):
 
-    def get_queryList(self):
-        queryList = (
-            (models.Fabric.objects.filter(shirt__is_template=True).distinct(), serializers.FabricSerializer, 'fabric'),
-            (dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True).distinct(), serializers.FabricColorSerializer, 'fabric__colors'),
-            (dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True).distinct(), serializers.FabricDesignSerializer, 'fabric__designs'),
-            (models.Collection.objects.filter(shirts__is_template=True).values('sex').distinct(), serializers.CollectionSexSerializer, 'collection__sex'),
-        )
-        return queryList
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'fabric': list(models.Fabric.objects.filter(shirt__is_template=True).values_list('id', 'code').distinct()),
+            'fabric__colors': list(dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True).values_list('id', 'title').distinct()),
+            'fabric__designs': list(dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True).values_list('id', 'title').distinct()),
+            'collection__sex': [(x['sex'], models.SEX[x['sex']]) for x in models.Collection.objects.filter(shirts__is_template=True).values('sex').distinct()],
+        })
