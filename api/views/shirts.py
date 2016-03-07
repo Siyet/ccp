@@ -1,10 +1,23 @@
 # coding: utf-8
-
+import django_filters
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import pagination
+from rest_framework import filters
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from backend import models
+from dictionaries import models as dictionaries
 from api import serializers
+
+
+class TemplateShirtsFilter(filters.FilterSet):
+    fabric = django_filters.ModelMultipleChoiceFilter(queryset=models.Fabric.objects.all())
+    collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
+
+    class Meta:
+        model = models.Shirt
+        fields = ['fabric', 'fabric__colors', 'fabric__designs', 'collection__sex']
 
 
 class TemplateShirtsList(ListAPIView):
@@ -12,6 +25,7 @@ class TemplateShirtsList(ListAPIView):
     queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric', 'collection__storehouse').\
         prefetch_related('collection__storehouse__prices')
     pagination_class = pagination.LimitOffsetPagination
+    filter_class = TemplateShirtsFilter
 
     def get(self, request, *args, **kwargs):
         """
@@ -34,3 +48,14 @@ class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
     queryset = models.Shirt.objects.filter(is_template=True).select_related('fabric', 'collection__storehouse').\
         prefetch_related('shirt_images', 'collection__storehouse__prices')
+
+
+class TemplateShirtsFiltersList(APIView):
+
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'fabric': list(models.Fabric.objects.filter(shirt__is_template=True).values_list('id', 'code').distinct()),
+            'fabric__colors': list(dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True).values_list('id', 'title').distinct()),
+            'fabric__designs': list(dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True).values_list('id', 'title').distinct()),
+            'collection__sex': [(x['sex'], models.SEX[x['sex']]) for x in models.Collection.objects.filter(shirts__is_template=True).values('sex').distinct()],
+        })

@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from backend import models
-from backend.models import FabricPrice
 from dictionaries import models as dictionaries
 
 
 class CollectionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Collection
         fields = ('id', 'title', 'text', 'image')
@@ -18,6 +18,7 @@ class ShirtInfoImageSerializer(serializers.ModelSerializer):
 
 class ShirtInfoSerializer(serializers.ModelSerializer):
     images = ShirtInfoImageSerializer(many=True)
+
     class Meta:
         model = dictionaries.ShirtInfo
         fields = ('title', 'text', 'images')
@@ -57,6 +58,7 @@ class CollarButtonsSerializer(serializers.ModelSerializer):
 
 class CollarTypeSerializer(serializers.ModelSerializer):
     buttons = CollarButtonsSerializer(many=True)
+
     class Meta:
         model = dictionaries.CollarType
         fields = ('id', 'title', 'picture', 'buttons')
@@ -103,10 +105,17 @@ class PocketTypeSerializer(serializers.ModelSerializer):
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     showcase_image = serializers.ImageField(source='showcase_image_list')
+    sex = serializers.SerializerMethodField()
+
+    def get_sex(self, object):
+        try:
+            return object.collection.get_sex_display()
+        except AttributeError:
+            return None
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'price']
+        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'price', 'sex']
 
 
 class ShirtImageSerializer(serializers.ModelSerializer):

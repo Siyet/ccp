@@ -20,6 +20,12 @@ HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
                    ('very_hard', _(u'Очень жесткий')),
                    ('no_hardener', _(u'Без уплотнителя')))
 
+SEX = Choices(
+    ('male', _(u'Мужской')),
+    ('female', _(u'Женский')),
+    ('unisex', _(u'Унисекс')),
+)
+
 
 class Collection(models.Model):
     storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections', blank=False, null=True)
@@ -30,6 +36,7 @@ class Collection(models.Model):
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
+    sex = models.CharField(_(u'Пол'), choices=SEX, max_length=6, default='male', blank=False)
 
     def __unicode__(self):
         return self.title
