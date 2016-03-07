@@ -258,10 +258,12 @@ class Shirt(models.Model):
 
     @property
     def price(self):
-        fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)
         try:
+            fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)
             return next(fabric_prices).price
         except StopIteration:
+            return None
+        except AttributeError:
             return None
 
 
