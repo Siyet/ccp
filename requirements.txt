@@ -28,4 +28,5 @@ git+https://github.com/digi604/django-smart-selects.git@master
 
 # filters
 django-filter
+#fancy forms for filters in the administration panel and django filter forms
 django-crispy-forms
