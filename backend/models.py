@@ -1,7 +1,9 @@
 # coding: UTF-8
+from django.db.models.signals import post_save
+
 __author__ = 'cloud'
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
@@ -74,6 +76,9 @@ class FabricPrice(models.Model):
     class Meta:
         verbose_name = _(u'Цена ткани')
         verbose_name_plural = _(u'Цены тканей')
+
+    def get_shirts(self):
+        return Shirt.objects.filter(fabric__category=self.fabric_category, collection__storehouse=self.storehouse)
 
 
 class Fabric(models.Model):
@@ -256,9 +261,9 @@ class Shirt(models.Model):
 
     dickey = models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
     initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
+    price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
-    @property
-    def price(self):
+    def calculate_price(self):
         try:
             fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)
             return next(fabric_prices).price
@@ -266,6 +271,20 @@ class Shirt(models.Model):
             return None
         except AttributeError:
             return None
+
+    def save(self, *args, **kwargs):
+        self.price = self.calculate_price()
+        super(Shirt, self).save(*args, **kwargs)
+
+
+def calculate_shirts_price(sender, instance, created, **kwargs):
+    with transaction.atomic():
+        # обязательный метод get_shirts для связанных с ценой рубашки моделей
+        for shirt in instance.get_shirts().select_related('collection__storehouse').\
+                prefetch_related('collection__storehouse__prices'):
+            shirt.save()
+# TODO: добавить событие для всех связанных моделей с ценой рубашки
+post_save.connect(calculate_shirts_price, sender=FabricPrice)
 
 
 class CustomShirt(Shirt):
@@ -282,6 +301,7 @@ class CustomShirt(Shirt):
 
     def __unicode__(self):
         return u"%s #%s" %(_(u"Рубашка"), self.id)
+
 
 class TemplateShirt(Shirt):
     objects = managers.TemplateShirtManager()
