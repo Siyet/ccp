@@ -129,7 +129,7 @@ class ShirtImageSerializer(serializers.ModelSerializer):
 class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
 
     shirt_images = serializers.SerializerMethodField()
-    collection = CollectionSerializer()
+    collection_title = serializers.SerializerMethodField()
     country = serializers.SerializerMethodField()
 
     def get_shirt_images(self, object):
@@ -141,9 +141,15 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
         except AttributeError:
             return None
 
+    def get_collection_title(self, object):
+        try:
+            return object.collection.title
+        except AttributeError:
+            return None
+
     class Meta:
         model = models.TemplateShirt
-        fields = ['individualization', 'description', 'shirt_images', 'collection', 'country']
+        fields = ['individualization', 'description', 'shirt_images', 'collection_title', 'country']
 
 class TemplateShirtSerializer(TemplateShirtListSerializer):
 
