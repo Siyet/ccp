@@ -97,7 +97,4 @@ try:
 except:
     raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")
 
-
-# Application settings
-
-MIN_FABRIC_RESIDUAL = 10
+from .appconfig import *

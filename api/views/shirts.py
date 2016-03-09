@@ -1,5 +1,6 @@
 # coding: utf-8
 import django_filters
+from django.conf import settings
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import pagination
@@ -22,7 +23,7 @@ class TemplateShirtsFilter(filters.FilterSet):
 
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gt=0).\
+    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
         select_related('fabric', 'collection').distinct()
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
@@ -48,7 +49,7 @@ class TemplateShirtsList(ListAPIView):
 
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
-    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gt=0).\
+    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
         select_related('fabric', 'collection__storehouse').prefetch_related('shirt_images').distinct()
 
 
@@ -56,8 +57,8 @@ class TemplateShirtsFiltersList(APIView):
 
     def get(self, request, *args, **kwargs):
         return Response({
-            'fabric': list(models.Fabric.objects.filter(shirt__is_template=True, residuals__amount__gt=0).values_list('id', 'code').distinct()),
-            'fabric__colors': list(dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True, color_fabrics__residuals__amount__gt=0).values_list('id', 'title').distinct()),
-            'fabric__designs': list(dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True, design_fabrics__residuals__amount__gt=0).values_list('id', 'title').distinct()),
-            'collection__sex': [(x['sex'], models.SEX[x['sex']]) for x in models.Collection.objects.filter(shirts__is_template=True, shirts__fabric__residuals__amount__gt=0).values('sex').distinct()],
+            'fabric': list(models.Fabric.objects.filter(shirt__is_template=True, residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'code').distinct()),
+            'fabric__colors': list(dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True, color_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'title').distinct()),
+            'fabric__designs': list(dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True, design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'title').distinct()),
+            'collection__sex': [(x['sex'], models.SEX[x['sex']]) for x in models.Collection.objects.filter(shirts__is_template=True, shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values('sex').distinct()],
         })
