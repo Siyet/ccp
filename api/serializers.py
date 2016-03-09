@@ -106,7 +106,6 @@ class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     showcase_image = serializers.ImageField(source='showcase_image_list')
     sex = serializers.SerializerMethodField()
-    price = serializers.Field()
 
     def get_sex(self, object):
         try:

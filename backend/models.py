@@ -107,7 +107,7 @@ class FabricResidual(models.Model):
     amount = models.DecimalField(_(u'Остаток'), max_digits=10, decimal_places=2)
 
     def __unicode__(self):
-        return u'%s %s %s' % (self.fabric.code, _(u'на складе'), self.storehouse.title)
+        return u'%s %s %s' % (self.fabric.code, _(u'на складе'), self.storehouse.country)
 
     class Meta:
         verbose_name = _(u'Остаток ткани')
