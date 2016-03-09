@@ -22,7 +22,8 @@ class TemplateShirtsFilter(filters.FilterSet):
 
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.Shirt.objects.filter(is_template=True, fabric__residuals__amount__gt=0).select_related('fabric', 'collection__storehouse').\
+    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gt=0).\
+        select_related('fabric', 'collection__storehouse').\
         prefetch_related('collection__storehouse__prices').distinct()
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
@@ -46,7 +47,8 @@ class TemplateShirtsList(ListAPIView):
 
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
-    queryset = models.Shirt.objects.filter(is_template=True, fabric__residuals__amount__gt=0).select_related('fabric', 'collection__storehouse').\
+    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gt=0).\
+        select_related('fabric', 'collection__storehouse').\
         prefetch_related('shirt_images', 'collection__storehouse__prices').distinct()
 
 

@@ -13,6 +13,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 
 from dictionaries.models import FabricCategory
+from backend import managers
 
 HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
                    ('soft', _(u'Мягкий')),
@@ -268,6 +269,7 @@ class Shirt(models.Model):
 
 
 class CustomShirt(Shirt):
+    objects = managers.CustomShirtManager()
 
     def save(self, *args, **kwargs):
         self.is_template = False
@@ -282,6 +284,7 @@ class CustomShirt(Shirt):
         return u"%s #%s" %(_(u"Рубашка"), self.id)
 
 class TemplateShirt(Shirt):
+    objects = managers.TemplateShirtManager()
 
     def save(self, *args, **kwargs):
         self.is_template = True
