@@ -12,6 +12,16 @@ from dictionaries import models as dictionaries
 from api import serializers
 
 
+select_amount = {
+    'amount': 'SELECT amount FROM backend_fabricresidual WHERE '
+              'backend_fabricresidual.storehouse_id = backend_storehouse.id '
+              'AND backend_fabricresidual.fabric_id = backend_fabric.id'
+}
+where_amount = [
+    'amount >= %i' % settings.MIN_FABRIC_RESIDUAL
+]
+
+
 class TemplateShirtsFilter(filters.FilterSet):
     fabric = django_filters.ModelMultipleChoiceFilter(queryset=models.Fabric.objects.all())
     collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
@@ -23,8 +33,8 @@ class TemplateShirtsFilter(filters.FilterSet):
 
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
-        select_related('fabric', 'collection').distinct()
+    queryset = models.TemplateShirt.objects.extra(select=select_amount, where=where_amount).\
+        select_related('fabric__category', 'collection__storehouse').distinct()
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
@@ -49,7 +59,8 @@ class TemplateShirtsList(ListAPIView):
 
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
-    queryset = models.TemplateShirt.objects.filter(fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
+    queryset = models.TemplateShirt.objects.extra(select=select_amount, where=where_amount).\
+        filter(fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
         select_related('fabric', 'collection__storehouse').prefetch_related('shirt_images').distinct()
 
 
