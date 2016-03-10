@@ -1,9 +1,7 @@
 # coding: UTF-8
-from django.db.models.signals import post_save, pre_save
-
 __author__ = 'cloud'
 
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Q
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
@@ -78,7 +76,7 @@ class FabricPrice(models.Model):
         verbose_name_plural = _(u'Цены тканей')
 
     def get_shirts(self):
-        return Shirt.objects.filter(fabric__category=self.fabric_category, collection__storehouse=self.storehouse)
+        return Shirt.objects.filter(fabric__category=self.fabric_category, collection__storehouse=self.storehouse).values('id')
 
 
 class Fabric(models.Model):
@@ -275,26 +273,6 @@ class Shirt(models.Model):
     def save(self, *args, **kwargs):
         self.price = self.calculate_price()
         super(Shirt, self).save(*args, **kwargs)
-
-
-def get_old_shirts(sender, instance, **kwargs):
-        if instance.pk is not None:
-            instance.old_shirts = sender.objects.get(pk=instance.pk).get_shirts()
-
-
-def calculate_shirts_price(sender, instance, created, **kwargs):
-    with transaction.atomic():
-        # обязательный метод get_shirts для связанных с ценой рубашки моделей
-        query = None
-        if not created:
-            query = Q(pk__in=instance.old_shirts)
-        query = Q(pk__in=instance.get_shirts()) | query if query is not None else Q(pk__in=instance.get_shirts())
-        for shirt in Shirt.objects.filter(query).select_related('collection__storehouse').\
-                prefetch_related('collection__storehouse__prices'):
-            shirt.save()
-# TODO: добавить 2 события для всех связанных моделей с ценой рубашки
-pre_save.connect(get_old_shirts, sender=FabricPrice)
-post_save.connect(calculate_shirts_price, sender=FabricPrice)
 
 
 class CustomShirt(Shirt):
