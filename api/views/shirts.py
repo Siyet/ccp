@@ -23,8 +23,7 @@ class TemplateShirtsFilter(filters.FilterSet):
 
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.TemplateShirt.objects.available().\
-        select_related('fabric__category', 'collection__storehouse').distinct()
+    queryset = models.TemplateShirt.objects.available().select_related('fabric').distinct()
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
