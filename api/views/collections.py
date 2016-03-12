@@ -1,4 +1,5 @@
 # coding: utf-8
+from django.http import Http404
 
 from rest_framework.generics import ListAPIView
 from backend.models import Collection
@@ -45,7 +46,7 @@ class CollectionFabricsList(ListAPIView):
 
     def get_queryset(self):
         id = self.kwargs['pk']
-        collection = get_object_or_404(Collection.objects.all(), pk=id)
+        collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
 
         queryset = collection.fabrics()
 
@@ -68,7 +69,7 @@ class CollectionFabricColorsList(ListAPIView):
 
     def get_queryset(self):
         id = self.kwargs['pk']
-        collection = get_object_or_404(Collection.objects.all(), pk=id)
+        collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
         fabrics = collection.fabrics().values_list('id', flat=True)
         return FabricColor.objects.filter(color_fabrics__id__in=fabrics)
 
@@ -81,6 +82,6 @@ class CollectionFabricDesignsList(ListAPIView):
 
     def get_queryset(self):
         id = self.kwargs['pk']
-        collection = get_object_or_404(Collection.objects.all(), pk=id)
+        collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
         fabrics = collection.fabrics().values_list('id', flat=True)
         return FabricDesign.objects.filter(design_fabrics__id__in=fabrics)
