@@ -2,9 +2,9 @@ from django.conf import settings
 from django.db import models
 
 select_amount = {
-    'amount': 'SELECT amount FROM backend_fabricresidual WHERE '
-              'backend_fabricresidual.storehouse_id = backend_collection.storehouse_id '
-              'AND backend_fabricresidual.fabric_id = backend_shirt.fabric_id'
+    'amount': """SELECT amount FROM backend_fabricresidual WHERE
+              backend_fabricresidual.storehouse_id = backend_collection.storehouse_id
+              AND backend_fabricresidual.fabric_id = backend_shirt.fabric_id"""
 }
 where_amount = [
     'amount >= %i' % settings.MIN_FABRIC_RESIDUAL

@@ -16,3 +16,6 @@ media
 
 # database
 *.sql
+
+# merge leftovers
+*.orig
