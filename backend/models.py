@@ -13,6 +13,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 
 from dictionaries.models import FabricCategory
+from backend import managers
 
 HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
                    ('soft', _(u'Мягкий')),
@@ -73,6 +74,9 @@ class FabricPrice(models.Model):
     class Meta:
         verbose_name = _(u'Цена ткани')
         verbose_name_plural = _(u'Цены тканей')
+
+    def get_shirts(self):
+        return Shirt.objects.filter(fabric__category=self.fabric_category, collection__storehouse=self.storehouse).values('id')
 
 
 class Fabric(models.Model):
@@ -255,9 +259,9 @@ class Shirt(models.Model):
 
     dickey = models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
     initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
+    price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
-    @property
-    def price(self):
+    def calculate_price(self):
         try:
             fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)
             return next(fabric_prices).price
@@ -266,8 +270,13 @@ class Shirt(models.Model):
         except AttributeError:
             return None
 
+    def save(self, *args, **kwargs):
+        self.price = self.calculate_price()
+        super(Shirt, self).save(*args, **kwargs)
+
 
 class CustomShirt(Shirt):
+    objects = managers.CustomShirtManager()
 
     def save(self, *args, **kwargs):
         self.is_template = False
@@ -281,7 +290,9 @@ class CustomShirt(Shirt):
     def __unicode__(self):
         return u"%s #%s" %(_(u"Рубашка"), self.id)
 
+
 class TemplateShirt(Shirt):
+    objects = managers.TemplateShirtManager()
 
     def save(self, *args, **kwargs):
         self.is_template = True

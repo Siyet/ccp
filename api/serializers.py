@@ -106,7 +106,6 @@ class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     showcase_image = serializers.ImageField(source='showcase_image_list')
     sex = serializers.SerializerMethodField()
-    price = serializers.Field()
 
     def get_sex(self, object):
         try:
@@ -128,26 +127,19 @@ class ShirtImageSerializer(serializers.ModelSerializer):
 
 
 class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
-
     shirt_images = serializers.SerializerMethodField()
-    collection = CollectionSerializer()
-    country = serializers.SerializerMethodField()
+    collection_title = serializers.StringRelatedField(source='collection.title')
+    country = serializers.StringRelatedField(source='collection.storehouse.country')
 
     def get_shirt_images(self, object):
         return [self.context['view'].request.build_absolute_uri(shirt_image.image.url) for shirt_image in object.shirt_images.all()]
 
-    def get_country(self, object):
-        try:
-            return object.collection.storehouse.country
-        except AttributeError:
-            return None
-
     class Meta:
         model = models.TemplateShirt
-        fields = ['individualization', 'description', 'shirt_images', 'collection', 'country']
+        fields = ['individualization', 'description', 'shirt_images', 'collection_title', 'country']
+
 
 class TemplateShirtSerializer(TemplateShirtListSerializer):
-
     showcase_image = serializers.ImageField(source='showcase_image_detail')
     details = serializers.SerializerMethodField()
 
