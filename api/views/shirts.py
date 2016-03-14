@@ -55,10 +55,17 @@ class TemplateShirtDetails(RetrieveAPIView):
 
 class TemplateShirtsFiltersList(APIView):
 
+    def build_filter(self, title, name, values):
+        return {
+            'title': title,
+            'id': name,
+            'values': values
+        }
+
     def get(self, request, *args, **kwargs):
-        return Response({
-            'fabric': list(models.Fabric.objects.filter(shirt__is_template=True, residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'code').distinct()),
-            'fabric__colors': list(dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True, color_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'title').distinct()),
-            'fabric__designs': list(dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True, design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'title').distinct()),
-            'collection__sex': [(x['sex'], models.SEX[x['sex']]) for x in models.Collection.objects.filter(shirts__is_template=True, shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values('sex').distinct()],
-        })
+        return Response([
+            self.build_filter(u'Ткань', u'fabric', list(models.Fabric.objects.filter(shirt__is_template=True, residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'code').distinct())),
+            self.build_filter(u'Цвет', 'fabric__colors', list(dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True, color_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'title').distinct())),
+            self.build_filter(u'Дизайн', 'fabric__designs', list(dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True, design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values_list('id', 'title').distinct())),
+            self.build_filter(u'Пол', 'collection__sex', [(x['sex'], models.SEX[x['sex']]) for x in models.Collection.objects.filter(shirts__is_template=True, shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).values('sex').distinct()]),
+        ])
