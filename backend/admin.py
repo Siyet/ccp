@@ -44,7 +44,7 @@ class ContrastStitchInline(admin.TabularInline):
 
 class CustomShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
-    exclude = ['is_template', 'code', 'material', 'showcase_image', 'individualization', 'description']
+    exclude = ['is_template', 'code', 'showcase_image', 'individualization', 'description']
 
 
 class TemplateShirtAdmin(admin.ModelAdmin):
