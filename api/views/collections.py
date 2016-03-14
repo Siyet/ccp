@@ -71,7 +71,7 @@ class CollectionFabricColorsList(ListAPIView):
         id = self.kwargs['pk']
         collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
         fabrics = collection.fabrics().values_list('id', flat=True)
-        return FabricColor.objects.filter(color_fabrics__id__in=fabrics)
+        return FabricColor.objects.filter(color_fabrics__id__in=fabrics).distinct()
 
 
 class CollectionFabricDesignsList(ListAPIView):
@@ -84,4 +84,4 @@ class CollectionFabricDesignsList(ListAPIView):
         id = self.kwargs['pk']
         collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
         fabrics = collection.fabrics().values_list('id', flat=True)
-        return FabricDesign.objects.filter(design_fabrics__id__in=fabrics)
+        return FabricDesign.objects.filter(design_fabrics__id__in=fabrics).distinct()
