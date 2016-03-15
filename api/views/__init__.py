@@ -1,5 +1,5 @@
 from collections import CollectionsListView, ShirtInfoListView
-from collections import CollectionFabricDesignsList, CollectionFabricsList, CollectionFabricColorsList
+from collections import CollectionFabricDesignsList, CollectionFabricsList, CollectionFabricColorsList, CollectionHardnessList
 
 from sizes import SizeOptionsList, SizesList
 

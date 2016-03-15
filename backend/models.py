@@ -15,11 +15,6 @@ from model_utils import Choices
 from dictionaries.models import FabricCategory
 from backend import managers
 
-HARDNESS = Choices(('very_soft', _(u'Очень мягкий')),
-                   ('soft', _(u'Мягкий')),
-                   ('hard', _(u'Жесткий')),
-                   ('very_hard', _(u'Очень жесткий')),
-                   ('no_hardener', _(u'Без уплотнителя')))
 
 SEX = Choices(
     ('male', _(u'Мужской')),
@@ -61,6 +56,18 @@ class Storehouse(models.Model):
     class Meta:
         verbose_name = _(u'Склад')
         verbose_name_plural = _(u'Склады')
+
+
+class Hardness(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='hardness')
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Жесткость')
+        verbose_name_plural = _(u'Жесткость')
 
 
 class FabricPrice(models.Model):
@@ -124,7 +131,7 @@ class Collar(models.Model):
     STAYS = Choices(('yes', _(u'Да')), ('no', _(u'Нет')), ('removable', _(u'Да, съемные')))
     stays = models.CharField(_(u'Косточки'), choices=STAYS, max_length=10)
 
-    hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
+    hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'))
 
     type = models.ForeignKey('dictionaries.CollarType', verbose_name=_(u'Тип'))
     size = ChainedForeignKey('dictionaries.CollarButtons', chained_field='type', chained_model_field='types',
@@ -140,7 +147,7 @@ class Collar(models.Model):
 
 
 class Cuff(models.Model):
-    hardness = models.CharField(_(u'Жесткость'), choices=HARDNESS, max_length=15)
+    hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'))
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_cuff')
 
     type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='cuff')
