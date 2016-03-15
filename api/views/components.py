@@ -60,3 +60,11 @@ class PocketTypeList(ListAPIView):
     queryset = dictionaries.PocketType.objects.all()
 
 
+class YokeTypeList(ListAPIView):
+    """
+    Список опций кокетки
+    """
+    serializer_class = serializers.YokeTypeSerializer
+    queryset = dictionaries.YokeType.objects.all()
+
+
