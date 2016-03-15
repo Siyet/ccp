@@ -85,3 +85,15 @@ class CollectionFabricDesignsList(ListAPIView):
         collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
         fabrics = collection.fabrics().values_list('id', flat=True)
         return FabricDesign.objects.filter(design_fabrics__id__in=fabrics).distinct()
+
+
+class CollectionHardnessList(ListAPIView):
+    """
+    Список доступных для коллекции вариантов жесткости
+    """
+    serializer_class = serializers.HardnessSerializer
+
+    def get_queryset(self):
+        id = self.kwargs['pk']
+        collection = get_object_or_404(Collection.objects.prefetch_related('hardness'), pk=id)
+        return collection.hardness.all()

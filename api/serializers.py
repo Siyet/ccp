@@ -154,3 +154,9 @@ class TemplateShirtSerializer(TemplateShirtListSerializer):
 
     class Meta(TemplateShirtListSerializer.Meta):
         fields = TemplateShirtListSerializer.Meta.fields + ['details']
+
+
+class HardnessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Hardness
+        fields = ['id', 'title']
