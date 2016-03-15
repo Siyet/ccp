@@ -15,7 +15,8 @@ from .models import (
     ContrastDetails,
     ContrastStitch,
     CustomShirt, TemplateShirt,
-    ShirtImage
+    ShirtImage,
+    AccessoriesPrice
 )
 
 
@@ -65,6 +66,10 @@ class FabricAdmin(admin.ModelAdmin):
     readonly_fields = ['category']
 
 
+class AccessoriesPriceAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register([
     Collection,
     Storehouse,
@@ -79,3 +84,4 @@ admin.site.register(Fabric, FabricAdmin)
 admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(CustomShirt, CustomShirtAdmin)
 admin.site.register(TemplateShirt, TemplateShirtAdmin)
+admin.site.register(AccessoriesPrice, AccessoriesPriceAdmin)

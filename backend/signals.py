@@ -2,7 +2,7 @@
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
-from backend.models import FabricPrice, Shirt
+from backend.models import FabricPrice, Shirt, AccessoriesPrice
 
 
 def get_old_shirts(sender, instance, **kwargs):
@@ -24,3 +24,5 @@ def calculate_shirts_price(sender, instance, created, **kwargs):
 # TODO: добавить 2 события для всех связанных моделей с ценой рубашки
 pre_save.connect(get_old_shirts, sender=FabricPrice)
 post_save.connect(calculate_shirts_price, sender=FabricPrice)
+pre_save.connect(get_old_shirts, sender=AccessoriesPrice)
+post_save.connect(calculate_shirts_price, sender=AccessoriesPrice)

@@ -1,8 +1,11 @@
 # coding: UTF-8
+from django.contrib.contenttypes.fields import GenericForeignKey
+
 __author__ = 'cloud'
 
 from django.db import models
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
 
@@ -181,6 +184,15 @@ class ShawlOptions(models.Model):
         verbose_name = _(u'Настройки платка')
         verbose_name_plural = _(u'Настройки платка')
 
+    @staticmethod
+    def get_shirts(pk=None, exclude=None):
+        qs = Shirt.objects.all()
+        if pk:
+            qs = qs.filter(shawl__id=pk)
+        if exclude:
+            qs = qs.exclude(shawl__id__in=exclude)
+        return qs.values('id')
+
 
 class Dickey(models.Model):
     type = models.ForeignKey('dictionaries.DickeyType')
@@ -262,13 +274,19 @@ class Shirt(models.Model):
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
     def calculate_price(self):
+        price = 0
+        # Платок
+        shawl_price = AccessoriesPrice.objects.filter(content_type__app_label='backend', content_type__model='shawloptions').filter(Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
+        if shawl_price:
+            price += shawl_price.price
+
         try:
             fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)
-            return next(fabric_prices).price
+            return price + next(fabric_prices).price
         except StopIteration:
-            return None
+            return price
         except AttributeError:
-            return None
+            return price
 
     def save(self, *args, **kwargs):
         self.price = self.calculate_price()
@@ -351,3 +369,30 @@ class ContrastStitch(models.Model):
     class Meta:
         verbose_name = _(u'Контрастная отстрочка')
         verbose_name_plural = _(u'Контрастные отстрочки')
+
+
+class AccessoriesPrice(models.Model):
+    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), related_name='accessories_price')
+    object_pk = models.IntegerField(_('object ID'), max_length=255, blank=True, null=True)
+    content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
+
+    def __unicode__(self):
+        return u'Цена: %s' % self.content_type
+
+    class Meta:
+        verbose_name = _(u'Цена надбавки')
+        verbose_name_plural = _(u'Цены надбавок')
+        unique_together = [('content_type', 'object_pk', )]
+
+    def get_content_object(self):
+        try:
+            return self.content_object
+        except ValueError:
+            return None
+
+    def get_shirts(self):
+        if self.object_pk:
+            return self.content_type.model_class().get_shirts(pk=self.object_pk)
+        else:
+            return self.content_type.model_class().get_shirts(exclude=AccessoriesPrice.objects.filter(content_type=self.content_type, object_pk__isnull=False).values('object_pk'))
