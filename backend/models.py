@@ -218,6 +218,8 @@ class Initials(models.Model):
 
 
 class Shirt(models.Model):
+    TUCK_OPTIONS = Choices((False, _(u'Без вытачек')), (True, _(u'С вытачками')))
+    CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
@@ -245,14 +247,17 @@ class Shirt(models.Model):
     placket = models.ForeignKey('dictionaries.PlacketType', verbose_name=_(u'Полочка'), related_name='placket_shirts')
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
 
-    tuck = models.BooleanField(_(u'Вытачки'))
+    tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=TUCK_OPTIONS, default=False)
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
 
-    custom_buttons = models.ForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), null=True, blank=True)
+    custom_buttons_type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип кастомных пуговиц'), null=True, blank=True)
+    custom_buttons = ChainedForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), chained_field='custom_buttons_type',
+                                 chained_model_field='type', show_all=False, null=True, blank=True)
+
     shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'))
     yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'))
-    clasp = models.BooleanField(_(u'Застежка под штифты'))
+    clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 
     STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')), ('5mm', _(u'5 мм')))
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
