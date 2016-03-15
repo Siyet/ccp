@@ -16,13 +16,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='collar',
             name='hardness',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='backend.Hardness', verbose_name='\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c'),
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='backend.Hardness', verbose_name='\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c'),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='cuff',
             name='hardness',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='backend.Hardness', verbose_name='\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c'),
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='backend.Hardness', verbose_name='\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c'),
             preserve_default=False,
         ),
     ]
