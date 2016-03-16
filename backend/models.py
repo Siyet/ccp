@@ -131,7 +131,7 @@ class Collar(models.Model):
     STAYS = Choices(('yes', _(u'Да')), ('no', _(u'Нет')), ('removable', _(u'Да, съемные')))
     stays = models.CharField(_(u'Косточки'), choices=STAYS, max_length=10)
 
-    hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'))
+    hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
 
     type = models.ForeignKey('dictionaries.CollarType', verbose_name=_(u'Тип'))
     size = ChainedForeignKey('dictionaries.CollarButtons', chained_field='type', chained_model_field='types',
@@ -147,7 +147,7 @@ class Collar(models.Model):
 
 
 class Cuff(models.Model):
-    hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'))
+    hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_cuff')
 
     type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='cuff')
