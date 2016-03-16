@@ -1,4 +1,5 @@
 # coding: utf-8
+from django import forms
 from django.contrib import admin
 from .models import (
     Collection,
@@ -67,8 +68,23 @@ class FabricAdmin(admin.ModelAdmin):
     readonly_fields = ['category']
 
 
+class AccessoriesPriceAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = AccessoriesPrice
+        fields = '__all__'
+
+    def clean_content_type(self):
+        content_type = self.cleaned_data.get('content_type')
+        if not hasattr(content_type.model_class(), 'get_shirts'):
+            raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
+        return content_type
+
+
 class AccessoriesPriceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('pk', 'content_type', 'content_object', 'price', )
+    list_display_links = ('pk', 'content_type', 'content_object', 'price', )
+    form = AccessoriesPriceAdminForm
 
 
 admin.site.register([
