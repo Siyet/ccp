@@ -10,7 +10,8 @@ shirt_urls = [
 collection_urls = [
     url(r'^fabric/$', views.CollectionFabricsList.as_view()),
     url(r'^fabric/color/$', views.CollectionFabricColorsList.as_view()),
-    url(r'^fabric/design/$', views.CollectionFabricDesignsList.as_view())
+    url(r'^fabric/design/$', views.CollectionFabricDesignsList.as_view()),
+    url(r'^hardness/$', views.CollectionHardnessList.as_view())
 ]
 
 components = [
@@ -21,6 +22,7 @@ components = [
     url(r'^pocket/$', views.PocketTypeList.as_view()),
     url(r'^placket/$', views.PlacketTypeList.as_view()),
     url(r'^sleeve/$', views.SleeveTypeList.as_view()),
+    url(r'^yoke/$', views.YokeTypeList.as_view())
 ]
 
 urlpatterns = [

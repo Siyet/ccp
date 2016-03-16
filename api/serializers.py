@@ -102,6 +102,11 @@ class PocketTypeSerializer(serializers.ModelSerializer):
         model = dictionaries.PocketType
 
 
+class YokeTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = dictionaries.PocketType
+
+
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     showcase_image = serializers.ImageField(source='showcase_image_list')
@@ -149,3 +154,9 @@ class TemplateShirtSerializer(TemplateShirtListSerializer):
 
     class Meta(TemplateShirtListSerializer.Meta):
         fields = TemplateShirtListSerializer.Meta.fields + ['details']
+
+
+class HardnessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Hardness
+        fields = ['id', 'title']

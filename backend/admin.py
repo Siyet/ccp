@@ -2,6 +2,7 @@
 from django.contrib import admin
 from .models import (
     Collection,
+    Hardness,
     Storehouse,
     Fabric,
     FabricPrice,
@@ -16,7 +17,7 @@ from .models import (
     ContrastStitch,
     CustomShirt, TemplateShirt,
     ShirtImage,
-    AccessoriesPrice
+    AccessoriesPrice,
 )
 
 
@@ -78,6 +79,7 @@ admin.site.register([
     ShawlOptions,
     Dickey,
     Initials,
+    Hardness
 ])
 
 admin.site.register(Fabric, FabricAdmin)
