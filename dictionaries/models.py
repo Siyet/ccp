@@ -50,6 +50,7 @@ class FabricCategory(models.Model):
 
     def __unicode__(self):
         return u"%s %s" % (_(u'Категория'), self.title)
+
     class Meta:
         verbose_name = _(u'Категория ткани')
         verbose_name_plural = _(u'Категории тканей')
@@ -116,6 +117,9 @@ class CustomButtonsType(models.Model):
     class Meta:
         verbose_name = _(u'Тип пуговиц')
         verbose_name_plural = _(u'Типы пуговиц')
+
+    def get_shirts(self):
+        return self.back_shirts.filter(custom_buttons__isnull=False).values('id')
 
 
 class YokeType(ComponentModel):

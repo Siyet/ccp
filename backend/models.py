@@ -148,6 +148,15 @@ class Collar(models.Model):
         verbose_name = _(u'Воротник')
         verbose_name_plural = _(u'Воротники')
 
+    @staticmethod
+    def get_shirts(pk=None, exclude=None):
+        qs = Shirt.objects.filter(collar__isnull=False)
+        if pk:
+            qs = qs.filter(collar__id=pk)
+        if exclude:
+            qs = qs.exclude(collar__id__in=exclude)
+        return qs.values('id').distinct()
+
 
 class Cuff(models.Model):
     hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
@@ -165,6 +174,15 @@ class Cuff(models.Model):
     class Meta:
         verbose_name = _(u'Манжета')
         verbose_name_plural = _(u'Манжеты')
+
+    @staticmethod
+    def get_shirts(pk=None, exclude=None):
+        qs = Shirt.objects.filter(shirt_cuff__isnull=False)
+        if pk:
+            qs = qs.filter(shirt_cuff__id=pk)
+        if exclude:
+            qs = qs.exclude(shirt_cuff__id__in=exclude)
+        return qs.values('id').distinct()
 
 
 class CustomButtons(models.Model):
@@ -191,6 +209,9 @@ class ShawlOptions(models.Model):
         verbose_name = _(u'Настройки платка')
         verbose_name_plural = _(u'Настройки платка')
 
+    def get_shirts(self):
+        return Shirt.objects.filter(shawl=self).values('id')
+
 
 class Dickey(models.Model):
     type = models.ForeignKey('dictionaries.DickeyType')
@@ -205,12 +226,12 @@ class Dickey(models.Model):
 
     @staticmethod
     def get_shirts(pk=None, exclude=None):
-        qs = Shirt.objects.all()
+        qs = Shirt.objects.filter(dickey__isnull=False)
         if pk:
             qs = qs.filter(dickey__id=pk)
         if exclude:
             qs = qs.exclude(dickey__id__in=exclude)
-        return qs.values('id')
+        return qs.values('id').distinct()
 
 
 class Initials(models.Model):
@@ -270,7 +291,7 @@ class Shirt(models.Model):
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
 
-    custom_buttons_type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип кастомных пуговиц'), null=True, blank=True)
+    custom_buttons_type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип кастомных пуговиц'), null=True, blank=True, related_name='back_shirts')
     custom_buttons = ChainedForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), chained_field='custom_buttons_type',
                                  chained_model_field='type', show_all=False, null=True, blank=True)
 
@@ -295,6 +316,13 @@ class Shirt(models.Model):
             shawl_price = 0
         price += shawl_price
 
+        # Кастомные пуговицы
+        try:
+            custom_buttons_price = self.custom_buttons.type.extra_price
+        except AttributeError:
+            custom_buttons_price = 0
+        price += custom_buttons_price
+
         # Манишка
         dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend', content_type__model='dickey').filter(Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
         if dickey_price:
@@ -302,8 +330,15 @@ class Shirt(models.Model):
 
         # Контрастные детали
         contrast_detail_price = AccessoriesPrice.objects.filter(content_type__app_label='backend', content_type__model='contrastdetails').first()
-        if contrast_detail_price:
-            price += self.shirt_contrast_details.count() * contrast_detail_price.price
+        # Не зависимо от количества
+        if contrast_detail_price and self.shirt_contrast_details.count() > 0:
+            price += contrast_detail_price.price
+
+        # Воротник или манжета. Наличие хотя бы одного прибавляем цену
+        if hasattr(self, 'shirt_cuff') or hasattr(self, 'collar'):
+            cuff_price = AccessoriesPrice.objects.filter(Q(content_type__app_label='backend') & (Q(content_type__model='cuff') | Q(content_type__model='collar'))).order_by('-object_pk').first()
+            if cuff_price:
+                price += cuff_price.price
 
         try:
             fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)

@@ -82,7 +82,6 @@ class AccessoriesPriceAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AccessoriesPriceAdminForm, self).__init__(*args, **kwargs)
         instance = kwargs.get('instance')
-        print self.fields['content_type'].widget
         if instance:
             self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in instance.content_type.model_class().objects.all()]
 
