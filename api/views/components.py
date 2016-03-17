@@ -68,3 +68,9 @@ class YokeTypeList(ListAPIView):
     queryset = dictionaries.YokeType.objects.all()
 
 
+class CustomButtonsTypeList(ListAPIView):
+    """
+    Список типов пуговиц
+    """
+    serializer_class = serializers.CustomButtonsTypeSerializer
+    queryset = dictionaries.CustomButtonsType.objects.prefetch_related('buttons')
