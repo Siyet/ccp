@@ -107,6 +107,21 @@ class YokeTypeSerializer(serializers.ModelSerializer):
         model = dictionaries.PocketType
 
 
+class CustomButtonsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.CustomButtons
+        fields = ['id', 'title', 'picture', ]
+
+
+class CustomButtonsTypeSerializer(serializers.ModelSerializer):
+    buttons = CustomButtonsSerializer(many=True)
+
+    class Meta:
+        model = dictionaries.CustomButtonsType
+        fields = ['id', 'title', 'extra_price', 'buttons', ]
+
+
 class ShawlOptionsSerializer(serializers.ModelSerializer):
 
     class Meta:
