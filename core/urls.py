@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^api/', include('api.urls')),
+    url(r'^backend/', include('backend.urls')),
     url(r'^', include('processing.urls'))
 
 ]

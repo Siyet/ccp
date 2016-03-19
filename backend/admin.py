@@ -1,5 +1,9 @@
 # coding: utf-8
+from django import forms
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
+from django.utils.text import ugettext_lazy as _
+from backend.widgets import ContentTypeSelect
 from .models import (
     Collection,
     Hardness,
@@ -18,6 +22,7 @@ from .models import (
     ContrastStitch,
     CustomShirt, TemplateShirt,
     ShirtImage,
+    AccessoriesPrice,
 )
 
 
@@ -67,6 +72,41 @@ class FabricAdmin(admin.ModelAdmin):
     readonly_fields = ['category']
 
 
+class AccessoriesPriceAdminForm(forms.ModelForm):
+    content_type = forms.ModelChoiceField(label=_('content type'), queryset=ContentType.objects.all(), widget=ContentTypeSelect(related_field='id_object_pk'))
+    object_pk = forms.ChoiceField(required=False)
+
+    class Meta:
+        model = AccessoriesPrice
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(AccessoriesPriceAdminForm, self).__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+        if instance:
+            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in instance.content_type.model_class().objects.all()]
+
+    def clean_content_type(self):
+        content_type = self.cleaned_data.get('content_type')
+        if not hasattr(content_type.model_class(), 'get_shirts'):
+            raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
+        if not self.fields['object_pk'].choices:
+            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in content_type.model_class().objects.all()]
+        return content_type
+
+    def clean_object_pk(self):
+        object_pk = self.cleaned_data.get('object_pk')
+        if not object_pk:
+            return None
+        return object_pk
+
+
+class AccessoriesPriceAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'content_type', 'content_object', 'price', )
+    list_display_links = ('pk', 'content_type', 'content_object', 'price', )
+    form = AccessoriesPriceAdminForm
+
+
 admin.site.register([
     Collection,
     Storehouse,
@@ -83,3 +123,4 @@ admin.site.register(Fabric, FabricAdmin)
 admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(CustomShirt, CustomShirtAdmin)
 admin.site.register(TemplateShirt, TemplateShirtAdmin)
+admin.site.register(AccessoriesPrice, AccessoriesPriceAdmin)
