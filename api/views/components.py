@@ -1,6 +1,8 @@
 # coding: utf-8
 
 from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
@@ -75,3 +77,12 @@ class ShawlOptionsList(ListAPIView):
     """
     serializer_class = serializers.ShawlOptionsSerializer
     queryset = models.ShawlOptions.objects.all()
+
+
+class ClaspOptionsList(APIView):
+    """
+    Список вариантов застежек
+    """
+
+    def get(self, request, *args, **kwargs):
+        return Response([{'key': x[0], 'value': unicode(x[1])} for x in models.Shirt.CLASP_OPTIONS])
