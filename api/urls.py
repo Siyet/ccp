@@ -25,6 +25,7 @@ components = [
     url(r'^yoke/$', views.YokeTypeList.as_view()),
     url(r'^button/$', views.CustomButtonsTypeList.as_view()),
     url(r'^shawl/$', views.ShawlOptionsList.as_view()),
+    url(r'^tuck/$', views.TuckOptionsList.as_view()),
 ]
 
 urlpatterns = [
