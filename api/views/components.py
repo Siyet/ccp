@@ -94,3 +94,10 @@ class TuckOptionsList(APIView):
 
     def get(self, request, *args, **kwargs):
         return Response([{'key': x[0], 'value': unicode(x[1])} for x in models.Shirt.TUCK_OPTIONS])
+
+class ClaspOptionsList(APIView):
+
+    def get(self, request, *args, **kwargs):
+        return Response([{'key': x[0], 'value': unicode(x[1])} for x in models.Shirt.CLASP_OPTIONS])
+
+

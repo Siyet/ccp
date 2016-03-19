@@ -27,6 +27,7 @@ components = [
     url(r'^button/$', views.CustomButtonsTypeList.as_view()),
     url(r'^shawl/$', views.ShawlOptionsList.as_view()),
     url(r'^tuck/$', views.TuckOptionsList.as_view()),
+    url(r'^clasp/$', views.ClaspOptionsList.as_view())
 ]
 
 urlpatterns = [
