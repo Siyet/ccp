@@ -11,7 +11,8 @@ collection_urls = [
     url(r'^fabric/$', views.CollectionFabricsList.as_view()),
     url(r'^fabric/color/$', views.CollectionFabricColorsList.as_view()),
     url(r'^fabric/design/$', views.CollectionFabricDesignsList.as_view()),
-    url(r'^hardness/$', views.CollectionHardnessList.as_view())
+    url(r'^hardness/$', views.CollectionHardnessList.as_view()),
+    url(r'^stays/$', views.CollectionStaysList.as_view()),
 ]
 
 components = [
@@ -25,7 +26,8 @@ components = [
     url(r'^yoke/$', views.YokeTypeList.as_view()),
     url(r'^button/$', views.CustomButtonsTypeList.as_view()),
     url(r'^shawl/$', views.ShawlOptionsList.as_view()),
-    url(r'^clasp/$', views.ClaspOptionsList.as_view()),
+    url(r'^tuck/$', views.TuckOptionsList.as_view()),
+    url(r'^clasp/$', views.ClaspOptionsList.as_view())
 ]
 
 urlpatterns = [

@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import (
     Collection,
     Hardness,
+    Stays,
     Storehouse,
     Fabric,
     FabricPrice,
@@ -74,7 +75,8 @@ admin.site.register([
     ShawlOptions,
     Dickey,
     Initials,
-    Hardness
+    Hardness,
+    Stays,
 ])
 
 admin.site.register(Fabric, FabricAdmin)

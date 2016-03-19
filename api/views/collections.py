@@ -97,3 +97,14 @@ class CollectionHardnessList(ListAPIView):
         id = self.kwargs['pk']
         collection = get_object_or_404(Collection.objects.prefetch_related('hardness'), pk=id)
         return collection.hardness.all()
+
+
+class CollectionStaysList(ListAPIView):
+    """
+    Список доступных для коллекции вариантов косточек воротника
+    """
+    serializer_class = serializers.StaysSerializer
+
+    def get_queryset(self):
+        collection = get_object_or_404(Collection.objects.prefetch_related('stays'), pk=self.kwargs['pk'])
+        return collection.stays.all()

@@ -1,9 +1,10 @@
 from collections import CollectionsListView, ShirtInfoListView
-from collections import CollectionFabricDesignsList, CollectionFabricsList, CollectionFabricColorsList, CollectionHardnessList
+from collections import CollectionFabricDesignsList, CollectionFabricsList, CollectionFabricColorsList, \
+    CollectionHardnessList, CollectionStaysList
 
 from sizes import SizeOptionsList, SizesList
 
 from components import CollarTypeList, CuffTypeList, HemTypeList, BackTypeList, PocketTypeList, \
-    PlacketTypeList, SleeveTypeList, YokeTypeList, CustomButtonsTypeList, ShawlOptionsList, ClaspOptionsList
+    PlacketTypeList, SleeveTypeList, YokeTypeList, CustomButtonsTypeList, ShawlOptionsList, TuckOptionsList, ClaspOptionsList
 
 from shirts import TemplateShirtsList, TemplateShirtDetails, TemplateShirtsFiltersList
