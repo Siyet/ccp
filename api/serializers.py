@@ -122,6 +122,12 @@ class CustomButtonsTypeSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'extra_price', 'buttons', ]
 
 
+class ShawlOptionsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ShawlOptions
+
+
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     showcase_image = serializers.ImageField(source='showcase_image_list')

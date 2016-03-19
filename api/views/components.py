@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from rest_framework.generics import ListAPIView
+from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
 
@@ -74,3 +75,11 @@ class CustomButtonsTypeList(ListAPIView):
     """
     serializer_class = serializers.CustomButtonsTypeSerializer
     queryset = dictionaries.CustomButtonsType.objects.prefetch_related('buttons')
+
+
+class ShawlOptionsList(ListAPIView):
+    """
+    Список настроек платка
+    """
+    serializer_class = serializers.ShawlOptionsSerializer
+    queryset = models.ShawlOptions.objects.all()
