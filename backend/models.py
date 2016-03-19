@@ -188,7 +188,7 @@ class Cuff(models.Model):
 class CustomButtons(models.Model):
     title = models.CharField(_(u'Название'), max_length=255)
     picture = models.ImageField(_(u'Изображение'))
-    type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип'))
+    type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип'), related_name='buttons')
 
     def __unicode__(self):
         return self.title
