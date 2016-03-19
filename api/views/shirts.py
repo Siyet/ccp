@@ -64,6 +64,9 @@ class TemplateShirtsFiltersList(APIView):
         }
 
     def get(self, request, *args, **kwargs):
+        """
+        Фильтры для списка рубашек
+        """
         fabrics = models.Fabric.objects.filter(shirt__is_template=True, residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         colors = dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True, color_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         designs = dictionaries.FabricDesign.objects.filter(design_fabrics__shirt__is_template=True, design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)

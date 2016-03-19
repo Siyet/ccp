@@ -23,6 +23,7 @@ components = [
     url(r'^placket/$', views.PlacketTypeList.as_view()),
     url(r'^sleeve/$', views.SleeveTypeList.as_view()),
     url(r'^yoke/$', views.YokeTypeList.as_view()),
+    url(r'^button/$', views.CustomButtonsTypeList.as_view()),
     url(r'^shawl/$', views.ShawlOptionsList.as_view()),
 ]
 
