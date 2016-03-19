@@ -33,6 +33,7 @@ class Collection(models.Model):
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
     sex = models.CharField(_(u'Пол'), choices=SEX, max_length=6, default='male', blank=False)
+    tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
 
     def __unicode__(self):
         return self.title

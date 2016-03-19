@@ -7,7 +7,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Collection
-        fields = ('id', 'title', 'text', 'image')
+        fields = ('id', 'title', 'text', 'image', 'tailoring_time', )
 
 
 class ShirtInfoImageSerializer(serializers.ModelSerializer):
