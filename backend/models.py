@@ -70,6 +70,18 @@ class Hardness(models.Model):
         verbose_name_plural = _(u'Жесткость')
 
 
+class Stays(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='stays')
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Косточки')
+        verbose_name_plural = _(u'Косточки')
+
+
 class FabricPrice(models.Model):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='prices')
     fabric_category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория тканей'), related_name='prices')
@@ -128,9 +140,7 @@ class FabricResidual(models.Model):
 
 
 class Collar(models.Model):
-    STAYS = Choices(('yes', _(u'Да')), ('no', _(u'Нет')), ('removable', _(u'Да, съемные')))
-    stays = models.CharField(_(u'Косточки'), choices=STAYS, max_length=10)
-
+    stays = models.ForeignKey(Stays, verbose_name=_(u'Косточки'), null=True)
     hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
 
     type = models.ForeignKey('dictionaries.CollarType', verbose_name=_(u'Тип'))
