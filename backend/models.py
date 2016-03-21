@@ -160,7 +160,7 @@ class Collar(models.Model):
         verbose_name_plural = _(u'Воротники')
 
     @staticmethod
-    def get_shirts(pk=None, exclude=None):
+    def get_related_shirts(pk=None, exclude=None):
         qs = Shirt.objects.filter(collar__isnull=False)
         if pk:
             qs = qs.filter(collar__id=pk)
@@ -187,7 +187,7 @@ class Cuff(models.Model):
         verbose_name_plural = _(u'Манжеты')
 
     @staticmethod
-    def get_shirts(pk=None, exclude=None):
+    def get_related_shirts(pk=None, exclude=None):
         qs = Shirt.objects.filter(shirt_cuff__isnull=False)
         if pk:
             qs = qs.filter(shirt_cuff__id=pk)
@@ -236,7 +236,7 @@ class Dickey(models.Model):
         verbose_name_plural = _(u'Манишки')
 
     @staticmethod
-    def get_shirts(pk=None, exclude=None):
+    def get_related_shirts(pk=None, exclude=None):
         qs = Shirt.objects.filter(dickey__isnull=False)
         if pk:
             qs = qs.filter(dickey__id=pk)
@@ -425,7 +425,7 @@ class ContrastDetails(models.Model):
         unique_together = ['shirt', 'element']
 
     @staticmethod
-    def get_shirts(pk=None, exclude=None):
+    def get_related_shirts(pk=None, exclude=None):
         qs = Shirt.objects.filter(shirt_contrast_details__isnull=False)
         return qs.values('id').distinct()
 
@@ -469,6 +469,6 @@ class AccessoriesPrice(models.Model):
 
     def get_shirts(self):
         if self.object_pk:
-            return self.content_type.model_class().get_shirts(pk=self.object_pk)
+            return self.content_type.model_class().get_related_shirts(pk=self.object_pk)
         else:
-            return self.content_type.model_class().get_shirts(exclude=AccessoriesPrice.objects.filter(content_type=self.content_type, object_pk__isnull=False).values('object_pk'))
+            return self.content_type.model_class().get_related_shirts(exclude=AccessoriesPrice.objects.filter(content_type=self.content_type, object_pk__isnull=False).values('object_pk'))
