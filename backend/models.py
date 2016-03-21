@@ -276,7 +276,7 @@ class Shirt(models.Model):
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     individualization = models.TextField(_(u'Индивидуализация'))
-    description = models.TextField(_(u'Описание'))
+    description = models.TextField(_(u'Описание'), blank=True, null=True)
 
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
 
