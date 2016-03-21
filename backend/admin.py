@@ -85,10 +85,12 @@ class AccessoriesPriceAdminForm(forms.ModelForm):
         instance = kwargs.get('instance')
         if instance:
             self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in instance.content_type.model_class().objects.all()]
+        content_type_pk = [x.pk for x in self.fields['content_type'].queryset if hasattr(x.model_class(), 'get_related_shirts')]
+        self.fields['content_type'].queryset = self.fields['content_type'].queryset.filter(pk__in=content_type_pk)
 
     def clean_content_type(self):
         content_type = self.cleaned_data.get('content_type')
-        if not hasattr(content_type.model_class(), 'get_shirts'):
+        if not hasattr(content_type.model_class(), 'get_related_shirts'):
             raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
         if not self.fields['object_pk'].choices:
             self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in content_type.model_class().objects.all()]
