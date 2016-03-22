@@ -115,7 +115,7 @@ class CollectionStaysList(ListAPIView):
 
 class CollectionContrastDetailsList(APIView):
     """
-    Выдача API для экрана "Контрастные ткани"
+    Доступные варианты для контрастных тканей
     """
 
     def get(self, request, *args, **kwargs):
