@@ -452,6 +452,7 @@ class AccessoriesPrice(models.Model):
     object_pk = models.IntegerField(_('object ID'), blank=True, null=True)
     content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
+    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='accessories_prices', blank=True)
 
     def __unicode__(self):
         return u'Цена: %s' % self.content_type

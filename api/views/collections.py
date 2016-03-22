@@ -2,8 +2,11 @@
 from django.http import Http404
 
 from rest_framework.generics import ListAPIView
-from backend.models import Collection
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from backend.models import Collection, AccessoriesPrice
 from django.shortcuts import get_object_or_404
+from django.utils.text import ugettext_lazy as _
 from dictionaries.models import ShirtInfo, FabricColor, FabricDesign
 from api import serializers
 
@@ -108,3 +111,17 @@ class CollectionStaysList(ListAPIView):
     def get_queryset(self):
         collection = get_object_or_404(Collection.objects.prefetch_related('stays'), pk=self.kwargs['pk'])
         return collection.stays.all()
+
+
+class CollectionContrastDetailsList(APIView):
+    """
+    Выдача API для экрана "Контрастные ткани"
+    """
+
+    def get(self, request, *args, **kwargs):
+        collection = get_object_or_404(Collection.objects.prefetch_related('stays'), pk=self.kwargs['pk'])
+        prices = AccessoriesPrice.objects.filter(collections=collection, content_type__app_label='backend', content_type__model='contrastdetails').distinct().first()
+        result = [{'key': False, 'value': _(u'Не использовать'), 'extra_price': None}]
+        if prices:
+            result.append({'key': False, 'value': _(u'Не использовать'), 'extra_price': prices.price})
+        return Response(result)
