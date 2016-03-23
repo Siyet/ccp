@@ -5,6 +5,7 @@ from collections import CollectionFabricDesignsList, CollectionFabricsList, Coll
 from sizes import SizeOptionsList, SizesList
 
 from components import CollarTypeList, CuffTypeList, HemTypeList, BackTypeList, PocketTypeList, \
-    PlacketTypeList, SleeveTypeList, YokeTypeList, CustomButtonsTypeList, ShawlOptionsList, TuckOptionsList, ClaspOptionsList
+    PlacketTypeList, SleeveTypeList, YokeTypeList, CustomButtonsTypeList, ShawlOptionsList, TuckOptionsList, \
+    ClaspOptionsList, StitchOptionsList
 
 from shirts import TemplateShirtsList, TemplateShirtDetails, TemplateShirtsFiltersList
