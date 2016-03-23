@@ -13,6 +13,7 @@ collection_urls = [
     url(r'^fabric/design/$', views.CollectionFabricDesignsList.as_view()),
     url(r'^hardness/$', views.CollectionHardnessList.as_view()),
     url(r'^stays/$', views.CollectionStaysList.as_view()),
+    url(r'^contrasting_fabrics/$', views.CollectionContrastDetailsList.as_view()),
 ]
 
 components = [
