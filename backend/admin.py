@@ -1,7 +1,11 @@
 # coding: utf-8
+from diff_match_patch import diff_match_patch
 from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.utils.encoding import force_text
+from django.utils.safestring import mark_safe
 from django.utils.text import ugettext_lazy as _
 from import_export import resources, fields
 from import_export.admin import ImportExportMixin
@@ -76,17 +80,47 @@ class FabricResidualAdminInline(admin.TabularInline):
 
 
 class FabricResource(resources.ModelResource):
-    prices = fields.Field(column_name='residuals', attribute='residuals', widget=FabricResidualWidget(), readonly=True)
+    residuals = fields.Field(column_name='residuals', attribute='residuals', widget=FabricResidualWidget())
     texture = fields.Field(column_name='texture', attribute='texture', widget=FileWidget())
 
     class Meta:
         model = Fabric
 
+    def import_field(self, field, obj, data):
+        if field.attribute and field.column_name in data:
+            if field.column_name == 'residuals':
+                obj.residuals_set = field.clean(data)
+            else:
+                field.save(obj, data)
+
     def save_instance(self, instance, dry_run=False):
         self.before_save_instance(instance, dry_run)
         if not dry_run:
+            with transaction.atomic():
+                instance.residuals.all().delete()
+                if instance.residuals_set is not None:
+                    for x in instance.residuals_set:
+                        FabricResidual.objects.create(fabric=instance, storehouse=x[0], amount=x[1])
             instance.save()
         self.after_save_instance(instance, dry_run)
+
+    def get_diff(self, original, current, dry_run=False):
+        data = []
+        dmp = diff_match_patch()
+        for field in self.get_fields():
+            v1 = self.export_field(field, original) if original else ""
+            v2 = self.export_field(field, current) if current else ""
+            if field.column_name == 'residuals':
+                v1 = u', '.join([u'%s: %f' % (x.storehouse.country, x.amount) for x in original.residuals.all()])
+                v2 = u''
+                if current.residuals_set is not None:
+                    v2 = u', '.join([u'%s: %f' % (x[0].country, x[1]) for x in current.residuals_set])
+            diff = dmp.diff_main(force_text(v1), force_text(v2))
+            dmp.diff_cleanupSemantic(diff)
+            html = dmp.diff_prettyHtml(diff)
+            html = mark_safe(html)
+            data.append(html)
+        return data
 
 
 class FabricAdmin(ImportExportMixin, admin.ModelAdmin):

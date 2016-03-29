@@ -5,6 +5,7 @@ from django import forms
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_text
 from import_export.widgets import Widget
+from backend import models
 
 
 class ContentTypeSelect(forms.Select):
@@ -38,6 +39,17 @@ class ContentTypeSelect(forms.Select):
 
 
 class FabricResidualWidget(Widget):
+
+    def clean(self, value):
+        if not value:
+            return []
+        residuals = []
+        for x in value.split(', '):
+            country, amount = x.split(': ')
+            storehouse = models.Storehouse.objects.get(country=country)
+            amount = float(amount)
+            residuals.append((storehouse, amount))
+        return residuals
 
     def render(self, value):
         result = [u'%s: %f' % (x.storehouse.country, x.amount) for x in value.all()]
