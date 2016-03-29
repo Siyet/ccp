@@ -9,7 +9,9 @@ from django.utils.safestring import mark_safe
 from django.utils.text import ugettext_lazy as _
 from import_export import resources, fields
 from import_export.admin import ImportExportMixin
+from import_export.widgets import ManyToManyWidget
 from backend.widgets import ContentTypeSelect, FabricResidualWidget, FileWidget
+from dictionaries import models as dictionaries
 from .models import (
     Collection,
     Hardness,
@@ -82,6 +84,14 @@ class FabricResidualAdminInline(admin.TabularInline):
 class FabricResource(resources.ModelResource):
     residuals = fields.Field(column_name='residuals', attribute='residuals', widget=FabricResidualWidget())
     texture = fields.Field(column_name='texture', attribute='texture', widget=FileWidget())
+    designs = fields.Field(
+        column_name='designs',
+        attribute='designs',
+        widget=ManyToManyWidget(
+            dictionaries.FabricDesign,
+            field='title'
+        )
+    )
 
     class Meta:
         model = Fabric
