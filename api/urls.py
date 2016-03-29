@@ -14,6 +14,7 @@ collection_urls = [
     url(r'^hardness/$', views.CollectionHardnessList.as_view()),
     url(r'^stays/$', views.CollectionStaysList.as_view()),
     url(r'^contrasting_fabrics/$', views.CollectionContrastDetailsList.as_view()),
+    url(r'^stitches/$', views.CollectionStitchesList.as_view()),
 ]
 
 components = [

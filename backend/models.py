@@ -430,17 +430,25 @@ class ContrastDetails(models.Model):
         return qs.values('id').distinct()
 
 
+class ElementStitch(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='stitches')
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Отстрочка')
+        verbose_name_plural = _(u'Отстрочки')
+
+
 class ContrastStitch(models.Model):
-    ELEMENT = Choices(('shirt', _(u'Сорочка')),
-                      ('cuffs', _(u'Манжеты')),
-                      ('collar', _(u'Воротник')),
-                      ('thread', _(u'Петель/ниток')))
-    element = models.CharField(_(u'Элемент'), choices=ELEMENT, max_length=10)
+    element = models.ForeignKey(ElementStitch, verbose_name=u'Элемент', null=True)
     color = models.ForeignKey('dictionaries.StitchColor', verbose_name=_(u'Цвет отстрочки'))
     shirt = models.ForeignKey(Shirt)
 
     def __unicode__(self):
-        return self.get_element_display()
+        return self.element.title
 
     class Meta:
         verbose_name = _(u'Контрастная отстрочка')
