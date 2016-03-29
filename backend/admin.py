@@ -3,7 +3,9 @@ from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
-from backend.widgets import ContentTypeSelect
+from import_export import resources, fields
+from import_export.admin import ImportExportMixin
+from backend.widgets import ContentTypeSelect, FabricResidualWidget, FileWidget
 from .models import (
     Collection,
     Hardness,
@@ -68,8 +70,34 @@ class FabricPriceAdmin(admin.ModelAdmin):
         return queryset.select_related('fabric_category', 'storehouse')
 
 
-class FabricAdmin(admin.ModelAdmin):
+class FabricResidualAdminInline(admin.TabularInline):
+    model = FabricResidual
+    extra = 0
+
+
+class FabricResource(resources.ModelResource):
+    prices = fields.Field(column_name='residuals', attribute='residuals', widget=FabricResidualWidget(), readonly=True)
+    texture = fields.Field(column_name='texture', attribute='texture', widget=FileWidget())
+
+    class Meta:
+        model = Fabric
+
+    def save_instance(self, instance, dry_run=False):
+        self.before_save_instance(instance, dry_run)
+        if not dry_run:
+            instance.save()
+        self.after_save_instance(instance, dry_run)
+
+
+class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
+    change_list_template = 'admin/backend/change_list_import_export.html'
+    list_display = ('code', 'category', 'material', )
+    list_display_links = ('code', 'category', )
+    search_fields = ('code', )
+    list_filter = ('category', )
     readonly_fields = ['category']
+    resource_class = FabricResource
+    inlines = [FabricResidualAdminInline, ]
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):

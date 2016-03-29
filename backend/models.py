@@ -109,7 +109,7 @@ class Fabric(models.Model):
     material = models.CharField(_(u'Материал'), max_length=255, null=True)
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
-    texture = models.ImageField(_(u'Текстура'))
+    texture = models.ImageField(_(u'Текстура'), upload_to='fabric_texture')
 
     def __unicode__(self):
         return self.code
