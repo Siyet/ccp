@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from backend.models import Collection, AccessoriesPrice
 from django.shortcuts import get_object_or_404
 from django.utils.text import ugettext_lazy as _
-from dictionaries.models import ShirtInfo, FabricColor, FabricDesign
+from dictionaries import models as dictionaries
 from api import serializers
 
 
@@ -23,7 +23,7 @@ class ShirtInfoListView(ListAPIView):
     """
     Информация о рубашках для отображения на экране выборе коллекций
     """
-    queryset = ShirtInfo.objects.all()
+    queryset = dictionaries.ShirtInfo.objects.all()
     serializer_class = serializers.ShirtInfoSerializer
 
 
@@ -74,7 +74,7 @@ class CollectionFabricColorsList(ListAPIView):
         id = self.kwargs['pk']
         collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
         fabrics = collection.fabrics().values_list('id', flat=True)
-        return FabricColor.objects.filter(color_fabrics__id__in=fabrics).distinct()
+        return dictionaries.FabricColor.objects.filter(color_fabrics__id__in=fabrics).distinct()
 
 
 class CollectionFabricDesignsList(ListAPIView):
@@ -87,7 +87,7 @@ class CollectionFabricDesignsList(ListAPIView):
         id = self.kwargs['pk']
         collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
         fabrics = collection.fabrics().values_list('id', flat=True)
-        return FabricDesign.objects.filter(design_fabrics__id__in=fabrics).distinct()
+        return dictionaries.FabricDesign.objects.filter(design_fabrics__id__in=fabrics).distinct()
 
 
 class CollectionHardnessList(ListAPIView):
@@ -125,3 +125,16 @@ class CollectionContrastDetailsList(APIView):
         if prices:
             result.append({'key': False, 'value': _(u'Не использовать'), 'extra_price': prices.price})
         return Response(result)
+
+
+class CollectionStitchesList(APIView):
+    """
+    Список доступных для коллекции вариантов отстрочек и цветов
+    """
+
+    def get(self, request, *args, **kwargs):
+        collection = get_object_or_404(Collection.objects.prefetch_related('stitches'), pk=self.kwargs['pk'])
+        return Response({
+            'elements': [{'id': x.pk, 'title': x.title} for x in collection.stitches.all()],
+            'colors': [{'id': x.pk, 'title': x.title, 'color': x.color} for x in dictionaries.StitchColor.objects.all()],
+        })

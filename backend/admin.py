@@ -40,7 +40,7 @@ from .models import (
     CustomShirt, TemplateShirt,
     ShirtImage,
     AccessoriesPrice,
-)
+    ElementStitch)
 
 
 class ShirtImageInline(admin.TabularInline):
@@ -328,6 +328,7 @@ admin.site.register([
     Initials,
     Hardness,
     Stays,
+    ElementStitch,
 ])
 
 admin.site.register(Fabric, FabricAdmin)

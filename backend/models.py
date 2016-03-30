@@ -109,7 +109,7 @@ class Fabric(models.Model):
     material = models.CharField(_(u'Материал'), max_length=255, null=True)
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
-    texture = models.ImageField(_(u'Текстура'), upload_to='fabric_texture')
+    texture = models.ImageField(_(u'Текстура'))
 
     def __unicode__(self):
         return self.code
@@ -430,17 +430,25 @@ class ContrastDetails(models.Model):
         return qs.values('id').distinct()
 
 
+class ElementStitch(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='stitches')
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _(u'Отстрочка')
+        verbose_name_plural = _(u'Отстрочки')
+
+
 class ContrastStitch(models.Model):
-    ELEMENT = Choices(('shirt', _(u'Сорочка')),
-                      ('cuffs', _(u'Манжеты')),
-                      ('collar', _(u'Воротник')),
-                      ('thread', _(u'Петель/ниток')))
-    element = models.CharField(_(u'Элемент'), choices=ELEMENT, max_length=10)
+    element = models.ForeignKey(ElementStitch, verbose_name=u'Элемент', null=True)
     color = models.ForeignKey('dictionaries.StitchColor', verbose_name=_(u'Цвет отстрочки'))
     shirt = models.ForeignKey(Shirt)
 
     def __unicode__(self):
-        return self.get_element_display()
+        return self.element.title
 
     class Meta:
         verbose_name = _(u'Контрастная отстрочка')
