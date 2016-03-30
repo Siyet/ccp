@@ -33,3 +33,4 @@ django-crispy-forms
 
 # Import/Export data
 django-import-export
+openpyxl

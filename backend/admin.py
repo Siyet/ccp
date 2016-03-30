@@ -105,7 +105,7 @@ class FabricResource(resources.ModelResource):
                         continue
                     try:
                         amount = float(amount)
-                    except ValueError:
+                    except (ValueError, TypeError):
                         amount = 0
                     storehouse = next(storehouse for pk, storehouse in self.get_storehouses().iteritems() if storehouse.country == country)
                     try:
@@ -136,7 +136,7 @@ class FabricResource(resources.ModelResource):
             v1 = u'%.2f' % residuals.get(pk, 0)
             try:
                 v2 = u'%.2f' % float(current.residuals_set.get(storehouse.country, 0))
-            except ValueError:
+            except (ValueError, TypeError):
                 v2 = u'%.2f' % 0
             diff = dmp.diff_main(force_text(v1), force_text(v2))
             dmp.diff_cleanupSemantic(diff)
@@ -149,10 +149,10 @@ class FabricResource(resources.ModelResource):
         return resources.ModelResource.get_queryset(self).prefetch_related('residuals__storehouse')
 
     def get_storehouses(self, storehouses=None):
-        if storehouses is not None:
-            for country in storehouses:
-                Storehouse.objects.get_or_create(country=country)
         if not hasattr(self, '_storehouses'):
+            if storehouses is not None:
+                for country in storehouses:
+                    Storehouse.objects.get_or_create(country=country)
             storehouses = Storehouse.objects.all()
             self._storehouses = OrderedDict((x.pk, x) for x in storehouses)
         return self._storehouses
