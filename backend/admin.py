@@ -218,6 +218,8 @@ class FabricResource(resources.ModelResource):
                     if not real_dry_run:
                         with transaction.atomic():
                             self.save_instance(instance, real_dry_run)
+                    row_result.object_repr = force_text(instance)
+                    row_result.object_id = instance.pk
                     row_result.diff = self.get_diff(instance, instance, real_dry_run)
             except Exception as e:
                 # There is no point logging a transaction error for each row
