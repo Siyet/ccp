@@ -1,11 +1,6 @@
 # coding: utf-8
-from django.conf import settings
-import os
 from django import forms
 from django.core.urlresolvers import reverse
-from django.utils.encoding import force_text
-from import_export.widgets import Widget
-from backend import models
 
 
 class ContentTypeSelect(forms.Select):
@@ -36,35 +31,3 @@ class ContentTypeSelect(forms.Select):
         attrs['data-field'] = self.related_field
         render = forms.Select.render(self, name, value, attrs, choices)
         return render + self.render_script(u'id_%s' % name)
-
-
-class FabricResidualWidget(Widget):
-
-    def clean(self, value):
-        if not value:
-            return []
-        residuals = []
-        for x in value.split(', '):
-            country, amount = x.split(': ')
-            storehouse = models.Storehouse.objects.get(country=country)
-            amount = float(amount)
-            residuals.append((storehouse, amount))
-        return residuals
-
-    def render(self, value):
-        result = [u'%s: %f' % (x.storehouse.country, x.amount) for x in value.all()]
-        return u', '.join(result)
-
-
-class FileWidget(Widget):
-    """
-    Widget for file fields.
-    """
-
-    def clean(self, value):
-        if not os.path.exists(os.path.join(settings.MEDIA_ROOT, value)):
-            raise ValueError(u'Не найден файл %s' % value)
-        return value
-
-    def render(self, value):
-        return force_text(value)
