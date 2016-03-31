@@ -52,7 +52,7 @@ class Collection(models.Model):
 
 
 class Storehouse(models.Model):
-    country = models.CharField(_(u'Страна'), max_length=255)
+    country = models.CharField(_(u'Страна'), max_length=255, unique=True)
 
     def __unicode__(self):
         return self.country
