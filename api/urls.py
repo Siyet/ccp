@@ -31,6 +31,7 @@ components = [
     url(r'^tuck/$', views.TuckOptionsList.as_view()),
     url(r'^clasp/$', views.ClaspOptionsList.as_view()),
     url(r'^stitch/$', views.StitchOptionsList.as_view()),
+    url(r'^initials/$', views.TemplateInitialsList.as_view()),
 ]
 
 urlpatterns = [

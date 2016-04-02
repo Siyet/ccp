@@ -114,3 +114,21 @@ class StitchOptionsList(APIView):
         return Response([{'key': x[0], 'value': unicode(x[1])} for x in models.Shirt.STITCH])
 
 
+class TemplateInitialsList(APIView):
+
+    def build_filter(self, title, name, values):
+        return {
+            'title': title,
+            'id': name,
+            'values': values
+        }
+
+    def get(self, request, *args, **kwargs):
+        """
+        Список параметров для инициалов
+        """
+        colors = dictionaries.Color.objects.all()
+        return Response([
+            self.build_filter(u'Цвет', 'color', list(colors.values('id', 'title', 'color').distinct())),
+            self.build_filter(u'Позиция', 'location', map(lambda x: {'key': x[0], 'value': unicode(x[1])}, models.Initials.LOCATION)),
+        ])
