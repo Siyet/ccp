@@ -2,7 +2,6 @@
 
 from django.db import models
 from django.utils.text import ugettext_lazy as _
-from model_utils import Choices
 from colorful.fields import RGBColorField
 from django.db.models import Count
 
@@ -19,14 +18,27 @@ class ComponentModel(models.Model):
 
 
 class Color(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255, default=u'')
     color = RGBColorField(_(u'Значение'))
 
     def __unicode__(self):
-        return self.color
+        return self.title
 
     class Meta:
         verbose_name = u'Цвет (для инициалов)'
         verbose_name_plural = u'Цвета (для инициалов)'
+
+
+class Font(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255)
+    font = models.FileField(_(u'Файл шрифта'), upload_to='fonts')
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = u'Шрифт (для инициалов)'
+        verbose_name_plural = u'Шрифты (для инициалов)'
 
 
 class FabricColor(models.Model):

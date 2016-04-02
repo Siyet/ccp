@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import (
     Color,
+    Font,
     FabricColor,
     FabricDesign,
     FabricCategory,
@@ -33,6 +34,7 @@ class ShirtInfoAdmin(admin.ModelAdmin):
 admin.site.register(ShirtInfo, ShirtInfoAdmin)
 admin.site.register([
     Color,
+    Font,
     FabricColor,
     FabricDesign,
     FabricCategory,
