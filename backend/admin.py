@@ -1,5 +1,6 @@
 # coding: utf-8
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
@@ -85,6 +86,7 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
     readonly_fields = ['category']
     resource_class = FabricResource
     inlines = [FabricResidualAdminInline, ]
+    formats = settings.IMPORT_EXPORT_FORMATS
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):
