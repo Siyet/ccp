@@ -127,8 +127,10 @@ class TemplateInitialsList(APIView):
         """
         Список параметров для инициалов
         """
-        colors = dictionaries.Color.objects.all()
+        colors = dictionaries.Color.objects.values('id', 'title', 'color')
+        fonts = dictionaries.Font.objects.values('id', 'title', 'font')
         return Response([
-            self.build_filter(u'Цвет', 'color', list(colors.values('id', 'title', 'color').distinct())),
-            self.build_filter(u'Позиция', 'location', map(lambda x: {'key': x[0], 'value': unicode(x[1])}, models.Initials.LOCATION)),
+            self.build_filter(u'Цвет', 'color', list(colors)),
+            self.build_filter(u'Шрифт', 'font', map(lambda x: {'id': x['id'], 'title': x['title'], 'font': request.build_absolute_uri(x['font'])}, fonts)),
+            self.build_filter(u'Позиция', 'location', [{'key': x[0], 'value': unicode(x[1])} for x in models.Initials.LOCATION]),
         ])

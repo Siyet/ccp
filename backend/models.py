@@ -246,8 +246,7 @@ class Dickey(models.Model):
 
 
 class Initials(models.Model):
-    FONTS = (('script', 'Script'), ('arial', 'Arial'), ('free', 'Free'))
-    font = models.CharField(_(u'Шрифт'), choices=FONTS, max_length=10)
+    font = models.ForeignKey('dictionaries.Font', verbose_name=_(u'Шрифт'), null=True)
 
     LOCATION = (('button2', _(u'2 пуговица')),
                 ('button3', _(u'3 пуговица')),
