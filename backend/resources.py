@@ -117,10 +117,11 @@ class FabricResource(resources.ModelResource):
                 raise
 
         fabric_dict = {x.code: x for x in self.get_queryset()}
+        numbers = set(map(str, range(10)))
         for row in dataset.dict:
             try:
                 row_result = RowResult()
-                if not row['Fabric']:
+                if not row['Fabric'] or (len(row['Fabric']) > 1 and row['Fabric'][1] not in numbers):
                     continue
                 try:
                     instance = fabric_dict[row['Fabric']]
