@@ -3,6 +3,8 @@ from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
+from import_export.admin import ImportExportMixin
+from backend.resources import FabricResource
 from backend.widgets import ContentTypeSelect
 from .models import (
     Collection,
@@ -68,8 +70,21 @@ class FabricPriceAdmin(admin.ModelAdmin):
         return queryset.select_related('fabric_category', 'storehouse')
 
 
-class FabricAdmin(admin.ModelAdmin):
+class FabricResidualAdminInline(admin.TabularInline):
+    model = FabricResidual
+    extra = 0
+
+
+class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
+    change_list_template = 'admin/backend/change_list_import_export.html'
+    import_template_name = 'admin/backend/import.html'
+    list_display = ('code', 'category', 'material', )
+    list_display_links = ('code', 'category', )
+    search_fields = ('code', )
+    list_filter = ('category', )
     readonly_fields = ['category']
+    resource_class = FabricResource
+    inlines = [FabricResidualAdminInline, ]
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):

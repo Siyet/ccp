@@ -52,7 +52,7 @@ class Collection(models.Model):
 
 
 class Storehouse(models.Model):
-    country = models.CharField(_(u'Страна'), max_length=255)
+    country = models.CharField(_(u'Страна'), max_length=255, unique=True)
 
     def __unicode__(self):
         return self.country
@@ -132,7 +132,7 @@ class Fabric(models.Model):
 class FabricResidual(models.Model):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='residuals')
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), related_name='residuals')
-    amount = models.DecimalField(_(u'Остаток'), max_digits=10, decimal_places=2)
+    amount = models.DecimalField(_(u'Остаток'), max_digits=10, decimal_places=2, default=0)
 
     def __unicode__(self):
         return u'%s %s %s' % (self.fabric.code, _(u'на складе'), self.storehouse)
