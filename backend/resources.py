@@ -10,12 +10,69 @@ from django.db.transaction import TransactionManagementError, savepoint_commit, 
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from import_export import resources
+from import_export import resources, fields
 from import_export.django_compat import savepoint, savepoint_rollback
 from import_export.results import Result, Error, RowResult
 import sys
+from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 import tablib
 from backend.models import Fabric, FabricResidual, Storehouse
+from dictionaries import models as dictionaries
+
+
+class CustomForeignKeyWidget(ForeignKeyWidget):
+
+    def clean(self, value):
+        val = super(ForeignKeyWidget, self).clean(value)
+        if val:
+            try:
+                return self.model.objects.get(**{self.field: val})
+            except self.model.DoesNotExist:
+                return self.model(**{self.field: val})
+        else:
+            return None
+
+
+class FabricResource(resources.ModelResource):
+    code = fields.Field(column_name='FABRIC NAME', attribute='code')
+    colors = fields.Field(column_name='COLOR', attribute='colors', default=[], widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
+    design = fields.Field(column_name='DESIGN', attribute='designs', default=[], widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
+    description = fields.Field(column_name='DESCRIPTION', attribute='description')
+    price_category = fields.Field(column_name='PRICE CATEGORY', attribute='category', widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
+
+    class Meta:
+        model = Fabric
+        import_id_fields = ('code', )
+        fields = ('code', 'description', )
+
+    def before_save_instance(self, instance, dry_run):
+        if instance.category.pk is None:
+            instance.category.save()
+
+    def import_obj(self, obj, data, dry_run):
+        for field in self.get_fields():
+            if isinstance(field.widget, ManyToManyWidget):
+                val = data.get(field.column_name)
+                if val is None:
+                    val = ''
+                setattr(obj, '%s_diff' % field.column_name, val)
+                continue
+            self.import_field(field, obj, data)
+
+    def get_diff(self, original, current, dry_run=False):
+        data = []
+        dmp = diff_match_patch()
+        for field in self.get_fields():
+            v1 = self.export_field(field, original) if original else ""
+            v2 = self.export_field(field, current) if current else ""
+            if isinstance(field.widget, ManyToManyWidget):
+                v2 = getattr(current, '%s_diff' % field.column_name)
+            diff = dmp.diff_main(force_text(v1), force_text(v2))
+            dmp.diff_cleanupSemantic(diff)
+            html = dmp.diff_prettyHtml(diff)
+            html = mark_safe(html)
+            data.append(html)
+        return data
 
 
 class FabricResidualResource(resources.ModelResource):

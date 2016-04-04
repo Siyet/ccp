@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
-from backend.resources import FabricResidualResource
+from backend.resources import FabricResidualResource, FabricResource
 from backend.widgets import ContentTypeSelect
 from .models import (
     Collection,
@@ -94,12 +94,17 @@ class FabricResidualAdminInline(admin.TabularInline):
 
 
 class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
+    resource_class = FabricResource
+    change_list_template = 'admin/backend/change_list_import_export.html'
+    import_template_name = 'admin/backend/import.html'
+    formats = settings.IMPORT_EXPORT_FORMATS
     list_display = ('code', 'category', 'material', )
     list_display_links = ('code', 'category', )
     search_fields = ('code', )
     list_filter = ('category', )
     readonly_fields = ['category']
     inlines = [FabricResidualAdminInline, ]
+    list_select_related = ('category', )
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):
