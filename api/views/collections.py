@@ -123,7 +123,7 @@ class CollectionContrastDetailsList(APIView):
         prices = AccessoriesPrice.objects.filter(collections=collection, content_type__app_label='backend', content_type__model='contrastdetails').distinct().first()
         result = [{'key': False, 'value': _(u'Не использовать'), 'extra_price': None}]
         if prices:
-            result.append({'key': False, 'value': _(u'Не использовать'), 'extra_price': prices.price})
+            result.append({'key': True, 'value': _(u'Использовать'), 'extra_price': prices.price})
         return Response(result)
 
 
