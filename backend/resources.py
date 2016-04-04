@@ -18,7 +18,7 @@ import tablib
 from backend.models import Fabric, FabricResidual, Storehouse
 
 
-class FabricResource(resources.ModelResource):
+class FabricResidualResource(resources.ModelResource):
 
     class Meta:
         model = Fabric
