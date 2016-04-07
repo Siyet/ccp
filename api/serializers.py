@@ -35,9 +35,11 @@ class SizeSerializer(serializers.ModelSerializer):
 
 
 class FabricSerializer(serializers.ModelSerializer):
+    fabric_type = serializers.StringRelatedField(source='fabric_type.title')
+
     class Meta:
         model = models.Fabric
-        fields = ['id', 'code', 'description', 'texture']
+        fields = ['id', 'fabric_type', 'code', 'description', 'texture']
 
 
 class FabricColorSerializer(serializers.ModelSerializer):
