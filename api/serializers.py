@@ -132,6 +132,7 @@ class ShawlOptionsSerializer(serializers.ModelSerializer):
 
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
+    fabric_type = serializers.StringRelatedField(source='fabric.fabric_type.title')
     showcase_image = serializers.ImageField(source='showcase_image_list')
     sex = serializers.SerializerMethodField()
     material = serializers.StringRelatedField(source='fabric.material')
@@ -144,7 +145,7 @@ class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'price', 'sex']
+        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'price', 'sex']
 
 
 class ShirtImageSerializer(serializers.ModelSerializer):
