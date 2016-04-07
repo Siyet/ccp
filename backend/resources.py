@@ -34,20 +34,31 @@ class CustomForeignKeyWidget(ForeignKeyWidget):
 
 
 class FabricResource(resources.ModelResource):
-    code = fields.Field(column_name='FABRIC NAME', attribute='code')
-    colors = fields.Field(column_name='COLOR', attribute='colors', default=[], widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
-    design = fields.Field(column_name='DESIGN', attribute='designs', default=[], widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
-    description = fields.Field(column_name='DESCRIPTION', attribute='description')
-    price_category = fields.Field(column_name='PRICE CATEGORY', attribute='category', widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
+    code = fields.Field(column_name='Code', attribute='code')
+    material = fields.Field(column_name='Fabric', attribute='material')
+    colors = fields.Field(column_name='Color', attribute='colors', default=[], widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
+    design = fields.Field(column_name='Design', attribute='designs', default=[], widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
+    description = fields.Field(column_name='Fabric description', attribute='description')
+    fabric_type = fields.Field(column_name='Type', attribute='fabric_type', widget=CustomForeignKeyWidget(dictionaries.FabricType, field='title'))
+    price_category = fields.Field(column_name='Price category', attribute='category', widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
 
     class Meta:
         model = Fabric
         import_id_fields = ('code', )
-        fields = ('code', 'description', )
+        fields = ('code', )
 
     def before_save_instance(self, instance, dry_run):
-        if instance.category.pk is None:
-            instance.category.save()
+        if not dry_run:
+            if instance.category is not None and instance.category.pk is None:
+                instance.category.save()
+            if instance.fabric_type is not None and instance.fabric_type.pk is None:
+                instance.fabric_type.save()
+
+    @atomic()
+    def import_data(self, *args, **kwargs):
+        result = super(resources.ModelResource, self).import_data(*args, **kwargs)
+        result.rows.sort(key=lambda x: x.new_record, reverse=True)
+        return result
 
     def import_obj(self, obj, data, dry_run):
         for field in self.get_fields():

@@ -128,6 +128,7 @@ class Fabric(models.Model):
     class Meta:
         verbose_name = _(u'Ткань')
         verbose_name_plural = _(u'Ткани')
+        ordering = ('code', )
 
 
 class FabricResidual(models.Model):

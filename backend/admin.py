@@ -98,13 +98,13 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
     change_list_template = 'admin/backend/change_list_import_export.html'
     import_template_name = 'admin/backend/import.html'
     formats = settings.IMPORT_EXPORT_FORMATS
-    list_display = ('code', 'category', 'material', )
+    list_display = ('code', 'category', 'material', 'fabric_type', )
     list_display_links = ('code', 'category', )
     search_fields = ('code', )
     list_filter = ('category', )
     readonly_fields = ['category']
     inlines = [FabricResidualAdminInline, ]
-    list_select_related = ('category', )
+    list_select_related = ('category', 'fabric_type', )
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):
