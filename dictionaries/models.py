@@ -68,6 +68,17 @@ class FabricCategory(models.Model):
         verbose_name_plural = _(u'Категории тканей')
 
 
+class FabricType(models.Model):
+    title = models.CharField(_(u'Тип'), unique=True, max_length=255)
+
+    def __unicode__(self):
+        return u"%s %s" % (_(u'Тип'), self.title)
+
+    class Meta:
+        verbose_name = _(u'Тип ткани')
+        verbose_name_plural = _(u'Типы тканей')
+
+
 class FabricDesign(ComponentModel):
     class Meta:
         verbose_name = _(u'Паттерн ткани')
