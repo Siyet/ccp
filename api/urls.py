@@ -14,6 +14,7 @@ collection_urls = [
     url(r'^hardness/$', views.CollectionHardnessList.as_view()),
     url(r'^stays/$', views.CollectionStaysList.as_view()),
     url(r'^contrasting_fabrics/$', views.CollectionContrastDetailsList.as_view()),
+    url(r'^dickey/$', views.CollectionDickeyList.as_view()),
     url(r'^stitches/$', views.CollectionStitchesList.as_view()),
 ]
 
@@ -32,6 +33,7 @@ components = [
     url(r'^clasp/$', views.ClaspOptionsList.as_view()),
     url(r'^stitch/$', views.StitchOptionsList.as_view()),
     url(r'^initials/$', views.TemplateInitialsList.as_view()),
+    url(r'^dickey/$', views.DickeyList.as_view()),
 ]
 
 urlpatterns = [
