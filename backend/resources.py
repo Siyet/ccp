@@ -6,16 +6,100 @@ import traceback
 from diff_match_patch import diff_match_patch
 from django.core.management.color import no_style
 from django.db import transaction, connections, DEFAULT_DB_ALIAS
+from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import TransactionManagementError, savepoint_commit, atomic
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from import_export import resources
+from import_export import resources, fields
 from import_export.django_compat import savepoint, savepoint_rollback
 from import_export.results import Result, Error, RowResult
 import sys
+from import_export.widgets import ForeignKeyWidget
 import tablib
-from backend.models import Fabric, FabricResidual, Storehouse
+from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection
+
+
+class CustomForeignKeyWidget(ForeignKeyWidget):
+
+    def clean(self, value):
+        val = super(ForeignKeyWidget, self).clean(value)
+        if val:
+            try:
+                return self.model.objects.get(**{self.field: val})
+            except self.model.DoesNotExist:
+                return self.model(**{self.field: val})
+        else:
+            return None
+
+
+class TemplateShirtCollectionWidget(ForeignKeyWidget):
+
+    def clean(self, value, sex=None):
+        val = super(ForeignKeyWidget, self).clean(value)
+        if sex == u'МУЖ':
+            sex = 'male'
+        elif sex == u'ЖЕН':
+            sex = 'female'
+        else:
+            sex = 'unisex'
+        return self.model.objects.get(**{self.field: val, 'sex': sex}) if val else None
+
+
+class TemplateShirtCollectionField(fields.Field):
+
+    def clean(self, data, sex=None):
+        try:
+            value = data[self.column_name]
+        except KeyError:
+            raise KeyError("Column '%s' not found in dataset. Available "
+                           "columns are: %s" % (self.column_name,
+                                                list(data.keys())))
+
+        try:
+            value = self.widget.clean(value, sex)
+        except ValueError as e:
+            raise ValueError("Column '%s': %s" % (self.column_name, e))
+
+        if not value and self.default != NOT_PROVIDED:
+            if callable(self.default):
+                return self.default()
+            return self.default
+
+        return value
+
+    def save(self, obj, data, sex=None):
+        if not self.readonly:
+            attrs = self.attribute.split('__')
+            for attr in attrs[:-1]:
+                obj = getattr(obj, attr, None)
+            setattr(obj, attrs[-1], self.clean(data, sex))
+
+
+class TemplateShirtResource(resources.ModelResource):
+    code = fields.Field(attribute='code', column_name='Shirt Code')
+    fabric = fields.Field(attribute='fabric', column_name=u'Код ткани', widget=CustomForeignKeyWidget(Fabric, field='code'))
+    collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
+                                              widget=TemplateShirtCollectionWidget(Collection, field='title'))
+
+    class Meta:
+        model = TemplateShirt
+        import_id_fields = ('code', )
+        fields = ('code', )
+
+    def before_save_instance(self, instance, dry_run):
+        if not dry_run:
+            if instance.fabric is not None and instance.fabric.pk is None:
+                instance.fabric.save()
+            if instance.collection is not None and instance.collection.pk is None:
+                instance.collection.save()
+
+    def import_field(self, field, obj, data):
+        if field.attribute and field.column_name in data:
+            if field.attribute == 'collection':
+                field.save(obj, data, sex=data.get(u'Пол'))
+            else:
+                field.save(obj, data)
 
 
 class FabricResource(resources.ModelResource):

@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
-from backend.resources import FabricResource
+from backend.resources import FabricResource, TemplateShirtResource
 from backend.widgets import ContentTypeSelect
 from .models import (
     Collection,
@@ -57,7 +57,11 @@ class CustomShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template', 'code', 'showcase_image', 'individualization', 'description']
 
 
-class TemplateShirtAdmin(admin.ModelAdmin):
+class TemplateShirtAdmin(ImportExportMixin, admin.ModelAdmin):
+    resource_class = TemplateShirtResource
+    formats = settings.IMPORT_EXPORT_FORMATS
+    change_list_template = 'admin/backend/change_list_import_export.html'
+    import_template_name = 'admin/backend/import.html'
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
 
