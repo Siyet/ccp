@@ -5,7 +5,7 @@ from django.db.models.expressions import RawSQL
 class CustomShirtManager(models.Manager):
 
     def get_queryset(self):
-        queryset = models.Manager.get_queryset(self).filter(is_template=False)
+        queryset = models.Manager.get_queryset(self).filter(is_template=False, is_standard=False)
         return queryset
 
 
@@ -22,5 +22,12 @@ class TemplateShirtManager(models.Manager):
         return self.annotate(amount=select_amount).filter(amount__gte=settings.MIN_FABRIC_RESIDUAL).select_related('collection')
 
     def get_queryset(self):
-        queryset = models.Manager.get_queryset(self).filter(is_template=True)
+        queryset = models.Manager.get_queryset(self).filter(is_template=True, is_standard=False)
+        return queryset
+
+
+class StandardShirtManager(models.Manager):
+
+    def get_queryset(self):
+        queryset = models.Manager.get_queryset(self).filter(is_template=False, is_standard=True)
         return queryset
