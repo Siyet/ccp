@@ -337,7 +337,7 @@ class Shirt(models.Model):
 
         # Манишка
         dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend', content_type__model='dickey').filter(Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
-        if dickey_price:
+        if dickey_price and self.dickey:
             price += dickey_price.price
 
         # Контрастные детали
