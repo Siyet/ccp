@@ -26,7 +26,7 @@ from .models import (
     CustomShirt, TemplateShirt,
     ShirtImage,
     AccessoriesPrice,
-    ElementStitch)
+    ElementStitch, StandardShirt)
 
 
 class ShirtImageInline(admin.TabularInline):
@@ -161,4 +161,5 @@ admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(FabricResidual, FabricResidualAdmin)
 admin.site.register(CustomShirt, CustomShirtAdmin)
 admin.site.register(TemplateShirt, TemplateShirtAdmin)
+admin.site.register(StandardShirt, TemplateShirtAdmin)
 admin.site.register(AccessoriesPrice, AccessoriesPriceAdmin)

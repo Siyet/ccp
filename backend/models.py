@@ -274,6 +274,7 @@ class Shirt(models.Model):
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
+    is_standard = models.BooleanField(_(u'Используется как стандартный вариант'), default=False, editable=False)
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     individualization = models.TextField(_(u'Индивидуализация'))
@@ -395,6 +396,23 @@ class TemplateShirt(Shirt):
 
     def __unicode__(self):
         return u"%s #%s" %(_(u"Шаблон"), self.code)
+
+
+class StandardShirt(Shirt):
+    objects = managers.StandardShirtManager()
+
+    def save(self, *args, **kwargs):
+        self.is_template = False
+        self.is_standard = True
+        super(StandardShirt, self).save(*args, **kwargs)
+
+    class Meta:
+        proxy = True
+        verbose_name = _(u'Стандартный вариант рубашки')
+        verbose_name_plural = _(u'Стандартные варианты рубашек')
+
+    def __unicode__(self):
+        return u"%s #%s" %(_(u"Стандартный вариант"), self.code)
 
 
 class ShirtImage(models.Model):
