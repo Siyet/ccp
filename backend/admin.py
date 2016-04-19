@@ -23,10 +23,13 @@ from .models import (
     Initials,
     ContrastDetails,
     ContrastStitch,
-    CustomShirt, TemplateShirt,
+    CustomShirt,
+    TemplateShirt,
     ShirtImage,
     AccessoriesPrice,
-    ElementStitch, StandardShirt)
+    ElementStitch,
+    StandardShirt,
+)
 
 
 class ShirtImageInline(admin.TabularInline):
@@ -52,14 +55,48 @@ class ContrastStitchInline(admin.TabularInline):
     model = ContrastStitch
 
 
+class CustomShirtAdminForm(forms.ModelForm):
+    fabric = forms.ModelChoiceField(label=_(u'Ткань'), queryset=Fabric.objects.all())
+
+    class Meta:
+        model = TemplateShirt
+        fields = '__all__'
+
+
 class CustomShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
     exclude = ['is_template', 'code', 'showcase_image', 'individualization', 'description']
+    form = CustomShirtAdminForm
+
+
+class TemplateShirtAdminForm(forms.ModelForm):
+    code = forms.CharField(label=_(u'Артикул'), widget=forms.TextInput(attrs={'class': 'vTextField'}))
+    individualization = forms.CharField(label=_(u'Индивидуализация'), widget=forms.Textarea(attrs={'class': 'vLargeTextField'}))
+    fabric = forms.ModelChoiceField(label=_(u'Ткань'), queryset=Fabric.objects.all())
+
+    class Meta:
+        model = TemplateShirt
+        fields = '__all__'
 
 
 class TemplateShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
+    form = TemplateShirtAdminForm
+
+
+class StandardShirtAdminForm(forms.ModelForm):
+    code = forms.CharField(label=_(u'Артикул'), required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
+    individualization = forms.CharField(label=_(u'Индивидуализация'), required=False, widget=forms.Textarea(attrs={'class': 'vLargeTextField'}))
+    fabric = forms.ModelChoiceField(label=_(u'Ткань'), required=False, queryset=Fabric.objects.all())
+
+    class Meta:
+        model = StandardShirt
+        fields = '__all__'
+
+
+class StandardShirtAdmin(TemplateShirtAdmin):
+    form = StandardShirtAdminForm
 
 
 class FabricPriceAdmin(admin.ModelAdmin):
@@ -161,5 +198,5 @@ admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(FabricResidual, FabricResidualAdmin)
 admin.site.register(CustomShirt, CustomShirtAdmin)
 admin.site.register(TemplateShirt, TemplateShirtAdmin)
-admin.site.register(StandardShirt, TemplateShirtAdmin)
+admin.site.register(StandardShirt, StandardShirtAdmin)
 admin.site.register(AccessoriesPrice, AccessoriesPriceAdmin)
