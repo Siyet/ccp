@@ -18,9 +18,14 @@ import sys
 from import_export.widgets import ForeignKeyWidget
 import tablib
 from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection
+from dictionaries import models as dictionaries
 
 
 class CustomForeignKeyWidget(ForeignKeyWidget):
+
+    def __init__(self, model, field='pk', null=False, *args, **kwargs):
+        self.null = null
+        super(CustomForeignKeyWidget, self).__init__(model, field, *args, **kwargs)
 
     def clean(self, value):
         val = super(ForeignKeyWidget, self).clean(value)
@@ -28,7 +33,14 @@ class CustomForeignKeyWidget(ForeignKeyWidget):
             try:
                 return self.model.objects.get(**{self.field: val})
             except self.model.DoesNotExist:
+                if self.null:
+                    return None
                 return self.model(**{self.field: val})
+            except ValueError as e:
+                if self.null:
+                    return None
+                raise e
+
         else:
             return None
 
@@ -78,6 +90,9 @@ class TemplateShirtCollectionField(fields.Field):
 
 class TemplateShirtResource(resources.ModelResource):
     code = fields.Field(attribute='code', column_name='Shirt Code')
+    size = fields.Field(attribute='size', column_name=u'№ размера', widget=CustomForeignKeyWidget(model=dictionaries.Size, field='size', null=True))
+    hem = fields.Field(attribute='hem', column_name=u'Низ', widget=CustomForeignKeyWidget(model=dictionaries.HemType, field='title'))
+    placket = fields.Field(attribute='placket', column_name=u'Полочка', widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title'))
     fabric = fields.Field(attribute='fabric', column_name=u'Код ткани', widget=CustomForeignKeyWidget(Fabric, field='code'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
@@ -93,6 +108,10 @@ class TemplateShirtResource(resources.ModelResource):
                 instance.fabric.save()
             if instance.collection is not None and instance.collection.pk is None:
                 instance.collection.save()
+            if instance.hem is not None and instance.hem.pk is None:
+                instance.hem.save()
+            if instance.placket is not None and instance.placket.pk is None:
+                instance.placket.save()
 
     def import_field(self, field, obj, data):
         if field.attribute and field.column_name in data:
