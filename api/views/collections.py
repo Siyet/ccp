@@ -4,7 +4,7 @@ from django.http import Http404
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from backend.models import Collection, AccessoriesPrice
+from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey
 from django.shortcuts import get_object_or_404
 from django.utils.text import ugettext_lazy as _
 from dictionaries import models as dictionaries
@@ -113,18 +113,30 @@ class CollectionStaysList(ListAPIView):
         return collection.stays.all()
 
 
-class CollectionContrastDetailsList(APIView):
-    """
-    Доступные варианты для контрастных тканей
-    """
+class CollectionAccessoriesPriceList(APIView):
+    model = None
 
     def get(self, request, *args, **kwargs):
         collection = get_object_or_404(Collection.objects.prefetch_related('stays'), pk=self.kwargs['pk'])
-        prices = AccessoriesPrice.objects.filter(collections=collection, content_type__app_label='backend', content_type__model='contrastdetails').distinct().first()
+        prices = AccessoriesPrice.objects.filter(collections=collection, content_type__app_label='backend', content_type__model=self.model.__name__.lower()).distinct().first()
         result = [{'key': False, 'value': _(u'Не использовать'), 'extra_price': None}]
         if prices:
-            result.append({'key': False, 'value': _(u'Не использовать'), 'extra_price': prices.price})
+            result.append({'key': True, 'value': _(u'Использовать'), 'extra_price': prices.price})
         return Response(result)
+
+
+class CollectionContrastDetailsList(CollectionAccessoriesPriceList):
+    """
+    Доступные варианты для контрастных тканей
+    """
+    model = ContrastDetails
+
+
+class CollectionDickeyList(CollectionAccessoriesPriceList):
+    """
+    Доступные варианты для манишки
+    """
+    model = Dickey
 
 
 class CollectionStitchesList(APIView):

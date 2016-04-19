@@ -48,7 +48,7 @@ class Collection(models.Model):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.prefetch_related('residuals__storehouse').filter(filter_predicate)
+        return Fabric.objects.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
 
 
 class Storehouse(models.Model):
@@ -103,10 +103,10 @@ class FabricPrice(models.Model):
 
 
 class Fabric(models.Model):
-    code = models.CharField(_(u'Артикул'), max_length=20)
+    code = models.CharField(_(u'Артикул'), max_length=20, unique=True)
     category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics', blank=True, null=True)
     fabric_type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics', null=True)
-    description = models.TextField(_(u'Описание'))
+    description = models.TextField(_(u'Описание'), null=True)
     material = models.CharField(_(u'Материал'), max_length=255, null=True)
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
@@ -128,6 +128,7 @@ class Fabric(models.Model):
     class Meta:
         verbose_name = _(u'Ткань')
         verbose_name_plural = _(u'Ткани')
+        ordering = ('code', )
 
 
 class FabricResidual(models.Model):
@@ -273,6 +274,7 @@ class Shirt(models.Model):
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
+    is_standard = models.BooleanField(_(u'Используется как стандартный вариант'), default=False, editable=False)
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     individualization = models.TextField(_(u'Индивидуализация'))
@@ -336,7 +338,7 @@ class Shirt(models.Model):
 
         # Манишка
         dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend', content_type__model='dickey').filter(Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
-        if dickey_price:
+        if dickey_price and self.dickey:
             price += dickey_price.price
 
         # Контрастные детали
@@ -394,6 +396,23 @@ class TemplateShirt(Shirt):
 
     def __unicode__(self):
         return u"%s #%s" %(_(u"Шаблон"), self.code)
+
+
+class StandardShirt(Shirt):
+    objects = managers.StandardShirtManager()
+
+    def save(self, *args, **kwargs):
+        self.is_template = False
+        self.is_standard = True
+        super(StandardShirt, self).save(*args, **kwargs)
+
+    class Meta:
+        proxy = True
+        verbose_name = _(u'Стандартный вариант рубашки')
+        verbose_name_plural = _(u'Стандартные варианты рубашек')
+
+    def __unicode__(self):
+        return u"%s #%s" %(_(u"Стандартный вариант"), self.code)
 
 
 class ShirtImage(models.Model):

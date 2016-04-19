@@ -1,4 +1,5 @@
 # coding: utf-8
+from django.conf import settings
 
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -133,4 +134,25 @@ class TemplateInitialsList(APIView):
             self.build_filter(u'Цвет', 'color', list(colors)),
             self.build_filter(u'Шрифт', 'font', map(lambda x: {'id': x['id'], 'title': x['title'], 'font': request.build_absolute_uri(x['font'])}, fonts)),
             self.build_filter(u'Позиция', 'location', [{'key': x[0], 'value': unicode(x[1])} for x in models.Initials.LOCATION]),
+        ])
+
+
+class DickeyList(APIView):
+    """
+    Список тканей и типов манишек
+    """
+
+    def build_filter(self, title, name, values):
+        return {
+            'title': title,
+            'id': name,
+            'values': values
+        }
+
+    def get(self, request, *args, **kwargs):
+        fabrics = models.Fabric.objects.filter(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
+        dickey_types = dictionaries.DickeyType.objects.all()
+        return Response([
+            self.build_filter(u'Ткань', 'fabric', list(fabrics.values('id', 'code').distinct())),
+            self.build_filter(u'Тип манишки', 'type', list(dickey_types.values())),
         ])
