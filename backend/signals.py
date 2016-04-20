@@ -19,7 +19,7 @@ def calculate_shirts_price(sender, instance, created, **kwargs):
             query |= Q(pk__in=instance.old_shirts)
 
         for shirt in models.Shirt.objects.filter(query).\
-                select_related('fabric', 'shawl', 'collection__storehouse', 'custom_buttons__type', 'shirt_cuff', 'collar').\
+                select_related('fabric', 'shawl', 'collection__storehouse', 'custom_buttons__type', 'shirt_cuff', 'collar', 'dickey').\
                 prefetch_related('collection__storehouse__prices', 'shirt_contrast_details'):
             shirt.save()
 

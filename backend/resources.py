@@ -15,9 +15,9 @@ from import_export import resources, fields
 from import_export.django_compat import savepoint, savepoint_rollback
 from import_export.results import Result, Error, RowResult
 import sys
-from import_export.widgets import ForeignKeyWidget
+from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 import tablib
-from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection
+from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays
 from dictionaries import models as dictionaries
 
 
@@ -38,7 +38,6 @@ class CustomForeignKeyWidget(ForeignKeyWidget):
                 if self.null:
                     return None
                 raise e
-
         else:
             return None
 
@@ -97,30 +96,56 @@ class TemplateShirtResource(resources.ModelResource):
     pocket = fields.Field(attribute='pocket', column_name=u'Карман', widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
+    collar__type = fields.Field(attribute='collar__type', column_name=u'Тип воротника', widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title'))
+    collar__hardness = fields.Field(attribute='collar__hardness', column_name=u'Жесткость воротника', widget=CustomForeignKeyWidget(model=Hardness, field='title'))
+    collar__stays = fields.Field(attribute='collar__stays', column_name=u'Косточки', widget=CustomForeignKeyWidget(model=Stays, field='title'))
+    collar__size = fields.Field(attribute='collar__size', column_name=u'Размер воротника', widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title'))
 
     class Meta:
         model = TemplateShirt
         import_id_fields = ('code', )
         fields = ('code', )
 
+    def check_relations(self, instance, field):
+        if getattr(instance, field) is not None and getattr(instance, field).pk is None:
+            getattr(instance, field).save()
+            setattr(instance, field, getattr(instance, field))
+        elif field == 'collar':
+            getattr(instance, field).save()
+
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
-            def check_relations(instance, field):
-                if getattr(instance, field) is not None and getattr(instance, field).pk is None:
-                    getattr(instance, field).save()
-                    setattr(instance, field, getattr(instance, field))
 
-            check_relations(instance, 'fabric')
-            check_relations(instance, 'collection')
-            check_relations(instance, 'hem')
-            check_relations(instance, 'placket')
-            check_relations(instance, 'size_option')
-            check_relations(instance, 'pocket')
-            check_relations(instance, 'back')
+            self.check_relations(instance, 'fabric')
+            self.check_relations(instance, 'collection')
+            self.check_relations(instance, 'hem')
+            self.check_relations(instance, 'placket')
+            self.check_relations(instance, 'size_option')
+            self.check_relations(instance, 'pocket')
+            self.check_relations(instance, 'back')
+            self.check_relations(instance.collar, 'type')
+            self.check_relations(instance.collar, 'hardness')
+            self.check_relations(instance.collar, 'stays')
+            self.check_relations(instance.collar, 'size')
 
             if instance.size is not None and instance.size._state.adding:
                 instance.size.save()
                 instance.size = instance.size
+
+    def after_save_instance(self, instance, dry_run):
+        if not dry_run:
+            instance.collar.shirt = instance
+            self.check_relations(instance, 'collar')
+
+    def import_obj(self, obj, data, dry_run):
+        try:
+            obj.collar
+        except:
+            obj.collar = Collar()
+        for field in self.get_fields():
+            if isinstance(field.widget, ManyToManyWidget):
+                continue
+            self.import_field(field, obj, data)
 
     def import_field(self, field, obj, data):
         if field.attribute and field.column_name in data:
@@ -128,9 +153,64 @@ class TemplateShirtResource(resources.ModelResource):
                 field.save(obj, data, sex=data.get(u'Пол'))
             else:
                 field.save(obj, data)
+        else:
+            return None
 
 
 class FabricResource(resources.ModelResource):
+    code = fields.Field(column_name='Code', attribute='code')
+    material = fields.Field(column_name='Fabric', attribute='material')
+    colors = fields.Field(column_name='Color', attribute='colors', default=[], widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
+    design = fields.Field(column_name='Design', attribute='designs', default=[], widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
+    description = fields.Field(column_name='Fabric description', attribute='description')
+    fabric_type = fields.Field(column_name='Type', attribute='fabric_type', widget=CustomForeignKeyWidget(dictionaries.FabricType, field='title'))
+    price_category = fields.Field(column_name='Price category', attribute='category', widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
+
+    class Meta:
+        model = Fabric
+        import_id_fields = ('code', )
+        fields = ('code', )
+
+    def before_save_instance(self, instance, dry_run):
+        if not dry_run:
+            if instance.category is not None and instance.category.pk is None:
+                instance.category.save()
+            if instance.fabric_type is not None and instance.fabric_type.pk is None:
+                instance.fabric_type.save()
+
+    @atomic()
+    def import_data(self, *args, **kwargs):
+        result = super(resources.ModelResource, self).import_data(*args, **kwargs)
+        result.rows.sort(key=lambda x: x.new_record, reverse=True)
+        return result
+
+    def import_obj(self, obj, data, dry_run):
+        for field in self.get_fields():
+            if isinstance(field.widget, ManyToManyWidget):
+                val = data.get(field.column_name)
+                if val is None:
+                    val = ''
+                setattr(obj, '%s_diff' % field.column_name, val)
+                continue
+            self.import_field(field, obj, data)
+
+    def get_diff(self, original, current, dry_run=False):
+        data = []
+        dmp = diff_match_patch()
+        for field in self.get_fields():
+            v1 = self.export_field(field, original) if original else ""
+            v2 = self.export_field(field, current) if current else ""
+            if isinstance(field.widget, ManyToManyWidget):
+                v2 = getattr(current, '%s_diff' % field.column_name)
+            diff = dmp.diff_main(force_text(v1), force_text(v2))
+            dmp.diff_cleanupSemantic(diff)
+            html = dmp.diff_prettyHtml(diff)
+            html = mark_safe(html)
+            data.append(html)
+        return data
+
+
+class FabricResidualResource(resources.ModelResource):
 
     class Meta:
         model = Fabric

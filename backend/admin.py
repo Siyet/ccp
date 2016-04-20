@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
-from backend.resources import FabricResource, TemplateShirtResource
+from backend.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from backend.widgets import ContentTypeSelect
 from .models import (
     Collection,
@@ -23,10 +23,13 @@ from .models import (
     Initials,
     ContrastDetails,
     ContrastStitch,
-    CustomShirt, TemplateShirt,
+    CustomShirt,
+    TemplateShirt,
     ShirtImage,
     AccessoriesPrice,
-    ElementStitch)
+    ElementStitch,
+    StandardShirt
+)
 
 
 class ShirtImageInline(admin.TabularInline):
@@ -75,22 +78,40 @@ class FabricPriceAdmin(admin.ModelAdmin):
         return queryset.select_related('fabric_category', 'storehouse')
 
 
+class FabricResidualAdmin(ImportExportMixin, admin.ModelAdmin):
+    resource_class = FabricResidualResource
+    change_list_template = 'admin/backend/change_list_import_export.html'
+    import_template_name = 'admin/backend/import.html'
+    formats = settings.IMPORT_EXPORT_FORMATS
+    list_select_related = ('fabric', 'storehouse', )
+
+    def get_export_queryset(self, request):
+        """
+        return all data to export
+        """
+        qs = self.resource_class._meta.model.objects.all()
+        if self.list_select_related:
+            qs = qs.select_related(*self.list_select_related)
+        return qs
+
+
 class FabricResidualAdminInline(admin.TabularInline):
     model = FabricResidual
     extra = 0
 
 
 class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
+    resource_class = FabricResource
     change_list_template = 'admin/backend/change_list_import_export.html'
     import_template_name = 'admin/backend/import.html'
-    list_display = ('code', 'category', 'material', )
+    formats = settings.IMPORT_EXPORT_FORMATS
+    list_display = ('code', 'category', 'material', 'fabric_type', )
     list_display_links = ('code', 'category', )
     search_fields = ('code', )
     list_filter = ('category', )
     readonly_fields = ['category']
-    resource_class = FabricResource
     inlines = [FabricResidualAdminInline, ]
-    formats = settings.IMPORT_EXPORT_FORMATS
+    list_select_related = ('category', 'fabric_type', )
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):
@@ -133,7 +154,6 @@ class AccessoriesPriceAdmin(admin.ModelAdmin):
 admin.site.register([
     Collection,
     Storehouse,
-    FabricResidual,
     CustomButtons,
     ShawlOptions,
     Dickey,
@@ -145,6 +165,8 @@ admin.site.register([
 
 admin.site.register(Fabric, FabricAdmin)
 admin.site.register(FabricPrice, FabricPriceAdmin)
+admin.site.register(FabricResidual, FabricResidualAdmin)
 admin.site.register(CustomShirt, CustomShirtAdmin)
 admin.site.register(TemplateShirt, TemplateShirtAdmin)
+admin.site.register(StandardShirt, TemplateShirtAdmin)
 admin.site.register(AccessoriesPrice, AccessoriesPriceAdmin)

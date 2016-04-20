@@ -42,7 +42,7 @@ class Font(models.Model):
 
 
 class FabricColor(models.Model):
-    title = models.CharField(_(u'Название'), max_length=255)
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
     value = RGBColorField(_(u'Значение'))
 
     def __unicode__(self):
