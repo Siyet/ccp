@@ -15,7 +15,7 @@ from api import serializers
 
 class TemplateShirtsFilter(filters.FilterSet):
     fabric = django_filters.ModelMultipleChoiceFilter(queryset=models.Fabric.objects.all())
-    fabric_type = django_filters.MultipleChoiceFilter(choices=map(lambda x: (x.title, x), dictionaries.FabricType.objects.all()), name='fabric__fabric_type__title')
+    fabric_type = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.FabricType.objects.all(), name='fabric__fabric_type')
     collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
 
     class Meta:
