@@ -23,10 +23,14 @@ from .models import (
     Initials,
     ContrastDetails,
     ContrastStitch,
-    CustomShirt, TemplateShirt,
+    CustomShirt,
+    TemplateShirt,
     ShirtImage,
     AccessoriesPrice,
-    ElementStitch, StandardShirt)
+    ElementStitch,
+    StandardShirt,
+    content_type_names
+)
 
 
 class ShirtImageInline(admin.TabularInline):
@@ -122,6 +126,7 @@ class AccessoriesPriceAdminForm(forms.ModelForm):
             self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in instance.content_type.model_class().objects.all()]
         content_type_pk = [x.pk for x in self.fields['content_type'].queryset if hasattr(x.model_class(), 'get_related_shirts')]
         self.fields['content_type'].queryset = self.fields['content_type'].queryset.filter(pk__in=content_type_pk)
+        self.fields['content_type'].choices = [(pk, content_type_names.get(title, title)) for pk, title in self.fields['content_type'].choices]
 
     def clean_content_type(self):
         content_type = self.cleaned_data.get('content_type')
@@ -139,8 +144,8 @@ class AccessoriesPriceAdminForm(forms.ModelForm):
 
 
 class AccessoriesPriceAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'content_type', 'content_object', 'price', )
-    list_display_links = ('pk', 'content_type', 'content_object', 'price', )
+    list_display = ('pk', 'content_type_title', 'content_object', 'price', )
+    list_display_links = ('pk', 'content_type_title', 'content_object', 'price', )
     form = AccessoriesPriceAdminForm
 
 

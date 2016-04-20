@@ -473,6 +473,12 @@ class ContrastStitch(models.Model):
         verbose_name = _(u'Контрастная отстрочка')
         verbose_name_plural = _(u'Контрастные отстрочки')
 
+content_type_names = {
+    _(u'Контрастная деталь'): _(u'Контрастные ткани'),
+    _(u'Воротник'): _(u' Воротник полностью белый'),
+    _(u'Манжета'): _(u' Манжета полностью белая'),
+}
+
 
 class AccessoriesPrice(models.Model):
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), related_name='accessories_price')
@@ -482,7 +488,13 @@ class AccessoriesPrice(models.Model):
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='accessories_prices', blank=True)
 
     def __unicode__(self):
+        print dir(self.content_type)
         return u'Цена: %s' % self.content_type
+
+    def content_type_title(self):
+        return content_type_names.get(self.content_type.name, self.content_type.name)
+    content_type_title.allow_tags = True
+    content_type_title.short_description = _(u'Тип')
 
     class Meta:
         verbose_name = _(u'Цена надбавки')
