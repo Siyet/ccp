@@ -33,8 +33,6 @@ class CustomForeignKeyWidget(ForeignKeyWidget):
             try:
                 return self.model.objects.get(**{self.field: val})
             except self.model.DoesNotExist:
-                if self.null:
-                    return None
                 return self.model(**{self.field: val})
             except ValueError as e:
                 if self.null:
@@ -90,10 +88,13 @@ class TemplateShirtCollectionField(fields.Field):
 
 class TemplateShirtResource(resources.ModelResource):
     code = fields.Field(attribute='code', column_name='Shirt Code')
-    size = fields.Field(attribute='size', column_name=u'№ размера', widget=CustomForeignKeyWidget(model=dictionaries.Size, field='size', null=True))
+    fabric = fields.Field(attribute='fabric', column_name=u'Код ткани', widget=CustomForeignKeyWidget(Fabric, field='code'))
+    size_option = fields.Field(attribute='size_option', column_name=u'Размер', widget=CustomForeignKeyWidget(model=dictionaries.SizeOptions, field='title'))
+    size = fields.Field(attribute='size', column_name=u'№ размера', widget=CustomForeignKeyWidget(model=dictionaries.Size, field='size'))
     hem = fields.Field(attribute='hem', column_name=u'Низ', widget=CustomForeignKeyWidget(model=dictionaries.HemType, field='title'))
     placket = fields.Field(attribute='placket', column_name=u'Полочка', widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title'))
-    fabric = fields.Field(attribute='fabric', column_name=u'Код ткани', widget=CustomForeignKeyWidget(Fabric, field='code'))
+    back = fields.Field(attribute='back', column_name=u'Спинка', widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title'))
+    pocket = fields.Field(attribute='pocket', column_name=u'Карман', widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
 
@@ -104,14 +105,22 @@ class TemplateShirtResource(resources.ModelResource):
 
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
-            if instance.fabric is not None and instance.fabric.pk is None:
-                instance.fabric.save()
-            if instance.collection is not None and instance.collection.pk is None:
-                instance.collection.save()
-            if instance.hem is not None and instance.hem.pk is None:
-                instance.hem.save()
-            if instance.placket is not None and instance.placket.pk is None:
-                instance.placket.save()
+            def check_relations(instance, field):
+                if getattr(instance, field) is not None and getattr(instance, field).pk is None:
+                    getattr(instance, field).save()
+                    setattr(instance, field, getattr(instance, field))
+
+            check_relations(instance, 'fabric')
+            check_relations(instance, 'collection')
+            check_relations(instance, 'hem')
+            check_relations(instance, 'placket')
+            check_relations(instance, 'size_option')
+            check_relations(instance, 'pocket')
+            check_relations(instance, 'back')
+
+            if instance.size is not None and instance.size._state.adding:
+                instance.size.save()
+                instance.size = instance.size
 
     def import_field(self, field, obj, data):
         if field.attribute and field.column_name in data:

@@ -306,8 +306,8 @@ class Shirt(models.Model):
     custom_buttons = ChainedForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), chained_field='custom_buttons_type',
                                  chained_model_field='type', show_all=False, null=True, blank=True)
 
-    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'))
-    yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'))
+    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True)
+    yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 
     STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')), ('5mm', _(u'5 мм')))
