@@ -270,7 +270,7 @@ class Initials(models.Model):
 
 
 class Shirt(models.Model):
-    TUCK_OPTIONS = Choices((False, _(u'Без вытачек')), (True, _(u'С вытачками')))
+    TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))

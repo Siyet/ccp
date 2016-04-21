@@ -17,7 +17,7 @@ from import_export.results import Result, Error, RowResult
 import sys
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 import tablib
-from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays
+from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff
 from dictionaries import models as dictionaries
 
 
@@ -92,25 +92,33 @@ class TemplateShirtResource(resources.ModelResource):
     size = fields.Field(attribute='size', column_name=u'№ размера', widget=CustomForeignKeyWidget(model=dictionaries.Size, field='size'))
     hem = fields.Field(attribute='hem', column_name=u'Низ', widget=CustomForeignKeyWidget(model=dictionaries.HemType, field='title'))
     placket = fields.Field(attribute='placket', column_name=u'Полочка', widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title'))
-    back = fields.Field(attribute='back', column_name=u'Спинка', widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title'))
     pocket = fields.Field(attribute='pocket', column_name=u'Карман', widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title'))
+    tuck = fields.Field(attribute='tuck', column_name=u'Вытачки')
+    back = fields.Field(attribute='back', column_name=u'Спинка', widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
+    # Импорт воротника
     collar__type = fields.Field(attribute='collar__type', column_name=u'Тип воротника', widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title'))
     collar__hardness = fields.Field(attribute='collar__hardness', column_name=u'Жесткость воротника', widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     collar__stays = fields.Field(attribute='collar__stays', column_name=u'Косточки', widget=CustomForeignKeyWidget(model=Stays, field='title'))
     collar__size = fields.Field(attribute='collar__size', column_name=u'Размер воротника', widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title'))
+    # Импорт манжеты
+    shirt_cuff__type = fields.Field(attribute='shirt_cuff__type', column_name=u'Манжеты', widget=CustomForeignKeyWidget(model=dictionaries.CuffType, field='title'))
+    shirt_cuff__rounding = fields.Field(attribute='shirt_cuff__rounding', column_name=u'Вид манжеты', widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title'))
+    shirt_cuff__sleeve = fields.Field(attribute='shirt_cuff__sleeve', column_name=u'Рукав', widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title'))
+    shirt_cuff__hardness = fields.Field(attribute='shirt_cuff__hardness', column_name=u'Жесткость манжеты', widget=CustomForeignKeyWidget(model=Hardness, field='title'))
 
     class Meta:
         model = TemplateShirt
         import_id_fields = ('code', )
         fields = ('code', )
 
-    def check_relations(self, instance, field):
+    @staticmethod
+    def check_relations(instance, field):
         if getattr(instance, field) is not None and getattr(instance, field).pk is None:
             getattr(instance, field).save()
             setattr(instance, field, getattr(instance, field))
-        elif field == 'collar':
+        elif field in {'collar', 'shirt_cuff'}:
             getattr(instance, field).save()
 
     def before_save_instance(self, instance, dry_run):
@@ -127,6 +135,10 @@ class TemplateShirtResource(resources.ModelResource):
             self.check_relations(instance.collar, 'hardness')
             self.check_relations(instance.collar, 'stays')
             self.check_relations(instance.collar, 'size')
+            self.check_relations(instance.shirt_cuff, 'type')
+            self.check_relations(instance.shirt_cuff, 'rounding')
+            self.check_relations(instance.shirt_cuff, 'sleeve')
+            self.check_relations(instance.shirt_cuff, 'hardness')
 
             if instance.size is not None and instance.size._state.adding:
                 instance.size.save()
@@ -136,12 +148,18 @@ class TemplateShirtResource(resources.ModelResource):
         if not dry_run:
             instance.collar.shirt = instance
             self.check_relations(instance, 'collar')
+            instance.shirt_cuff.shirt = instance
+            self.check_relations(instance, 'shirt_cuff')
 
     def import_obj(self, obj, data, dry_run):
         try:
             obj.collar
         except:
             obj.collar = Collar()
+        try:
+            obj.shirt_cuff
+        except:
+            obj.shirt_cuff = Cuff()
         for field in self.get_fields():
             if isinstance(field.widget, ManyToManyWidget):
                 continue
@@ -151,10 +169,29 @@ class TemplateShirtResource(resources.ModelResource):
         if field.attribute and field.column_name in data:
             if field.attribute == 'collection':
                 field.save(obj, data, sex=data.get(u'Пол'))
+            elif field.attribute == 'tuck':
+                obj.tuck = data[u'Вытачки'] != u'Без вытачки'
             else:
                 field.save(obj, data)
         else:
             return None
+
+    def get_diff(self, original, current, dry_run=False):
+        data = []
+        dmp = diff_match_patch()
+        for field in self.get_fields():
+            if field.attribute == 'tuck':
+                v1 = original.get_tuck_display() if original else ''
+                v2 = current.get_tuck_display() if current else ""
+            else:
+                v1 = self.export_field(field, original) if original else ""
+                v2 = self.export_field(field, current) if current else ""
+            diff = dmp.diff_main(force_text(v1), force_text(v2))
+            dmp.diff_cleanupSemantic(diff)
+            html = dmp.diff_prettyHtml(diff)
+            html = mark_safe(html)
+            data.append(html)
+        return data
 
 
 class FabricResource(resources.ModelResource):
