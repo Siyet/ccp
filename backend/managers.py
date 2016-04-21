@@ -19,7 +19,7 @@ class TemplateShirtManager(models.Manager):
               AND backend_fabricresidual.fabric_id = backend_shirt.fabric_id
         """, ())
 
-        return self.annotate(amount=select_amount).filter(amount__gte=settings.MIN_FABRIC_RESIDUAL).select_related('collection')
+        return self.annotate(amount=select_amount).filter(fabric__active=True, amount__gte=settings.MIN_FABRIC_RESIDUAL).select_related('collection')
 
     def get_queryset(self):
         queryset = models.Manager.get_queryset(self).filter(is_template=True, is_standard=False)
@@ -30,4 +30,11 @@ class StandardShirtManager(models.Manager):
 
     def get_queryset(self):
         queryset = models.Manager.get_queryset(self).filter(is_template=False, is_standard=True)
+        return queryset
+
+
+class ActiveManager(models.Manager):
+
+    def get_queryset(self):
+        queryset = models.Manager.get_queryset(self).filter(active=True)
         return queryset

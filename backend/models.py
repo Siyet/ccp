@@ -1,5 +1,6 @@
 # coding: UTF-8
 from django.contrib.contenttypes.fields import GenericForeignKey
+from backend.managers import ActiveManager
 
 __author__ = 'cloud'
 
@@ -48,7 +49,7 @@ class Collection(models.Model):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
+        return Fabric.items.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
 
 
 class Storehouse(models.Model):
@@ -111,6 +112,10 @@ class Fabric(models.Model):
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
     texture = models.ImageField(_(u'Текстура'))
+    active = models.BooleanField(_(u'Активна'), default=True)
+
+    objects = models.Manager()
+    items = ActiveManager()
 
     def __unicode__(self):
         return self.code
