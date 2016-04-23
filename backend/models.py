@@ -111,6 +111,7 @@ class Fabric(models.Model):
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
     texture = models.ImageField(_(u'Текстура'))
+    dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
 
     def __unicode__(self):
         return self.code
@@ -228,7 +229,7 @@ class ShawlOptions(models.Model):
 
 class Dickey(models.Model):
     type = models.ForeignKey('dictionaries.DickeyType')
-    fabric = models.ForeignKey(Fabric)
+    fabric = models.ForeignKey(Fabric, related_name='dickey_list')
 
     def __unicode__(self):
         return self.type.title
