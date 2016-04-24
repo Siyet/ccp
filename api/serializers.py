@@ -39,7 +39,7 @@ class FabricSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Fabric
-        fields = ['id', 'fabric_type', 'code', 'description', 'texture']
+        fields = ['id', 'fabric_type', 'thickness', 'code', 'description', 'texture']
 
 
 class FabricColorSerializer(serializers.ModelSerializer):
