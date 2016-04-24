@@ -19,7 +19,12 @@ from .models import (
     ShirtInfoImage,
     SizeOptions,
     Size,
-    HemType, BackType, PlacketType, PocketType, SleeveType
+    HemType,
+    BackType,
+    PlacketType,
+    PocketType,
+    SleeveType,
+    Thickness,
 )
 
 
@@ -54,5 +59,6 @@ admin.site.register([
     BackType,
     PlacketType,
     PocketType,
-    SleeveType
+    SleeveType,
+    Thickness,
 ])
