@@ -33,8 +33,8 @@ class StandardShirtManager(models.Manager):
         return queryset
 
 
-class ActiveManager(models.Manager):
+class FabricManager(models.Manager):
 
-    def get_queryset(self):
-        queryset = models.Manager.get_queryset(self).filter(active=True)
-        return queryset
+   @property
+   def active(self):
+      return self.get_queryset().filter(active=True)
