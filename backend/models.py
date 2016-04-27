@@ -106,6 +106,7 @@ class Fabric(models.Model):
     code = models.CharField(_(u'Артикул'), max_length=20, unique=True)
     category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics', blank=True, null=True)
     fabric_type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics', null=True)
+    thickness = models.ForeignKey('dictionaries.Thickness', verbose_name=_(u'Толщина'), related_name='fabrics', null=True)
     description = models.TextField(_(u'Описание'), null=True)
     material = models.CharField(_(u'Материал'), max_length=255, null=True)
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
@@ -476,6 +477,12 @@ class ContrastStitch(models.Model):
         verbose_name = _(u'Контрастная отстрочка')
         verbose_name_plural = _(u'Контрастные отстрочки')
 
+content_type_names = {
+    _(u'Контрастная деталь'): _(u'Контрастные ткани'),
+    _(u'Воротник'): _(u' Воротник полностью белый'),
+    _(u'Манжета'): _(u' Манжета полностью белая'),
+}
+
 
 class AccessoriesPrice(models.Model):
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), related_name='accessories_price')
@@ -485,7 +492,13 @@ class AccessoriesPrice(models.Model):
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='accessories_prices', blank=True)
 
     def __unicode__(self):
+        print dir(self.content_type)
         return u'Цена: %s' % self.content_type
+
+    def content_type_title(self):
+        return content_type_names.get(self.content_type.name, self.content_type.name)
+    content_type_title.allow_tags = True
+    content_type_title.short_description = _(u'Тип')
 
     class Meta:
         verbose_name = _(u'Цена надбавки')
