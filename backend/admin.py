@@ -70,34 +70,13 @@ class CustomShirtAdmin(admin.ModelAdmin):
     form = CustomShirtAdminForm
 
 
-class TemplateShirtAdminForm(forms.ModelForm):
-    code = forms.CharField(label=_(u'Артикул'), widget=forms.TextInput(attrs={'class': 'vTextField'}))
-    individualization = forms.CharField(label=_(u'Индивидуализация'), widget=forms.Textarea(attrs={'class': 'vLargeTextField'}))
-    fabric = forms.ModelChoiceField(label=_(u'Ткань'), queryset=Fabric.objects.all())
-
-    class Meta:
-        model = TemplateShirt
-        fields = '__all__'
-
-
 class TemplateShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
-    form = TemplateShirtAdminForm
 
 
-class StandardShirtAdminForm(forms.ModelForm):
-    code = forms.CharField(label=_(u'Артикул'), required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
-    individualization = forms.CharField(label=_(u'Индивидуализация'), required=False, widget=forms.Textarea(attrs={'class': 'vLargeTextField'}))
-    fabric = forms.ModelChoiceField(label=_(u'Ткань'), required=False, queryset=Fabric.objects.all())
-
-    class Meta:
-        model = StandardShirt
-        fields = '__all__'
-
-
-class StandardShirtAdmin(TemplateShirtAdmin):
-    form = StandardShirtAdminForm
+class StandardShirtAdmin(admin.ModelAdmin):
+    exclude = ['is_template', 'code', 'individualization', 'fabric']
 
 
 class FabricPriceAdmin(admin.ModelAdmin):

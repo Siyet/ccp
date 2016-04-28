@@ -280,9 +280,9 @@ class Shirt(models.Model):
     is_standard = models.BooleanField(_(u'Используется как стандартный вариант'), default=False, editable=False)
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
-    individualization = models.TextField(_(u'Индивидуализация'))
+    individualization = models.TextField(_(u'Индивидуализация'), null=True)
 
-    fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), null=True, blank=True)
+    fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), null=True)
 
     showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True, upload_to='showcase')
     showcase_image_list = ImageSpecField(source='showcase_image',
