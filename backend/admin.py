@@ -66,7 +66,7 @@ class CustomShirtAdminForm(forms.ModelForm):
 
 class CustomShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
-    exclude = ['is_template', 'code', 'showcase_image', 'individualization', 'description']
+    exclude = ['is_template', 'code', 'showcase_image', 'individualization']
     form = CustomShirtAdminForm
 
 
