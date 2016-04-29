@@ -56,18 +56,9 @@ class ContrastStitchInline(admin.TabularInline):
     model = ContrastStitch
 
 
-class CustomShirtAdminForm(forms.ModelForm):
-    fabric = forms.ModelChoiceField(label=_(u'Ткань'), queryset=Fabric.objects.all())
-
-    class Meta:
-        model = TemplateShirt
-        fields = '__all__'
-
-
 class CustomShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
     exclude = ['is_template', 'code', 'showcase_image', 'individualization']
-    form = CustomShirtAdminForm
 
 
 class TemplateShirtAdmin(admin.ModelAdmin):
@@ -75,25 +66,8 @@ class TemplateShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
 
 
-class StandardShirtAdminForm(forms.ModelForm):
-
-    class Meta:
-        model = StandardShirt
-        fields = '__all__'
-
-    def clean_collection(self):
-        collection = self.cleaned_data.get('collection')
-        qs = StandardShirt.objects.filter(collection=collection)
-        if self.instance.pk is not None:
-            qs = qs.exclude(pk=self.instance.pk)
-        if qs.exists():
-            raise forms.ValidationError(_(u'Стандартный вариант для коллекции уже существует'))
-        return collection
-
-
 class StandardShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template', 'code', 'individualization', 'fabric']
-    form = StandardShirtAdminForm
 
 
 class FabricPriceAdmin(admin.ModelAdmin):

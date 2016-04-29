@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
@@ -403,11 +404,6 @@ class TemplateShirt(Shirt):
 class StandardShirt(Shirt):
     objects = managers.StandardShirtManager()
 
-    def save(self, *args, **kwargs):
-        self.is_template = False
-        self.is_standard = True
-        super(StandardShirt, self).save(*args, **kwargs)
-
     class Meta:
         proxy = True
         verbose_name = _(u'Стандартный вариант рубашки')
@@ -415,6 +411,20 @@ class StandardShirt(Shirt):
 
     def __unicode__(self):
         return u"%s #%s" %(_(u"Стандартный вариант"), self.code)
+
+    def save(self, *args, **kwargs):
+        self.is_template = False
+        self.is_standard = True
+        super(StandardShirt, self).save(*args, **kwargs)
+
+    def validate_unique(self, exclude=None):
+        super(StandardShirt, self).validate_unique(exclude)
+        if self.collection:
+            qs = StandardShirt.objects.filter(collection=self.collection)
+            if self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
+            if qs.exists():
+                raise ValidationError([_(u'Стандартный вариант для коллекции уже существует')])
 
 
 class ShirtImage(models.Model):
