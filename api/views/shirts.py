@@ -26,7 +26,9 @@ class TemplateShirtsFilter(filters.FilterSet):
 
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.TemplateShirt.objects.available().select_related('fabric__fabric_type').distinct()
+    queryset = models.TemplateShirt.objects.available().\
+        filter(fabric__active=True, fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
+        select_related('fabric__fabric_type').distinct()
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
@@ -52,7 +54,7 @@ class TemplateShirtsList(ListAPIView):
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
     queryset = models.TemplateShirt.objects.available().\
-        filter(fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
+        filter(fabric__active=True, fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
         select_related('fabric', 'collection__storehouse').prefetch_related('shirt_images').distinct()
 
 
@@ -69,7 +71,7 @@ class TemplateShirtsFiltersList(APIView):
         """
         Фильтры для списка рубашек
         """
-        fabrics = models.Fabric.objects.filter(shirt__is_template=True, residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
+        fabrics = models.Fabric.objects.active.filter(shirt__is_template=True, residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         fabric_types = dictionaries.FabricType.objects.filter(fabrics__shirt__is_template=True, fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         thickness = dictionaries.Thickness.objects.filter(fabrics__shirt__is_template=True, fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         colors = dictionaries.FabricColor.objects.filter(color_fabrics__shirt__is_template=True, color_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)

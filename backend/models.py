@@ -48,7 +48,7 @@ class Collection(models.Model):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
+        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
 
 
 class Storehouse(models.Model):
@@ -113,6 +113,9 @@ class Fabric(models.Model):
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
     texture = models.ImageField(_(u'Текстура'))
     dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
+    active = models.BooleanField(_(u'Активна'), default=True)
+
+    objects = managers.FabricManager()
 
     def __unicode__(self):
         return self.code
