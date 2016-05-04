@@ -38,7 +38,7 @@ class FabricResource(resources.ModelResource):
     material = fields.Field(column_name='Fabric', attribute='material')
     colors = fields.Field(column_name='Color', attribute='colors', default=[], widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
     design = fields.Field(column_name='Design', attribute='designs', default=[], widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
-    description = fields.Field(column_name='Fabric description', attribute='description')
+    long_description = fields.Field(column_name='Fabric description', attribute='long_description')
     fabric_type = fields.Field(column_name='Type', attribute='fabric_type', widget=CustomForeignKeyWidget(dictionaries.FabricType, field='title'))
     price_category = fields.Field(column_name='Price category', attribute='category', widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
 
