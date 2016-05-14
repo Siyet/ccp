@@ -18,7 +18,7 @@ import sys
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 import tablib
 from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, \
-    CustomButtons
+    CustomButtons, Dickey
 from dictionaries import models as dictionaries
 
 
@@ -132,6 +132,11 @@ class TemplateShirtResource(resources.ModelResource):
                                        widget=ForeignKeyWidget(model=dictionaries.CustomButtonsType, field='title'))
     custom_buttons = fields.Field(attribute='custom_buttons', column_name=u'Пуговицы',
                                   widget=ForeignKeyWidget(model=CustomButtons, field='title'))
+    # импорт манишки
+    dickey__type = fields.Field(attribute='dickey__type', column_name=u'МА Тип',
+                                widget=ForeignKeyWidget(dictionaries.DickeyType, field='title'))
+    dickey__fabric = fields.Field(attribute='dickey__fabric', column_name=u'МА Ткань',
+                                  widget=ForeignKeyWidget(Fabric, field='code'))
 
     class Meta:
         model = TemplateShirt
@@ -161,6 +166,10 @@ class TemplateShirtResource(resources.ModelResource):
             self.check_relations(instance.collar, 'hardness')
             self.check_relations(instance.collar, 'stays')
             self.check_relations(instance.collar, 'size')
+            if instance.dickey is not None:
+                self.check_relations(instance, 'dickey')
+                self.check_relations(instance.dickey, 'type')
+                self.check_relations(instance.dickey, 'fabric')
             self.check_relations(instance.shirt_cuff, 'type')
             self.check_relations(instance.shirt_cuff, 'rounding')
             self.check_relations(instance.shirt_cuff, 'sleeve')
@@ -191,6 +200,8 @@ class TemplateShirtResource(resources.ModelResource):
             obj.shirt_cuff
         except:
             obj.shirt_cuff = Cuff()
+        if data[u'Манишка'] != u'Я не хочу использовать манишку' and obj.dickey is None:
+            obj.dickey = Dickey()
         for field in self.get_fields():
             if isinstance(field.widget, ManyToManyWidget):
                 continue
@@ -204,6 +215,9 @@ class TemplateShirtResource(resources.ModelResource):
                 obj.tuck = data[u'Вытачки'] != u'Без вытачки'
             elif field.attribute == 'clasp':
                 obj.clasp = data[u'Застежка под штифты'] != u'Я не хочу использовать застежку под штифты'
+            elif field.attribute in {'dickey__type', 'dickey__fabric'}:
+                if data[u'Манишка'] != u'Я не хочу использовать манишку':
+                    field.save(obj, data)
             else:
                 field.save(obj, data)
         else:
