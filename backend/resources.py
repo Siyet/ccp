@@ -38,8 +38,10 @@ class FabricResource(resources.ModelResource):
     material = fields.Field(column_name='Fabric', attribute='material')
     colors = fields.Field(column_name='Color', attribute='colors', default=[], widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
     design = fields.Field(column_name='Design', attribute='designs', default=[], widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
-    long_description = fields.Field(column_name='Fabric description', attribute='long_description')
+    short_description = fields.Field(column_name='Short fabric description', attribute='short_description')
+    long_description = fields.Field(column_name='Long fabric description', attribute='long_description')
     fabric_type = fields.Field(column_name='Type', attribute='fabric_type', widget=CustomForeignKeyWidget(dictionaries.FabricType, field='title'))
+    thickness = fields.Field(column_name='Thickness', attribute='thickness', widget=CustomForeignKeyWidget(dictionaries.Thickness, field='title'))
     price_category = fields.Field(column_name='Price category', attribute='category', widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
 
     class Meta:
@@ -47,12 +49,19 @@ class FabricResource(resources.ModelResource):
         import_id_fields = ('code', )
         fields = ('code', )
 
+    @staticmethod
+    def check_relations(instance, field):
+        if getattr(instance, field) is not None and getattr(instance, field).pk is None:
+            getattr(instance, field).save()
+            setattr(instance, field, getattr(instance, field))
+        elif field in {'collar', 'shirt_cuff'}:
+            getattr(instance, field).save()
+
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
-            if instance.category is not None and instance.category.pk is None:
-                instance.category.save()
-            if instance.fabric_type is not None and instance.fabric_type.pk is None:
-                instance.fabric_type.save()
+            self.check_relations(instance, 'category')
+            self.check_relations(instance, 'fabric_type')
+            self.check_relations(instance, 'thickness')
 
     @atomic()
     def import_data(self, *args, **kwargs):
