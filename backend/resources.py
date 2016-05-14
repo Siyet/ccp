@@ -17,7 +17,8 @@ from import_export.results import Result, Error, RowResult
 import sys
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 import tablib
-from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff
+from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, \
+    CustomButtons
 from dictionaries import models as dictionaries
 
 
@@ -107,6 +108,9 @@ class TemplateShirtResource(resources.ModelResource):
     shirt_cuff__rounding = fields.Field(attribute='shirt_cuff__rounding', column_name=u'Вид манжеты', widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title'))
     shirt_cuff__sleeve = fields.Field(attribute='shirt_cuff__sleeve', column_name=u'Рукав', widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title'))
     shirt_cuff__hardness = fields.Field(attribute='shirt_cuff__hardness', column_name=u'Жесткость манжеты', widget=CustomForeignKeyWidget(model=Hardness, field='title'))
+    # Импорт пуговиц
+    custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=u'Вариант пуговиц', widget=ForeignKeyWidget(model=dictionaries.CustomButtonsType, field='title'))
+    custom_buttons = fields.Field(attribute='custom_buttons', column_name=u'Пуговицы', widget=ForeignKeyWidget(model=CustomButtons, field='title'))
 
     class Meta:
         model = TemplateShirt
