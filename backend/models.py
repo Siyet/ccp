@@ -48,7 +48,7 @@ class Collection(models.Model):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
+        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
 
 
 class Storehouse(models.Model):
@@ -106,11 +106,17 @@ class Fabric(models.Model):
     code = models.CharField(_(u'Артикул'), max_length=20, unique=True)
     category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics', blank=True, null=True)
     fabric_type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics', null=True)
-    description = models.TextField(_(u'Описание'), null=True)
+    thickness = models.ForeignKey('dictionaries.Thickness', verbose_name=_(u'Толщина'), related_name='fabrics', null=True)
+    short_description = models.TextField(_(u'Краткое описание'), null=True, blank=True)
+    long_description = models.TextField(_(u'Полное описание'), null=True, blank=True)
     material = models.CharField(_(u'Материал'), max_length=255, null=True)
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
     texture = models.ImageField(_(u'Текстура'))
+    dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
+    active = models.BooleanField(_(u'Активна'), default=True)
+
+    objects = managers.FabricManager()
 
     def __unicode__(self):
         return self.code
@@ -228,7 +234,7 @@ class ShawlOptions(models.Model):
 
 class Dickey(models.Model):
     type = models.ForeignKey('dictionaries.DickeyType')
-    fabric = models.ForeignKey(Fabric)
+    fabric = models.ForeignKey(Fabric, related_name='dickey_list')
 
     def __unicode__(self):
         return self.type.title
@@ -278,7 +284,6 @@ class Shirt(models.Model):
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     individualization = models.TextField(_(u'Индивидуализация'))
-    description = models.TextField(_(u'Описание'), blank=True, null=True)
 
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
 
@@ -473,6 +478,12 @@ class ContrastStitch(models.Model):
         verbose_name = _(u'Контрастная отстрочка')
         verbose_name_plural = _(u'Контрастные отстрочки')
 
+content_type_names = {
+    _(u'Контрастная деталь'): _(u'Контрастные ткани'),
+    _(u'Воротник'): _(u' Воротник полностью белый'),
+    _(u'Манжета'): _(u' Манжета полностью белая'),
+}
+
 
 class AccessoriesPrice(models.Model):
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), related_name='accessories_price')
@@ -482,7 +493,13 @@ class AccessoriesPrice(models.Model):
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='accessories_prices', blank=True)
 
     def __unicode__(self):
+        print dir(self.content_type)
         return u'Цена: %s' % self.content_type
+
+    def content_type_title(self):
+        return content_type_names.get(self.content_type.name, self.content_type.name)
+    content_type_title.allow_tags = True
+    content_type_title.short_description = _(u'Тип')
 
     class Meta:
         verbose_name = _(u'Цена надбавки')

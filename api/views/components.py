@@ -150,7 +150,7 @@ class DickeyList(APIView):
         }
 
     def get(self, request, *args, **kwargs):
-        fabrics = models.Fabric.objects.filter(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
+        fabrics = models.Fabric.objects.active.filter(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL, dickey=True)
         dickey_types = dictionaries.DickeyType.objects.all()
         return Response([
             self.build_filter(u'Ткань', 'fabric', list(fabrics.values('id', 'code').distinct())),

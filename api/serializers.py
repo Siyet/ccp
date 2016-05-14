@@ -39,7 +39,7 @@ class FabricSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Fabric
-        fields = ['id', 'fabric_type', 'code', 'description', 'texture']
+        fields = ['id', 'fabric_type', 'thickness', 'code', 'short_description', 'long_description', 'texture']
 
 
 class FabricColorSerializer(serializers.ModelSerializer):
@@ -133,6 +133,7 @@ class ShawlOptionsSerializer(serializers.ModelSerializer):
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     fabric_type = serializers.StringRelatedField(source='fabric.fabric_type.title')
+    thickness = serializers.StringRelatedField(source='fabric.thickness.title')
     showcase_image = serializers.ImageField(source='showcase_image_list')
     sex = serializers.SerializerMethodField()
     material = serializers.StringRelatedField(source='fabric.material')
@@ -145,7 +146,7 @@ class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'price', 'sex']
+        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'thickness', 'price', 'sex']
 
 
 class ShirtImageSerializer(serializers.ModelSerializer):
@@ -160,6 +161,7 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
     shirt_images = serializers.SerializerMethodField()
     collection_title = serializers.StringRelatedField(source='collection.title')
     country = serializers.StringRelatedField(source='collection.storehouse.country')
+    description = serializers.StringRelatedField(source='fabric.long_description')
 
     def get_shirt_images(self, object):
         return [self.context['view'].request.build_absolute_uri(shirt_image.image.url) for shirt_image in object.shirt_images.all()]

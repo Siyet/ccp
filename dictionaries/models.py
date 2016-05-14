@@ -243,3 +243,12 @@ class BackType(ComponentModel):
         verbose_name_plural = _(u'Типы спинок')
 
 
+class Thickness(models.Model):
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+
+    class Meta:
+        verbose_name = _(u'Толщина ткани')
+        verbose_name_plural = _(u'Толщина ткани')
+
+    def __unicode__(self):
+        return self.title
