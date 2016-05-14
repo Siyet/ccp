@@ -13,12 +13,13 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from import_export import resources, fields
 from import_export.django_compat import savepoint, savepoint_rollback
+from import_export.instance_loaders import ModelInstanceLoader
 from import_export.results import Result, Error, RowResult
 import sys
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 import tablib
 from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, \
-    CustomButtons, Dickey
+    CustomButtons, Dickey, Initials
 from dictionaries import models as dictionaries
 
 
@@ -137,6 +138,12 @@ class TemplateShirtResource(resources.ModelResource):
                                 widget=ForeignKeyWidget(dictionaries.DickeyType, field='title'))
     dickey__fabric = fields.Field(attribute='dickey__fabric', column_name=u'МА Ткань',
                                   widget=ForeignKeyWidget(Fabric, field='code'))
+    # импорт инициалов
+    initials__font = fields.Field(attribute='initials__font', column_name=u'ИН Шрифт',
+                                  widget=ForeignKeyWidget(dictionaries.Font, field='title'))
+    initials__color = fields.Field(attribute='initials__color', column_name=u'ИН Цвет',
+                                  widget=ForeignKeyWidget(dictionaries.Color, field='title'))
+    initials__location = fields.Field(attribute='initials__location', column_name=u'ИН Позиция')
 
     class Meta:
         model = TemplateShirt
@@ -170,6 +177,10 @@ class TemplateShirtResource(resources.ModelResource):
                 self.check_relations(instance, 'dickey')
                 self.check_relations(instance.dickey, 'type')
                 self.check_relations(instance.dickey, 'fabric')
+            if instance.initials is not None:
+                self.check_relations(instance, 'initials')
+                self.check_relations(instance.initials, 'font')
+                self.check_relations(instance.initials, 'color')
             self.check_relations(instance.shirt_cuff, 'type')
             self.check_relations(instance.shirt_cuff, 'rounding')
             self.check_relations(instance.shirt_cuff, 'sleeve')
@@ -183,6 +194,12 @@ class TemplateShirtResource(resources.ModelResource):
                 instance.stitch = next(x for x in instance.STITCH if x[1] == instance.stitch)[0]
             except StopIteration:
                 instance.stitch = 'none'
+
+            if instance.initials is not None:
+                try:
+                    instance.initials.location = next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
+                except StopIteration:
+                    instance.initials.location = 'button2'
 
     def after_save_instance(self, instance, dry_run):
         if not dry_run:
@@ -202,6 +219,8 @@ class TemplateShirtResource(resources.ModelResource):
             obj.shirt_cuff = Cuff()
         if data[u'Манишка'] != u'Я не хочу использовать манишку' and obj.dickey is None:
             obj.dickey = Dickey()
+        if data[u'Инициалы'] != u'Я не хочу использовать инициалы' and obj.initials is None:
+            obj.initials = Initials()
         for field in self.get_fields():
             if isinstance(field.widget, ManyToManyWidget):
                 continue
@@ -218,6 +237,9 @@ class TemplateShirtResource(resources.ModelResource):
             elif field.attribute in {'dickey__type', 'dickey__fabric'}:
                 if data[u'Манишка'] != u'Я не хочу использовать манишку':
                     field.save(obj, data)
+            elif field.attribute in {'initials__font', 'initials__color', 'initials__location'}:
+                if data[u'Инициалы'] != u'Я не хочу использовать инициалы':
+                    field.save(obj, data)
             else:
                 field.save(obj, data)
         else:
@@ -230,6 +252,9 @@ class TemplateShirtResource(resources.ModelResource):
             if field.attribute in {'tuck', 'stitch', 'clasp'}:
                 v1 = getattr(original, 'get_%s_display' % field.attribute)() if original else ''
                 v2 = getattr(current, 'get_%s_display' % field.attribute)() if current else ''
+            elif field.attribute in 'initials__location':
+                v1 = original.initials.get_location_display() if original and original.initials is not None else ''
+                v2 = current.initials.get_location_display() if current and current.initials is not None else ''
             else:
                 v1 = self.export_field(field, original) if original else ""
                 v2 = self.export_field(field, current) if current else ""
