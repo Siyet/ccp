@@ -68,3 +68,15 @@ class OrderDetails(models.Model):
 class Payment(models.Model):
     order = models.OneToOneField(Order, verbose_name=_(u'Заказ'))
     paid = models.BooleanField(_(u'Оплачено'))
+
+
+class Certificate(models.Model):
+    number = models.CharField(_(u'Уникальный номер сертификата'), max_length=50, unique=True)
+    value = models.PositiveIntegerField(_(u'Стоимость'), null=True, default=0)
+
+    def __unicode__(self):
+        return u'{0}'.format(self.number)
+
+    class Meta:
+        verbose_name = _(u'Сертификат')
+        verbose_name_plural = _(u'Сертификаты')
