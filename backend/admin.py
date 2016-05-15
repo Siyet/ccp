@@ -29,7 +29,6 @@ from .models import (
     AccessoriesPrice,
     ElementStitch,
     StandardShirt,
-    Store,
     content_type_names,
 )
 
@@ -160,7 +159,6 @@ admin.site.register([
     Hardness,
     Stays,
     ElementStitch,
-    Store,
 ])
 
 admin.site.register(Fabric, FabricAdmin)

@@ -63,20 +63,6 @@ class Storehouse(models.Model):
         verbose_name_plural = _(u'Склады')
 
 
-class Store(models.Model):
-    index = models.IntegerField(verbose_name=_(u'Индекс'), validators=[MaxValueValidator(999999)])
-    city = models.CharField(verbose_name=_(u'Город'), max_length=255)
-    street = models.CharField(verbose_name=_(u'Улица'), max_length=255)
-    home = models.CharField(verbose_name=_(u'Дом'), max_length=255)
-
-    def __unicode__(self):
-        return u'{0}, {1}, {2}'.format(self.city, self.street, self.home)
-
-    class Meta:
-        verbose_name = _(u'Магазин')
-        verbose_name_plural = _(u'Магазины')
-
-
 class Hardness(models.Model):
     title = models.CharField(_(u'Название'), max_length=255)
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='hardness')

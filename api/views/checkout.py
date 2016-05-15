@@ -1,13 +1,14 @@
 # coding: utf-8
+from __future__ import absolute_import
 
 from rest_framework.generics import ListAPIView
 from api import serializers
-from backend import models
+from checkout import models as checkout
 
 
-class StoreListView(ListAPIView):
+class ShopListView(ListAPIView):
     """
     Список магазинов для самовывоза
     """
-    queryset = models.Store.objects.all()
-    serializer_class = serializers.StoreSerializer
+    queryset = checkout.Shop.objects.all()
+    serializer_class = serializers.ShopSerializer

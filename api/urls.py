@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 import views
 
 checkout_urls = [
-    url(r'^store/$', views.StoreListView.as_view()),
+    url(r'^shop/$', views.ShopListView.as_view()),
 ]
 
 shirt_urls = [
