@@ -25,6 +25,7 @@ from .models import (
     PocketType,
     SleeveType,
     Thickness,
+    FAQ,
 )
 
 
@@ -61,4 +62,5 @@ admin.site.register([
     PocketType,
     SleeveType,
     Thickness,
+    FAQ,
 ])

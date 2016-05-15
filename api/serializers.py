@@ -194,3 +194,10 @@ class StaysSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Stays
         fields = ['id', 'title']
+
+
+class FAQSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = dictionaries.FAQ
+        fields = ('question', 'answer', )
