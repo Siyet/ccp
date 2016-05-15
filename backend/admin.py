@@ -66,6 +66,10 @@ class TemplateShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
 
 
+class StandardShirtAdmin(admin.ModelAdmin):
+    exclude = ['is_template', 'code', 'individualization', 'fabric']
+
+
 class FabricPriceAdmin(admin.ModelAdmin):
     list_display = ['fabric_category', 'storehouse', 'price']
     list_display_links = ['price']
@@ -166,5 +170,5 @@ admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(FabricResidual, FabricResidualAdmin)
 admin.site.register(CustomShirt, CustomShirtAdmin)
 admin.site.register(TemplateShirt, TemplateShirtAdmin)
-admin.site.register(StandardShirt, TemplateShirtAdmin)
+admin.site.register(StandardShirt, StandardShirtAdmin)
 admin.site.register(AccessoriesPrice, AccessoriesPriceAdmin)
