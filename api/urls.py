@@ -3,6 +3,7 @@ import views
 
 checkout_urls = [
     url(r'^shop/$', views.ShopListView.as_view()),
+    url(r'^cert/(?P<number>[0-9-]+)/$', views.CertificateDetailView.as_view()),
 ]
 
 shirt_urls = [

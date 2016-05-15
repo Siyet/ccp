@@ -202,3 +202,10 @@ class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = checkout.Shop
         fields = '__all__'
+
+
+class CertificateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = checkout.Certificate
+        fields = '__all__'
