@@ -36,6 +36,7 @@ class SizeSerializer(serializers.ModelSerializer):
 
 class FabricSerializer(serializers.ModelSerializer):
     fabric_type = serializers.StringRelatedField(source='fabric_type.title')
+    thickness = serializers.StringRelatedField(source='thickness.title')
 
     class Meta:
         model = models.Fabric
