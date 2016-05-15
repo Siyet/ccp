@@ -10,3 +10,5 @@ from components import CollarTypeList, CuffTypeList, HemTypeList, BackTypeList, 
     ClaspOptionsList, StitchOptionsList, TemplateInitialsList, DickeyList
 
 from shirts import TemplateShirtsList, TemplateShirtDetails, TemplateShirtsFiltersList
+
+from checkout import StoreListView

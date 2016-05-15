@@ -1,5 +1,6 @@
 # coding: UTF-8
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.core.validators import MaxValueValidator
 
 __author__ = 'cloud'
 
@@ -60,6 +61,20 @@ class Storehouse(models.Model):
     class Meta:
         verbose_name = _(u'Склад')
         verbose_name_plural = _(u'Склады')
+
+
+class Store(models.Model):
+    index = models.IntegerField(verbose_name=_(u'Индекс'), validators=[MaxValueValidator(999999)])
+    city = models.CharField(verbose_name=_(u'Город'), max_length=255)
+    street = models.CharField(verbose_name=_(u'Улица'), max_length=255)
+    home = models.CharField(verbose_name=_(u'Дом'), max_length=255)
+
+    def __unicode__(self):
+        return u'{0}, {1}, {2}'.format(self.city, self.street, self.home)
+
+    class Meta:
+        verbose_name = _(u'Магазин')
+        verbose_name_plural = _(u'Магазины')
 
 
 class Hardness(models.Model):

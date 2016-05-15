@@ -194,3 +194,10 @@ class StaysSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Stays
         fields = ['id', 'title']
+
+
+class StoreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Store
+        fields = '__all__'
