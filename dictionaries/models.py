@@ -1,5 +1,4 @@
 # coding: utf-8
-import datetime
 from django.db import models
 from django.utils.text import ugettext_lazy as _
 from colorful.fields import RGBColorField
@@ -255,7 +254,7 @@ class Thickness(models.Model):
 
 
 class FAQ(models.Model):
-    date_add = models.DateTimeField(verbose_name=_(u'Дата добавления'), default=datetime.datetime.now)
+    date_add = models.DateTimeField(verbose_name=_(u'Дата добавления'), auto_now_add=True)
     question = models.TextField(verbose_name=_(u'Вопрос'), max_length=1000)
     answer = models.TextField(verbose_name=_(u'Ответ'), max_length=1000)
 
