@@ -54,7 +54,7 @@ class CollectionFabricsList(APIView):
         if design is not None:
             queryset = queryset.prefetch_related('designs').filter(designs__id=design)
         for fabric in queryset:
-            fabric._collection = collection
+            fabric.cached_collection = collection
         return Response(serializers.FabricSerializer(queryset, many=True).data)
 
 
