@@ -28,31 +28,3 @@ class CertificateDetailView(APIView):
         certificate = get_object_or_404(checkout.Certificate, number=kwargs.get('number'))
         serializer = serializers.CertificateSerializer(certificate)
         return Response(serializer.data)
-
-    def put(self, request, *args, **kwargs):
-        """
-        Обновление значения сертификата
-        ---
-        parameters:
-            - name: order_cost
-              type: integer
-              paramType: form
-              required: True
-              description: стоимость заказа
-        """
-        try:
-            order_cost = int(request.data.get('order_cost', 0))
-        except ValueError:
-            order_cost = 0
-        certificate = get_object_or_404(checkout.Certificate, number=kwargs.get('number'))
-        if certificate.value < order_cost:
-            return Response({
-                'status': 'ERROR',
-                'message': 'Not enough money',
-            })
-        certificate.value -= order_cost
-        certificate.save()
-        return Response({
-            'status': 'OK',
-            'message': 'Information successfully updated!',
-        })
