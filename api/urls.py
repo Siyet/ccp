@@ -49,6 +49,7 @@ urlpatterns = [
     url(r'^shirt/', include(shirt_urls)),
     url(r'^shirt_info/', views.ShirtInfoListView.as_view()),
     url(r'^size/$', views.SizesList.as_view()),
+    url(r'^faq/$', views.FAQListView.as_view()),
     url(r'^size/option/$', views.SizeOptionsList.as_view()),
     url(r'^docs/', include('rest_framework_swagger.urls')),
 ]

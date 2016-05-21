@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from django.db import models
 from django.utils.text import ugettext_lazy as _
 from colorful.fields import RGBColorField
@@ -252,3 +251,17 @@ class Thickness(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class FAQ(models.Model):
+    date_add = models.DateTimeField(verbose_name=_(u'Дата добавления'), auto_now_add=True)
+    question = models.TextField(verbose_name=_(u'Вопрос'), max_length=1000)
+    answer = models.TextField(verbose_name=_(u'Ответ'), max_length=1000)
+
+    class Meta:
+        verbose_name = _(u'Вопрос')
+        verbose_name_plural = _(u'Вопросы и ответы')
+        ordering = ('-date_add', )
+
+    def __unicode__(self):
+        return self.question
