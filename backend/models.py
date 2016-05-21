@@ -430,12 +430,16 @@ class ShirtImage(models.Model):
 
 
 class ContrastDetails(models.Model):
-    ELEMENTS = (('collar_face', _(u'Воротник лицевая сторона')),
-                ('collar_bottom', _(u'Воротник низ')),
-                ('collar_outer', _(u'Воротник внешняя стойка')),
-                ('collar_inner', _(u'Воротник внутрення стойка')),
-                ('cuff_outer', _(u'Манжета внешняя')),
-                ('cuff_inner', _(u'Манжета внутрення')))
+    ELEMENTS = (
+        ('collar', _(u'Воротник')),
+        ('collar_face', _(u'Воротник лицевая сторона')),
+        ('collar_bottom', _(u'Воротник низ')),
+        ('collar_outer', _(u'Воротник внешняя стойка')),
+        ('collar_inner', _(u'Воротник внутрення стойка')),
+        ('cuff', _(u'Манжета')),
+        ('cuff_outer', _(u'Манжета внешняя')),
+        ('cuff_inner', _(u'Манжета внутрення'))
+    )
     element = models.CharField(_(u'Элемент'), choices=ELEMENTS, max_length=20)
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
     shirt = models.ForeignKey(Shirt, verbose_name=_(u'Рубашка'), related_name='shirt_contrast_details')

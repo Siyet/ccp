@@ -19,7 +19,7 @@ import sys
 from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
 import tablib
 from backend.models import Fabric, FabricResidual, Storehouse, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, \
-    CustomButtons, Dickey, Initials
+    CustomButtons, Dickey, Initials, ContrastStitch, ElementStitch, ContrastDetails
 from dictionaries import models as dictionaries
 
 
@@ -144,6 +144,21 @@ class TemplateShirtResource(resources.ModelResource):
     initials__color = fields.Field(attribute='initials__color', column_name=u'ИН Цвет',
                                   widget=ForeignKeyWidget(dictionaries.Color, field='title'))
     initials__location = fields.Field(attribute='initials__location', column_name=u'ИН Позиция')
+    # контрастные отстрочки
+    contrast_stitch_shirt = fields.Field(attribute='contrast_stitch_shirt', column_name=u'ОТЦ Сорочка')
+    contrast_stitch_cuff = fields.Field(attribute='contrast_stitch_cuff', column_name=u'ОТЦ Манжеты')
+    contrast_stitch_collar = fields.Field(attribute='contrast_stitch_collar', column_name=u'ОТЦ Воротник')
+    contrast_stitch_loops = fields.Field(attribute='contrast_stitch_loops', column_name=u'ОТЦ Петель/ниток')
+    # контрастные детали
+    contrast_detail_collar = fields.Field(attribute='contrast_detail_collar', column_name=u'КТ Воротник')
+    contrast_detail_collar_face = fields.Field(attribute='contrast_detail_collar_face', column_name=u'КТ Воротник лицевая сторона')
+    contrast_detail_collar_bottom = fields.Field(attribute='contrast_detail_collar_bottom', column_name=u'КТ Воротник низ')
+    contrast_detail_collar_outer = fields.Field(attribute='contrast_detail_collar_outer', column_name=u'КТ Воротник внешняя стойка')
+    contrast_detail_collar_inner = fields.Field(attribute='contrast_detail_collar_inner', column_name=u'КТ Воротник внутренняя стойка')
+    contrast_detail_cuuff = fields.Field(attribute='contrast_detail_cuff', column_name=u'КТ Манжета')
+    contrast_detail_cuff_outer = fields.Field(attribute='contrast_detail_cuff_outer', column_name=u'КТ Манжета внешняя')
+    contrast_detail_cuff_inner = fields.Field(attribute='contrast_detail_cuff_inner', column_name=u'КТ Манжета внутренняя')
+
 
     class Meta:
         model = TemplateShirt
@@ -155,9 +170,42 @@ class TemplateShirtResource(resources.ModelResource):
             getattr(instance, field).save()
             setattr(instance, field, getattr(instance, field))
 
+    def import_contrast_stich(self, instance, element, color):
+        if color:
+            ContrastStitch.objects.get_or_create(
+                element=ElementStitch.objects.get_or_create(title=element)[0],
+                color=dictionaries.StitchColor.objects.get_or_create(title=color)[0],
+                shirt=instance
+            )
+        else:
+            self.remove_contrast_stich(instance, element)
+
+    def remove_contrast_stich(self, instance, element):
+        try:
+            detail = ContrastStitch.objects.get(element=ElementStitch.objects.get_or_create(title=element)[0], shirt=instance)
+            detail.delete()
+        except ContrastStitch.DoesNotExist:
+            pass
+
+    def import_contrast_detail(self, instance, element, fabric):
+        if fabric:
+            ContrastDetails.objects.get_or_create(
+                element=element,
+                fabric=Fabric.objects.get_or_create(code=fabric)[0],
+                shirt=instance
+            )
+        else:
+            self.remove_contrast_stich(instance, element)
+
+    def remove_contrast_detail(self, instance, element):
+        try:
+            detail = ContrastDetails.objects.get(element=element, shirt=instance)
+            detail.delete()
+        except ContrastDetails.DoesNotExist:
+            pass
+
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
-
             self.check_relations(instance, 'fabric')
             self.check_relations(instance, 'collection')
             self.check_relations(instance, 'hem')
@@ -197,6 +245,21 @@ class TemplateShirtResource(resources.ModelResource):
                     instance.initials.location = next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
                 except StopIteration:
                     instance.initials.location = 'button2'
+
+            # контрастные отстрочки
+            self.import_contrast_stich(instance, u'Сорочка', instance.contrast_stitch_shirt)
+            self.import_contrast_stich(instance, u'Манжета', instance.contrast_stitch_cuff)
+            self.import_contrast_stich(instance, u'Воротник', instance.contrast_stitch_collar)
+            self.import_contrast_stich(instance, u'Петели/нитки', instance.contrast_stitch_loops)
+            # контрастные детали
+            self.import_contrast_detail(instance, 'collar', instance.contrast_detail_collar)
+            self.import_contrast_detail(instance, 'collar_face', instance.contrast_detail_collar_face)
+            self.import_contrast_detail(instance, 'collar_bottom', instance.contrast_detail_collar_bottom)
+            self.import_contrast_detail(instance, 'collar_outer', instance.contrast_detail_collar_outer)
+            self.import_contrast_detail(instance, 'collar_inner', instance.contrast_detail_collar_inner)
+            self.import_contrast_detail(instance, 'cuff', instance.contrast_detail_cuff)
+            self.import_contrast_detail(instance, 'cuff_outer', instance.contrast_detail_cuff_outer)
+            self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff_inner)
 
     def after_save_instance(self, instance, dry_run):
         if not dry_run:
