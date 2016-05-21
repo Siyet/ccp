@@ -150,13 +150,10 @@ class TemplateShirtResource(resources.ModelResource):
         import_id_fields = ('code', )
         fields = ('code', )
 
-    @staticmethod
-    def check_relations(instance, field):
+    def check_relations(self, instance, field):
         if getattr(instance, field) is not None and getattr(instance, field).pk is None:
             getattr(instance, field).save()
             setattr(instance, field, getattr(instance, field))
-        elif field in {'collar', 'shirt_cuff'}:
-            getattr(instance, field).save()
 
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
