@@ -27,8 +27,7 @@ class ShirtInfoListView(ListAPIView):
     serializer_class = serializers.ShirtInfoSerializer
 
 
-class CollectionFabricsList(ListAPIView):
-    serializer_class = serializers.FabricSerializer
+class CollectionFabricsList(APIView):
 
     def get(self, request, *args, **kwargs):
         """
@@ -45,14 +44,8 @@ class CollectionFabricsList(ListAPIView):
               paramType: query
               description: дизайн (id)
         """
-        return super(CollectionFabricsList, self).get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        id = self.kwargs['pk']
-        collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=id)
-
+        collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=kwargs.get('pk'))
         queryset = collection.fabrics()
-
         color = self.request.query_params.get('color', None)
         if color is not None:
             queryset = queryset.prefetch_related('colors').filter(colors__id=color)
@@ -60,8 +53,9 @@ class CollectionFabricsList(ListAPIView):
         design = self.request.query_params.get('design', None)
         if design is not None:
             queryset = queryset.prefetch_related('designs').filter(designs__id=design)
-
-        return queryset
+        for fabric in queryset:
+            fabric.cached_collection = collection
+        return Response(serializers.FabricSerializer(queryset, many=True).data)
 
 
 class CollectionFabricColorsList(ListAPIView):

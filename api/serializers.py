@@ -37,10 +37,17 @@ class SizeSerializer(serializers.ModelSerializer):
 class FabricSerializer(serializers.ModelSerializer):
     fabric_type = serializers.StringRelatedField(source='fabric_type.title')
     thickness = serializers.StringRelatedField(source='thickness.title')
+    price = serializers.SerializerMethodField()
+
+    def get_price(self, object):
+        try:
+            return next(x for x in object.category.prices.all() if x.storehouse == object.cached_collection.storehouse).price
+        except StopIteration:
+            return None
 
     class Meta:
         model = models.Fabric
-        fields = ['id', 'fabric_type', 'thickness', 'code', 'short_description', 'long_description', 'texture']
+        fields = ['id', 'fabric_type', 'thickness', 'code', 'short_description', 'long_description', 'texture', 'price']
 
 
 class FabricColorSerializer(serializers.ModelSerializer):

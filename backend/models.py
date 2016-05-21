@@ -49,7 +49,7 @@ class Collection(models.Model):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
+        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse', 'category__prices').filter(filter_predicate)
 
 
 class Storehouse(models.Model):
