@@ -473,7 +473,7 @@ class ElementStitch(models.Model):
 class ContrastStitch(models.Model):
     element = models.ForeignKey(ElementStitch, verbose_name=u'Элемент', null=True)
     color = models.ForeignKey('dictionaries.StitchColor', verbose_name=_(u'Цвет отстрочки'))
-    shirt = models.ForeignKey(Shirt)
+    shirt = models.ForeignKey(Shirt, related_name='contrast_stitches')
 
     def __unicode__(self):
         return self.element.title

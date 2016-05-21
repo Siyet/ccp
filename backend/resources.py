@@ -6,6 +6,7 @@ import traceback
 from diff_match_patch import diff_match_patch
 from django.core.management.color import no_style
 from django.db import transaction, connections, DEFAULT_DB_ALIAS
+from django.db.models import QuerySet
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import TransactionManagementError, savepoint_commit, atomic
 from django.utils import six
@@ -159,11 +160,91 @@ class TemplateShirtResource(resources.ModelResource):
     contrast_detail_cuff_outer = fields.Field(attribute='contrast_detail_cuff_outer', column_name=u'КТ Манжета внешняя')
     contrast_detail_cuff_inner = fields.Field(attribute='contrast_detail_cuff_inner', column_name=u'КТ Манжета внутренняя')
 
+    select_related = ('fabric', 'collection', 'collar__type', 'collar__hardness', 'collar__stays', 'collar__size',
+                      'shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__sleeve', 'shirt_cuff__hardness', 'hem',
+                      'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke', 'dickey__fabric',
+                      'dickey__type', 'initials__font', 'initials__color', )
+    prefetch_related = ('contrast_stitches', 'shirt_contrast_details', )
+
+    export_headers = [u'Shirt Code', u'Код ткани', u'Коллекция', u'Пол', u'Размер', u'№ размера', u'Тип воротника',
+                      u'Размер воротника', u'Жесткость воротника', u'Косточки', u'Манжеты', u'Вид манжеты', u'Рукав',
+                      u'Жесткость манжеты', u'Низ', u'Полочка', u'Карман', u'Вытачки', u'Спинка', u'Вариант пуговиц',
+                      u'Пуговицы', u'Код цвета пуговицы', u'Отстрочка (цвет)', u'ОТЦ Сорочка', u'ОТЦ Манжеты',
+                      u'ОТЦ Воротник', u'ОТЦ Петель/ниток', u'Отстрочка (мм)', u'Цельная кокетка',
+                      u'Застежка под штифты', u'Манишка', u'МА Ткань', u'МА Тип', u'Контрастные ткани', u'КТ Воротник',
+                      u'КТ Воротник лицевая сторона', u'КТ Воротник низ', u'КТ Воротник внешняя стойка',
+                      u'КТ Воротник внутренняя стойка', u'КТ Манжета', u'КТ Манжета внешняя', u'КТ Манжета внутренняя',
+                      u'Инициалы', u'ИН Шрифт', u'ИН Цвет', u'ИН Позиция', ]
 
     class Meta:
         model = TemplateShirt
         import_id_fields = ('code', )
         fields = ('code', )
+
+    def get_queryset(self):
+        qs = super(TemplateShirtResource, self).get_queryset()
+        return qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
+
+    def export(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        data = tablib.Dataset(headers=self.export_headers)
+
+        if isinstance(queryset, QuerySet):
+            iterable = queryset.iterator()
+        else:
+            iterable = queryset
+        for obj in iterable:
+            row = [
+                obj.code,
+                obj.fabric.code,
+                obj.collection.title if obj.collection else '',
+                obj.collection.get_sex_display() if obj.collection else '',
+                obj.size_option.title,
+                obj.size.size if obj.size else '',
+                obj.collar.type.title if hasattr(obj, 'collar') else '',
+                obj.collar.size.title if hasattr(obj, 'collar') else '',
+                obj.collar.hardness.title if hasattr(obj, 'collar') and obj.collar.hardness else '',
+                obj.collar.stays.title if hasattr(obj, 'collar') and obj.collar.stays else '',
+                obj.shirt_cuff.type.title if hasattr(obj, 'shirt_cuff') else '',
+                obj.shirt_cuff.rounding.title if hasattr(obj, 'shirt_cuff') and obj.shirt_cuff.rounding else '',
+                obj.shirt_cuff.sleeve.title if hasattr(obj, 'shirt_cuff') else '',
+                obj.shirt_cuff.hardness.title if hasattr(obj, 'shirt_cuff') and obj.shirt_cuff.hardness else '',
+                obj.hem.title,
+                obj.placket.title,
+                obj.pocket.title,
+                obj.get_tuck_display(),
+                obj.back.title,
+                obj.custom_buttons_type.title if obj.custom_buttons_type else '',
+                obj.custom_buttons.title if obj.custom_buttons else '',
+                '',
+                u'Я хочу использовать отстрочку контрастного цвета' if obj.contrast_stitches.all() else u'Я не хочу использовать отстрочку контрастного цвета',
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Сорочка'), ''),
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Манжета'), ''),
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Воротник'), ''),
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Петели/нитки'), ''),
+                obj.get_stitch_display(),
+                obj.yoke.title if obj.yoke else '',
+                u'Я хочу использовать застежку под штифты' if obj.clasp else u'Я не хочу использовать застежку под штифты',
+                u'Я хочу использовать манишку' if obj.dickey else u'Я не хочу использовать манишку',
+                obj.dickey.fabric.code if obj.dickey else '',
+                obj.dickey.type.title if obj.dickey else '',
+                u'Я хочу использовать контрастные ткани' if obj.shirt_contrast_details.all() else u'Я не хочу использовать контрастные ткани',
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar'), ''),
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_face'), ''),
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_bottom'), ''),
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_outer'), ''),
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_inner'), ''),
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'cuff'), ''),
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'cuff_outer'), ''),
+                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'cuff_inner'), ''),
+                u'Я хочу использовать инициалы' if obj.initials else u'Я не хочу использовать инициалы',
+                obj.initials.font.title if obj.initials and obj.initials.font else '',
+                obj.initials.color.title if obj.initials else '',
+                obj.initials.get_location_display() if obj.initials else '',
+            ]
+            data.append(row)
+        return data
 
     def check_relations(self, instance, field):
         if getattr(instance, field) is not None and getattr(instance, field).pk is None:
@@ -172,34 +253,50 @@ class TemplateShirtResource(resources.ModelResource):
 
     def import_contrast_stich(self, instance, element, color):
         if color:
-            ContrastStitch.objects.get_or_create(
-                element=ElementStitch.objects.get_or_create(title=element)[0],
-                color=dictionaries.StitchColor.objects.get_or_create(title=color)[0],
-                shirt=instance
-            )
+            try:
+                detail = ContrastStitch.objects.get(
+                    element=ElementStitch.objects.get_or_create(title=element)[0],
+                    shirt=instance
+                )
+                detail.color = dictionaries.StitchColor.objects.get_or_create(title=color)[0]
+                detail.save()
+            except ContrastStitch.DoesNotExist:
+                ContrastStitch.objects.create(
+                    element=ElementStitch.objects.get_or_create(title=element)[0],
+                    color=dictionaries.StitchColor.objects.get_or_create(title=color)[0],
+                    shirt=instance
+                )
         else:
             self.remove_contrast_stich(instance, element)
 
     def remove_contrast_stich(self, instance, element):
         try:
-            detail = ContrastStitch.objects.get(element=ElementStitch.objects.get_or_create(title=element)[0], shirt=instance)
+            detail = ContrastStitch.objects.filter(element=ElementStitch.objects.get_or_create(title=element)[0], shirt=instance)
             detail.delete()
         except ContrastStitch.DoesNotExist:
             pass
 
     def import_contrast_detail(self, instance, element, fabric):
         if fabric:
-            ContrastDetails.objects.get_or_create(
-                element=element,
-                fabric=Fabric.objects.get_or_create(code=fabric)[0],
-                shirt=instance
-            )
+            try:
+                detail = ContrastDetails.objects.get(
+                    element=element,
+                    shirt=instance
+                )
+                detail.fabric = Fabric.objects.get_or_create(code=fabric)[0]
+                detail.save()
+            except ContrastDetails.DoesNotExist:
+                ContrastDetails.objects.create(
+                    element=element,
+                    fabric=Fabric.objects.get_or_create(code=fabric)[0],
+                    shirt=instance
+                )
         else:
             self.remove_contrast_stich(instance, element)
 
     def remove_contrast_detail(self, instance, element):
         try:
-            detail = ContrastDetails.objects.get(element=element, shirt=instance)
+            detail = ContrastDetails.objects.filter(element=element, shirt=instance)
             detail.delete()
         except ContrastDetails.DoesNotExist:
             pass
