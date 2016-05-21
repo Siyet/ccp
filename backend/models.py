@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
@@ -48,7 +49,7 @@ class Collection(models.Model):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse').filter(filter_predicate)
+        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse', 'category__prices').filter(filter_predicate)
 
 
 class Storehouse(models.Model):
@@ -283,9 +284,9 @@ class Shirt(models.Model):
     is_standard = models.BooleanField(_(u'Используется как стандартный вариант'), default=False, editable=False)
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
-    individualization = models.TextField(_(u'Индивидуализация'))
+    individualization = models.TextField(_(u'Индивидуализация'), null=True)
 
-    fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
+    fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), null=True)
 
     showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True, upload_to='showcase')
     showcase_image_list = ImageSpecField(source='showcase_image',
@@ -406,11 +407,6 @@ class TemplateShirt(Shirt):
 class StandardShirt(Shirt):
     objects = managers.StandardShirtManager()
 
-    def save(self, *args, **kwargs):
-        self.is_template = False
-        self.is_standard = True
-        super(StandardShirt, self).save(*args, **kwargs)
-
     class Meta:
         proxy = True
         verbose_name = _(u'Стандартный вариант рубашки')
@@ -418,6 +414,20 @@ class StandardShirt(Shirt):
 
     def __unicode__(self):
         return u"%s #%s" %(_(u"Стандартный вариант"), self.code)
+
+    def save(self, *args, **kwargs):
+        self.is_template = False
+        self.is_standard = True
+        super(StandardShirt, self).save(*args, **kwargs)
+
+    def validate_unique(self, exclude=None):
+        super(StandardShirt, self).validate_unique(exclude)
+        if self.collection:
+            qs = StandardShirt.objects.filter(collection=self.collection)
+            if self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
+            if qs.exists():
+                raise ValidationError([_(u'Стандартный вариант для коллекции уже существует')])
 
 
 class ShirtImage(models.Model):
