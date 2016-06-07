@@ -202,6 +202,7 @@ class TemplateShirtResource(resources.ModelResource):
                 obj.collection.get_sex_display() if obj.collection else '',
                 obj.size_option.title,
                 obj.size.size if obj.size else '',
+                # TODO: упросить запись row
                 obj.collar.type.title if hasattr(obj, 'collar') else '',
                 obj.collar.size.title if hasattr(obj, 'collar') else '',
                 obj.collar.hardness.title if hasattr(obj, 'collar') and obj.collar.hardness else '',
@@ -217,7 +218,7 @@ class TemplateShirtResource(resources.ModelResource):
                 obj.back.title,
                 obj.custom_buttons_type.title if obj.custom_buttons_type else '',
                 obj.custom_buttons.title if obj.custom_buttons else '',
-                '',
+                '', # TODO подписать
                 u'Я хочу использовать отстрочку контрастного цвета' if obj.contrast_stitches.all() else u'Я не хочу использовать отстрочку контрастного цвета',
                 next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Сорочка'), ''),
                 next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Манжета'), ''),
@@ -335,13 +336,13 @@ class TemplateShirtResource(resources.ModelResource):
             try:
                 instance.stitch = next(x for x in instance.STITCH if x[1] == instance.stitch)[0]
             except StopIteration:
-                instance.stitch = 'none'
+                instance.stitch = 'none' # TODO: через choice
 
             if instance.initials is not None:
                 try:
                     instance.initials.location = next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
                 except StopIteration:
-                    instance.initials.location = 'button2'
+                    instance.initials.location = 'button2' # TODO: через choice
 
             # контрастные отстрочки
             self.import_contrast_stich(instance, u'Сорочка', instance.contrast_stitch_shirt)
@@ -349,12 +350,12 @@ class TemplateShirtResource(resources.ModelResource):
             self.import_contrast_stich(instance, u'Воротник', instance.contrast_stitch_collar)
             self.import_contrast_stich(instance, u'Петели/нитки', instance.contrast_stitch_loops)
             # контрастные детали
-            self.import_contrast_detail(instance, 'collar', instance.contrast_detail_collar)
+            self.import_contrast_detail(instance, 'collar', instance.contrast_detail_collar) # TODO: выкинуть
             self.import_contrast_detail(instance, 'collar_face', instance.contrast_detail_collar_face)
             self.import_contrast_detail(instance, 'collar_bottom', instance.contrast_detail_collar_bottom)
             self.import_contrast_detail(instance, 'collar_outer', instance.contrast_detail_collar_outer)
             self.import_contrast_detail(instance, 'collar_inner', instance.contrast_detail_collar_inner)
-            self.import_contrast_detail(instance, 'cuff', instance.contrast_detail_cuff)
+            self.import_contrast_detail(instance, 'cuff', instance.contrast_detail_cuff) # TODO: выкинуть
             self.import_contrast_detail(instance, 'cuff_outer', instance.contrast_detail_cuff_outer)
             self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff_inner)
 
@@ -374,9 +375,9 @@ class TemplateShirtResource(resources.ModelResource):
             obj.shirt_cuff
         except:
             obj.shirt_cuff = Cuff()
-        if data[u'Манишка'] != u'Я не хочу использовать манишку' and obj.dickey is None:
+        if data[u'Манишка'] != u'Я не хочу использовать манишку' and obj.dickey is None: # TODO: выкинуть
             obj.dickey = Dickey()
-        if data[u'Инициалы'] != u'Я не хочу использовать инициалы' and obj.initials is None:
+        if data[u'Инициалы'] != u'Я не хочу использовать инициалы' and obj.initials is None: # TODO: выкинуть
             obj.initials = Initials()
         for field in self.get_fields():
             if isinstance(field.widget, ManyToManyWidget):
@@ -407,7 +408,7 @@ class TemplateShirtResource(resources.ModelResource):
         dmp = diff_match_patch()
         for field in self.get_fields():
             if field.attribute in {'tuck', 'stitch', 'clasp'}:
-                v1 = getattr(original, 'get_%s_display' % field.attribute)() if original else ''
+                v1 = getattr(original, 'get_%s_display' % field.attribute)() if original else '' # TODO: переименовать
                 v2 = getattr(current, 'get_%s_display' % field.attribute)() if current else ''
             elif field.attribute in 'initials__location':
                 v1 = original.initials.get_location_display() if original and original.initials is not None else ''
