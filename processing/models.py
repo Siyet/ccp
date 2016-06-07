@@ -7,6 +7,7 @@ from django.utils.text import ugettext_lazy as _
 
 from upload_path import UploadComposingSource
 
+from backend import models as backend
 
 class SourceMixin(object):
 
@@ -28,10 +29,11 @@ class BodySource(models.Model, SourceMixin):
 
 class BackSource(models.Model, SourceMixin):
     back = models.ForeignKey(dictionaries.BackType, verbose_name=_(u'Спинка'))
+    tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=backend.Shirt.TUCK_OPTIONS, default=False)
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
 
     class Meta:
-        unique_together = ('back', 'hem')
+        unique_together = ('back', 'hem', 'tuck')
         verbose_name = _(u'Конфигурация сборки для спинки')
         verbose_name_plural = _(u'Конфигурации сборки для спинки')
 
