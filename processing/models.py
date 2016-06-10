@@ -26,7 +26,6 @@ class BodySource(models.Model, SourceMixin):
         verbose_name_plural = _(u'Конфигурации сборки для основы')
 
 
-
 class BackSource(models.Model, SourceMixin):
     back = models.ForeignKey(dictionaries.BackType, verbose_name=_(u'Спинка'))
     tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=backend.Shirt.TUCK_OPTIONS, default=False)
@@ -36,6 +35,7 @@ class BackSource(models.Model, SourceMixin):
         unique_together = ('back', 'hem', 'tuck')
         verbose_name = _(u'Конфигурация сборки для спинки')
         verbose_name_plural = _(u'Конфигурации сборки для спинки')
+
 
 class CollarSource(models.Model, SourceMixin):
     collar = models.OneToOneField(dictionaries.CollarType, verbose_name=_(u'Воротник'))
@@ -65,19 +65,26 @@ class PocketSource(models.Model, SourceMixin):
 
 class PlacketSource(models.Model, SourceMixin):
     placket = models.OneToOneField(dictionaries.PlacketType, verbose_name=_(u'Тип полочки'))
+    hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
 
     class Meta:
+        unique_together = ('placket', 'hem')
         verbose_name = _(u'Конфигурация сборки для полочки')
         verbose_name_plural = _(u'Конфигурации сборки для полочки')
 
 
-class ComposeSource(models.Model):
+class ProjectionModel(models.Model):
     PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
+    projection = models.CharField(_(u'Проекция'), max_length=5, choices=PROJECTION)
 
+    class Meta:
+        abstract = True
+
+
+class ComposeSource(ProjectionModel):
     uv = models.FileField(_(u'UV'), upload_to=UploadComposingSource('%s/uv/%s'))
     ao = models.FileField(_(u'Тени'), upload_to=UploadComposingSource('%s/ao/%s'))
     light = models.FileField(_(u'Свет'), upload_to=UploadComposingSource('%s/light/%s'))
-    projection = models.CharField(_(u'Проекция'), max_length=5, choices=PROJECTION)
 
     cuff_source = models.ForeignKey(CuffSource, blank=True, null=True)
     back_source = models.ForeignKey(BackSource, blank=True, null=True)
@@ -89,6 +96,47 @@ class ComposeSource(models.Model):
     class Meta:
         verbose_name = _(u'Модель сборки')
         verbose_name_plural = _(u'Модели сборки')
+
+
+class BodyButtonsSource(models.Model, SourceMixin):
+    buttons = models.OneToOneField(dictionaries.CustomButtonsType, verbose_name=_(u'Пуговицы'))
+
+    class Meta:
+        verbose_name = _(u'Конфигурация сборки для основных пуговиц')
+        verbose_name_plural = _(u'Конфигурации сборки для основных пуговиц')
+
+
+class CollarButtonsSource(models.Model, SourceMixin):
+    collar = models.ForeignKey(dictionaries.CollarType, verbose_name=_(u'Воротник'))
+    buttons = models.ForeignKey(dictionaries.CollarButtons, verbose_name=_(u'Пуговицы'), blank=True, null=True)
+
+    class Meta:
+        unique_together = ('collar', 'buttons')
+        verbose_name = _(u'Конфигурация сборки для пуговиц воротника')
+        verbose_name_plural = _(u'Конфигурации сборки для пуговиц воротника')
+
+
+class CuffButtonsSource(models.Model, SourceMixin):
+    cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Манжеты'))
+    rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
+
+    class Meta:
+        unique_together = ('cuff', 'rounding')
+        verbose_name = _(u'Конфигурация сборки для пуговиц манжет')
+        verbose_name_plural = _(u'Конфигурации сборки для пуговиц манжет')
+
+
+class ButtonsSource(ProjectionModel):
+    image = models.FileField(_(u'Изображение'), upload_to=UploadComposingSource("%s/buttons/image/%s"))
+    ao = models.FileField(_(u'Тени'), upload_to=UploadComposingSource("%s/buttons/ao/%s"), blank=True, null=True)
+
+    body_buttons = models.ForeignKey(BodyButtonsSource, blank=True, null=True)
+    collar_buttons = models.ForeignKey(CollarButtonsSource, blank=True, null=True)
+    cuff_buttons = models.ForeignKey(CuffButtonsSource, blank=True, null=True)
+
+    class Meta:
+        verbose_name = _(u'Модель сборки пуговиц')
+        verbose_name_plural = _(u'Модели сборки пуговиц')
 
 
 class Texture(models.Model):
