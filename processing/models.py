@@ -64,7 +64,7 @@ class PocketSource(models.Model, SourceMixin):
 
 
 class PlacketSource(models.Model, SourceMixin):
-    placket = models.OneToOneField(dictionaries.PlacketType, verbose_name=_(u'Тип полочки'))
+    placket = models.ForeignKey(dictionaries.PlacketType, verbose_name=_(u'Тип полочки'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
 
     class Meta:
