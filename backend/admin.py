@@ -1,11 +1,13 @@
 # coding: utf-8
+from __future__ import absolute_import
+
 from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
-from backend.resources import FabricResidualResource, FabricResource, TemplateShirtResource
+from backend.import_export.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from backend.widgets import ContentTypeSelect
 from .models import (
     Collection,
@@ -110,13 +112,13 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
     change_list_template = 'admin/backend/change_list_import_export.html'
     import_template_name = 'admin/backend/import.html'
     formats = settings.IMPORT_EXPORT_FORMATS
-    list_display = ('code', 'category', 'material', 'fabric_type', )
+    list_display = ('code', 'category', 'material', 'fabric_type', 'thickness', )
     list_display_links = ('code', 'category', )
     search_fields = ('code', )
     list_filter = ('category', )
     readonly_fields = ['category']
     inlines = [FabricResidualAdminInline, ]
-    list_select_related = ('category', 'fabric_type', )
+    list_select_related = ('category', 'fabric_type', 'thickness', )
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):
