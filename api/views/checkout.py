@@ -1,11 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from django.shortcuts import get_object_or_404
-
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from api import serializers
 from checkout import models as checkout
@@ -19,12 +15,9 @@ class ShopListView(ListAPIView):
     serializer_class = serializers.ShopSerializer
 
 
-class CertificateDetailView(APIView):
+class CertificateDetailView(RetrieveAPIView):
     """
     Информация о сертификате
     """
-
-    def get(self, request, *args, **kwargs):
-        certificate = get_object_or_404(checkout.Certificate, number=kwargs.get('number'))
-        serializer = serializers.CertificateSerializer(certificate)
-        return Response(serializer.data)
+    queryset = checkout.Certificate.objects.all()
+    serializer_class = serializers.CertificateSerializer

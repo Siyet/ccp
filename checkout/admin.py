@@ -22,9 +22,9 @@ class CertificateAdmin(ImportExportMixin, admin.ModelAdmin):
         date_str = datetime.datetime.now().strftime('%d_%m_%Y')
         filename = "Certificates_CC_%s.%s" % (date_str, file_format.get_extension())
         return filename
+
+
 admin.site.register(Certificate, CertificateAdmin)
-
-
 admin.site.register([
     Shop,
 ])

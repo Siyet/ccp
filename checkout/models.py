@@ -1,5 +1,4 @@
 # coding: utf-8
-from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.text import ugettext_lazy as _
 
@@ -16,7 +15,7 @@ class Customer(models.Model):
 
 
 class Shop(models.Model):
-    index = models.IntegerField(verbose_name=_(u'Индекс'), validators=[MaxValueValidator(999999)])
+    index = models.IntegerField(verbose_name=_(u'Индекс'))
     city = models.CharField(verbose_name=_(u'Город'), max_length=255)
     street = models.CharField(verbose_name=_(u'Улица'), max_length=255)
     home = models.CharField(verbose_name=_(u'Дом'), max_length=255)
@@ -71,7 +70,7 @@ class Payment(models.Model):
 
 
 class Certificate(models.Model):
-    number = models.CharField(_(u'Уникальный номер сертификата'), max_length=50, unique=True)
+    number = models.CharField(_(u'Уникальный номер сертификата'), max_length=50, unique=True, primary_key=True)
     value = models.PositiveIntegerField(_(u'Стоимость'), null=True, default=0)
 
     def __unicode__(self):
