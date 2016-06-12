@@ -1,5 +1,6 @@
 # coding: UTF-8
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.core.validators import MaxValueValidator
 
 __author__ = 'cloud'
 

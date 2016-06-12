@@ -11,4 +11,6 @@ from components import CollarTypeList, CuffTypeList, HemTypeList, BackTypeList, 
 
 from shirts import TemplateShirtsList, TemplateShirtDetails, TemplateShirtsFiltersList
 
+from .checkout import ShopListView, CertificateDetailView
+
 from faq import FAQListView

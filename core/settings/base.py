@@ -35,7 +35,8 @@ INSTALLED_APPS = (
     'corsheaders',
 
     'backend',
-    'processing'
+    'checkout',
+    'processing',
 )
 
 MIDDLEWARE_CLASSES = (

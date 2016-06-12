@@ -29,7 +29,7 @@ from .models import (
     AccessoriesPrice,
     ElementStitch,
     StandardShirt,
-    content_type_names
+    content_type_names,
 )
 
 
