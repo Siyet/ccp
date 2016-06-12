@@ -1,6 +1,11 @@
 from django.conf.urls import url, include
 import views
 
+checkout_urls = [
+    url(r'^shop/$', views.ShopListView.as_view()),
+    url(r'^cert/(?P<pk>[0-9-]+)/$', views.CertificateDetailView.as_view()),
+]
+
 shirt_urls = [
     url(r'^showcase/$', views.TemplateShirtsList.as_view()),
     url(r'^showcase/(?P<pk>[0-9]+)/$', views.TemplateShirtDetails.as_view(), name='templateshirt-detail'),
@@ -37,6 +42,7 @@ components = [
 ]
 
 urlpatterns = [
+    url(r'^checkout/', include(checkout_urls)),
     url(r'^collection/$', views.CollectionsListView.as_view()),
     url(r'^collection/(?P<pk>[0-9]+)/', include(collection_urls)),
     url(r'^components/', include(components)),

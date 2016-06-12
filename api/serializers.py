@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from backend import models
 from dictionaries import models as dictionaries
+from checkout import models as checkout
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -203,6 +204,20 @@ class StaysSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Stays
         fields = ['id', 'title']
+
+
+class ShopSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = checkout.Shop
+        fields = '__all__'
+
+
+class CertificateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = checkout.Certificate
+        fields = '__all__'
 
 
 class FAQSerializer(serializers.ModelSerializer):
