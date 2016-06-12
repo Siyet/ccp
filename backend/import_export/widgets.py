@@ -24,13 +24,12 @@ class CustomForeignKeyWidget(ForeignKeyWidget):
 
 
 class TemplateShirtCollectionWidget(ForeignKeyWidget):
+    SEX_DICT = {
+        u'МУЖ': 'male',
+        u'ЖЕН': 'female'
+    }
 
     def clean(self, value, sex=None):
         val = super(ForeignKeyWidget, self).clean(value)
-        if sex == u'МУЖ':
-            sex = 'male'
-        elif sex == u'ЖЕН':
-            sex = 'female'
-        else:
-            sex = 'unisex'
+        sex = self.SEX_DICT.get(sex, 'unisex')
         return self.model.objects.get(**{self.field: val, 'sex': sex}) if val else None
