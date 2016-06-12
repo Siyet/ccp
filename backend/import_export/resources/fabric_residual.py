@@ -52,9 +52,9 @@ class FabricResidualResource(resources.ModelResource):
     def get_diff(self, original, current, dry_run=False):
         data = []
         dmp = diff_match_patch()
-        v1 = original.code if original else ""
-        v2 = current.code if current else ""
-        diff = dmp.diff_main(force_text(v1), force_text(v2))
+        original_value = original.code if original else ""
+        current_value = current.code if current else ""
+        diff = dmp.diff_main(force_text(original_value), force_text(current_value))
         dmp.diff_cleanupSemantic(diff)
         html = dmp.diff_prettyHtml(diff)
         html = mark_safe(html)
@@ -66,12 +66,12 @@ class FabricResidualResource(resources.ModelResource):
         else:
             residuals = {}
         for pk, storehouse in storehouses.iteritems():
-            v1 = u'%.2f' % residuals.get(pk, 0)
+            original_value = u'%.2f' % residuals.get(pk, 0)
             try:
-                v2 = u'%.2f' % float(current.residuals_set.get(storehouse.country, 0))
+                current_value = u'%.2f' % float(current.residuals_set.get(storehouse.country, 0))
             except (ValueError, TypeError):
-                v2 = u'%.2f' % 0
-            diff = dmp.diff_main(force_text(v1), force_text(v2))
+                current_value = u'%.2f' % 0
+            diff = dmp.diff_main(force_text(original_value), force_text(current_value))
             dmp.diff_cleanupSemantic(diff)
             html = dmp.diff_prettyHtml(diff)
             html = mark_safe(html)

@@ -38,6 +38,22 @@ class TemplateShirtResource(resources.ModelResource):
         False: u'Я не хочу использовать инициалы'
     }
 
+    TUCK_NOT_USE_CONSTANT = u'Без вытачки'
+
+    COLLECTION_ATTRIBUTE_MAP = {'collection'}
+    TUCK_ATTRIBUTE_MAP = {'tuck'}
+    CLASP_ATTRIBUTE_MAP = {'clasp'}
+    DICKEY_ATTRIBUTE_MAP = {'dickey__type', 'dickey__fabric'}
+    INITIALS_ATTRIBUTE_MAP = {'initials__font', 'initials__color', 'initials__location'}
+    CHOICES_ATTRIBUTE_MAP = {'tuck', 'stitch', 'clasp'}
+    INITIALS_CHOICES_ATTRIBUTE_MAP = {'initials__location'}
+
+    SEX_COLUMN_NAME = u'Пол'
+    TUCK_COLUMN_NAME = u'Вытачки'
+    CLASP_COLUMN_NAME = u'Застежка под штифты'
+    DICKEY_COLUMN_NAME = u'Манишка'
+    INITIALS_COLUMN_NAME = u'Инициалы'
+
     code = fields.Field(attribute='code', column_name='Shirt Code')
     fabric = fields.Field(attribute='fabric', column_name=u'Код ткани',
                           widget=CustomForeignKeyWidget(Fabric, field='code'))
@@ -51,7 +67,7 @@ class TemplateShirtResource(resources.ModelResource):
                            widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title'))
     pocket = fields.Field(attribute='pocket', column_name=u'Карман',
                           widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title'))
-    tuck = fields.Field(attribute='tuck', column_name=u'Вытачки')
+    tuck = fields.Field(attribute='tuck', column_name=TUCK_COLUMN_NAME)
     back = fields.Field(attribute='back', column_name=u'Спинка',
                         widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
@@ -59,7 +75,7 @@ class TemplateShirtResource(resources.ModelResource):
     stitch = fields.Field(attribute='stitch', column_name=u'Отстрочка (мм)')
     yoke = fields.Field(attribute='yoke', column_name=u'Цельная кокетка',
                         widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title'))
-    clasp = fields.Field(attribute='clasp', column_name=u'Застежка под штифты')
+    clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME)
     # Импорт воротника
     collar__type = fields.Field(attribute='collar__type', column_name=u'Тип воротника',
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title'))
@@ -320,18 +336,20 @@ class TemplateShirtResource(resources.ModelResource):
             save_relations(instance.collar, 'hardness')
             save_relations(instance.collar, 'stays')
             save_relations(instance.collar, 'size')
-            if instance.dickey is not None:
-                save_relations(instance, 'dickey')
-                save_relations(instance.dickey, 'type')
-                save_relations(instance.dickey, 'fabric')
-            if instance.initials is not None:
-                save_relations(instance, 'initials')
-                save_relations(instance.initials, 'font')
-                save_relations(instance.initials, 'color')
             save_relations(instance.shirt_cuff, 'type')
             save_relations(instance.shirt_cuff, 'rounding')
             save_relations(instance.shirt_cuff, 'sleeve')
             save_relations(instance.shirt_cuff, 'hardness')
+
+            if instance.dickey is not None:
+                save_relations(instance, 'dickey')
+                save_relations(instance.dickey, 'type')
+                save_relations(instance.dickey, 'fabric')
+
+            if instance.initials is not None:
+                save_relations(instance, 'initials')
+                save_relations(instance.initials, 'font')
+                save_relations(instance.initials, 'color')
 
             if instance.size is not None and instance.size._state.adding:
                 instance.size.save()
@@ -340,13 +358,13 @@ class TemplateShirtResource(resources.ModelResource):
             try:
                 instance.stitch = next(x for x in instance.STITCH if x[1] == instance.stitch)[0]
             except StopIteration:
-                instance.stitch = 'none' # TODO: через choice
+                instance.stitch = instance.STITCH.none
 
             if instance.initials is not None:
                 try:
                     instance.initials.location = next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
                 except StopIteration:
-                    instance.initials.location = 'button2' # TODO: через choice
+                    instance.initials.location = instance.initials.LOCATION.button2
 
     def after_save_instance(self, instance, dry_run):
         if not dry_run:
@@ -361,27 +379,40 @@ class TemplateShirtResource(resources.ModelResource):
             self.import_contrast_stitch(instance, u'Воротник', instance.contrast_stitch_collar)
             self.import_contrast_stitch(instance, u'Петели/нитки', instance.contrast_stitch_loops)
             # контрастные детали
-            self.import_contrast_detail(instance, 'collar', instance.contrast_detail_collar) # TODO: выкинуть
-            self.import_contrast_detail(instance, 'collar_face', instance.contrast_detail_collar_face)
-            self.import_contrast_detail(instance, 'collar_bottom', instance.contrast_detail_collar_bottom)
-            self.import_contrast_detail(instance, 'collar_outer', instance.contrast_detail_collar_outer)
-            self.import_contrast_detail(instance, 'collar_inner', instance.contrast_detail_collar_inner)
-            self.import_contrast_detail(instance, 'cuff', instance.contrast_detail_cuff) # TODO: выкинуть
-            self.import_contrast_detail(instance, 'cuff_outer', instance.contrast_detail_cuff_outer)
-            self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff_inner)
+            if instance.contrast_detail_collar:
+                self.import_contrast_detail(instance, 'collar_face', instance.contrast_detail_collar)
+                self.import_contrast_detail(instance, 'collar_bottom', instance.contrast_detail_collar)
+                self.import_contrast_detail(instance, 'collar_outer', instance.contrast_detail_collar)
+                self.import_contrast_detail(instance, 'collar_inner', instance.contrast_detail_collar)
+            else:
+                self.import_contrast_detail(instance, 'collar_face', instance.contrast_detail_collar_face)
+                self.import_contrast_detail(instance, 'collar_bottom', instance.contrast_detail_collar_bottom)
+                self.import_contrast_detail(instance, 'collar_outer', instance.contrast_detail_collar_outer)
+                self.import_contrast_detail(instance, 'collar_inner', instance.contrast_detail_collar_inner)
+            if instance.contrast_detail_cuff:
+                self.import_contrast_detail(instance, 'cuff_outer', instance.contrast_detail_cuff)
+                self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff)
+            else:
+                self.import_contrast_detail(instance, 'cuff_outer', instance.contrast_detail_cuff_outer)
+                self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff_inner)
 
     def import_obj(self, obj, data, dry_run):
         try:
             obj.collar
-        except:
+        except Exception:
             obj.collar = Collar()
         try:
             obj.shirt_cuff
-        except:
+        except Exception:
             obj.shirt_cuff = Cuff()
-        if data[u'Манишка'] != u'Я не хочу использовать манишку' and obj.dickey is None: # TODO: выкинуть
+        if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False] and obj.initials is None:
+            obj.initials = Initials()
+        if data[self.DICKEY_COLUMN_NAME] != self.DICKEY_USE_DICT[False]:
             obj.dickey = Dickey()
-        if data[u'Инициалы'] != u'Я не хочу использовать инициалы' and obj.initials is None: # TODO: выкинуть
+
+        if data[self.DICKEY_COLUMN_NAME] == self.DICKEY_USE_DICT[True] and obj.dickey is None:
+            obj.dickey = Dickey()
+        if data[self.INITIALS_COLUMN_NAME] == self.INITIALS_USE_DICT[True] and obj.initials is None:
             obj.initials = Initials()
         for field in self.get_fields():
             if isinstance(field.widget, ManyToManyWidget):
@@ -390,17 +421,17 @@ class TemplateShirtResource(resources.ModelResource):
 
     def import_field(self, field, obj, data):
         if field.attribute and field.column_name in data:
-            if field.attribute == 'collection':
-                field.save(obj, data, sex=data.get(u'Пол'))
-            elif field.attribute == 'tuck':
-                obj.tuck = data[u'Вытачки'] != u'Без вытачки'
-            elif field.attribute == 'clasp':
-                obj.clasp = data[u'Застежка под штифты'] != u'Я не хочу использовать застежку под штифты'
-            elif field.attribute in {'dickey__type', 'dickey__fabric'}:
-                if data[u'Манишка'] != u'Я не хочу использовать манишку':
+            if field.attribute in self.COLLECTION_ATTRIBUTE_MAP:
+                field.save(obj, data, sex=data[self.SEX_COLUMN_NAME])
+            elif field.attribute in self.TUCK_ATTRIBUTE_MAP:
+                obj.tuck = data[self.TUCK_COLUMN_NAME] != self.TUCK_NOT_USE_CONSTANT
+            elif field.attribute in self.CLASP_ATTRIBUTE_MAP:
+                obj.clasp = data[self.CLASP_COLUMN_NAME] == self.CLASP_USE_DICT[True]
+            elif field.attribute in self.DICKEY_ATTRIBUTE_MAP:
+                if data[self.DICKEY_COLUMN_NAME] != self.DICKEY_USE_DICT[False]:
                     field.save(obj, data)
-            elif field.attribute in {'initials__font', 'initials__color', 'initials__location'}:
-                if data[u'Инициалы'] != u'Я не хочу использовать инициалы':
+            elif field.attribute in self.INITIALS_ATTRIBUTE_MAP:
+                if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False]:
                     field.save(obj, data)
             else:
                 field.save(obj, data)
@@ -411,16 +442,22 @@ class TemplateShirtResource(resources.ModelResource):
         data = []
         dmp = diff_match_patch()
         for field in self.get_fields():
-            if field.attribute in {'tuck', 'stitch', 'clasp'}:
-                v1 = getattr(original, 'get_%s_display' % field.attribute)() if original else '' # TODO: переименовать
-                v2 = getattr(current, 'get_%s_display' % field.attribute)() if current else ''
-            elif field.attribute in 'initials__location':
-                v1 = original.initials.get_location_display() if original and original.initials is not None else ''
-                v2 = current.initials.get_location_display() if current and current.initials is not None else ''
+            if field.attribute in self.CHOICES_ATTRIBUTE_MAP:
+                original_value = getattr(original, 'get_%s_display' % field.attribute)() if original else ''
+                current_value = getattr(current, 'get_%s_display' % field.attribute)() if current else ''
+            elif field.attribute in self.INITIALS_CHOICES_ATTRIBUTE_MAP:
+                if original and original.initials is not None:
+                    original_value = original.initials.get_location_display()
+                else:
+                    original_value = ''
+                if current and current.initials is not None:
+                    current_value = current.initials.get_location_display()
+                else:
+                    current_value = ''
             else:
-                v1 = self.export_field(field, original) if original else ""
-                v2 = self.export_field(field, current) if current else ""
-            diff = dmp.diff_main(force_text(v1), force_text(v2))
+                original_value = self.export_field(field, original) if original else ""
+                current_value = self.export_field(field, current) if current else ""
+            diff = dmp.diff_main(force_text(original_value), force_text(current_value))
             dmp.diff_cleanupSemantic(diff)
             html = dmp.diff_prettyHtml(diff)
             html = mark_safe(html)

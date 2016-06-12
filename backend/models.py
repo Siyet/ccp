@@ -257,13 +257,15 @@ class Dickey(models.Model):
 class Initials(models.Model):
     font = models.ForeignKey('dictionaries.Font', verbose_name=_(u'Шрифт'), null=True)
 
-    LOCATION = (('button2', _(u'2 пуговица')),
-                ('button3', _(u'3 пуговица')),
-                ('button4', _(u'4 пуговица')),
-                ('button5', _(u'5 пуговица')),
-                ('hem', _(u'Низ (л)')),
-                ('pocket', _(u'Карман (л)')),
-                ('cuff', _(u'Манжета (л)')))
+    LOCATION = Choices(
+        ('button2', _(u'2 пуговица')),
+        ('button3', _(u'3 пуговица')),
+        ('button4', _(u'4 пуговица')),
+        ('button5', _(u'5 пуговица')),
+        ('hem', _(u'Низ (л)')),
+        ('pocket', _(u'Карман (л)')),
+        ('cuff', _(u'Манжета (л)'))
+    )
     location = models.CharField(_(u'Местоположение'), choices=LOCATION, max_length=10)
     text = models.CharField(_(u'Текст'), max_length=255)
     color = models.ForeignKey('dictionaries.Color', verbose_name=_(u'Цвет'))
@@ -441,12 +443,10 @@ class ShirtImage(models.Model):
 
 class ContrastDetails(models.Model):
     ELEMENTS = (
-        ('collar', _(u'Воротник')),
         ('collar_face', _(u'Воротник лицевая сторона')),
         ('collar_bottom', _(u'Воротник низ')),
         ('collar_outer', _(u'Воротник внешняя стойка')),
         ('collar_inner', _(u'Воротник внутрення стойка')),
-        ('cuff', _(u'Манжета')),
         ('cuff_outer', _(u'Манжета внешняя')),
         ('cuff_inner', _(u'Манжета внутрення'))
     )
