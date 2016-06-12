@@ -1,8 +1,13 @@
 # coding: utf-8
-from collections import OrderedDict
-from copy import deepcopy
+from __future__ import absolute_import
+
+import sys
+import tablib
 import logging
 import traceback
+
+from collections import OrderedDict
+from copy import deepcopy
 from diff_match_patch import diff_match_patch
 from django.core.management.color import no_style
 from django.db import transaction, connections, DEFAULT_DB_ALIAS
@@ -10,86 +15,11 @@ from django.db.transaction import TransactionManagementError, savepoint_commit, 
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from import_export import resources, fields
+from import_export import resources
 from import_export.django_compat import savepoint, savepoint_rollback
 from import_export.results import Result, Error, RowResult
-import sys
-from import_export.widgets import ManyToManyWidget, ForeignKeyWidget
-import tablib
+
 from backend.models import Fabric, FabricResidual, Storehouse
-from dictionaries import models as dictionaries
-
-
-class CustomForeignKeyWidget(ForeignKeyWidget):
-
-    def clean(self, value):
-        val = super(ForeignKeyWidget, self).clean(value)
-        if val:
-            try:
-                return self.model.objects.get(**{self.field: val})
-            except self.model.DoesNotExist:
-                return self.model(**{self.field: val})
-        else:
-            return None
-
-
-class FabricResource(resources.ModelResource):
-    code = fields.Field(column_name='Code', attribute='code')
-    material = fields.Field(column_name='Fabric', attribute='material')
-    colors = fields.Field(column_name='Color', attribute='colors', default=[], widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
-    design = fields.Field(column_name='Design', attribute='designs', default=[], widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
-    short_description = fields.Field(column_name='Short fabric description', attribute='short_description')
-    long_description = fields.Field(column_name='Long fabric description', attribute='long_description')
-    fabric_type = fields.Field(column_name='Type', attribute='fabric_type', widget=CustomForeignKeyWidget(dictionaries.FabricType, field='title'))
-    thickness = fields.Field(column_name='Thickness', attribute='thickness', widget=CustomForeignKeyWidget(dictionaries.Thickness, field='title'))
-    price_category = fields.Field(column_name='Price category', attribute='category', widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
-
-    class Meta:
-        model = Fabric
-        import_id_fields = ('code', )
-        fields = ('code', )
-
-    def check_relations(self, instance, field):
-        if getattr(instance, field) is not None and getattr(instance, field).pk is None:
-            getattr(instance, field).save()
-            setattr(instance, field, getattr(instance, field))
-
-    def before_save_instance(self, instance, dry_run):
-        if not dry_run:
-            self.check_relations(instance, 'category')
-            self.check_relations(instance, 'fabric_type')
-            self.check_relations(instance, 'thickness')
-
-    @atomic()
-    def import_data(self, *args, **kwargs):
-        result = super(resources.ModelResource, self).import_data(*args, **kwargs)
-        result.rows.sort(key=lambda x: x.new_record, reverse=True)
-        return result
-
-    def import_obj(self, obj, data, dry_run):
-        for field in self.get_fields():
-            if isinstance(field.widget, ManyToManyWidget):
-                val = data.get(field.column_name)
-                if val is None:
-                    val = ''
-                setattr(obj, '%s_diff' % field.column_name, val)
-                continue
-            self.import_field(field, obj, data)
-
-    def get_diff(self, original, current, dry_run=False):
-        data = []
-        dmp = diff_match_patch()
-        for field in self.get_fields():
-            v1 = self.export_field(field, original) if original else ""
-            v2 = self.export_field(field, current) if current else ""
-            if isinstance(field.widget, ManyToManyWidget):
-                v2 = getattr(current, '%s_diff' % field.column_name)
-            diff = dmp.diff_main(force_text(v1), force_text(v2))
-            dmp.diff_cleanupSemantic(diff)
-            html = dmp.diff_prettyHtml(diff)
-            html = mark_safe(html)
-            data.append(html)
-        return data
 
 
 class FabricResidualResource(resources.ModelResource):
@@ -122,9 +52,9 @@ class FabricResidualResource(resources.ModelResource):
     def get_diff(self, original, current, dry_run=False):
         data = []
         dmp = diff_match_patch()
-        v1 = original.code if original else ""
-        v2 = current.code if current else ""
-        diff = dmp.diff_main(force_text(v1), force_text(v2))
+        original_value = original.code if original else ""
+        current_value = current.code if current else ""
+        diff = dmp.diff_main(force_text(original_value), force_text(current_value))
         dmp.diff_cleanupSemantic(diff)
         html = dmp.diff_prettyHtml(diff)
         html = mark_safe(html)
@@ -136,12 +66,12 @@ class FabricResidualResource(resources.ModelResource):
         else:
             residuals = {}
         for pk, storehouse in storehouses.iteritems():
-            v1 = u'%.2f' % residuals.get(pk, 0)
+            original_value = u'%.2f' % residuals.get(pk, 0)
             try:
-                v2 = u'%.2f' % float(current.residuals_set.get(storehouse.country, 0))
+                current_value = u'%.2f' % float(current.residuals_set.get(storehouse.country, 0))
             except (ValueError, TypeError):
-                v2 = u'%.2f' % 0
-            diff = dmp.diff_main(force_text(v1), force_text(v2))
+                current_value = u'%.2f' % 0
+            diff = dmp.diff_main(force_text(original_value), force_text(current_value))
             dmp.diff_cleanupSemantic(diff)
             html = dmp.diff_prettyHtml(diff)
             html = mark_safe(html)
@@ -149,7 +79,7 @@ class FabricResidualResource(resources.ModelResource):
         return data
 
     def get_queryset(self):
-        return resources.ModelResource.get_queryset(self).prefetch_related('residuals__storehouse')
+        return self._meta.model.objects.all().prefetch_related('residuals__storehouse')
 
     def get_storehouses(self, storehouses=None):
         if not hasattr(self, '_storehouses'):
@@ -166,7 +96,7 @@ class FabricResidualResource(resources.ModelResource):
         result = Result()
         storehouses = self.get_storehouses(dataset.headers[1:])
         result.diff_headers = self.get_diff_headers()
-        headers = [storehouse.country for pk, storehouse in storehouses.iteritems()]
+        headers = [storehouse.country for pk, storehouse in storehouses.items()]
         headers.insert(0, 'Fabric')
         result.diff_headers = headers
 
@@ -259,14 +189,15 @@ class FabricResidualResource(resources.ModelResource):
         return result
 
     def export(self, queryset=None):
+        queryset = self.get_queryset()
         storehouses = self.get_storehouses()
-        headers = [storehouse.country for pk, storehouse in storehouses.iteritems()]
+        headers = [storehouse.country for pk, storehouse in storehouses.items()]
         headers.insert(0, 'Fabric')
         data = tablib.Dataset(headers=headers)
         for obj in queryset:
             row = [obj.code]
             residuals = {x.storehouse_id: x.amount for x in obj.residuals.all()}
-            for pk in storehouses.iterkeys():
+            for pk in storehouses.keys():
                 try:
                     row.append(u'%.2f' % residuals[pk])
                 except KeyError:

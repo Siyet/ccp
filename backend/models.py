@@ -258,13 +258,15 @@ class Dickey(models.Model):
 class Initials(models.Model):
     font = models.ForeignKey('dictionaries.Font', verbose_name=_(u'Шрифт'), null=True)
 
-    LOCATION = (('button2', _(u'2 пуговица')),
-                ('button3', _(u'3 пуговица')),
-                ('button4', _(u'4 пуговица')),
-                ('button5', _(u'5 пуговица')),
-                ('hem', _(u'Низ (л)')),
-                ('pocket', _(u'Карман (л)')),
-                ('cuff', _(u'Манжета (л)')))
+    LOCATION = Choices(
+        ('button2', _(u'2 пуговица')),
+        ('button3', _(u'3 пуговица')),
+        ('button4', _(u'4 пуговица')),
+        ('button5', _(u'5 пуговица')),
+        ('hem', _(u'Низ (л)')),
+        ('pocket', _(u'Карман (л)')),
+        ('cuff', _(u'Манжета (л)'))
+    )
     location = models.CharField(_(u'Местоположение'), choices=LOCATION, max_length=10)
     text = models.CharField(_(u'Текст'), max_length=255)
     color = models.ForeignKey('dictionaries.Color', verbose_name=_(u'Цвет'))
@@ -278,7 +280,7 @@ class Initials(models.Model):
 
 
 class Shirt(models.Model):
-    TUCK_OPTIONS = Choices((False, _(u'Без вытачек')), (True, _(u'С вытачками')))
+    TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
@@ -315,8 +317,8 @@ class Shirt(models.Model):
     custom_buttons = ChainedForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), chained_field='custom_buttons_type',
                                  chained_model_field='type', show_all=False, null=True, blank=True)
 
-    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'))
-    yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'))
+    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True)
+    yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 
     STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')), ('5mm', _(u'5 мм')))
@@ -441,12 +443,14 @@ class ShirtImage(models.Model):
 
 
 class ContrastDetails(models.Model):
-    ELEMENTS = (('collar_face', _(u'Воротник лицевая сторона')),
-                ('collar_bottom', _(u'Воротник низ')),
-                ('collar_outer', _(u'Воротник внешняя стойка')),
-                ('collar_inner', _(u'Воротник внутрення стойка')),
-                ('cuff_outer', _(u'Манжета внешняя')),
-                ('cuff_inner', _(u'Манжета внутрення')))
+    ELEMENTS = (
+        ('collar_face', _(u'Воротник лицевая сторона')),
+        ('collar_bottom', _(u'Воротник низ')),
+        ('collar_outer', _(u'Воротник внешняя стойка')),
+        ('collar_inner', _(u'Воротник внутрення стойка')),
+        ('cuff_outer', _(u'Манжета внешняя')),
+        ('cuff_inner', _(u'Манжета внутрення'))
+    )
     element = models.CharField(_(u'Элемент'), choices=ELEMENTS, max_length=20)
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
     shirt = models.ForeignKey(Shirt, verbose_name=_(u'Рубашка'), related_name='shirt_contrast_details')
@@ -480,7 +484,7 @@ class ElementStitch(models.Model):
 class ContrastStitch(models.Model):
     element = models.ForeignKey(ElementStitch, verbose_name=u'Элемент', null=True)
     color = models.ForeignKey('dictionaries.StitchColor', verbose_name=_(u'Цвет отстрочки'))
-    shirt = models.ForeignKey(Shirt)
+    shirt = models.ForeignKey(Shirt, related_name='contrast_stitches')
 
     def __unicode__(self):
         return self.element.title

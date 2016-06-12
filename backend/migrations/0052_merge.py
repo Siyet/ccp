@@ -8,6 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('backend', '0051_auto_20160521_1915'),
         ('backend', '0051_merge'),
         ('backend', '0051_delete_store'),
     ]

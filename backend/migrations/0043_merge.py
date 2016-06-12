@@ -10,6 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('backend', '0041_auto_20160408_0852'),
         ('backend', '0042_auto_20160407_0955'),
+        ('backend', '0042_auto_20160420_0852'),
     ]
 
     operations = [
