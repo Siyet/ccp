@@ -10,6 +10,7 @@ shirt_urls = [
     url(r'^showcase/$', views.TemplateShirtsList.as_view()),
     url(r'^showcase/(?P<pk>[0-9]+)/$', views.TemplateShirtDetails.as_view(), name='templateshirt-detail'),
     url(r'^showcase/filter/$', views.TemplateShirtsFiltersList.as_view()),
+    url(r'^(?P<pk>[0-9]+)/$', views.ShirtDetails.as_view()),
 ]
 
 collection_urls = [

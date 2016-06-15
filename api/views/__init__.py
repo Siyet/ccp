@@ -9,7 +9,7 @@ from components import CollarTypeList, CuffTypeList, HemTypeList, BackTypeList, 
     PlacketTypeList, SleeveTypeList, YokeTypeList, CustomButtonsTypeList, ShawlOptionsList, TuckOptionsList, \
     ClaspOptionsList, StitchOptionsList, TemplateInitialsList, DickeyList
 
-from shirts import TemplateShirtsList, TemplateShirtDetails, TemplateShirtsFiltersList
+from shirts import TemplateShirtsList, TemplateShirtDetails, TemplateShirtsFiltersList, ShirtDetails
 
 from .checkout import ShopListView, CertificateDetailView
 
