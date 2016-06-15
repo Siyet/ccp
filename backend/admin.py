@@ -6,9 +6,11 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
+from itertools import ifilter
 from import_export.admin import ImportExportMixin
 from backend.import_export.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from backend.widgets import ContentTypeSelect
+
 from .models import (
     Collection,
     Hardness,
@@ -90,7 +92,7 @@ class FabricResidualAdmin(ImportExportMixin, admin.ModelAdmin):
     change_list_template = 'admin/backend/change_list_import_export.html'
     import_template_name = 'admin/backend/import.html'
     formats = settings.IMPORT_EXPORT_FORMATS
-    list_select_related = ('fabric', 'storehouse', )
+    list_select_related = ('fabric', 'storehouse',)
 
     def get_export_queryset(self, request):
         """
@@ -108,21 +110,68 @@ class FabricResidualAdminInline(admin.TabularInline):
 
 
 class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
+    list_per_page = 20
     resource_class = FabricResource
     change_list_template = 'admin/backend/change_list_import_export.html'
     import_template_name = 'admin/backend/import.html'
     formats = settings.IMPORT_EXPORT_FORMATS
-    list_display = ('code', 'category', 'material', 'fabric_type', 'thickness', )
-    list_display_links = ('code', 'category', )
-    search_fields = ('code', )
-    list_filter = ('category', )
+    search_fields = ('code',)
+    list_filter = ('category',)
     readonly_fields = ['category']
     inlines = [FabricResidualAdminInline, ]
-    list_select_related = ('category', 'fabric_type', 'thickness', )
+    list_select_related = ('category', 'fabric_type', 'thickness',)
+
+    def __init__(self, *args, **kwargs):
+        super(FabricAdmin, self).__init__(*args, **kwargs)
+        self.storehouses = Storehouse.objects.all()
+        self.bind_storehouse_residuals()
+
+    def bind_storehouse_residuals(self):
+        """
+        Attaches callable properties to admin class for every fetched storehouse which are resolved to corresponding
+        residuals during display cycle
+        """
+        for storehouse in self.storehouses:
+            residual_for_storehouse = lambda self, fabric, storehouse=storehouse: self.get_residual(fabric, storehouse)
+            residual_for_storehouse.short_description = storehouse.country
+            setattr(FabricAdmin, storehouse.country, residual_for_storehouse)
+
+    def get_queryset(self, request):
+        queryset = super(FabricAdmin, self).get_queryset(request)
+        return queryset.prefetch_related('residuals__storehouse', 'colors', 'designs')
+
+    def get_residual(self, fabric, storehouse):
+        residual_predicate = lambda residual: residual.storehouse == storehouse
+        residual = next(ifilter(residual_predicate, fabric.residuals.all()), None)
+        return residual.amount if residual else None
+
+    def get_list_display(self, request):
+        residual_fields = map(lambda storehouse: unicode(storehouse), self.storehouses)
+        list_display = ['code', 'category'] + residual_fields + ['material', 'has_description', 'fabric_type',
+                                                                 'thickness', 'get_colors', 'get_designs', 'texture']
+        return list_display
+
+    def get_list_display_links(self, request, list_display):
+        return ('code',)
+
+    # fields
+    def has_description(self, fabric):
+        return not (not (fabric.short_description or fabric.long_description))
+    has_description.short_description = _(u'Описание')
+    has_description.boolean = True
+
+    def get_colors(self, fabric):
+        return "; ".join([unicode(color) for color in fabric.colors.all()])
+    get_colors.short_description = _(u'Цвета')
+
+    def get_designs(self, fabric):
+        return "; ".join([unicode(design) for design in fabric.designs.all()])
+    get_designs.short_description = _(u'Дизайн')
 
 
 class AccessoriesPriceAdminForm(forms.ModelForm):
-    content_type = forms.ModelChoiceField(label=_('content type'), queryset=ContentType.objects.all(), widget=ContentTypeSelect(related_field='id_object_pk'))
+    content_type = forms.ModelChoiceField(label=_('content type'), queryset=ContentType.objects.all(),
+                                          widget=ContentTypeSelect(related_field='id_object_pk'))
     object_pk = forms.ChoiceField(required=False)
 
     class Meta:
@@ -133,17 +182,21 @@ class AccessoriesPriceAdminForm(forms.ModelForm):
         super(AccessoriesPriceAdminForm, self).__init__(*args, **kwargs)
         instance = kwargs.get('instance')
         if instance:
-            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in instance.content_type.model_class().objects.all()]
-        content_type_pk = [x.pk for x in self.fields['content_type'].queryset if hasattr(x.model_class(), 'get_related_shirts')]
+            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in
+                                                               instance.content_type.model_class().objects.all()]
+        content_type_pk = [x.pk for x in self.fields['content_type'].queryset if
+                           hasattr(x.model_class(), 'get_related_shirts')]
         self.fields['content_type'].queryset = self.fields['content_type'].queryset.filter(pk__in=content_type_pk)
-        self.fields['content_type'].choices = [(pk, content_type_names.get(title, title)) for pk, title in self.fields['content_type'].choices]
+        self.fields['content_type'].choices = [(pk, content_type_names.get(title, title)) for pk, title in
+                                               self.fields['content_type'].choices]
 
     def clean_content_type(self):
         content_type = self.cleaned_data.get('content_type')
         if not hasattr(content_type.model_class(), 'get_related_shirts'):
             raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
         if not self.fields['object_pk'].choices:
-            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in content_type.model_class().objects.all()]
+            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in
+                                                               content_type.model_class().objects.all()]
         return content_type
 
     def clean_object_pk(self):
@@ -154,8 +207,8 @@ class AccessoriesPriceAdminForm(forms.ModelForm):
 
 
 class AccessoriesPriceAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'content_type_title', 'content_object', 'price', )
-    list_display_links = ('pk', 'content_type_title', 'content_object', 'price', )
+    list_display = ('pk', 'content_type_title', 'content_object', 'price',)
+    list_display_links = ('pk', 'content_type_title', 'content_object', 'price',)
     form = AccessoriesPriceAdminForm
 
 
