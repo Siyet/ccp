@@ -17,6 +17,10 @@ from dictionaries import models as dictionaries
 
 
 class TemplateShirtResource(resources.ModelResource):
+    BUTTONS_DEFAULT_DICT = {
+        True: u'Пожалуйста, используйте стандартные пуговицы',
+        False: u''
+    }
     CONTRAST_STITCHES_USE_DICT = {
         True: u'Я хочу использовать отстрочку контрастного цвета',
         False: u'Я не хочу использовать отстрочку контрастного цвета'
@@ -95,9 +99,9 @@ class TemplateShirtResource(resources.ModelResource):
     shirt_cuff__hardness = fields.Field(attribute='shirt_cuff__hardness', column_name=u'Жесткость манжеты',
                                         widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     # Импорт пуговиц
-    custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=u'Вариант пуговиц',
+    custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=u'Пуговицы',
                                        widget=ForeignKeyWidget(model=dictionaries.CustomButtonsType, field='title'))
-    custom_buttons = fields.Field(attribute='custom_buttons', column_name=u'Пуговицы',
+    custom_buttons = fields.Field(attribute='custom_buttons', column_name=u'Код цвета пуговицы',
                                   widget=ForeignKeyWidget(model=CustomButtons, field='title'))
     # импорт манишки
     dickey__type = fields.Field(attribute='dickey__type', column_name=u'МА Тип',
@@ -210,13 +214,12 @@ class TemplateShirtResource(resources.ModelResource):
             # Кастомные пуговицы
             if obj.custom_buttons_type:
                 row += [
+                    self.BUTTONS_DEFAULT_DICT[True],
                     obj.custom_buttons_type.title,
                     obj.custom_buttons.title,
                 ]
             else:
-                row += ['' for i in range(2)]
-            # Код цвета пуговицы
-            row.append('')
+                row += ['' for i in range(3)]
 
             # Контрастные отстрочки
             row.append(self.CONTRAST_STITCHES_USE_DICT[len(obj.contrast_stitches.all()) > 0])
