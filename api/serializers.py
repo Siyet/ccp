@@ -5,7 +5,7 @@ from checkout import models as checkout
 
 
 class CollectionSerializer(serializers.ModelSerializer):
-
+    title = serializers.ReadOnlyField(source='__unicode__')
     class Meta:
         model = models.Collection
         fields = ('id', 'title', 'text', 'image', 'tailoring_time', )
@@ -168,7 +168,7 @@ class ShirtImageSerializer(serializers.ModelSerializer):
 
 class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
     shirt_images = serializers.SerializerMethodField()
-    collection_title = serializers.StringRelatedField(source='collection.title')
+    collection_title = serializers.StringRelatedField(source='collection')
     country = serializers.StringRelatedField(source='collection.storehouse.country')
     short_description = serializers.StringRelatedField(source='fabric.short_description')
     long_description = serializers.StringRelatedField(source='fabric.long_description')

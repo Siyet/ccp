@@ -98,10 +98,12 @@ class TemplateShirtsFiltersList(APIView):
             design_fabrics__shirt__is_template=True,
             design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
-        sex = [(x['sex'], models.SEX[x['sex']]) for x in models.Collection.objects.filter(
-            shirts__is_template=True,
-            shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
-        ).values('sex').distinct()]
+        sex_values = models.Collection.objects.filter(
+             shirts__is_template=True,
+             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
+        ).values_list('sex', flat=True).distinct()
+
+        sex_pairs = map(lambda sex: {"id": sex, "title": models.SEX[sex]}, sex_values)
 
         return Response([
             self.build_filter(u'Ткань', u'fabric',
@@ -110,9 +112,9 @@ class TemplateShirtsFiltersList(APIView):
             self.build_filter(u'Толщина ткани', u'thickness', list(thickness.values('id', 'title').distinct())),
             self.build_filter(u'Цвет', 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
             self.build_filter(u'Дизайн', 'fabric__designs', self.build_design_list(designs.distinct(), request)),
-            self.build_filter(u'Пол', 'collection__sex', map(lambda pair: {'id': pair[0], 'title': pair[1]}, sex))
+            self.build_filter(u'Пол', 'collection__sex', sex_pairs)
         ])
-    
+
 
 class ShirtDetails(RetrieveAPIView):
     """
