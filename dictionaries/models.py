@@ -71,7 +71,7 @@ class FabricType(models.Model):
     title = models.CharField(_(u'Тип'), unique=True, max_length=255)
 
     def __unicode__(self):
-        return u"%s %s" % (_(u'Тип'), self.title)
+        return self.title
 
     class Meta:
         verbose_name = _(u'Тип ткани')
