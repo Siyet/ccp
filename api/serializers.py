@@ -225,3 +225,10 @@ class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.FAQ
         fields = ('question', 'answer', )
+
+
+class ShirtDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Shirt
+        exclude = ["is_template", "is_standard", "code", "individualization", "showcase_image"]

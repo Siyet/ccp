@@ -15,8 +15,10 @@ from api import serializers
 
 class TemplateShirtsFilter(filters.FilterSet):
     fabric = django_filters.ModelMultipleChoiceFilter(queryset=models.Fabric.objects.all())
-    fabric_type = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.FabricType.objects.all(), name='fabric__fabric_type')
-    thickness = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.Thickness.objects.all(), name='fabric__thickness')
+    fabric_type = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.FabricType.objects.all(),
+                                                           name='fabric__fabric_type')
+    thickness = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.Thickness.objects.all(),
+                                                         name='fabric__thickness')
     collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
 
     class Meta:
@@ -26,13 +28,13 @@ class TemplateShirtsFilter(filters.FilterSet):
 
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.TemplateShirt.objects.available().\
-        filter(fabric__active=True, fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
+    queryset = models.TemplateShirt.objects.available(). \
+        filter(fabric__active=True, fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL). \
         select_related('fabric__fabric_type').distinct()
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
-    filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
-    ordering_fields = ('price', )
+    filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend,)
+    ordering_fields = ('price',)
 
     def get(self, request, *args, **kwargs):
         """
@@ -53,13 +55,12 @@ class TemplateShirtsList(ListAPIView):
 
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
-    queryset = models.TemplateShirt.objects.available().\
-        filter(fabric__active=True, fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).\
+    queryset = models.TemplateShirt.objects.available(). \
+        filter(fabric__active=True, fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL). \
         select_related('fabric', 'collection__storehouse').prefetch_related('shirt_images').distinct()
 
 
 class TemplateShirtsFiltersList(APIView):
-
     def build_filter(self, title, name, values):
         return {
             'title': title,
@@ -101,11 +102,41 @@ class TemplateShirtsFiltersList(APIView):
             shirts__is_template=True,
             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         ).values('sex').distinct()]
+
         return Response([
-            self.build_filter(u'Ткань', u'fabric', list(fabrics.annotate(title=F('code')).values('id', 'title', 'material').distinct())),
+            self.build_filter(u'Ткань', u'fabric',
+                              list(fabrics.annotate(title=F('code')).values('id', 'title', 'material').distinct())),
             self.build_filter(u'Тип ткани', u'fabric_type', list(fabric_types.values('id', 'title').distinct())),
             self.build_filter(u'Толщина ткани', u'thickness', list(thickness.values('id', 'title').distinct())),
             self.build_filter(u'Цвет', 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
             self.build_filter(u'Дизайн', 'fabric__designs', self.build_design_list(designs.distinct(), request)),
             self.build_filter(u'Пол', 'collection__sex', map(lambda pair: {'id': pair[0], 'title': pair[1]}, sex))
         ])
+    
+
+class ShirtDetails(RetrieveAPIView):
+    """
+    Получение информации о рубашке
+    """
+    serializer_class = serializers.ShirtDetailsSerializer
+
+    related_fields = []
+    """ # uncomment in case depth > 0
+    related_fields = [
+        "collection",
+        "fabric",
+        "size_option",
+        "size",
+        "hem",
+        "placket",
+        "pocket",
+        "back",
+        "custom_buttons_type",
+        "custom_buttons",
+        "shawl",
+        "yoke",
+        "dickey",
+        "initials"
+    ]
+    """
+    queryset = models.Shirt.objects.select_related(*related_fields)
