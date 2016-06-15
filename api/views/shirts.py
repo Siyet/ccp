@@ -2,7 +2,7 @@
 import django_filters
 from django.conf import settings
 from django.db.models import F
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import pagination
 from rest_framework import filters
 from rest_framework.response import Response
