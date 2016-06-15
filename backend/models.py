@@ -22,8 +22,8 @@ from backend import managers
 
 
 SEX = Choices(
-    ('male', _(u'Мужской')),
-    ('female', _(u'Женский')),
+    ('male', _(u'Мужская')),
+    ('female', _(u'Женская')),
     ('unisex', _(u'Унисекс')),
 )
 
@@ -37,11 +37,12 @@ class Collection(models.Model):
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
-    sex = models.CharField(_(u'Пол'), choices=SEX, max_length=6, default='male', blank=False)
+    sex = models.CharField(_(u'Пол коллекции'), choices=SEX, max_length=6, default=SEX.male, blank=False)
     tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
 
+
     def __unicode__(self):
-        return self.title
+        return "%s %s" % (self.title, self.get_sex_display().lower())
 
     class Meta:
         verbose_name = _(u'Коллекция')

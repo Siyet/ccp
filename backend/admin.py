@@ -159,8 +159,11 @@ class AccessoriesPriceAdmin(admin.ModelAdmin):
     form = AccessoriesPriceAdminForm
 
 
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'sex')
+
+
 admin.site.register([
-    Collection,
     Storehouse,
     CustomButtons,
     ShawlOptions,
@@ -171,6 +174,7 @@ admin.site.register([
     ElementStitch,
 ])
 
+admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Fabric, FabricAdmin)
 admin.site.register(FabricPrice, FabricPriceAdmin)
 admin.site.register(FabricResidual, FabricResidualAdmin)

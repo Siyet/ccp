@@ -1,6 +1,6 @@
 # coding: utf-8
 from import_export.widgets import ForeignKeyWidget
-
+from backend.models import SEX
 
 class CustomForeignKeyWidget(ForeignKeyWidget):
 
@@ -25,11 +25,11 @@ class CustomForeignKeyWidget(ForeignKeyWidget):
 
 class TemplateShirtCollectionWidget(ForeignKeyWidget):
     SEX_DICT = {
-        u'МУЖ': 'male',
-        u'ЖЕН': 'female'
+        u'МУЖ': SEX.male,
+        u'ЖЕН': SEX.female
     }
 
     def clean(self, value, sex=None):
         val = super(ForeignKeyWidget, self).clean(value)
-        sex = self.SEX_DICT.get(sex, 'unisex')
+        sex = self.SEX_DICT.get(sex, SEX.unisex)
         return self.model.objects.get(**{self.field: val, 'sex': sex}) if val else None
