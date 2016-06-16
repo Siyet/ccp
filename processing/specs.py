@@ -4,7 +4,15 @@ from imagekit.utils import get_field_info
 from .processors import ComposeSample
 from django.conf import settings
 
-sample_generator_id = 'costumecode:sample'
+class Generators(object):
+    sample = 'costumecode:sample'
+    sample_thumbnail = 'costumecode:sample_thumbnail'
+
+class TextureSampleThumbnail(ImageSpec):
+    format = 'JPEG'
+    options = {'quality': 80}
+    processors =  [ResizeToFit(*settings.FABRIC_SAMPLE_THUMBNAIL_SIZE)]
+
 
 class TextureSample(ImageSpec):
     format = 'JPEG'
@@ -15,8 +23,9 @@ class TextureSample(ImageSpec):
         instance, field_name = get_field_info(self.source)
         return [
             ComposeSample(texture=instance),
-            ResizeToFit(width=settings.FABRIC_SAMPLE_SIZE[0], height=settings.FABRIC_SAMPLE_SIZE[1])
+            ResizeToFit(*settings.FABRIC_SAMPLE_SIZE)
         ]
 
 
-register.generator(sample_generator_id, TextureSample)
+register.generator(Generators.sample, TextureSample)
+register.generator(Generators.sample_thumbnail, TextureSampleThumbnail)
