@@ -10,17 +10,11 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('backend', '0054_auto_20160616_0205'),
-        ('processing', '0007_auto_20160611_1149')
     ]
 
     operations = [
         migrations.RemoveField(
             model_name='fabric',
             name='texture',
-        ),
-        migrations.AddField(
-            model_name='fabric',
-            name='texture',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='fabric', to='processing.Texture', verbose_name='\u0422\u0435\u043a\u0441\u0442\u0443\u0440\u0430'),
         ),
     ]
