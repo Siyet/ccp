@@ -43,7 +43,7 @@ class FabricSerializer(serializers.ModelSerializer):
     def get_price(self, object):
         try:
             return next(x for x in object.category.prices.all() if x.storehouse == object.cached_collection.storehouse).price
-        except StopIteration:
+        except (AttributeError, StopIteration):
             return None
 
     class Meta:
