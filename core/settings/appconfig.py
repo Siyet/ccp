@@ -8,3 +8,5 @@ IMPORT_EXPORT_FORMATS = (
     base_formats.XLS,
     base_formats.XLSX,
 )
+
+FABRIC_SAMPLE_SIZE = (512, 512)

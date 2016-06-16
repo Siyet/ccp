@@ -17,6 +17,7 @@ from imagekit.processors import ResizeToFill
 from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 
+
 from dictionaries.models import FabricCategory
 from backend import managers
 
@@ -115,7 +116,7 @@ class Fabric(models.Model):
     material = models.CharField(_(u'Материал'), max_length=255, default="")
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
-    texture = models.ImageField(_(u'Текстура'))
+    texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True)
     dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
     active = models.BooleanField(_(u'Активна'), default=True)
 
@@ -123,6 +124,9 @@ class Fabric(models.Model):
 
     def __unicode__(self):
         return self.code
+
+    def get_sample(self):
+        return self.texture.sample if self.texture else None
 
     def save(self, *args, **kwargs):
         category_letter = self.code[0]
