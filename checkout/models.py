@@ -79,3 +79,16 @@ class Certificate(models.Model):
     class Meta:
         verbose_name = _(u'Сертификат')
         verbose_name_plural = _(u'Сертификаты')
+
+
+class Discount(models.Model):
+    customer = models.OneToOneField(Customer, to_field='number', verbose_name=_(u'Уникальный номер пользователя'),
+                                    max_length=255, primary_key=True)
+    discount_value = models.FloatField(_(u'Процент скидки'), default=0, null=True)
+
+    def __unicode__(self):
+        return u'{0}'.format(self.customer.number)
+
+    class Meta:
+        verbose_name = _(u'Скидка')
+        verbose_name_plural = _(u'Скидки')
