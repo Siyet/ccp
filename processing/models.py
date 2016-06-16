@@ -143,7 +143,7 @@ class ButtonsSource(ProjectionModel):
 class Texture(models.Model):
     TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
 
-    texture = models.ImageField(_(u'Файл текстуры'))
+    texture = models.ImageField(_(u'Файл текстуры'), upload_to='textures')
     tiling = models.PositiveIntegerField(_(u'Тайлинг'), choices=TILING, default=TILING.default)
     needs_shadow = models.BooleanField(_(u'Использовать тени'), default=True)
     sample = ImageSpecField(source='texture', spec=TextureSample, id=sample_generator_id)
