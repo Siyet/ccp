@@ -111,6 +111,7 @@ class FabricResidualAdminInline(admin.TabularInline):
 
 
 class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
+    RESIDUAL_KEY = "storehouse_%s"
     list_per_page = 20
     resource_class = FabricResource
     change_list_template = 'admin/backend/change_list_import_export.html'
@@ -120,7 +121,7 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
     list_filter = ('category',)
     readonly_fields = ['category']
     inlines = [FabricResidualAdminInline, ]
-    list_select_related = ('category', 'fabric_type', 'thickness',)
+    list_select_related = ('category', 'fabric_type', 'thickness', 'texture')
 
     def __init__(self, *args, **kwargs):
         super(FabricAdmin, self).__init__(*args, **kwargs)
@@ -135,7 +136,7 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
         for storehouse in self.storehouses:
             residual_for_storehouse = lambda self, fabric, storehouse=storehouse: self.get_residual(fabric, storehouse)
             residual_for_storehouse.short_description = storehouse.country
-            setattr(FabricAdmin, storehouse.country, residual_for_storehouse)
+            setattr(FabricAdmin, self.RESIDUAL_KEY % storehouse.id, residual_for_storehouse)
 
     def get_queryset(self, request):
         queryset = super(FabricAdmin, self).get_queryset(request)
@@ -147,7 +148,7 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
         return residual.amount if residual else None
 
     def get_list_display(self, request):
-        residual_fields = map(lambda storehouse: unicode(storehouse), self.storehouses)
+        residual_fields = map(lambda storehouse: self.RESIDUAL_KEY % storehouse.id, self.storehouses)
         list_display = ['code', 'category'] + residual_fields + ['material', 'has_description', 'fabric_type',
                                                                  'thickness', 'get_colors', 'get_designs', 'thumbnail']
         return list_display
