@@ -1,4 +1,8 @@
+# coding: utf-8
+
 from django.contrib import admin
+from imagekit.admin import AdminThumbnail
+from django.utils.text import ugettext_lazy as _
 import models
 
 
@@ -28,6 +32,13 @@ class ButtonsSourceAdmin(admin.ModelAdmin):
         return self.get_fields(request)
 
 
+class TextureAdmin(admin.ModelAdmin):
+    list_display = ['__unicode__', 'thumbnail']
+
+    thumbnail = AdminThumbnail(image_field='sample', template='processing/sample.html')
+    thumbnail.short_description = _(u'Лоскут')
+
+
 admin.site.register(models.BodySource, SourceAdmin)
 admin.site.register(models.CollarSource, SourceAdmin)
 admin.site.register(models.CuffSource, SourceAdmin)
@@ -37,4 +48,4 @@ admin.site.register(models.PlacketSource, SourceAdmin)
 admin.site.register(models.BodyButtonsSource, ButtonsSourceAdmin)
 admin.site.register(models.CollarButtonsSource, ButtonsSourceAdmin)
 admin.site.register(models.CuffButtonsSource, ButtonsSourceAdmin)
-admin.site.register(models.Texture)
+admin.site.register(models.Texture, TextureAdmin)

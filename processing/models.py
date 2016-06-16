@@ -4,9 +4,10 @@ from django.db import models
 from dictionaries import models as dictionaries
 from model_utils.choices import Choices
 from django.utils.text import ugettext_lazy as _
+from imagekit.models import ImageSpecField
 
 from upload_path import UploadComposingSource
-
+from .specs import TextureSample, sample_generator_id
 from backend import models as backend
 
 class SourceMixin(object):
@@ -145,8 +146,12 @@ class Texture(models.Model):
     texture = models.ImageField(_(u'Файл текстуры'))
     tiling = models.PositiveIntegerField(_(u'Тайлинг'), choices=TILING, default=TILING.default)
     needs_shadow = models.BooleanField(_(u'Использовать тени'), default=True)
+    sample = ImageSpecField(source='texture', spec=TextureSample, id=sample_generator_id)
 
     class Meta:
         verbose_name = _(u'Текстура')
         verbose_name_plural = _(u'Текстуры')
+
+    def __unicode__(self):
+        return self.texture.name
 

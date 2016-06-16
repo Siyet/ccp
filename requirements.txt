@@ -1,24 +1,22 @@
 Django==1.9
+mysql
 
 # Graphics
 Pillow
 OpenEXR
 django-imagekit
 
-mysql
-
+# Admin
 django-grappelli==2.7.3
+django-colorful
+
+# REST
 djangorestframework
 django-rest-swagger
-
-# REST authentication
 djoser
 
-django-colorful
 # Choice fields
 django-model-utils
-django-admin-sortable2
-django-debug-toolbar
 
 # Cross-domain requests
 django-cors-headers
@@ -34,3 +32,6 @@ django-crispy-forms
 # Import/Export data
 django-import-export
 openpyxl
+
+# misc
+django-debug-toolbar

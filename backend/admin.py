@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from itertools import ifilter
+from imagekit.admin import AdminThumbnail
 from import_export.admin import ImportExportMixin
 from backend.import_export.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from backend.widgets import ContentTypeSelect
@@ -148,13 +149,16 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
     def get_list_display(self, request):
         residual_fields = map(lambda storehouse: unicode(storehouse), self.storehouses)
         list_display = ['code', 'category'] + residual_fields + ['material', 'has_description', 'fabric_type',
-                                                                 'thickness', 'get_colors', 'get_designs', 'texture']
+                                                                 'thickness', 'get_colors', 'get_designs', 'thumbnail']
         return list_display
 
     def get_list_display_links(self, request, list_display):
         return ('code',)
 
     # fields
+    thumbnail = AdminThumbnail(image_field="get_sample", template='processing/sample.html')
+    thumbnail.short_description = _(u'Лоскут')
+
     def has_description(self, fabric):
         return not (not (fabric.short_description or fabric.long_description))
     has_description.short_description = _(u'Описание')

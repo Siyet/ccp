@@ -22,7 +22,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'smart_selects',
-
+    'imagekit',
     'dictionaries',
 
     'rest_framework',
@@ -94,9 +94,13 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
+# Database
+
 try:
     from .database import *
 except:
     raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")
+
+
 
 from .appconfig import *
