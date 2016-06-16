@@ -45,7 +45,8 @@ class CollectionFabricsList(APIView):
               description: дизайн (id)
         """
         collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=kwargs.get('pk'))
-        queryset = collection.fabrics()
+        collection.prices = collection.storehouse.prices.values('fabric_category', 'price')
+        queryset = collection.fabrics().select_related('texture')
         color = self.request.query_params.get('color', None)
         if color is not None:
             queryset = queryset.prefetch_related('colors').filter(colors__id=color)
@@ -55,7 +56,8 @@ class CollectionFabricsList(APIView):
             queryset = queryset.prefetch_related('designs').filter(designs__id=design)
         for fabric in queryset:
             fabric.cached_collection = collection
-        return Response(serializers.FabricSerializer(queryset, many=True).data)
+
+        return Response(serializers.FabricSerializer(queryset, many=True, context={'request': request}).data)
 
 
 class CollectionFabricColorsList(ListAPIView):

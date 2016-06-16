@@ -7,7 +7,7 @@ from django.utils.text import ugettext_lazy as _
 from imagekit.models import ImageSpecField
 
 from upload_path import UploadComposingSource
-from .specs import TextureSample, sample_generator_id
+from .specs import TextureSample, TextureSampleThumbnail, Generators
 from backend import models as backend
 
 class SourceMixin(object):
@@ -146,7 +146,8 @@ class Texture(models.Model):
     texture = models.ImageField(_(u'Файл текстуры'), upload_to='textures')
     tiling = models.PositiveIntegerField(_(u'Тайлинг'), choices=TILING, default=TILING.default)
     needs_shadow = models.BooleanField(_(u'Использовать тени'), default=True)
-    sample = ImageSpecField(source='texture', spec=TextureSample, id=sample_generator_id)
+    sample = ImageSpecField(source='texture', spec=TextureSample, id=Generators.sample)
+    sample_thumbnail = ImageSpecField(source='sample', spec=TextureSampleThumbnail, id=Generators.sample_thumbnail)
 
     class Meta:
         verbose_name = _(u'Текстура')
