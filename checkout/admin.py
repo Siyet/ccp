@@ -8,6 +8,9 @@ from checkout.resources import CertificateResource
 from .models import (
     Shop,
     Certificate,
+    Order,
+    OrderDetails,
+    OrderAddress,
 )
 
 
@@ -24,7 +27,22 @@ class CertificateAdmin(ImportExportMixin, admin.ModelAdmin):
         return filename
 
 
+class OrderDetailsInline(admin.TabularInline):
+    model = OrderDetails
+    extra = 0
+
+
+class OrderAddressInline(admin.TabularInline):
+    model = OrderAddress
+    extra = 0
+
+
+class OrderAdmin(admin.ModelAdmin):
+    inlines = [OrderDetailsInline, OrderAddressInline]
+
+
 admin.site.register(Certificate, CertificateAdmin)
+admin.site.register(Order, OrderAdmin)
 admin.site.register([
     Shop,
 ])

@@ -1,6 +1,9 @@
 # coding: utf-8
+import uuid
+
 from django.db import models
 from django.utils.text import ugettext_lazy as _
+from model_utils import Choices
 
 
 class Customer(models.Model):
@@ -14,8 +17,26 @@ class Customer(models.Model):
         verbose_name_plural = _(u'Клиенты')
 
 
+class CustomerDataAbstract(models.Model):
+    name = models.CharField(_(u'Имя'), max_length=255)
+    lastname = models.CharField(_(u'Фамилия'), max_length=255)
+    midname = models.CharField(_(u'Отчество'), max_length=255)
+
+    phone = models.CharField(_(u'Телефон'), max_length=255)
+    city = models.CharField(_(u'Город'), max_length=255)
+    address = models.CharField(_(u'Адрес'), max_length=255)
+    index = models.CharField(_(u'Индекс'), max_length=6)
+    email = models.EmailField(_(u'E-mail'))
+
+    class Meta:
+        abstract = True
+
+    def __unicode__(self):
+        return u'%s, %s' % (self.city, self.address)
+
+
 class Shop(models.Model):
-    index = models.IntegerField(verbose_name=_(u'Индекс'))
+    index = models.IntegerField(verbose_name=_(u'Индекс'), unique=True)
     city = models.CharField(verbose_name=_(u'Город'), max_length=255)
     street = models.CharField(verbose_name=_(u'Улица'), max_length=255)
     home = models.CharField(verbose_name=_(u'Дом'), max_length=255)
@@ -28,20 +49,10 @@ class Shop(models.Model):
         verbose_name_plural = _(u'Магазины')
 
 
-class Order(models.Model):
-    number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True)
-    customer = models.ForeignKey(Customer, verbose_name=_(u'Клиент'), null=True, blank=True)
-    checkout_shop = models.ForeignKey(Shop, verbose_name=_(u'Магазин'), null=True, blank=True)
-
-    name = models.CharField(_(u'Имя'), max_length=255)
-    lastname = models.CharField(_(u'Фамилия'), max_length=255)
-    midname = models.CharField(_(u'Отчество'), max_length=255)
-
-    phone = models.CharField(_(u'Телефон'), max_length=255)
-    city = models.CharField(_(u'Город'), max_length=255)
-    address = models.CharField(_(u'Адрес'), max_length=255)
-    index = models.CharField(_(u'Индекс'), max_length=6)
-    email = models.EmailField(_(u'E-mail'))
+class Order(CustomerDataAbstract):
+    number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True, default=uuid.uuid4)
+    customer = models.ForeignKey(Customer, to_field='number', verbose_name=_(u'Клиент'), null=True, blank=True)
+    checkout_shop = models.ForeignKey(Shop, to_field='index', verbose_name=_(u'Магазин'), null=True, blank=True)
 
     def __unicode__(self):
         return self.number
@@ -52,7 +63,7 @@ class Order(models.Model):
 
 
 class OrderDetails(models.Model):
-    order = models.ForeignKey(Order, verbose_name=_(u'Заказ'))
+    order = models.ForeignKey(Order, verbose_name=_(u'Заказ'), related_name='order_details')
     shirt = models.ForeignKey('backend.Shirt', verbose_name=_(u'Рубашка'))
     amount = models.IntegerField(_(u'Количество'))
 
@@ -62,6 +73,16 @@ class OrderDetails(models.Model):
     class Meta:
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
+
+
+class OrderAddress(CustomerDataAbstract):
+    ADDRESS_TYPE = Choices(
+        ('customer_address', _(u'Адрес клиента')),
+        ('other_address', _(u'Другой адрес (или адрес другого человека)')),
+    )
+    order = models.ForeignKey(Order, verbose_name=_(u'Заказ'), related_name='addresses')
+    type = models.CharField(_(u'Тип адреса'), max_length=50, choices=ADDRESS_TYPE,
+                            default=ADDRESS_TYPE.customer_address)
 
 
 class Payment(models.Model):

@@ -239,3 +239,27 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Shirt
         exclude = ["is_template", "is_standard", "code", "individualization", "showcase_image"]
+
+
+class OrderDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = checkout.OrderDetails
+        fields = ('order', 'shirt', 'amount', )
+
+
+class OrderAddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = checkout.OrderAddress
+        fields = ('name', 'lastname', 'midname', 'phone', 'city', 'address', 'index', 'email')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_details = OrderDetailsSerializer(many=True, required=True)
+    addresses = OrderAddressSerializer(many=True, required=True)
+
+    class Meta:
+        model = checkout.Order
+        fields = ('number', 'customer', 'checkout_shop', 'name', 'lastname', 'midname', 'phone', 'city', 'address',
+                  'index', 'email', 'order_details', 'addresses')
