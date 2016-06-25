@@ -1,10 +1,10 @@
-Django==1.9
+Django>=1.8,<1.9
 mysql
 
 # Graphics
 Pillow
 OpenEXR
-django-imagekit
+django-imagekit==3.2.6
 
 # Admin
 django-grappelli==2.7.3

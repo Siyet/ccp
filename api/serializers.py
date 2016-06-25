@@ -39,12 +39,19 @@ class FabricSerializer(serializers.ModelSerializer):
     fabric_type = serializers.StringRelatedField(source='fabric_type.title')
     thickness = serializers.StringRelatedField(source='thickness.title')
     price = serializers.SerializerMethodField()
+    texture = serializers.SerializerMethodField()
+
+    def get_texture(self, obj):
+        if obj.texture:
+            return self.context['request'].build_absolute_uri(obj.texture.sample_thumbnail.url)
+        return None
 
     def get_price(self, object):
-        try:
-            return next(x for x in object.category.prices.all() if x.storehouse == object.cached_collection.storehouse).price
-        except (AttributeError, StopIteration):
-            return None
+        for price_info in object.cached_collection.prices:
+            if price_info["fabric_category"] == object.category_id:
+                return price_info["price"]
+        return None
+
 
     class Meta:
         model = models.Fabric
