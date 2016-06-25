@@ -257,7 +257,7 @@ class OrderAddressSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     order_details = OrderDetailsSerializer(many=True, required=True)
-    addresses = OrderAddressSerializer(many=True, required=True)
+    addresses = OrderAddressSerializer(many=True)
 
     class Meta:
         model = checkout.Order
