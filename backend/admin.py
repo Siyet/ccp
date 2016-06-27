@@ -10,7 +10,10 @@ from itertools import ifilter
 from imagekit.admin import AdminThumbnail
 from import_export.admin import ImportExportMixin
 from backend.import_export.resources import FabricResidualResource, FabricResource, TemplateShirtResource
+from backend.import_export.mixin import TemplateAndFormatMixin
 from backend.widgets import ContentTypeSelect
+
+from grappelli_orderable.admin import GrappelliOrderableAdmin
 
 from .models import (
     Collection,
@@ -66,11 +69,8 @@ class CustomShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template', 'code', 'showcase_image', 'individualization']
 
 
-class TemplateShirtAdmin(ImportExportMixin, admin.ModelAdmin):
+class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, GrappelliOrderableAdmin):
     resource_class = TemplateShirtResource
-    formats = settings.IMPORT_EXPORT_FORMATS
-    change_list_template = 'admin/backend/change_list_import_export.html'
-    import_template_name = 'admin/backend/import.html'
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
 
@@ -88,11 +88,8 @@ class FabricPriceAdmin(admin.ModelAdmin):
         return queryset.select_related('fabric_category', 'storehouse')
 
 
-class FabricResidualAdmin(ImportExportMixin, admin.ModelAdmin):
+class FabricResidualAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
     resource_class = FabricResidualResource
-    change_list_template = 'admin/backend/change_list_import_export.html'
-    import_template_name = 'admin/backend/import.html'
-    formats = settings.IMPORT_EXPORT_FORMATS
     list_select_related = ('fabric', 'storehouse',)
 
     def get_export_queryset(self, request):
@@ -110,13 +107,10 @@ class FabricResidualAdminInline(admin.TabularInline):
     extra = 0
 
 
-class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
+class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
     RESIDUAL_KEY = "storehouse_%s"
     list_per_page = 20
     resource_class = FabricResource
-    change_list_template = 'admin/backend/change_list_import_export.html'
-    import_template_name = 'admin/backend/import.html'
-    formats = settings.IMPORT_EXPORT_FORMATS
     search_fields = ('code',)
     list_filter = ('category',)
     readonly_fields = ['category']
@@ -162,15 +156,18 @@ class FabricAdmin(ImportExportMixin, admin.ModelAdmin):
 
     def has_description(self, fabric):
         return not (not (fabric.short_description or fabric.long_description))
+
     has_description.short_description = _(u'Описание')
     has_description.boolean = True
 
     def get_colors(self, fabric):
         return "; ".join([unicode(color) for color in fabric.colors.all()])
+
     get_colors.short_description = _(u'Цвета')
 
     def get_designs(self, fabric):
         return "; ".join([unicode(design) for design in fabric.designs.all()])
+
     get_designs.short_description = _(u'Дизайн')
 
 
@@ -217,20 +214,18 @@ class AccessoriesPriceAdmin(admin.ModelAdmin):
     form = AccessoriesPriceAdminForm
 
 
-class CollectionAdmin(admin.ModelAdmin):
+class CollectionAdmin(GrappelliOrderableAdmin):
     list_display = ('title', 'sex')
 
 
 admin.site.register([
     Storehouse,
-    CustomButtons,
-    ShawlOptions,
     Dickey,
     Initials,
-    Hardness,
-    Stays,
-    ElementStitch,
+    ElementStitch
 ])
+
+admin.site.register([Hardness, CustomButtons, ShawlOptions, Stays], GrappelliOrderableAdmin)
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Fabric, FabricAdmin)

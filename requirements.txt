@@ -9,6 +9,7 @@ django-imagekit==3.2.6
 # Admin
 django-grappelli==2.7.3
 django-colorful
+django-ordered-model
 
 # REST
 djangorestframework

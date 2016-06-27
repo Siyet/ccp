@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.text import ugettext_lazy as _
 from model_utils import Choices
 
+from ordered_model.models import OrderedModel
 
 class Customer(models.Model):
     number = models.CharField(_(u'Уникальный номер пользователя'), max_length=255, unique=True)
@@ -35,7 +36,7 @@ class CustomerDataAbstract(models.Model):
         return u'%s, %s' % (self.city, self.address)
 
 
-class Shop(models.Model):
+class Shop(OrderedModel):
     index = models.IntegerField(verbose_name=_(u'Индекс'), unique=True)
     city = models.CharField(verbose_name=_(u'Город'), max_length=255)
     street = models.CharField(verbose_name=_(u'Улица'), max_length=255)
@@ -44,7 +45,7 @@ class Shop(models.Model):
     def __unicode__(self):
         return u'{0}, {1}, {2}'.format(self.city, self.street, self.home)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Магазин')
         verbose_name_plural = _(u'Магазины')
 
@@ -100,3 +101,16 @@ class Certificate(models.Model):
     class Meta:
         verbose_name = _(u'Сертификат')
         verbose_name_plural = _(u'Сертификаты')
+
+
+class Discount(models.Model):
+    customer = models.OneToOneField(Customer, to_field='number', verbose_name=_(u'Уникальный номер пользователя'),
+                                    max_length=255, primary_key=True)
+    discount_value = models.FloatField(_(u'Процент скидки'), default=0, null=True)
+
+    def __unicode__(self):
+        return u'{0}'.format(self.customer.number)
+
+    class Meta:
+        verbose_name = _(u'Скидка')
+        verbose_name_plural = _(u'Скидки')
