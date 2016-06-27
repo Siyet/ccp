@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils.text import ugettext_lazy as _
 
+from ordered_model.models import OrderedModel
 
 class Customer(models.Model):
     number = models.CharField(_(u'Уникальный номер пользователя'), max_length=255, unique=True)
@@ -14,7 +15,7 @@ class Customer(models.Model):
         verbose_name_plural = _(u'Клиенты')
 
 
-class Shop(models.Model):
+class Shop(OrderedModel):
     index = models.IntegerField(verbose_name=_(u'Индекс'))
     city = models.CharField(verbose_name=_(u'Город'), max_length=255)
     street = models.CharField(verbose_name=_(u'Улица'), max_length=255)
@@ -23,7 +24,7 @@ class Shop(models.Model):
     def __unicode__(self):
         return u'{0}, {1}, {2}'.format(self.city, self.street, self.home)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Магазин')
         verbose_name_plural = _(u'Магазины')
 
@@ -31,7 +32,7 @@ class Shop(models.Model):
 class Order(models.Model):
     number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True)
     customer = models.ForeignKey(Customer, verbose_name=_(u'Клиент'), null=True, blank=True)
-    checkout_shop = models.ForeignKey(Shop, verbose_name=_(u'Магазин'), null=True, blank=True)
+    checkout_shop = models.ForeignKey(Shop, verbose_name=_(u'Магазин'), null=True, blank=True, related_name='orders')
 
     name = models.CharField(_(u'Имя'), max_length=255)
     lastname = models.CharField(_(u'Фамилия'), max_length=255)

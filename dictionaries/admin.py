@@ -1,4 +1,5 @@
 from django.contrib import admin
+from grappelli_orderable.admin import GrappelliOrderableAdmin
 
 from .models import (
     Color,
@@ -38,29 +39,30 @@ class ShirtInfoAdmin(admin.ModelAdmin):
     inlines = [ShirtInfoImageInline]
 
 
+class SizeAdmin(GrappelliOrderableAdmin):
+    list_display = ('size',)
+
+
 admin.site.register(ShirtInfo, ShirtInfoAdmin)
 admin.site.register([
     Color,
     Font,
     FabricColor,
-    FabricDesign,
     FabricCategory,
-    FabricType,
-    CollarButtons,
-    CollarType,
     CuffRounding,
-    CuffType,
     CustomButtonsType,
     YokeType,
     StitchColor,
     DickeyType,
-    SizeOptions,
-    Size,
     HemType,
     BackType,
     PlacketType,
     PocketType,
     SleeveType,
-    Thickness,
     FAQ,
 ])
+
+admin.site.register(Size, SizeAdmin)
+
+admin.site.register([SizeOptions, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
+                    GrappelliOrderableAdmin)

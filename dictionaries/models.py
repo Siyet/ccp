@@ -4,15 +4,16 @@ from django.utils.text import ugettext_lazy as _
 from colorful.fields import RGBColorField
 from django.db.models import Count
 
+from ordered_model.models import OrderedModel
 
-class ComponentModel(models.Model):
+class ComponentModel(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
     picture = models.ImageField(_(u'Изображение'))
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         abstract = True
 
 
@@ -67,19 +68,19 @@ class FabricCategory(models.Model):
         verbose_name_plural = _(u'Категории тканей')
 
 
-class FabricType(models.Model):
+class FabricType(OrderedModel):
     title = models.CharField(_(u'Тип'), unique=True, max_length=255)
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Тип ткани')
         verbose_name_plural = _(u'Типы тканей')
 
 
 class FabricDesign(ComponentModel):
-    class Meta:
+    class Meta(ComponentModel.Meta):
         verbose_name = _(u'Паттерн ткани')
         verbose_name_plural = _(u'Паттерны тканей')
 
@@ -91,12 +92,12 @@ class FabricDesign(ComponentModel):
 class CollarType(ComponentModel):
     buttons = models.ManyToManyField('CollarButtons', verbose_name=_(u'Варианты пуговиц'))
 
-    class Meta:
+    class Meta(ComponentModel.Meta):
         verbose_name = _(u'Тип воротника')
         verbose_name_plural = _(u'Типы воротников')
 
 
-class CollarButtons(models.Model):
+class CollarButtons(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     types = models.ManyToManyField('CollarType', verbose_name=_(u'Типы воротников'), through=CollarType.buttons.through,
                                    blank=True)
@@ -104,7 +105,7 @@ class CollarButtons(models.Model):
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Пуговицы воротника')
         verbose_name_plural = _(u'Пуговицы воротника')
 
@@ -112,7 +113,7 @@ class CollarButtons(models.Model):
 class CuffType(ComponentModel):
     rounding = models.ManyToManyField('CuffRounding', verbose_name=_(u'Варианты закругления'), blank=True)
 
-    class Meta:
+    class Meta(ComponentModel.Meta):
         verbose_name = _(u'Тип манжеты')
         verbose_name_plural = _(u'Типы манжет')
 
@@ -189,25 +190,25 @@ class ShirtInfoImage(models.Model):
         verbose_name_plural = _(u'Изображения')
 
 
-class SizeOptions(models.Model):
+class SizeOptions(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     show_sizes = models.BooleanField(_(u'Показывать размеры'), default=True)
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Вариант размера')
         verbose_name_plural = _(u'Варианты размеров')
 
 
-class Size(models.Model):
+class Size(OrderedModel):
     size = models.PositiveIntegerField(_(u'Размер'), unique=True, primary_key=True)
 
     def __unicode__(self):
         return "%s" % self.size
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Размер рубашки')
         verbose_name_plural = _(u'Размеры рубашек')
 
@@ -242,10 +243,10 @@ class BackType(ComponentModel):
         verbose_name_plural = _(u'Типы спинок')
 
 
-class Thickness(models.Model):
+class Thickness(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Толщина ткани')
         verbose_name_plural = _(u'Толщина ткани')
 
