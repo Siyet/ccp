@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^backend/', include('backend.urls')),
+    url(r'^kassa/', include('yandex_kassa.urls')),
     url(r'^', include('processing.urls'))
 
 ]

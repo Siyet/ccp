@@ -4,6 +4,7 @@ import views
 checkout_urls = [
     url(r'^shop/$', views.ShopListView.as_view()),
     url(r'^order/$', views.OrderCreateView.as_view()),
+    url(r'^order/(?P<number>[0-9a-f-]+)/payment/$', views.OrderPaymentData.as_view()),
     url(r'^cert/(?P<pk>[0-9-]+)/$', views.CertificateDetailView.as_view()),
 ]
 

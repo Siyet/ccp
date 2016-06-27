@@ -283,4 +283,5 @@ class OrderSerializer(serializers.ModelSerializer):
             checkout.OrderDetails.objects.create(order=order, **detail)
         for data in customer_data:
             checkout.CustomerData.objects.create(order=order, **data)
+        order.create_payment()
         return order

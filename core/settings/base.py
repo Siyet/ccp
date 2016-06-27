@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'colorful',
     'import_export',
+    'yandex_kassa',
 
     'corsheaders',
 

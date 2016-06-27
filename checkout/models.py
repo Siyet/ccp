@@ -6,6 +6,7 @@ from django.utils.text import ugettext_lazy as _
 from model_utils import Choices
 
 from ordered_model.models import OrderedModel
+from yandex_kassa.models import Payment
 
 
 class Customer(models.Model):
@@ -38,13 +39,32 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer, to_field='number', verbose_name=_(u'Клиент'), null=True, blank=True)
     checkout_shop = models.ForeignKey(Shop, to_field='index', verbose_name=_(u'Магазин'), null=True, blank=True,
                                       related_name='orders')
-
-    def __unicode__(self):
-        return self.number
+    payment = models.OneToOneField(Payment, null=True, blank=True)
 
     class Meta:
         verbose_name = _(u'Заказ')
         verbose_name_plural = _(u'Заказы')
+
+    def __unicode__(self):
+        return self.number
+
+    @property
+    def paid(self):
+        return self.payment and self.payment.status == Payment.STATUS.SUCCESS
+
+    @property
+    def amount(self):
+        result = 0
+        for detail in self.order_details.all():
+            result += float(detail.shirt.price) * detail.amount
+        return result
+
+    def create_payment(self):
+        payment = Payment.objects.create(customer_number=self.number, order_amount=float(self.amount),
+                                         payment_type=Payment.PAYMENT_TYPE.AC)
+        self.payment = payment
+        self.save(update_fields=['payment'])
+        return payment
 
 
 class CustomerData(models.Model):
@@ -87,11 +107,6 @@ class OrderDetails(models.Model):
     class Meta:
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
-
-
-class Payment(models.Model):
-    order = models.OneToOneField(Order, verbose_name=_(u'Заказ'))
-    paid = models.BooleanField(_(u'Оплачено'))
 
 
 class Certificate(models.Model):
