@@ -17,10 +17,10 @@ from imagekit.processors import ResizeToFill
 from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 
-
 from dictionaries.models import FabricCategory
 from backend import managers
 
+from ordered_model.models import OrderedModel
 
 SEX = Choices(
     ('male', _(u'Мужская')),
@@ -29,7 +29,7 @@ SEX = Choices(
 )
 
 
-class Collection(models.Model):
+class Collection(OrderedModel):
     storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections', blank=False, null=True)
     title = models.CharField(_(u'Название'), max_length=255)
     text = models.TextField(_(u'Описание'))
@@ -45,7 +45,7 @@ class Collection(models.Model):
     def __unicode__(self):
         return "%s %s" % (self.title, self.get_sex_display().lower())
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Коллекция')
         verbose_name_plural = _(u'Коллекции')
 
@@ -66,26 +66,26 @@ class Storehouse(models.Model):
         verbose_name_plural = _(u'Склады')
 
 
-class Hardness(models.Model):
+class Hardness(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='hardness')
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Жесткость')
         verbose_name_plural = _(u'Жесткость')
 
 
-class Stays(models.Model):
+class Stays(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='stays')
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Косточки')
         verbose_name_plural = _(u'Косточки')
 
@@ -138,10 +138,10 @@ class Fabric(models.Model):
 
         super(Fabric, self).save(*args, **kwargs)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
+        ordering = ('code', )
         verbose_name = _(u'Ткань')
         verbose_name_plural = _(u'Ткани')
-        ordering = ('code', )
 
 
 class FabricResidual(models.Model):
@@ -211,7 +211,7 @@ class Cuff(models.Model):
         return qs.values('id').distinct()
 
 
-class CustomButtons(models.Model):
+class CustomButtons(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     picture = models.ImageField(_(u'Изображение'))
     type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип'), related_name='buttons')
@@ -219,19 +219,19 @@ class CustomButtons(models.Model):
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Кастомные пуговицы')
         verbose_name_plural = _(u'Кастомные пуговицы')
 
 
-class ShawlOptions(models.Model):
+class ShawlOptions(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     extra_price = models.DecimalField(_(u'Добавочная стоимость'), max_digits=10, decimal_places=2)
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Настройки платка')
         verbose_name_plural = _(u'Настройки платка')
 
@@ -284,7 +284,7 @@ class Initials(models.Model):
         verbose_name_plural = _(u'Инициалы')
 
 
-class Shirt(models.Model):
+class Shirt(OrderedModel):
     TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
@@ -403,7 +403,7 @@ class TemplateShirt(Shirt):
         self.is_template = True
         super(TemplateShirt, self).save(*args, **kwargs)
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         proxy = True
         verbose_name = _(u'Шаблон рубашки')
         verbose_name_plural = _(u'Шаблоны рубашек')

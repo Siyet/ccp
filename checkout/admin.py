@@ -8,6 +8,7 @@ from import_export.admin import ImportExportMixin
 
 from backend.import_export.mixin import TemplateAndFormatMixin
 from checkout.import_export.resources import CertificateResource, DiscountResource
+from grappelli_orderable.admin import GrappelliOrderableAdmin
 from .models import (
     Shop,
     Certificate,
@@ -35,8 +36,10 @@ class DiscountAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin)
         return filename
 
 
+class ShopAdmin(GrappelliOrderableAdmin):
+    list_display = ('city', 'street', 'home')
+
+
 admin.site.register(Certificate, CertificateAdmin)
 admin.site.register(Discount, DiscountAdmin)
-admin.site.register([
-    Shop,
-])
+admin.site.register(Shop, ShopAdmin)

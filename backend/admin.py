@@ -13,6 +13,8 @@ from backend.import_export.resources import FabricResidualResource, FabricResour
 from backend.import_export.mixin import TemplateAndFormatMixin
 from backend.widgets import ContentTypeSelect
 
+from grappelli_orderable.admin import GrappelliOrderableAdmin
+
 from .models import (
     Collection,
     Hardness,
@@ -67,7 +69,7 @@ class CustomShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template', 'code', 'showcase_image', 'individualization']
 
 
-class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
+class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, GrappelliOrderableAdmin):
     resource_class = TemplateShirtResource
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
@@ -154,15 +156,18 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
 
     def has_description(self, fabric):
         return not (not (fabric.short_description or fabric.long_description))
+
     has_description.short_description = _(u'Описание')
     has_description.boolean = True
 
     def get_colors(self, fabric):
         return "; ".join([unicode(color) for color in fabric.colors.all()])
+
     get_colors.short_description = _(u'Цвета')
 
     def get_designs(self, fabric):
         return "; ".join([unicode(design) for design in fabric.designs.all()])
+
     get_designs.short_description = _(u'Дизайн')
 
 
@@ -209,20 +214,18 @@ class AccessoriesPriceAdmin(admin.ModelAdmin):
     form = AccessoriesPriceAdminForm
 
 
-class CollectionAdmin(admin.ModelAdmin):
+class CollectionAdmin(GrappelliOrderableAdmin):
     list_display = ('title', 'sex')
 
 
 admin.site.register([
     Storehouse,
-    CustomButtons,
-    ShawlOptions,
     Dickey,
     Initials,
-    Hardness,
-    Stays,
-    ElementStitch,
+    ElementStitch
 ])
+
+admin.site.register([Hardness, CustomButtons, ShawlOptions, Stays], GrappelliOrderableAdmin)
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Fabric, FabricAdmin)
