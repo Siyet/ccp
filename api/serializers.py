@@ -1,4 +1,6 @@
+# coding: utf-8
 from rest_framework import serializers
+from django.utils.text import ugettext_lazy as _
 from backend import models
 from dictionaries import models as dictionaries
 from checkout import models as checkout
@@ -245,21 +247,40 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = checkout.OrderDetails
-        fields = ('order', 'shirt', 'amount', )
+        fields = ('shirt', 'amount', )
 
 
-class OrderAddressSerializer(serializers.ModelSerializer):
+class CustomerDataSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = checkout.OrderAddress
-        fields = ('name', 'lastname', 'midname', 'phone', 'city', 'address', 'index', 'email')
+        model = checkout.CustomerData
+        fields = ('name', 'lastname', 'midname', 'phone', 'type', 'city', 'address', 'index', )
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_details = OrderDetailsSerializer(many=True, required=True)
-    addresses = OrderAddressSerializer(many=True)
+    order_details = OrderDetailsSerializer(many=True, required=True, read_only=False)
+    customer_data = CustomerDataSerializer(many=True, required=True, read_only=False)
 
     class Meta:
         model = checkout.Order
-        fields = ('number', 'customer', 'checkout_shop', 'name', 'lastname', 'midname', 'phone', 'city', 'address',
-                  'index', 'email', 'order_details', 'addresses')
+        fields = ('number', 'customer', 'checkout_shop', 'order_details', 'customer_data', )
+
+    def validate(self, attrs):
+        customer_data = attrs.get('customer_data', [])
+        has_customer_address = False
+        for data in customer_data:
+            if data.get('type') == checkout.CustomerData.ADDRESS_TYPE.customer_address:
+                has_customer_address = True
+        if not has_customer_address:
+            raise serializers.ValidationError(_(u'Данные клиента обязательны'))
+        return attrs
+
+    def create(self, validated_data):
+        order_details = validated_data.pop('order_details')
+        customer_data = validated_data.pop('customer_data')
+        order = checkout.Order.objects.create(**validated_data)
+        for detail in order_details:
+            checkout.OrderDetails.objects.create(order=order, **detail)
+        for data in customer_data:
+            checkout.CustomerData.objects.create(order=order, **data)
+        return order

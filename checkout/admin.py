@@ -13,9 +13,8 @@ from .models import (
     Certificate,
     Order,
     OrderDetails,
-    OrderAddress,
     Discount,
-)
+    CustomerData)
 
 
 class CertificateAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
@@ -47,13 +46,13 @@ class OrderDetailsInline(admin.TabularInline):
     extra = 0
 
 
-class OrderAddressInline(admin.TabularInline):
-    model = OrderAddress
+class CustomerDataInline(admin.StackedInline):
+    model = CustomerData
     extra = 0
 
 
 class OrderAdmin(admin.ModelAdmin):
-    inlines = [OrderDetailsInline, OrderAddressInline]
+    inlines = [CustomerDataInline, OrderDetailsInline]
 
 
 admin.site.register(Order, OrderAdmin)
