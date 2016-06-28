@@ -5,13 +5,16 @@ from diff_match_patch import diff_match_patch
 from django.db.transaction import atomic
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from import_export import resources, fields
+from import_export import fields
 from import_export.widgets import ManyToManyWidget
 
-from backend.import_export.utils import save_relations
-from backend.import_export.widgets import CustomForeignKeyWidget
+from import_export import resources
+from conversions.utils import save_relations
+from conversions.widgets import CustomForeignKeyWidget
 from backend.models import Fabric
 from dictionaries import models as dictionaries
+
+import itertools
 
 
 class FabricResource(resources.ModelResource):
@@ -47,27 +50,26 @@ class FabricResource(resources.ModelResource):
         result.rows.sort(key=lambda x: x.new_record, reverse=True)
         return result
 
-    def import_obj(self, obj, data, dry_run):
-        for field in self.get_fields():
-            if isinstance(field.widget, ManyToManyWidget):
-                val = data.get(field.column_name)
-                if val is None:
-                    val = ''
-                setattr(obj, '%s_diff' % field.column_name, val)
-                continue
-            self.import_field(field, obj, data)
-
-    def get_diff(self, original, current, dry_run=False):
-        data = []
-        dmp = diff_match_patch()
-        for field in self.get_fields():
-            original_value = self.export_field(field, original) if original else ""
-            current_value = self.export_field(field, current) if current else ""
-            if isinstance(field.widget, ManyToManyWidget):
-                current_value = getattr(current, '%s_diff' % field.column_name)
-            diff = dmp.diff_main(force_text(original_value), force_text(current_value))
-            dmp.diff_cleanupSemantic(diff)
-            html = dmp.diff_prettyHtml(diff)
-            html = mark_safe(html)
-            data.append(html)
-        return data
+    # def import_obj(self, obj, data, dry_run):
+    #     for field in self.get_fields():
+    #         if isinstance(field.widget, ManyToManyWidget):
+    #             val = data.get(field.column_name)
+    #             if val is None:
+    #                 val = ''
+    #             setattr(obj, '%s_diff' % field.column_name, val)
+    #             continue
+    #         self.import_field(field, obj, data)
+    #
+    # def get_diff(self, original_fields, new, current_fields, dry_run=False):
+    #     data = []
+    #     dmp = diff_match_patch()
+    #     for v1, v2 in itertools.izip(original_fields, current_fields):
+    #
+    #         if isinstance(field.widget, ManyToManyWidget):
+    #             current_value = getattr(current, '%s_diff' % field.column_name)
+    #         diff = dmp.diff_main(force_text(v1), force_text(v2))
+    #         dmp.diff_cleanupSemantic(diff)
+    #         html = dmp.diff_prettyHtml(diff)
+    #         html = mark_safe(html)
+    #         data.append(html)
+    #     return data

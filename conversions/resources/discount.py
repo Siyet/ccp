@@ -1,15 +1,17 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from import_export import fields
+from import_export import fields, resources
 
-from backend.import_export.utils import save_relations
-from backend.import_export.widgets import CustomForeignKeyWidget
-from checkout.import_export.resources.base import BaseResource
+from conversions.widgets import CustomForeignKeyWidget
+from conversions.utils import save_relations
+from conversions.instance_loaders import ForeignPrimaryKeyInstanceLoader
 from checkout.models import Discount, Customer
 
+from .base import BatchReplaceableResource
 
-class DiscountResource(BaseResource):
+
+class DiscountResource(BatchReplaceableResource):
     PK_ATTRIBUTE_NAME = 'customer'
     PK_COLUMN_NAME = 'Client number'
 
@@ -19,8 +21,10 @@ class DiscountResource(BaseResource):
 
     class Meta:
         model = Discount
-        import_id_fields = ('customer', )
-        fields = ('customer', 'discount_value', )
+        import_id_fields = ('customer',)
+        fields = ('customer', 'discount_value',)
+        instance_loader_class = ForeignPrimaryKeyInstanceLoader
+        skip_unchanged = True
 
     def before_save_instance(self, instance, dry_run):
         if not dry_run:

@@ -3,11 +3,11 @@ from __future__ import absolute_import
 
 from import_export import fields
 
-from checkout.import_export.resources.base import BaseResource
+from .base import BatchReplaceableResource
 from checkout.models import Certificate
 
 
-class CertificateResource(BaseResource):
+class CertificateResource(BatchReplaceableResource):
     PK_ATTRIBUTE_NAME = 'number'
     PK_COLUMN_NAME = 'Certificate number'
 
