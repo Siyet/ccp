@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.conf import settings
 from django.contrib.staticfiles.urls import static
 
+from checkout import views as checkout_views
+
 
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
@@ -10,6 +12,7 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^backend/', include('backend.urls')),
+    url(r'^kassa/order-check/?$', checkout_views.CheckOrderView.as_view(), name='kassa_check_order'),
     url(r'^kassa/', include('yandex_kassa.urls')),
     url(r'^', include('processing.urls'))
 

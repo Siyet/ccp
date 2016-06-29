@@ -260,10 +260,11 @@ class CustomerDataSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     order_details = OrderDetailsSerializer(many=True, required=True, read_only=False)
     customer_data = CustomerDataSerializer(many=True, required=True, read_only=False)
+    amount = serializers.StringRelatedField(source='payment.order_amount')
 
     class Meta:
         model = checkout.Order
-        fields = ('number', 'customer', 'checkout_shop', 'order_details', 'customer_data', )
+        fields = ('number', 'customer', 'checkout_shop', 'certificate', 'amount', 'order_details', 'customer_data', )
 
     def validate(self, attrs):
         customer_data = attrs.get('customer_data', [])

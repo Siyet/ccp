@@ -2,6 +2,7 @@
 import uuid
 
 from django.db import models
+from django.db.transaction import atomic
 from django.utils.text import ugettext_lazy as _
 from model_utils import Choices
 
@@ -14,6 +15,12 @@ class Customer(models.Model):
 
     def __unicode__(self):
         return self.number
+
+    def get_discount_value(self):
+        try:
+            return float(self.discount.discount_value)
+        except (AttributeError, TypeError):
+            return 0
 
     class Meta:
         verbose_name = _(u'Клиент')
@@ -35,11 +42,14 @@ class Shop(OrderedModel):
 
 
 class Order(models.Model):
+    CERTIFICATE_ERROR = _(u'Сертификат уже был использован')
+
     number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True, default=uuid.uuid4)
     customer = models.ForeignKey(Customer, to_field='number', verbose_name=_(u'Клиент'), null=True, blank=True)
     checkout_shop = models.ForeignKey(Shop, to_field='index', verbose_name=_(u'Магазин'), null=True, blank=True,
                                       related_name='orders')
-    payment = models.OneToOneField(Payment, null=True, blank=True)
+    certificate = models.ForeignKey('checkout.Certificate', to_field='number', null=True, blank=True)
+    payment = models.OneToOneField(Payment, null=True, blank=True, related_name='order')
 
     class Meta:
         verbose_name = _(u'Заказ')
@@ -52,19 +62,37 @@ class Order(models.Model):
     def paid(self):
         return self.payment and self.payment.status == Payment.STATUS.SUCCESS
 
-    @property
-    def amount(self):
+    def get_amount(self):
         result = 0
         for detail in self.order_details.all():
             result += float(detail.shirt.price) * detail.amount
+        if self.customer:
+            result *= 1 - self.customer.get_discount_value()
+        if self.certificate:
+            cached_result = result
+            result -= self.certificate.get_value()
+            if result < 0:
+                result = 0
+            self.certificate.value -= cached_result
+            if self.certificate.value < 0:
+                self.certificate.value = 0
         return result
 
+    @atomic
     def create_payment(self):
-        payment = Payment.objects.create(customer_number=self.number, order_amount=float(self.amount),
+        payment = Payment.objects.create(customer_number=self.number, order_amount=float(self.get_amount()),
                                          payment_type=Payment.PAYMENT_TYPE.AC)
         self.payment = payment
         self.save(update_fields=['payment'])
         return payment
+
+    def check_amount(self):
+        return self.get_amount() == self.payment.order_amount
+
+    def save_cert(self):
+        self.get_amount()
+        if self.certificate:
+            self.certificate.save(update_fields=['value'])
 
 
 class CustomerData(models.Model):
@@ -120,10 +148,16 @@ class Certificate(models.Model):
         verbose_name = _(u'Сертификат')
         verbose_name_plural = _(u'Сертификаты')
 
+    def get_value(self):
+        try:
+            return int(self.value)
+        except TypeError:
+            return 0
+
 
 class Discount(models.Model):
     customer = models.OneToOneField(Customer, to_field='number', verbose_name=_(u'Уникальный номер пользователя'),
-                                    max_length=255, primary_key=True)
+                                    max_length=255, primary_key=True, related_name='discount')
     discount_value = models.FloatField(_(u'Процент скидки'), default=0, null=True)
 
     def __unicode__(self):
