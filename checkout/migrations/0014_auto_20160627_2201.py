@@ -7,8 +7,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('yandex_kassa', '0006_auto_20160627_2201'),
         ('checkout', '0013_auto_20160627_2126'),
+        ('yandex_kassa', '0005_auto_20160109_0638')
     ]
 
     operations = [

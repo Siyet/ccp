@@ -10,6 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('checkout', '0009_auto_20160623_2054'),
+        ('checkout', '0009_auto_20160628_2003')
     ]
 
     operations = [
