@@ -1,6 +1,19 @@
 from import_export.instance_loaders import CachedInstanceLoader
 
 
+class CachedWithPrefetchedInstanceLoader(CachedInstanceLoader):
+
+    def __init__(self, *args, **kwargs):
+        self.select_related = kwargs.pop('select_related', [])
+        self.prefetch_related = kwargs.pop('prefetch_related', [])
+        super(CachedWithPrefetchedInstanceLoader, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = super(CachedWithPrefetchedInstanceLoader, self).get_queryset()
+        return qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
+
+
+
 class ForeignPrimaryKeyInstanceLoader(CachedInstanceLoader):
     def __init__(self, *args, **kwargs):
         super(CachedInstanceLoader, self).__init__(*args, **kwargs)

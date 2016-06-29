@@ -1,29 +1,60 @@
 # coding: utf-8
-from import_export.widgets import ForeignKeyWidget, Widget
+from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
 from backend.models import SEX
+from django.utils.encoding import smart_text
 
-class CustomForeignKeyWidget(ForeignKeyWidget):
+class ModelCacheMixin(object):
 
     def _cache_objects(self):
         objects = list(self.model.objects.all())
         self._objects =  dict((unicode(getattr(obj, self.field)), obj) for obj in objects)
 
-    def clean(self, value, create_missing=False):
+    def get_object(self, key):
         if not hasattr(self, "_objects"):
             self._cache_objects()
 
-        if value:
-            value_key = unicode(value)
-            try:
-                return self._objects[value_key]
-            except KeyError:
-                new_object = self.model(**{self.field: value})
-                self._objects[value_key] = new_object
-                return new_object
+        value_key = unicode(key)
+        return self._objects.get(value_key, None)
 
+    def add_object(self, key):
+        new_object = self.model(**{self.field: key})
+        self._objects[unicode(key)] = new_object
+        return new_object
+
+
+class CustomForeignKeyWidget(ModelCacheMixin, ForeignKeyWidget):
+
+    def __init__(self,  model, field='pk', create_missing=True, *args, **kwargs):
+        self.create_missing = create_missing
+        super(CustomForeignKeyWidget, self).__init__(model, field, *args, **kwargs)
+
+    def clean(self, value):
+        if value:
+            obj = self.get_object(value)
+            if not obj and self.create_missing:
+                obj = self.add_object(value)
+            return obj
         else:
             return None
 
+
+class CachedManyToManyWidget(ModelCacheMixin, ManyToManyWidget):
+
+    def clean(self, value):
+        if not value:
+            return self.model.objects.none()
+        if isinstance(value, float):
+            ids = [int(value)]
+        else:
+            ids = value.split(self.separator)
+
+        objects = map(lambda id: self.get_object(id), ids)
+        return filter(None, objects)
+
+    def render(self, value):
+        objects = value.all() if hasattr(value, 'all') else value
+        ids = [smart_text(getattr(obj, self.field)) for obj in objects]
+        return self.separator.join(ids)
 
 class ChoicesWidget(Widget):
     def __init__(self, choices):
