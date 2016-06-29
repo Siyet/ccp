@@ -1,5 +1,5 @@
 # Зависимости #
-
-- libxml2, libxml2-devel
+- libxslt-devel
+- libxml2-devel
 - ImageMagick
 - OpenEXR
