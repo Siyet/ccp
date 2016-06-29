@@ -34,6 +34,7 @@ INSTALLED_APPS = (
 
     'conversions',
     'import_export',
+    'yandex_kassa',
 
     'corsheaders',
 
