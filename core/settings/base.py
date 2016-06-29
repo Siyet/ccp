@@ -31,6 +31,8 @@ INSTALLED_APPS = (
     'django_filters',
     'crispy_forms',
     'colorful',
+
+    'conversions',
     'import_export',
 
     'corsheaders',

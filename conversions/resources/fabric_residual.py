@@ -2,12 +2,12 @@
 from __future__ import absolute_import
 
 import sys
-import tablib
 import logging
 import traceback
-
 from collections import OrderedDict
 from copy import deepcopy
+
+import tablib
 from diff_match_patch import diff_match_patch
 from django.core.management.color import no_style
 from django.db import transaction, connections, DEFAULT_DB_ALIAS
@@ -15,10 +15,10 @@ from django.db.transaction import TransactionManagementError, savepoint_commit, 
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from import_export import resources
 from import_export.django_compat import savepoint, savepoint_rollback
 from import_export.results import Result, Error, RowResult
 
+from import_export import resources
 from backend.models import Fabric, FabricResidual, Storehouse
 
 

@@ -31,7 +31,7 @@ django-filter
 django-crispy-forms
 
 # Import/Export data
-django-import-export
+git+https://github.com/arseniy-panfilov/django-import-export.git@master
 openpyxl
 
 # misc

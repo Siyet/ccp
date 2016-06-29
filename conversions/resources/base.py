@@ -3,11 +3,12 @@ from __future__ import absolute_import
 
 from django.db.transaction import atomic
 from django.utils.encoding import force_text
-from import_export import resources
 from import_export.results import RowResult
 
+from import_export import resources
 
-class BaseResource(resources.ModelResource):
+
+class BatchReplaceableResource(resources.ModelResource):
 
     @atomic()
     def import_data(self, *args, **kwargs):
@@ -24,7 +25,8 @@ class BaseResource(resources.ModelResource):
             row_result = RowResult()
             row_result.new = False
             row_result.import_type = RowResult.IMPORT_TYPE_DELETE
-            row_result.diff = self.get_diff(obj, None)
+            original_fields = [self.export_field(f, obj) for f in self.get_user_visible_fields()]
+            row_result.diff = self.get_diff(original_fields, False, None)
             row_result.object_repr = force_text(obj)
             row_result.object_id = obj.pk
             self.delete_instance(obj, real_dry_run)
