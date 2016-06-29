@@ -1,16 +1,17 @@
 # coding: utf-8
 from __future__ import absolute_import
-import tablib
 
+import tablib
 from diff_match_patch import diff_match_patch
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from import_export import resources, fields
+from import_export import fields
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
+from import_export import resources
 
-from backend.import_export.fields import TemplateShirtCollectionField
-from backend.import_export.utils import save_relations
-from backend.import_export.widgets import CustomForeignKeyWidget, TemplateShirtCollectionWidget
+from conversions.fields import TemplateShirtCollectionField
+from conversions.utils import save_relations
+from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionWidget, ChoicesWidget
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
     Initials, ContrastStitch, ElementStitch, ContrastDetails
 from dictionaries import models as dictionaries
@@ -49,7 +50,6 @@ class TemplateShirtResource(resources.ModelResource):
     CLASP_ATTRIBUTE_MAP = {'clasp'}
     DICKEY_ATTRIBUTE_MAP = {'dickey__type', 'dickey__fabric'}
     INITIALS_ATTRIBUTE_MAP = {'initials__font', 'initials__color', 'initials__location'}
-    CHOICES_ATTRIBUTE_MAP = {'tuck', 'stitch', 'clasp'}
     INITIALS_CHOICES_ATTRIBUTE_MAP = {'initials__location'}
 
     SEX_COLUMN_NAME = u'Пол'
@@ -71,15 +71,16 @@ class TemplateShirtResource(resources.ModelResource):
                            widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title'))
     pocket = fields.Field(attribute='pocket', column_name=u'Карман',
                           widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title'))
-    tuck = fields.Field(attribute='tuck', column_name=TUCK_COLUMN_NAME)
+    tuck = fields.Field(attribute='tuck', column_name=TUCK_COLUMN_NAME,
+                        widget=ChoicesWidget(choices=TemplateShirt.TUCK_OPTIONS))
     back = fields.Field(attribute='back', column_name=u'Спинка',
                         widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
-    stitch = fields.Field(attribute='stitch', column_name=u'Отстрочка (мм)')
+    stitch = fields.Field(attribute='stitch', column_name=u'Отстрочка (мм)', widget=ChoicesWidget(choices=TemplateShirt.STITCH))
     yoke = fields.Field(attribute='yoke', column_name=u'Цельная кокетка',
                         widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title'))
-    clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME)
+    clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME, widget=ChoicesWidget(choices=CLASP_USE_DICT))
     # Импорт воротника
     collar__type = fields.Field(attribute='collar__type', column_name=u'Тип воротника',
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title'))
@@ -138,8 +139,8 @@ class TemplateShirtResource(resources.ModelResource):
     select_related = ('fabric', 'collection', 'collar__type', 'collar__hardness', 'collar__stays', 'collar__size',
                       'shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__sleeve', 'shirt_cuff__hardness', 'hem',
                       'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke', 'dickey__fabric',
-                      'dickey__type', 'initials__font', 'initials__color', )
-    prefetch_related = ('contrast_stitches', 'shirt_contrast_details', )
+                      'dickey__type', 'initials__font', 'initials__color',)
+    prefetch_related = ('contrast_stitches', 'shirt_contrast_details',)
 
     export_headers = [u'Shirt Code', u'Код ткани', u'Коллекция', u'Пол', u'Размер', u'№ размера', u'Тип воротника',
                       u'Размер воротника', u'Жесткость воротника', u'Косточки', u'Манжеты', u'Вид манжеты', u'Рукав',
@@ -153,8 +154,10 @@ class TemplateShirtResource(resources.ModelResource):
 
     class Meta:
         model = TemplateShirt
-        import_id_fields = ('code', )
-        fields = ('code', )
+        import_id_fields = ('code',)
+        fields = ('code',)
+        skip_unchanged = True
+
 
     def get_queryset(self):
         qs = super(TemplateShirtResource, self).get_queryset()
@@ -295,7 +298,8 @@ class TemplateShirtResource(resources.ModelResource):
 
     def remove_contrast_stich(self, instance, element):
         try:
-            detail = ContrastStitch.objects.filter(element=ElementStitch.objects.get_or_create(title=element)[0], shirt=instance)
+            detail = ContrastStitch.objects.filter(element=ElementStitch.objects.get_or_create(title=element)[0],
+                                                   shirt=instance)
             detail.delete()
         except ContrastStitch.DoesNotExist:
             pass
@@ -365,7 +369,8 @@ class TemplateShirtResource(resources.ModelResource):
 
             if instance.initials is not None:
                 try:
-                    instance.initials.location = next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
+                    instance.initials.location = \
+                    next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
                 except StopIteration:
                     instance.initials.location = instance.initials.LOCATION.button2
 
@@ -440,29 +445,3 @@ class TemplateShirtResource(resources.ModelResource):
                 field.save(obj, data)
         else:
             return None
-
-    def get_diff(self, original, current, dry_run=False):
-        data = []
-        dmp = diff_match_patch()
-        for field in self.get_fields():
-            if field.attribute in self.CHOICES_ATTRIBUTE_MAP:
-                original_value = getattr(original, 'get_%s_display' % field.attribute)() if original else ''
-                current_value = getattr(current, 'get_%s_display' % field.attribute)() if current else ''
-            elif field.attribute in self.INITIALS_CHOICES_ATTRIBUTE_MAP:
-                if original and original.initials is not None:
-                    original_value = original.initials.get_location_display()
-                else:
-                    original_value = ''
-                if current and current.initials is not None:
-                    current_value = current.initials.get_location_display()
-                else:
-                    current_value = ''
-            else:
-                original_value = self.export_field(field, original) if original else ""
-                current_value = self.export_field(field, current) if current else ""
-            diff = dmp.diff_main(force_text(original_value), force_text(current_value))
-            dmp.diff_cleanupSemantic(diff)
-            html = dmp.diff_prettyHtml(diff)
-            html = mark_safe(html)
-            data.append(html)
-        return data

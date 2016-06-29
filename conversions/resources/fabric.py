@@ -1,15 +1,13 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from diff_match_patch import diff_match_patch
 from django.db.transaction import atomic
-from django.utils.encoding import force_text
-from django.utils.safestring import mark_safe
-from import_export import resources, fields
-from import_export.widgets import ManyToManyWidget
+from import_export import fields
+from import_export import resources
 
-from backend.import_export.utils import save_relations
-from backend.import_export.widgets import CustomForeignKeyWidget
+from conversions.utils import save_relations
+from conversions.instance_loaders import CachedWithPrefetchedInstanceLoader
+from conversions.widgets import CustomForeignKeyWidget, CachedManyToManyWidget
 from backend.models import Fabric
 from dictionaries import models as dictionaries
 
@@ -18,9 +16,9 @@ class FabricResource(resources.ModelResource):
     code = fields.Field(column_name='Code', attribute='code')
     material = fields.Field(column_name='Fabric', attribute='material')
     colors = fields.Field(column_name='Color', attribute='colors', default=[],
-                          widget=ManyToManyWidget(dictionaries.FabricColor, field='title'))
+                          widget=CachedManyToManyWidget(dictionaries.FabricColor, field='title'))
     design = fields.Field(column_name='Design', attribute='designs', default=[],
-                          widget=ManyToManyWidget(dictionaries.FabricDesign, field='title'))
+                          widget=CachedManyToManyWidget(dictionaries.FabricDesign, field='title'))
     short_description = fields.Field(column_name='Short fabric description', attribute='short_description')
     long_description = fields.Field(column_name='Long fabric description', attribute='long_description')
     fabric_type = fields.Field(column_name='Type', attribute='fabric_type',
@@ -30,10 +28,26 @@ class FabricResource(resources.ModelResource):
     price_category = fields.Field(column_name='Price category', attribute='category',
                                   widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
 
+
     class Meta:
         model = Fabric
-        import_id_fields = ('code', )
-        fields = ('code', )
+        import_id_fields = ('code',)
+        fields = ('code',)
+        skip_unchanged = True
+        select_related = ['thickness', 'fabric_type', 'category']
+        prefetch_related = ['designs', 'colors']
+
+        @staticmethod
+        def instance_loader_class(*args, **kwargs):
+            kwargs.update({
+                'select_related': FabricResource.Meta.select_related,
+                'prefetch_related': FabricResource.Meta.prefetch_related
+            })
+            return CachedWithPrefetchedInstanceLoader(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = super(FabricResource, self).get_queryset()
+        return qs.select_related(*self._meta.select_related).prefetch_related(*self._meta.prefetch_related)
 
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
@@ -46,28 +60,3 @@ class FabricResource(resources.ModelResource):
         result = super(resources.ModelResource, self).import_data(*args, **kwargs)
         result.rows.sort(key=lambda x: x.new_record, reverse=True)
         return result
-
-    def import_obj(self, obj, data, dry_run):
-        for field in self.get_fields():
-            if isinstance(field.widget, ManyToManyWidget):
-                val = data.get(field.column_name)
-                if val is None:
-                    val = ''
-                setattr(obj, '%s_diff' % field.column_name, val)
-                continue
-            self.import_field(field, obj, data)
-
-    def get_diff(self, original, current, dry_run=False):
-        data = []
-        dmp = diff_match_patch()
-        for field in self.get_fields():
-            original_value = self.export_field(field, original) if original else ""
-            current_value = self.export_field(field, current) if current else ""
-            if isinstance(field.widget, ManyToManyWidget):
-                current_value = getattr(current, '%s_diff' % field.column_name)
-            diff = dmp.diff_main(force_text(original_value), force_text(current_value))
-            dmp.diff_cleanupSemantic(diff)
-            html = dmp.diff_prettyHtml(diff)
-            html = mark_safe(html)
-            data.append(html)
-        return data

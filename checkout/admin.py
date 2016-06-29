@@ -5,8 +5,8 @@ import datetime
 from django.contrib import admin
 from import_export.admin import ImportExportMixin
 
-from backend.import_export.mixin import TemplateAndFormatMixin
-from checkout.import_export.resources import CertificateResource, DiscountResource
+from conversions.mixin import TemplateAndFormatMixin
+from conversions.resources import CertificateResource, DiscountResource
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 from .models import (
     Shop,
@@ -28,8 +28,10 @@ class CertificateAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdm
 
 
 class DiscountAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
+    skip_admin_log = True
     search_fields = ('customer__number', )
     resource_class = DiscountResource
+    list_select_related = ('customer',)
 
     def get_export_filename(self, file_format):
         date_str = datetime.datetime.now().strftime('%d_%m_%Y')

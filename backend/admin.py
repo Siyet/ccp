@@ -1,20 +1,19 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+from itertools import ifilter
+
 from django import forms
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
-from itertools import ifilter
 from imagekit.admin import AdminThumbnail
 from import_export.admin import ImportExportMixin
-from backend.import_export.resources import FabricResidualResource, FabricResource, TemplateShirtResource
-from backend.import_export.mixin import TemplateAndFormatMixin
+
+from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
+from conversions.mixin import TemplateAndFormatMixin
 from backend.widgets import ContentTypeSelect
-
 from grappelli_orderable.admin import GrappelliOrderableAdmin
-
 from .models import (
     Collection,
     Hardness,
