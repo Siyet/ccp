@@ -9,6 +9,7 @@ from imagekit.models import ImageSpecField
 from upload_path import UploadComposingSource
 from .specs import TextureSample, TextureSampleThumbnail, Generators
 from backend import models as backend
+from .storage import overwrite_storage
 
 class SourceMixin(object):
 
@@ -83,9 +84,9 @@ class ProjectionModel(models.Model):
 
 
 class ComposeSource(ProjectionModel):
-    uv = models.FileField(_(u'UV'), upload_to=UploadComposingSource('%s/uv/%s'))
-    ao = models.FileField(_(u'Тени'), upload_to=UploadComposingSource('%s/ao/%s'))
-    light = models.FileField(_(u'Свет'), upload_to=UploadComposingSource('%s/light/%s'))
+    uv = models.FileField(_(u'UV'), storage=overwrite_storage, upload_to= UploadComposingSource('%s/uv/%s'))
+    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to= UploadComposingSource('%s/ao/%s'))
+    light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to= UploadComposingSource('%s/light/%s'))
 
     cuff_source = models.ForeignKey(CuffSource, blank=True, null=True)
     back_source = models.ForeignKey(BackSource, blank=True, null=True)
@@ -128,8 +129,8 @@ class CuffButtonsSource(models.Model, SourceMixin):
 
 
 class ButtonsSource(ProjectionModel):
-    image = models.FileField(_(u'Изображение'), upload_to=UploadComposingSource("%s/buttons/image/%s"))
-    ao = models.FileField(_(u'Тени'), upload_to=UploadComposingSource("%s/buttons/ao/%s"), blank=True, null=True)
+    image = models.FileField(_(u'Изображение'), storage=overwrite_storage, upload_to= UploadComposingSource("%s/buttons/image/%s"))
+    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to= UploadComposingSource("%s/buttons/ao/%s"), blank=True, null=True)
 
     body_buttons = models.ForeignKey(BodyButtonsSource, blank=True, null=True)
     collar_buttons = models.ForeignKey(CollarButtonsSource, blank=True, null=True)
@@ -143,7 +144,7 @@ class ButtonsSource(ProjectionModel):
 class Texture(models.Model):
     TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
 
-    texture = models.ImageField(_(u'Файл текстуры'), upload_to='textures')
+    texture = models.ImageField(_(u'Файл текстуры'), storage=overwrite_storage, upload_to= 'textures')
     tiling = models.PositiveIntegerField(_(u'Тайлинг'), choices=TILING, default=TILING.default)
     needs_shadow = models.BooleanField(_(u'Использовать тени'), default=True)
     sample = ImageSpecField(source='texture', spec=TextureSample, id=Generators.sample)
