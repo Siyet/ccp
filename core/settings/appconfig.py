@@ -1,6 +1,8 @@
 # Application settings
 from import_export.formats import base_formats
 
+APP_NAME = 'CostumeCode'
+
 MIN_FABRIC_RESIDUAL = 10
 
 IMPORT_EXPORT_FORMATS = (

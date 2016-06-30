@@ -2,15 +2,13 @@
 from __future__ import absolute_import
 
 import tablib
-from diff_match_patch import diff_match_patch
-from django.utils.encoding import force_text
-from django.utils.safestring import mark_safe
 from import_export import fields
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export import resources
 
 from conversions.fields import TemplateShirtCollectionField
 from conversions.utils import save_relations
+from conversions.instance_loaders import CachedWithPrefetchedInstanceLoader
 from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionWidget, ChoicesWidget
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
     Initials, ContrastStitch, ElementStitch, ContrastDetails
@@ -77,7 +75,8 @@ class TemplateShirtResource(resources.ModelResource):
                         widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
-    stitch = fields.Field(attribute='stitch', column_name=u'Отстрочка (мм)', widget=ChoicesWidget(choices=TemplateShirt.STITCH))
+    stitch = fields.Field(attribute='stitch', column_name=u'Отстрочка (мм)',
+                          widget=ChoicesWidget(choices=TemplateShirt.STITCH))
     yoke = fields.Field(attribute='yoke', column_name=u'Цельная кокетка',
                         widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title'))
     clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME, widget=ChoicesWidget(choices=CLASP_USE_DICT))
@@ -101,14 +100,18 @@ class TemplateShirtResource(resources.ModelResource):
                                         widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     # Импорт пуговиц
     custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=u'Пуговицы',
-                                       widget=ForeignKeyWidget(model=dictionaries.CustomButtonsType, field='title'))
+                                       widget=CustomForeignKeyWidget(model=dictionaries.CustomButtonsType,
+                                                                     field='title',
+                                                                     create_missing=False))
     custom_buttons = fields.Field(attribute='custom_buttons', column_name=u'Код цвета пуговицы',
-                                  widget=ForeignKeyWidget(model=CustomButtons, field='title'))
+                                  widget=CustomForeignKeyWidget(model=CustomButtons, field='title',
+                                                                create_missing=False))
     # импорт манишки
     dickey__type = fields.Field(attribute='dickey__type', column_name=u'МА Тип',
-                                widget=ForeignKeyWidget(dictionaries.DickeyType, field='title'))
+                                widget=CustomForeignKeyWidget(dictionaries.DickeyType, field='title',
+                                                              create_missing=False))
     dickey__fabric = fields.Field(attribute='dickey__fabric', column_name=u'МА Ткань',
-                                  widget=ForeignKeyWidget(Fabric, field='code'))
+                                  widget=CustomForeignKeyWidget(Fabric, field='code', create_missing=False))
     # импорт инициалов
     initials__font = fields.Field(attribute='initials__font', column_name=u'ИН Шрифт',
                                   widget=ForeignKeyWidget(dictionaries.Font, field='title'))
@@ -136,12 +139,6 @@ class TemplateShirtResource(resources.ModelResource):
     contrast_detail_cuff_inner = fields.Field(attribute='contrast_detail_cuff_inner',
                                               column_name=u'КТ Манжета внутренняя')
 
-    select_related = ('fabric', 'collection', 'collar__type', 'collar__hardness', 'collar__stays', 'collar__size',
-                      'shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__sleeve', 'shirt_cuff__hardness', 'hem',
-                      'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke', 'dickey__fabric',
-                      'dickey__type', 'initials__font', 'initials__color',)
-    prefetch_related = ('contrast_stitches', 'shirt_contrast_details',)
-
     export_headers = [u'Shirt Code', u'Код ткани', u'Коллекция', u'Пол', u'Размер', u'№ размера', u'Тип воротника',
                       u'Размер воротника', u'Жесткость воротника', u'Косточки', u'Манжеты', u'Вид манжеты', u'Рукав',
                       u'Жесткость манжеты', u'Низ', u'Полочка', u'Карман', u'Вытачки', u'Спинка', u'Вариант пуговиц',
@@ -157,11 +154,17 @@ class TemplateShirtResource(resources.ModelResource):
         import_id_fields = ('code',)
         fields = ('code',)
         skip_unchanged = True
+        select_related = ['fabric', 'collection', 'collar__type', 'collar__hardness', 'collar__stays', 'collar__size',
+                      'shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__sleeve', 'shirt_cuff__hardness', 'hem',
+                      'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke', 'dickey__fabric',
+                      'dickey__type', 'initials__font', 'initials__color']
+        prefetch_related = ['contrast_stitches', 'shirt_contrast_details']
+        instance_loader_class = CachedWithPrefetchedInstanceLoader.prepare(select_related, prefetch_related)
 
 
     def get_queryset(self):
         qs = super(TemplateShirtResource, self).get_queryset()
-        return qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
+        return qs.select_related(*self._meta.select_related).prefetch_related(*self._meta.prefetch_related)
 
     def export(self, queryset=None):
         queryset = self.get_queryset().iterator()
@@ -362,15 +365,10 @@ class TemplateShirtResource(resources.ModelResource):
                 instance.size.save()
                 instance.size = instance.size
 
-            try:
-                instance.stitch = next(x for x in instance.STITCH if x[1] == instance.stitch)[0]
-            except StopIteration:
-                instance.stitch = instance.STITCH.none
-
             if instance.initials is not None:
                 try:
                     instance.initials.location = \
-                    next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
+                        next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
                 except StopIteration:
                     instance.initials.location = instance.initials.LOCATION.button2
 
@@ -415,10 +413,8 @@ class TemplateShirtResource(resources.ModelResource):
             obj.shirt_cuff = Cuff()
         if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False] and obj.initials is None:
             obj.initials = Initials()
-        if data[self.DICKEY_COLUMN_NAME] != self.DICKEY_USE_DICT[False]:
-            obj.dickey = Dickey()
-
-        if data[self.DICKEY_COLUMN_NAME] == self.DICKEY_USE_DICT[True] and obj.dickey is None:
+        use_dickey = self.DICKEY_USE_DICT[True] in data[self.DICKEY_COLUMN_NAME]
+        if use_dickey:
             obj.dickey = Dickey()
         if data[self.INITIALS_COLUMN_NAME] == self.INITIALS_USE_DICT[True] and obj.initials is None:
             obj.initials = Initials()
@@ -436,7 +432,8 @@ class TemplateShirtResource(resources.ModelResource):
             elif field.attribute in self.CLASP_ATTRIBUTE_MAP:
                 obj.clasp = data[self.CLASP_COLUMN_NAME] == self.CLASP_USE_DICT[True]
             elif field.attribute in self.DICKEY_ATTRIBUTE_MAP:
-                if data[self.DICKEY_COLUMN_NAME] != self.DICKEY_USE_DICT[False]:
+                use_dickey = self.DICKEY_USE_DICT[True] in data[self.DICKEY_COLUMN_NAME]
+                if use_dickey:
                     field.save(obj, data)
             elif field.attribute in self.INITIALS_ATTRIBUTE_MAP:
                 if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False]:

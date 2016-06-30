@@ -12,6 +12,20 @@ class CachedWithPrefetchedInstanceLoader(CachedInstanceLoader):
         qs = super(CachedWithPrefetchedInstanceLoader, self).get_queryset()
         return qs.select_related(*self.select_related).prefetch_related(*self.prefetch_related)
 
+    @staticmethod
+    def prepare(select_related=None, prefetch_related=None):
+        related = {}
+        if select_related:
+            related['select_related'] = select_related
+        if prefetch_related:
+            related['prefetch_related'] = prefetch_related
+
+        @staticmethod
+        def create_loader(*args, **kwargs):
+            kwargs.update(related)
+            return CachedWithPrefetchedInstanceLoader(*args, **kwargs)
+
+        return create_loader
 
 
 class ForeignPrimaryKeyInstanceLoader(CachedInstanceLoader):

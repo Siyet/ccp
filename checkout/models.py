@@ -7,7 +7,15 @@ from django.utils.text import ugettext_lazy as _
 from model_utils import Choices
 
 from ordered_model.models import OrderedModel
-from yandex_kassa.models import Payment
+from yandex_kassa.models import Payment as YandexPayment
+
+
+class Payment(YandexPayment):
+    class Meta:
+        proxy = True
+        ordering = ('-created', )
+        verbose_name = _(u'Платеж')
+        verbose_name_plural = _(u'Платежи')
 
 
 class Customer(models.Model):
