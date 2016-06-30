@@ -2,47 +2,27 @@ import OpenEXR
 import Imath
 from PIL import Image, ImageChops
 import numpy
-
-import time
-
-FLOAT = Imath.PixelType(Imath.PixelType.FLOAT)
-
-def exr_to_array(exrfile, channels=None):
-    global CHAN
-    file = OpenEXR.InputFile(exrfile)
-    dw = file.header()['dataWindow']
-
-    channels = file.header()['channels'].keys() if channels is None else channels
-
-    channels_list = list()
-    for c in ('R', 'G', 'B', 'A'):
-        if c in channels:
-            channels_list.append(c)
-
-    size = (dw.max.x - dw.min.x + 1, dw.max.y - dw.min.y + 1)
-    color_channels = file.channels(channels_list, FLOAT)
-
-    channels_tuple = [numpy.fromstring(channel, dtype='f') for channel in color_channels]
-    res = numpy.dstack(channels_tuple)
-    return res.reshape(size + (len(channels_tuple),))
+from time import time
 
 
 def compose_arrays(source, texture_arr, AA):
-
+    start = time()
     size = source.shape[:2]
     # add blue channel
-    source = numpy.dstack((source[..., :2], numpy.zeros(size + (1, ))))
 
     source[..., 0] = (source[..., 0] * size[0]) % texture_arr.shape[0]
     source[..., 1] = (source[..., 1] * size[1]) % texture_arr.shape[1]
+    print("adjust", time()-start)
     source = source.astype('uint16')
-
+    print("astype", time()-start)
     # one-line mapping!
-
     result = texture_arr[source[..., 0], source[..., 1]]
+    print("mapping", time()-start)
     result = Image.fromarray(result, "RGB")
+    print("image", time()-start)
     if AA:
         result = result.resize(tuple(x / 2 for x in result.size), Image.LANCZOS)
+        print("resize", time()-start)
 
     return result
 
@@ -84,7 +64,6 @@ def compose_light(*sources):
     result = sources[0]
     for source in sources[1:]:
         result = Image.alpha_composite(result, source)
-        # result = alpha_blend(source, result)
     return result
 
 
@@ -152,17 +131,8 @@ def add_alpha(source, alpha_donor):
 
 
 def create(textures, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=None, buttons_shadow=None, AA=True):
-    # op1
-    full_uv = compose_uv(*uv)
 
-    # op2: op1
-    uv = Image.fromarray((full_uv * 255.0).astype('uint8'), "RGBA")
-    if AA:
-        size = uv.size
-        uv = uv.resize((size[0]/2, size[1]/2), Image.LANCZOS)
-    alpha = uv.split()[-1]
-
-    # op3
+     # op3
     lights_images = [image_from_exr(light) for light in lights]
     full_light = compose_light(*lights_images )
 
@@ -174,6 +144,17 @@ def create(textures, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=N
     post_shadow_images = [image_from_exr(shadow) for shadow in post_shadows]
     for shadow in post_shadow_images:
         full_shadow = ImageChops.multiply(full_shadow, shadow)
+
+
+    # op1
+    full_uv = compose_uv(*uv)
+
+    # op2: op1
+    uv = Image.fromarray((full_uv * 255.0).astype('uint8'), "RGBA")
+    if AA:
+        size = uv.size
+        uv = uv.resize((size[0]/2, size[1]/2), Image.LANCZOS)
+    alpha = uv.split()[-1]
 
     results = list()
     # op6
