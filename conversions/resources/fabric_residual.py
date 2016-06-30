@@ -27,6 +27,7 @@ class FabricResidualResource(resources.ModelResource):
     class Meta:
         model = Fabric
 
+
     def save_instance(self, instance, dry_run=False):
         self.before_save_instance(instance, dry_run)
         if not dry_run:
@@ -100,6 +101,15 @@ class FabricResidualResource(resources.ModelResource):
         headers.insert(0, 'Fabric')
         result.diff_headers = headers
 
+        result.totals = OrderedDict([(RowResult.IMPORT_TYPE_NEW, 0),
+                                     (RowResult.IMPORT_TYPE_UPDATE, 0),
+                                     (RowResult.IMPORT_TYPE_DELETE, 0),
+                                     (RowResult.IMPORT_TYPE_SKIP, 0),
+                                     (RowResult.IMPORT_TYPE_ERROR, 0),
+                                     ('total', len(dataset))])
+
+        result.totals['total'] = len(dataset)
+
         if use_transactions is None:
             use_transactions = self.get_use_transactions()
 
@@ -121,11 +131,12 @@ class FabricResidualResource(resources.ModelResource):
                 raise
 
         fabric_dict = {x.code: x for x in self.get_queryset()}
-        numbers = set(map(str, range(10)))
+
         for row in dataset.dict:
             try:
                 row_result = RowResult()
-                if not row['Fabric'] or (len(row['Fabric']) > 1 and row['Fabric'][1] not in numbers):
+                code = row['Fabric']
+                if not Fabric.is_valid_code(code):
                     continue
                 try:
                     instance = fabric_dict[row['Fabric']]
@@ -154,6 +165,7 @@ class FabricResidualResource(resources.ModelResource):
                             self.save_instance(instance, real_dry_run)
                     row_result.object_repr = force_text(instance)
                     row_result.object_id = instance.pk
+                    result.totals[row_result.import_type] += 1
                     row_result.diff = self.get_diff(instance, instance, real_dry_run)
             except Exception as e:
                 # There is no point logging a transaction error for each row
@@ -162,6 +174,7 @@ class FabricResidualResource(resources.ModelResource):
                     logging.exception(e)
                 tb_info = traceback.format_exc()
                 row_result.errors.append(Error(e, tb_info, row))
+                result.totals[row_result.IMPORT_TYPE_ERROR] += 1
                 if raise_errors:
                     if use_transactions:
                         savepoint_rollback(sp1)

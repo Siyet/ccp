@@ -105,6 +105,8 @@ try:
 except:
     raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")
 
-
+# Misc
 
 from .appconfig import *
+
+GRAPPELLI_ADMIN_TITLE = APP_NAME

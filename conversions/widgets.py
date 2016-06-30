@@ -1,13 +1,14 @@
 # coding: utf-8
 from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
-from backend.models import SEX
 from django.utils.encoding import smart_text
 
-class ModelCacheMixin(object):
+from backend.models import SEX
 
+
+class ModelCacheMixin(object):
     def _cache_objects(self):
         objects = list(self.model.objects.all())
-        self._objects =  dict((unicode(getattr(obj, self.field)), obj) for obj in objects)
+        self._objects = dict((unicode(getattr(obj, self.field)), obj) for obj in objects)
 
     def get_object(self, key):
         if not hasattr(self, "_objects"):
@@ -23,8 +24,7 @@ class ModelCacheMixin(object):
 
 
 class CustomForeignKeyWidget(ModelCacheMixin, ForeignKeyWidget):
-
-    def __init__(self,  model, field='pk', create_missing=True, *args, **kwargs):
+    def __init__(self, model, field='pk', create_missing=True, *args, **kwargs):
         self.create_missing = create_missing
         super(CustomForeignKeyWidget, self).__init__(model, field, *args, **kwargs)
 
@@ -39,7 +39,6 @@ class CustomForeignKeyWidget(ModelCacheMixin, ForeignKeyWidget):
 
 
 class CachedManyToManyWidget(ModelCacheMixin, ManyToManyWidget):
-
     def clean(self, value):
         if not value:
             return self.model.objects.none()
@@ -55,6 +54,7 @@ class CachedManyToManyWidget(ModelCacheMixin, ManyToManyWidget):
         objects = value.all() if hasattr(value, 'all') else value
         ids = [smart_text(getattr(obj, self.field)) for obj in objects]
         return self.separator.join(ids)
+
 
 class ChoicesWidget(Widget):
     def __init__(self, choices):
@@ -72,14 +72,29 @@ class ChoicesWidget(Widget):
         return self.choices.get(value)
 
 
-
 class TemplateShirtCollectionWidget(ForeignKeyWidget):
     SEX_DICT = {
         u'МУЖ': SEX.male,
         u'ЖЕН': SEX.female
     }
 
+    def get_object(self, key):
+        if not hasattr(self, "_objects"):
+            self._cache_objects()
+
+        return self._objects.get(key, None)
+
+    def _cache_objects(self):
+        objects = list(self.model.objects.all())
+        self._objects = {}
+        for collection in objects:
+            self._objects[(collection.title, collection.sex)] = collection
+
     def clean(self, value, sex=None):
         val = super(ForeignKeyWidget, self).clean(value)
         sex = self.SEX_DICT.get(sex, SEX.unisex)
-        return self.model.objects.get(**{self.field: val, 'sex': sex}) if val else None
+        if val:
+            return self.get_object((val, sex))
+
+    def render(self, value):
+        return unicode(value)

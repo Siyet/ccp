@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from django.db.transaction import atomic
 from import_export import fields
 from import_export import resources
+from import_export.results import RowResult
 
 from conversions.utils import save_relations
 from conversions.instance_loaders import CachedWithPrefetchedInstanceLoader
@@ -28,7 +29,6 @@ class FabricResource(resources.ModelResource):
     price_category = fields.Field(column_name='Price category', attribute='category',
                                   widget=CustomForeignKeyWidget(dictionaries.FabricCategory, field='title'))
 
-
     class Meta:
         model = Fabric
         import_id_fields = ('code',)
@@ -36,14 +36,18 @@ class FabricResource(resources.ModelResource):
         skip_unchanged = True
         select_related = ['thickness', 'fabric_type', 'category']
         prefetch_related = ['designs', 'colors']
+        instance_loader_class = CachedWithPrefetchedInstanceLoader.prepare(select_related, prefetch_related)
 
-        @staticmethod
-        def instance_loader_class(*args, **kwargs):
-            kwargs.update({
-                'select_related': FabricResource.Meta.select_related,
-                'prefetch_related': FabricResource.Meta.prefetch_related
-            })
-            return CachedWithPrefetchedInstanceLoader(*args, **kwargs)
+    def import_row(self, row, instance_loader, dry_run=False, **kwargs):
+        code = self.fields['code'].clean(row)
+        if not Fabric.is_valid_code(code):
+            row_result = RowResult()
+            row_result.new_record = False
+            row_result.import_type = RowResult.IMPORT_TYPE_SKIP
+            row_result.diff = self.get_diff([], False, [], dry_run)
+            return row_result
+
+        return super(FabricResource, self).import_row(row, instance_loader, dry_run=dry_run, **kwargs)
 
     def get_queryset(self):
         qs = super(FabricResource, self).get_queryset()

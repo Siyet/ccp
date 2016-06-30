@@ -8,13 +8,16 @@ from import_export.admin import ImportExportMixin
 from conversions.mixin import TemplateAndFormatMixin
 from conversions.resources import CertificateResource, DiscountResource
 from grappelli_orderable.admin import GrappelliOrderableAdmin
+from yandex_kassa.admin import Payment as YandexPayment, PaymentAdmin
 from .models import (
     Shop,
     Certificate,
     Order,
     OrderDetails,
     Discount,
-    CustomerData)
+    CustomerData,
+    Payment
+)
 
 
 class CertificateAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
@@ -61,3 +64,6 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(Certificate, CertificateAdmin)
 admin.site.register(Discount, DiscountAdmin)
 admin.site.register(Shop, ShopAdmin)
+admin.site.register(Payment, PaymentAdmin)
+
+admin.site.unregister(YandexPayment)

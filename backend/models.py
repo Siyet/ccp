@@ -1,8 +1,5 @@
 # coding: UTF-8
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.core.validators import MaxValueValidator
-
-__author__ = 'cloud'
 
 from django.db import models
 from django.db.models import Q
@@ -21,6 +18,8 @@ from dictionaries.models import FabricCategory
 from backend import managers
 
 from ordered_model.models import OrderedModel
+
+import re
 
 SEX = Choices(
     ('male', _(u'Мужская')),
@@ -129,14 +128,20 @@ class Fabric(models.Model):
         return self.texture.sample if self.texture else None
 
     def save(self, *args, **kwargs):
-        category_letter = self.code[0]
-        try:
-            category = FabricCategory.objects.get(title=category_letter)
-            self.category = category
-        except:
-            pass
+        category_letter = self.code[:1]
+
+        if self.category and self.category.title != category_letter:
+            try:
+                category = FabricCategory.objects.get(title=category_letter)
+                self.category = category
+            except:
+                pass
 
         super(Fabric, self).save(*args, **kwargs)
+
+    @staticmethod
+    def is_valid_code(code):
+        return re.match(r'[A-Z]\d+$', code) if isinstance(code, basestring) else False
 
     class Meta(OrderedModel.Meta):
         ordering = ('code', )
