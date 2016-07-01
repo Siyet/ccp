@@ -191,8 +191,6 @@ class Collar(models.Model):
 
 class Cuff(models.Model):
     hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
-    sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_cuff')
-
     type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='cuff')
     rounding = ChainedForeignKey('dictionaries.CuffRounding', verbose_name=_(u'Тип закругления'), chained_field='type',
                                  chained_model_field='types', show_all=False, null=True)
@@ -318,7 +316,7 @@ class Shirt(OrderedModel):
     hem = models.ForeignKey('dictionaries.HemType', verbose_name=_(u'Низ'), related_name='hem_shirts')
     placket = models.ForeignKey('dictionaries.PlacketType', verbose_name=_(u'Полочка'), related_name='placket_shirts')
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
-
+    sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts', null=True)
     tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=TUCK_OPTIONS, default=False)
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
