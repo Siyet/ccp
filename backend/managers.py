@@ -1,40 +1,31 @@
 from django.conf import settings
 from django.db import models
-from django.db.models.expressions import RawSQL
+
 
 class CustomShirtManager(models.Manager):
-
     def get_queryset(self):
-        queryset = models.Manager.get_queryset(self).filter(is_template=False, is_standard=False)
+        queryset = super(CustomShirtManager, self).get_queryset().filter(is_template=False, is_standard=False)
         return queryset
 
 
 class TemplateShirtManager(models.Manager):
-
     def available(self):
-        select_amount = RawSQL("""
-            SELECT amount
-            FROM backend_fabricresidual
-            WHERE backend_fabricresidual.storehouse_id = backend_collection.storehouse_id
-              AND backend_fabricresidual.fabric_id = backend_shirt.fabric_id
-        """, ())
-
-        return self.annotate(amount=select_amount).filter(fabric__active=True, amount__gte=settings.MIN_FABRIC_RESIDUAL).select_related('collection')
+        return self.filter(fabric__active=True,
+                           fabric__residuals__storehouse_id=models.F('collection__storehouse_id'),
+                           fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).select_related('collection')
 
     def get_queryset(self):
-        queryset = models.Manager.get_queryset(self).filter(is_template=True, is_standard=False)
+        queryset = super(TemplateShirtManager, self).get_queryset().filter(is_template=True, is_standard=False)
         return queryset
 
 
 class StandardShirtManager(models.Manager):
-
     def get_queryset(self):
-        queryset = models.Manager.get_queryset(self).filter(is_template=False, is_standard=True)
+        queryset = super(StandardShirtManager, self).get_queryset().filter(is_template=False, is_standard=True)
         return queryset
 
 
 class FabricManager(models.Manager):
-
-   @property
-   def active(self):
-      return self.get_queryset().filter(active=True)
+    @property
+    def active(self):
+        return self.get_queryset().filter(active=True)
