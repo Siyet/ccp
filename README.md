@@ -3,3 +3,4 @@
 - libxml2-devel
 - ImageMagick
 - OpenEXR
+- GEOS
