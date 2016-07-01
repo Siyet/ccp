@@ -46,6 +46,7 @@ class TemplateShirtResource(resources.ModelResource):
     COLLECTION_ATTRIBUTE_MAP = {'collection'}
     TUCK_ATTRIBUTE_MAP = {'tuck'}
     CLASP_ATTRIBUTE_MAP = {'clasp'}
+    CUFF_ATTRIBUTE_LIST = ('shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__hardness')
     DICKEY_ATTRIBUTE_MAP = {'dickey__type', 'dickey__fabric'}
     INITIALS_ATTRIBUTE_MAP = {'initials__font', 'initials__color', 'initials__location'}
     INITIALS_CHOICES_ATTRIBUTE_MAP = {'initials__location'}
@@ -54,6 +55,7 @@ class TemplateShirtResource(resources.ModelResource):
     TUCK_COLUMN_NAME = u'Вытачки'
     CLASP_COLUMN_NAME = u'Застежка под штифты'
     DICKEY_COLUMN_NAME = u'Манишка'
+    CUFF_COLUMN_NAME = u'Манжеты'
     INITIALS_COLUMN_NAME = u'Инициалы'
 
     code = fields.Field(attribute='code', column_name='Shirt Code')
@@ -80,6 +82,8 @@ class TemplateShirtResource(resources.ModelResource):
     yoke = fields.Field(attribute='yoke', column_name=u'Цельная кокетка',
                         widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title'))
     clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME, widget=ChoicesWidget(choices=CLASP_USE_DICT))
+    sleeve = fields.Field(attribute='sleeve', column_name=u'Рукав',
+                                      widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title'))
     # Импорт воротника
     collar__type = fields.Field(attribute='collar__type', column_name=u'Тип воротника',
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title'))
@@ -89,13 +93,12 @@ class TemplateShirtResource(resources.ModelResource):
                                  widget=CustomForeignKeyWidget(model=Stays, field='title'))
     collar__size = fields.Field(attribute='collar__size', column_name=u'Размер воротника',
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title'))
+
     # Импорт манжеты
-    shirt_cuff__type = fields.Field(attribute='shirt_cuff__type', column_name=u'Манжеты',
+    shirt_cuff__type = fields.Field(attribute='shirt_cuff__type', column_name=CUFF_COLUMN_NAME,
                                     widget=CustomForeignKeyWidget(model=dictionaries.CuffType, field='title'))
     shirt_cuff__rounding = fields.Field(attribute='shirt_cuff__rounding', column_name=u'Вид манжеты',
                                         widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title'))
-    shirt_cuff__sleeve = fields.Field(attribute='shirt_cuff__sleeve', column_name=u'Рукав',
-                                      widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title'))
     shirt_cuff__hardness = fields.Field(attribute='shirt_cuff__hardness', column_name=u'Жесткость манжеты',
                                         widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     # Импорт пуговиц
@@ -155,7 +158,7 @@ class TemplateShirtResource(resources.ModelResource):
         fields = ('code',)
         skip_unchanged = True
         select_related = ['fabric', 'collection', 'collar__type', 'collar__hardness', 'collar__stays', 'collar__size',
-                      'shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__sleeve', 'shirt_cuff__hardness', 'hem',
+                      'shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__hardness', 'hem',
                       'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke', 'dickey__fabric',
                       'dickey__type', 'initials__font', 'initials__color']
         prefetch_related = ['contrast_stitches', 'shirt_contrast_details']
@@ -201,13 +204,17 @@ class TemplateShirtResource(resources.ModelResource):
                     row.append(obj.shirt_cuff.rounding.title)
                 else:
                     row.append('')
-                row.append(obj.shirt_cuff.sleeve.title)
+                # пропускаем рукав
+                row.append('')
                 if obj.shirt_cuff.hardness:
                     row.append(obj.shirt_cuff.hardness.title)
                 else:
                     row.append('')
             else:
                 row += ['' for i in range(4)]
+
+            # Рукав
+            row[-2] = obj.sleeve.title if hasattr(obj, 'sleeve') else ''
 
             row += [
                 obj.hem.title,
@@ -342,14 +349,15 @@ class TemplateShirtResource(resources.ModelResource):
             save_relations(instance, 'pocket')
             save_relations(instance, 'back')
             save_relations(instance, 'yoke')
+            save_relations(instance, 'sleeve')
             save_relations(instance.collar, 'type')
             save_relations(instance.collar, 'hardness')
             save_relations(instance.collar, 'stays')
             save_relations(instance.collar, 'size')
-            save_relations(instance.shirt_cuff, 'type')
-            save_relations(instance.shirt_cuff, 'rounding')
-            save_relations(instance.shirt_cuff, 'sleeve')
-            save_relations(instance.shirt_cuff, 'hardness')
+            if hasattr(instance, 'shirt_cuff'):
+                save_relations(instance.shirt_cuff, 'type')
+                save_relations(instance.shirt_cuff, 'rounding')
+                save_relations(instance.shirt_cuff, 'hardness')
 
             if instance.dickey is not None:
                 save_relations(instance, 'dickey')
@@ -376,8 +384,9 @@ class TemplateShirtResource(resources.ModelResource):
         if not dry_run:
             instance.collar.shirt = instance
             save_relations(instance, 'collar')
-            instance.shirt_cuff.shirt = instance
-            save_relations(instance, 'shirt_cuff')
+            if hasattr(instance, 'shirt_cuff'):
+                instance.shirt_cuff.shirt = instance
+                save_relations(instance, 'shirt_cuff')
 
             # контрастные отстрочки
             self.import_contrast_stitch(instance, u'Сорочка', instance.contrast_stitch_shirt)
@@ -403,14 +412,11 @@ class TemplateShirtResource(resources.ModelResource):
                 self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff_inner)
 
     def import_obj(self, obj, data, dry_run):
-        try:
-            obj.collar
-        except Exception:
+        if not hasattr(obj, 'collar'):
             obj.collar = Collar()
-        try:
-            obj.shirt_cuff
-        except Exception:
+        if data[self.CUFF_COLUMN_NAME] and not hasattr(obj, 'shirt_cuff'):
             obj.shirt_cuff = Cuff()
+
         if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False] and obj.initials is None:
             obj.initials = Initials()
         use_dickey = self.DICKEY_USE_DICT[True] in data[self.DICKEY_COLUMN_NAME]
@@ -437,6 +443,9 @@ class TemplateShirtResource(resources.ModelResource):
                     field.save(obj, data)
             elif field.attribute in self.INITIALS_ATTRIBUTE_MAP:
                 if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False]:
+                    field.save(obj, data)
+            elif field.attribute in self.CUFF_ATTRIBUTE_LIST:
+                if hasattr(obj, 'shirt_cuff'):
                     field.save(obj, data)
             else:
                 field.save(obj, data)
