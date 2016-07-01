@@ -14,9 +14,18 @@ from .storage import overwrite_storage
 from .cache import CacheBuilder
 
 
+
 class SourceMixin(object):
     def __unicode__(self):
         return "#%s" % self.id
+
+
+class ProjectionModel(models.Model):
+    PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
+    projection = models.CharField(_(u'Проекция'), max_length=5, choices=PROJECTION)
+
+    class Meta:
+        abstract = True
 
 
 class BodySource(models.Model, SourceMixin):
@@ -49,6 +58,16 @@ class CollarSource(models.Model, SourceMixin):
         verbose_name_plural = _(u'Конфигурации сборки для воротника')
 
 
+class CollarMask(ProjectionModel):
+    collar = models.ForeignKey(CollarSource)
+    mask = models.FileField(verbose_name=_(u'Файл маски'), storage=overwrite_storage,
+                            upload_to=UploadComposingSource('composesource/%s/%s'))
+
+    class Meta:
+        verbose_name = _(u'Маска воротника')
+        verbose_name_plural = _(u'Маски воротника')
+
+
 class CuffSource(models.Model, SourceMixin):
     cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Тип манжеты'))
     rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
@@ -75,14 +94,6 @@ class PlacketSource(models.Model, SourceMixin):
         unique_together = ('placket', 'hem')
         verbose_name = _(u'Конфигурация сборки для полочки')
         verbose_name_plural = _(u'Конфигурации сборки для полочки')
-
-
-class ProjectionModel(models.Model):
-    PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
-    projection = models.CharField(_(u'Проекция'), max_length=5, choices=PROJECTION)
-
-    class Meta:
-        abstract = True
 
 
 class ComposeSource(ProjectionModel):
