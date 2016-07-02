@@ -32,7 +32,7 @@ class Collection(OrderedModel):
     storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections', blank=False, null=True)
     title = models.CharField(_(u'Название'), max_length=255)
     text = models.TextField(_(u'Описание'))
-    image = models.ImageField(_(u'Изображение'))
+    image = models.ImageField(_(u'Изображение'), upload_to='collection')
     dickey = models.BooleanField(_(u'Манишка'))
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
@@ -216,7 +216,7 @@ class Cuff(models.Model):
 
 class CustomButtons(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
-    picture = models.ImageField(_(u'Изображение'))
+    picture = models.ImageField(_(u'Изображение'), upload_to='custombuttons')
     type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип'), related_name='buttons')
 
     def __unicode__(self):
@@ -451,14 +451,17 @@ class ShirtImage(models.Model):
 
 
 class ContrastDetails(models.Model):
-    ELEMENTS = (
+    COLLAR_ELEMENTS = (
         ('collar_face', _(u'Воротник лицевая сторона')),
         ('collar_bottom', _(u'Воротник низ')),
         ('collar_outer', _(u'Воротник внешняя стойка')),
-        ('collar_inner', _(u'Воротник внутрення стойка')),
+        ('collar_inner', _(u'Воротник внутрення стойка'))
+    )
+    CUFF_ELEMENTS = (
         ('cuff_outer', _(u'Манжета внешняя')),
         ('cuff_inner', _(u'Манжета внутрення'))
     )
+    ELEMENTS = COLLAR_ELEMENTS + CUFF_ELEMENTS
     element = models.CharField(_(u'Элемент'), choices=ELEMENTS, max_length=20)
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
     shirt = models.ForeignKey(Shirt, verbose_name=_(u'Рубашка'), related_name='shirt_contrast_details')

@@ -2,7 +2,6 @@ import OpenEXR
 
 import numpy
 import Imath
-from django.contrib.gis.geos.geometry import Polygon
 import os
 from PIL import Image
 
@@ -28,30 +27,6 @@ class Submatrix(object):
         self.bbox = bbox
         (x, y, x1, y1) = bbox
         self.values = self._source[x: x1, y: y1]
-
-
-def rect_to_polygon(x0, y0, x1, y1):
-    return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
-
-
-def polygon_to_rect(polygon):
-    if len(polygon) != 1 or len(polygon[0]) != 5:
-        raise Exception('Provided polygon is not 4-sided')
-    ring = polygon[0]
-    (x0, y0) = ring[0]
-    (x1, y1) = ring[1]
-    (x2, y2) = ring[2]
-    (x3, y3) = ring[3]
-    (x4, y4) = ring[4]
-    if (x0, y0) != (x4, y4):
-        raise Exception('Polygon is not closed')
-
-    xset = {x0, x1, x2, x3}
-    yset = {y0, y1, y2, y3}
-    if len(xset) != 2 or len(yset) != 2:
-        raise Exception('Provided polygon is not rectangular')
-
-    return (min(xset), min(yset), max(xset), max(yset))
 
 
 def save_image_as_exr(image, filename):

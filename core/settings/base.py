@@ -106,9 +106,6 @@ try:
 except:
     raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")
 
-if not 'django.contrib.gis' in DATABASES['default']['ENGINE']:
-    raise Exception("Please use gis-enabled database engine (check 'database.default.py' for mysql example)")
-
 # Misc
 
 from .appconfig import *

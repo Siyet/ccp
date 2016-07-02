@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import django.contrib.gis.db.models.fields
 import processing.upload_path
 import processing.storage
 
@@ -19,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('source_field', models.CharField(max_length=10)),
-                ('bounding_box', django.contrib.gis.db.models.fields.PolygonField(srid=4326)),
+                ('bounding_box', models.IntegerField()),
                 ('file', models.FileField(storage=processing.storage.OverwriteStorage(), upload_to=processing.upload_path.UploadComposeCache(b'composecache/%s/%s'))),
                 ('source', models.ForeignKey(to='processing.ButtonsSource')),
             ],
@@ -32,7 +31,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('source_field', models.CharField(max_length=10)),
-                ('bounding_box', django.contrib.gis.db.models.fields.PolygonField(srid=4326)),
+                ('bounding_box', models.IntegerField()),
                 ('file', models.FileField(storage=processing.storage.OverwriteStorage(), upload_to=processing.upload_path.UploadComposeCache(b'composecache/%s/%s'))),
                 ('source', models.ForeignKey(to='processing.ComposeSource')),
             ],
