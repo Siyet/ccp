@@ -1,7 +1,7 @@
 # coding: UTF-8
 
 from django.db import models
-from django.contrib.gis.db.models import PolygonField, PointField
+from django.contrib.gis.db.models import PolygonField
 from model_utils.choices import Choices
 from django.utils.text import ugettext_lazy as _
 from imagekit.models import ImageSpecField
@@ -11,6 +11,7 @@ from upload_path import UploadComposingSource, UploadComposeCache
 from .specs import TextureSample, TextureSampleThumbnail, Generators
 from backend import models as backend
 from .storage import overwrite_storage
+from .cache import CacheBuilder
 
 
 class SourceMixin(object):
@@ -170,9 +171,15 @@ class Texture(models.Model):
     sample = ImageSpecField(source='texture', spec=TextureSample, id=Generators.sample)
     sample_thumbnail = ImageSpecField(source='sample', spec=TextureSampleThumbnail, id=Generators.sample_thumbnail)
 
+    cache = models.FileField(storage=overwrite_storage, upload_to='textures/cache', editable=False, null=True)
+
     class Meta:
         verbose_name = _(u'Текстура')
         verbose_name_plural = _(u'Текстуры')
 
     def __unicode__(self):
         return self.texture.name
+
+    def save(self, *args, **kwargs):
+        CacheBuilder.cache_texture(self, save=False)
+        super(Texture, self).save(*args, **kwargs)

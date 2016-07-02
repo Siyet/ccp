@@ -1,36 +1,46 @@
-import OpenEXR
 from time import time
 
 from PIL import Image, ImageChops
 import numpy
+import numexpr as ne
 
 from utils import exr_to_array
 
 
-def compose_arrays(source, texture_arr, AA):
+def compose(source, texture_arr, AA):
     size = source.shape[:2]
-    # add blue channel
 
-    source[..., 0] = (source[..., 0] * size[0]) % texture_arr.shape[0]
-    source[..., 1] = (source[..., 1] * size[1]) % texture_arr.shape[1]
+    # TODO: ensure cache
+    # source[..., 0] %= texture_arr.shape[0]
+    # source[..., 1] %= texture_arr.shape[1]
 
-    source = source.astype('uint16')
+    start = time()
+    source = source.astype('uint16')  # TODO: store cache in uint16
+    print('astype', time() - start)
     # one-line mapping!
+    start = time()
+
     result = texture_arr[source[..., 0], source[..., 1]]
+    print("mapping", time() - start)
     result = Image.fromarray(result, "RGB")
     if AA:
+        start = time()
         result = result.resize(tuple(x / 2 for x in result.size), Image.LANCZOS)
+        print("resize", time() - start)
 
     return result
 
-def compose(source, texture, AA):
-    texture_arr = numpy.array(texture).transpose(1, 0, 2)
-    return compose_arrays(source, texture_arr, AA)
 
 def overlay_arrays(A, B):
-    return numpy.where(B< 0.5,
-                       2. * A* B,
-                       1.0 - 2.0 * (1. - A) * (1. - B))
+    start = time()
+    res = ne.evaluate("""where(
+                            B < 0.5,
+                            2. * A * B,
+                            1.0 - 2.0 * (1. - A) * (1. - B)
+                         )""")
+
+    print("overlay", time() - start)
+    return res
 
 
 def overlay(a, b):
@@ -64,21 +74,10 @@ def compose_light(*sources):
     return result
 
 
-def gamma(src, value=2.2):
-    src_array = numpy.asarray(src).astype('float32') / 255.
-    src_array = numpy.power(src_array, value) * 255.0
-    return Image.fromarray(src_array.astype('uint8'), src.mode)
-
-
-def ungamma(src, value=2.2):
-    src_array = numpy.asarray(src).astype('float32') / 255.
-    src_array = numpy.power(src_array, 1.0 / value) * 255.0
-    return Image.fromarray(src_array.astype('uint8'), src.mode)
-
-
 def uv_to_image(arr):
     result = extend_uv_with_blue(arr) * 255.0
     return Image.fromarray(result.astype('uint8'), "RGB")
+
 
 def extend_uv_with_blue(arr):
     sz = arr.shape[:2]
@@ -96,21 +95,23 @@ def exr_to_srgb(array):
 
 def encode_to_srgb(x):
     a = 0.055
-    return numpy.where(x <= 0.0031308,
-                 x * 12.92,
-                 (1 + a) * pow(x, 1 / 2.4) - a)
+    return ne.evaluate("""where(
+                            x <= 0.0031308,
+                            x * 12.92,
+                            (1 + a) * (x ** (1 / 2.4)) - a
+                          )""")
 
 
 def apply_srgb(img):
-    arr = numpy.asarray(img).astype('float32') /255.0
+    arr = numpy.asarray(img).astype('float32') / 255.0
     res = exr_to_srgb(arr)
     return res
 
-def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=None, buttons_shadow=None, AA=True):
 
-     # op3
+def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=None, buttons_shadow=None, AA=True):
+    # op3
     lights_images = [Image.open(light) for light in lights]
-    full_light = compose_light(*lights_images )
+    full_light = compose_light(*lights_images)
 
     # op4
     pre_shadow_images = [Image.open(shadow) for shadow in pre_shadows]
@@ -125,20 +126,17 @@ def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=No
     full_uv = compose_uv(*uv)
 
     # op2: op1
-    uv = Image.fromarray((full_uv * 255.0).astype('uint8'), "RGBA")
-    if AA:
-        size = uv.size
-        uv = uv.resize((size[0]/2, size[1]/2), Image.LANCZOS)
-    alpha = uv.split()[-1]
+    # uv = Image.fromarray((full_uv * 255.0).astype('uint8'), "RGBA")
+    # if AA:
+    #     size = uv.size
+    #     uv = uv.resize((size[0] / 2, size[1] / 2), Image.LANCZOS)
+    # alpha = uv.split()[-1]
 
     # op6
-    texture_img = Image.open(texture)
-
-    if tiling > 4: # TODO: proper resizing
-        texture_img = texture_img.resize((texture_img.size[0] / 2, texture_img.size[1] / 2), Image.LANCZOS)
+    texture_arr = numpy.load(texture)
 
     # op7: op1+op6
-    result = compose(full_uv, texture_img, AA)
+    result = compose(full_uv, texture_arr, AA)
 
     # op8: op1+op6+op7
     if full_shadow is not None:
@@ -156,6 +154,6 @@ def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=No
 
     # op10: op9 + op2
     result = apply_srgb(result)
-    result.putalpha(alpha)
+    # result.putalpha(alpha)
 
     return result

@@ -13,13 +13,12 @@ class ComposeSample(object):
 
     def process(self, img):
         sample = {
-            "texture": self.texture.texture.path,
+            "texture": self.texture.cache,
             "uv":[localpath("sample/UV.exr")],
-            "lights": [localpath("sample/LIGHT.exr")],
-            "pre_shadows": [localpath("sample/LIGHT.exr")] if self.texture.needs_shadow else [],
+            "lights": [localpath("sample/LIGHT.png")],
+            "pre_shadows": [localpath("sample/LIGHT.png")] if self.texture.needs_shadow else [],
             "post_shadows": [],
             "tiling": self.texture.tiling,
             "AA": False
         }
-        results = create(**sample)
-        return results[0]
+        return create(**sample)

@@ -4,6 +4,7 @@ from math import floor, ceil
 from django.core.files.base import ContentFile
 import numpy as np
 from .utils import Submatrix, exr_to_array, rect_to_polygon, image_from_array
+from PIL import Image
 
 
 class CacheBuilder(object):
@@ -28,6 +29,12 @@ class CacheBuilder(object):
                 continue
             image = getattr(instance, field)
             array = exr_to_array(image.path)
+            if field == 'uv':
+                size = array.shape[:2]
+                array[..., 0] *= size[0]
+                array[..., 1] *= size[1]
+                array[..., 0] %= 1024
+                array[..., 1] %= 1024
             submatrix = Submatrix(array)
             scale = CacheBuilder.SCALE_MAP.get(field, 1)
             matrices.append((field, submatrix, scale))
@@ -56,7 +63,7 @@ class CacheBuilder(object):
         buffer = BytesIO()
         if field in CacheBuilder.EXR_FIELDS:
             extension = 'npy'
-            np.save(buffer, matrix.values)
+            np.save(buffer, matrix.values) # TODO: only save [:2] slice and save alpha separately
         else:
             extension = 'png'
             channels = ('R', 'G', 'B', 'A') if field in CacheBuilder.RGBA_FIELDS else ('R', 'G', 'B')
@@ -64,6 +71,22 @@ class CacheBuilder(object):
             img.save(buffer, extension)
 
         return (buffer, extension)
+
+
+    @staticmethod
+    def cache_texture(texture, save=True):
+        if not texture.texture:
+            return
+        try:
+            img = Image.open(texture.texture.path)
+            texture_arr = np.asarray(img).transpose(1, 0, 2)
+            print(texture_arr.shape)
+            buffer = BytesIO()
+            np.save(buffer, texture_arr)
+            filename = "%s.npy" % texture.texture.name
+            texture.cache.save(filename, ContentFile(buffer.getvalue()), save=save)
+        except:
+            return
 
 
 

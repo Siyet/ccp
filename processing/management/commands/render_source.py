@@ -1,6 +1,7 @@
 from django.core.management import BaseCommand
 from processing.models import BodySource, Texture
 from processing.process import create
+from PIL import Image
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -11,6 +12,7 @@ class Command(BaseCommand):
         src = s.composesource_set.first()
 
         texture = Texture.objects.get(pk=1)
+
         sample = {
             "texture": texture.texture.path,
             "uv": [src.cache.get(source_field='uv').file.path],
