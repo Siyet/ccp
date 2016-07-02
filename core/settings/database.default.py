@@ -1,9 +1,9 @@
-import os
-from .base import BASE_DIR
-
 DATABASES = {
     'default': {
-        'ENGINE': "django.db.backends.sqlite3",
-        'NAME': os.path.join(BASE_DIR, "costumecode.sql")
+        'ENGINE': 'django.contrib.gis.db.backends.mysql',
+        'HOST': 'localhost',
+        'NAME': 'costumecode',
+        'USER': 'user',
+        'PASSWORD': 'password'
     }
 }

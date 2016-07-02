@@ -27,12 +27,11 @@ class TemplateShirtsFilter(filters.FilterSet):
 
 class TemplateShirtsList(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
+    queryset = models.TemplateShirt.objects.available().select_related('fabric__fabric_type', 'fabric__thickness')
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend,)
     ordering_fields = ('price',)
-
-    queryset = models.TemplateShirt.objects.available().select_related('fabric__fabric_type', 'fabric__thickness')
 
     def get(self, request, *args, **kwargs):
         """
@@ -54,7 +53,7 @@ class TemplateShirtsList(ListAPIView):
 class TemplateShirtDetails(RetrieveAPIView):
     serializer_class = serializers.TemplateShirtSerializer
     queryset = models.TemplateShirt.objects.available(). \
-        select_related('fabric', 'collection__storehouse').prefetch_related('shirt_images').distinct()
+        select_related('fabric', 'collection__storehouse').prefetch_related('shirt_images')
 
 
 class TemplateShirtsFiltersList(APIView):
@@ -92,8 +91,8 @@ class TemplateShirtsFiltersList(APIView):
             design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
         sex_values = models.Collection.objects.filter(
-            shirts__is_template=True,
-            shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
+             shirts__is_template=True,
+             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         ).values_list('sex', flat=True).distinct()
 
         sex_pairs = map(lambda sex: {"id": sex, "title": models.SEX[sex]}, sex_values)

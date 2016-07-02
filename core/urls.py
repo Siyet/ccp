@@ -14,8 +14,6 @@ urlpatterns = [
     url(r'^backend/', include('backend.urls')),
     url(r'^kassa/order-check/?$', checkout_views.CheckOrderView.as_view(), name='kassa_check_order'),
     url(r'^kassa/', include('yandex_kassa.urls')),
-    url(r'^', include('processing.urls'))
-
 ]
 
 if settings.DEBUG:
