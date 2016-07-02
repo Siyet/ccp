@@ -1,6 +1,12 @@
-from process import create, compose, exr_to_array
+from process import create, compose
 from PIL import Image
 from time import time
+
+import numpy
+
+arr = numpy.load('media/composecache/uv/cache_uv_26ad9ae0-af73-4980-880c-fb8e7880daf3')
+print(arr.shape)
+exit()
 
 
 

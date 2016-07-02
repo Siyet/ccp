@@ -16,4 +16,4 @@ class UploadComposeCache(object):
         self.path = path
 
     def __call__(self, instance, filename):
-        return (self.path % (instance.field_name, filename)).encode('utf-8')
+        return (self.path % (instance.source_field, filename)).encode('utf-8')

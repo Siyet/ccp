@@ -1,28 +1,25 @@
 import OpenEXR
-import Imath
+from time import time
+
 from PIL import Image, ImageChops
 import numpy
-from time import time
+
+from utils import exr_to_array
 
 
 def compose_arrays(source, texture_arr, AA):
-    start = time()
     size = source.shape[:2]
     # add blue channel
 
     source[..., 0] = (source[..., 0] * size[0]) % texture_arr.shape[0]
     source[..., 1] = (source[..., 1] * size[1]) % texture_arr.shape[1]
-    print("adjust", time()-start)
+
     source = source.astype('uint16')
-    print("astype", time()-start)
     # one-line mapping!
     result = texture_arr[source[..., 0], source[..., 1]]
-    print("mapping", time()-start)
     result = Image.fromarray(result, "RGB")
-    print("image", time()-start)
     if AA:
         result = result.resize(tuple(x / 2 for x in result.size), Image.LANCZOS)
-        print("resize", time()-start)
 
     return result
 
@@ -90,23 +87,6 @@ def extend_uv_with_blue(arr):
     return result
 
 
-def image_from_exr(file, channels=('R', 'G', 'B', 'A')):
-    array = exr_to_array(file, channels)
-    array = array * 255.0
-    return Image.fromarray(array.astype('uint8'), ''.join(channels))
-
-def save_array_as_exr(image_array, filename, size=None):
-    size = image_array.shape[:2] if size is None else size
-    channels = (image_array[..., 0].ravel(), image_array[..., 1].ravel(), image_array[..., 2].ravel())
-    (Rs, Gs, Bs) = [chan.tostring() for chan in channels]
-    out = OpenEXR.OutputFile(filename, OpenEXR.Header(size[0], size[1]))
-    out.writePixels({'R': Rs, 'G': Gs, 'B': Bs})
-
-def save_image_as_exr(image, filename):
-    image_array = numpy.asarray(image).astype('float32') / 255.
-    save_array_as_exr(image_array, filename)
-
-
 def exr_to_srgb(array):
     array = encode_to_srgb(array) * 255.
     present_channels = ["R", "G", "B", "A"][:array.shape[2]]
@@ -120,31 +100,26 @@ def encode_to_srgb(x):
                  x * 12.92,
                  (1 + a) * pow(x, 1 / 2.4) - a)
 
-def add_alpha_array(source, alpha_arr):
-    source_arr = numpy.asarray(source)
-    result = numpy.dstack((source_arr, alpha_arr))
-    return Image.fromarray(result, "RGBA")
 
-def add_alpha(source, alpha_donor):
-    alpha_arr = numpy.asarray(alpha_donor)[..., 3]
-    return add_alpha_array(source, alpha_arr)
+def apply_srgb(img):
+    arr = numpy.asarray(img).astype('float32') /255.0
+    res = exr_to_srgb(arr)
+    return res
 
-
-def create(textures, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=None, buttons_shadow=None, AA=True):
+def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=None, buttons_shadow=None, AA=True):
 
      # op3
-    lights_images = [image_from_exr(light) for light in lights]
+    lights_images = [Image.open(light) for light in lights]
     full_light = compose_light(*lights_images )
 
     # op4
-    pre_shadow_images = [image_from_exr(shadow) for shadow in pre_shadows]
+    pre_shadow_images = [Image.open(shadow) for shadow in pre_shadows]
     full_shadow = compose_light(*pre_shadow_images)
 
     # op5: op4
-    post_shadow_images = [image_from_exr(shadow) for shadow in post_shadows]
+    post_shadow_images = [Image.open(shadow) for shadow in post_shadows]
     for shadow in post_shadow_images:
         full_shadow = ImageChops.multiply(full_shadow, shadow)
-
 
     # op1
     full_uv = compose_uv(*uv)
@@ -156,34 +131,31 @@ def create(textures, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=N
         uv = uv.resize((size[0]/2, size[1]/2), Image.LANCZOS)
     alpha = uv.split()[-1]
 
-    results = list()
     # op6
-    for texture in textures:
-        texture_img = Image.open(texture).convert("RGB")
-        if tiling > 4: # TODO: proper resizing
-            texture_img = texture_img.resize((texture_img.size[0] / 2, texture_img.size[1] / 2), Image.LANCZOS)
+    texture_img = Image.open(texture)
 
-        # op7: op1+op6
-        result = compose(full_uv, texture_img, AA)
+    if tiling > 4: # TODO: proper resizing
+        texture_img = texture_img.resize((texture_img.size[0] / 2, texture_img.size[1] / 2), Image.LANCZOS)
 
-        # op8: op1+op6+op7
-        if full_shadow is not None:
-            result = ImageChops.multiply(result, full_shadow.convert("RGB"))
+    # op7: op1+op6
+    result = compose(full_uv, texture_img, AA)
 
-        result = overlay(full_light.convert("RGB"), result)
+    # op8: op1+op6+op7
+    if full_shadow is not None:
+        result = ImageChops.multiply(result, full_shadow)
 
-        # op9: op8
-        if buttons is not None and buttons_shadow is not None:
-            buttons_image = Image.open(buttons)
-            buttons_shadow_image = Image.open(buttons_shadow)
+    result = overlay(full_light, result)
 
-            result.paste(buttons_image, mask=buttons_image)
-            result.paste(buttons_shadow_image, mask=buttons_shadow_image)
+    # op9: op8
+    if buttons is not None and buttons_shadow is not None:
+        buttons_image = Image.open(buttons)
+        buttons_shadow_image = Image.open(buttons_shadow)
 
-        # op10: op9 + op2
-        result_array = numpy.asarray(result).astype('float32') / 255.
-        result = exr_to_srgb(result_array)
-        result.putalpha(alpha)
-        results.append(result)
+        result.paste(buttons_image, mask=buttons_image)
+        result.paste(buttons_shadow_image, mask=buttons_shadow_image)
 
-    return results
+    # op10: op9 + op2
+    result = apply_srgb(result)
+    result.putalpha(alpha)
+
+    return result

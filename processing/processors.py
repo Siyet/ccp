@@ -13,7 +13,7 @@ class ComposeSample(object):
 
     def process(self, img):
         sample = {
-            "textures": [self.texture.texture.path],
+            "texture": self.texture.texture.path,
             "uv":[localpath("sample/UV.exr")],
             "lights": [localpath("sample/LIGHT.exr")],
             "pre_shadows": [localpath("sample/LIGHT.exr")] if self.texture.needs_shadow else [],

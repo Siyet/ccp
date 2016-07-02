@@ -111,7 +111,7 @@ class SourceCache(models.Model):
 
 
 class ComposeSourceCache(SourceCache):
-    source = models.ForeignKey(ComposeSource)
+    source = models.ForeignKey(ComposeSource, related_name='cache')
 
 
 class BodyButtonsSource(models.Model, SourceMixin):
