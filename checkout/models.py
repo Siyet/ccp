@@ -1,13 +1,18 @@
 # coding: utf-8
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.db.transaction import atomic
+from django.dispatch.dispatcher import receiver
 from django.utils.text import ugettext_lazy as _
 from model_utils import Choices
 
 from ordered_model.models import OrderedModel
 from yandex_kassa.models import Payment as YandexPayment
+from yandex_kassa.signals import payment_completed
+
+from core.utils import send_email
 
 
 class Payment(YandexPayment):
@@ -212,3 +217,13 @@ class Discount(models.Model):
     class Meta:
         verbose_name = _(u'Скидка')
         verbose_name_plural = _(u'Скидки')
+
+
+@receiver(payment_completed)
+def payment_completed_receiver(sender, *args, **kwargs):
+    send_email(
+        _(u'НОВЫЙ ЗАКАЗ'),
+        'checkout/payment_completed_admin_email.html',
+        {'order': sender.order, 'SITE_DOMAIN': settings.SITE_DOMAIN},
+        [settings.ADMIN_ORDER_EMAIL]
+    )

@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<p>
+    {% trans 'Здравствуйте! На сайте' %} {{ SITE_DOMAIN }}
+    {% trans 'был успешно оформлен новый заказ' %} № {{ order.number }}
+</p>
+<p>
+    {% trans 'Для того, что бы ознакомиться с деталями заказа, пожалуйста, пройдите по ссылке' %}
+    <a href="{{ SITE_DOMAIN }}{% url 'admin:checkout_order_change' order.pk %}">
+        {{ SITE_DOMAIN }}{% url 'admin:checkout_order_change' order.pk %}
+    </a>
+</p>
