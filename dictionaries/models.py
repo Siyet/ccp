@@ -3,12 +3,13 @@ from django.db import models
 from django.utils.text import ugettext_lazy as _
 from colorful.fields import RGBColorField
 from django.db.models import Count
+from model_utils import Choices
 
 from ordered_model.models import OrderedModel
 
 class ComponentModel(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
-    picture = models.ImageField(_(u'Изображение'))
+    picture = models.ImageField(_(u'Изображение'), upload_to='component')
 
     def __unicode__(self):
         return self.title
@@ -98,9 +99,12 @@ class CollarType(ComponentModel):
 
 
 class CollarButtons(OrderedModel):
+    BUTTONS_CHOICES = Choices(0, 1, 2)
+
     title = models.CharField(_(u'Название'), max_length=255)
     types = models.ManyToManyField('CollarType', verbose_name=_(u'Типы воротников'), through=CollarType.buttons.through,
                                    blank=True)
+    buttons = models.IntegerField(_(u'Количество пуговиц'), choices=BUTTONS_CHOICES, default = 1)
 
     def __unicode__(self):
         return self.title
@@ -181,7 +185,7 @@ class ShirtInfo(models.Model):
         verbose_name_plural = _(u'Информация о рубашках')
 
 class ShirtInfoImage(models.Model):
-    image = models.ImageField(_(u'Файл'))
+    image = models.ImageField(_(u'Файл'), upload_to='shirtinfo')
     text = models.TextField(_(u'Текст под изображением'))
     shirt_info = models.ForeignKey(ShirtInfo, related_name='images')
 

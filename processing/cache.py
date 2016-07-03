@@ -3,8 +3,9 @@ from math import floor, ceil
 
 from django.core.files.base import ContentFile
 import numpy as np
-from .utils import Submatrix, exr_to_array, rect_to_polygon, image_from_array
 from PIL import Image
+
+from .utils import Submatrix, exr_to_array, image_from_array
 
 
 class CacheBuilder(object):
@@ -15,7 +16,7 @@ class CacheBuilder(object):
         'body': 1.0,
     }
 
-    EXR_FIELDS = ('uv', )
+    EXR_FIELDS = ('uv',)
     RGB_FIELDS = ('light', 'ao')
     RGBA_FIELDS = ('body',)
 
@@ -41,7 +42,7 @@ class CacheBuilder(object):
 
         size_array = []
         for _, matrix, scale in matrices:
-            size_array.append([floor(x/scale) if i < 2 else ceil(x/scale) for i, x in enumerate(matrix.bbox)])
+            size_array.append([floor(x / scale) if i < 2 else ceil(x / scale) for i, x in enumerate(matrix.bbox)])
 
         (x0, y0, x1, y1) = zip(*size_array)
 
@@ -50,9 +51,8 @@ class CacheBuilder(object):
         for field, matrix, scale in matrices:
             # remove old cache
             instance.cache.filter(source_field=field).delete()
-            scaled_bbox = tuple(x*scale for x in bbox)
-            bbox_polygon = rect_to_polygon(*scaled_bbox)
-            cache = cache_model(source_field=field, source=instance, bounding_box=bbox_polygon)
+            scaled_bbox = tuple(x * scale for x in bbox)
+            cache = cache_model(source_field=field, source=instance, position=scaled_bbox[:2])
             matrix.repick(scaled_bbox)
             (buffer, extension) = CacheBuilder.get_buffer(field, matrix)
             filename = "%s_%s_%s.%s" % (instance._meta.model_name, instance.id, field, extension)
@@ -63,7 +63,7 @@ class CacheBuilder(object):
         buffer = BytesIO()
         if field in CacheBuilder.EXR_FIELDS:
             extension = 'npy'
-            np.save(buffer, matrix.values) # TODO: only save [:2] slice and save alpha separately
+            np.save(buffer, matrix.values)  # TODO: only save [:2] slice and save alpha separately
         else:
             extension = 'png'
             channels = ('R', 'G', 'B', 'A') if field in CacheBuilder.RGBA_FIELDS else ('R', 'G', 'B')
@@ -71,7 +71,6 @@ class CacheBuilder(object):
             img.save(buffer, extension)
 
         return (buffer, extension)
-
 
     @staticmethod
     def cache_texture(texture, save=True):
@@ -87,6 +86,3 @@ class CacheBuilder(object):
             texture.cache.save(filename, ContentFile(buffer.getvalue()), save=save)
         except:
             return
-
-
-
