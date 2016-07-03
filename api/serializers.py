@@ -254,7 +254,7 @@ class CustomerDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = checkout.CustomerData
-        fields = ('name', 'lastname', 'midname', 'phone', 'type', 'city', 'address', 'index', )
+        fields = ('name', 'lastname', 'midname', 'phone', 'email', 'type', 'city', 'address', 'index', )
 
 
 class OrderSerializer(serializers.ModelSerializer):

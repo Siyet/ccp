@@ -54,9 +54,11 @@ class Order(models.Model):
 
     number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True, default=uuid.uuid4)
     customer = models.ForeignKey(Customer, to_field='number', verbose_name=_(u'Клиент'), null=True, blank=True)
+    discount_value = models.FloatField(_(u'Номинал скидки'), null=True, default=0)
     checkout_shop = models.ForeignKey(Shop, to_field='index', verbose_name=_(u'Магазин'), null=True, blank=True,
                                       related_name='orders')
     certificate = models.ForeignKey('checkout.Certificate', to_field='number', null=True, blank=True)
+    certificate_value = models.PositiveIntegerField(_(u'Номинал сертификата'), null=True, default=0)
     payment = models.OneToOneField(Payment, null=True, blank=True, related_name='order')
 
     class Meta:
@@ -70,36 +72,71 @@ class Order(models.Model):
     def paid(self):
         return self.payment and self.payment.status == Payment.STATUS.SUCCESS
 
-    def get_amount(self):
+    def get_full_amount(self):
         result = 0
         for detail in self.order_details.all():
             result += float(detail.shirt.price) * detail.amount
-        if self.customer:
-            result *= 1 - self.customer.get_discount_value()
-        if self.certificate:
-            cached_result = result
-            result -= self.certificate.get_value()
-            if result < 0:
-                result = 0
-            self.certificate.value -= cached_result
-            if self.certificate.value < 0:
-                self.certificate.value = 0
         return result
+    get_full_amount.allow_tags = True
+    get_full_amount.short_description = _(u'Общая стоимость заказа')
+
+    def get_amount_to_pay(self):
+        try:
+            return self.payment.order_amount
+        except AttributeError:
+            return None
+    get_amount_to_pay.allow_tags = True
+    get_amount_to_pay.short_description = _(u'К оплате')
+
+    def get_amount_paid(self):
+        try:
+            return self.payment.shop_amount
+        except AttributeError:
+            return None
+    get_amount_paid.allow_tags = True
+    get_amount_paid.short_description = _(u'Оплаченная сумма')
+
+    def get_performed_datetime(self):
+        try:
+            return self.payment.performed_datetime
+        except AttributeError:
+            return None
+    get_performed_datetime.allow_tags = True
+    get_performed_datetime.short_description = _(u'Дата обработки заказа')
+
+    def set_discount(self, amount):
+        if self.customer:
+            self.discount_value = amount * self.customer.get_discount_value()
+            self.save(update_fields=['discount_value'])
+        return amount - self.discount_value
+
+    def set_certificate(self, amount):
+        if not self.certificate:
+            return amount
+        if self.certificate.get_value() > amount:
+            self.certificate_value = amount
+        else:
+            self.certificate_value = self.certificate.get_value()
+        self.save(update_fields=['certificate_value'])
+        return amount - self.certificate_value
 
     @atomic
     def create_payment(self):
-        payment = Payment.objects.create(customer_number=self.number, order_amount=float(self.get_amount()),
+        amount = self.get_full_amount()
+        amount = self.set_discount(amount)
+        amount = self.set_certificate(amount)
+        payment = Payment.objects.create(customer_number=self.number, order_amount=float(amount),
                                          payment_type=Payment.PAYMENT_TYPE.AC)
         self.payment = payment
         self.save(update_fields=['payment'])
         return payment
 
-    def check_amount(self):
-        return self.get_amount() == self.payment.order_amount
+    def check_certificate(self):
+        return self.certificate.get_value() > self.certificate_value
 
-    def save_cert(self):
-        self.get_amount()
+    def save_certificate(self):
         if self.certificate:
+            self.certificate.value = self.certificate.get_value() - self.certificate_value
             self.certificate.save(update_fields=['value'])
 
 
@@ -114,6 +151,7 @@ class CustomerData(models.Model):
     lastname = models.CharField(_(u'Фамилия'), max_length=255)
     midname = models.CharField(_(u'Отчество'), max_length=255)
     phone = models.CharField(_(u'Телефон'), max_length=255)
+    email = models.EmailField(_(u'Телефон'), max_length=255, null=True)
 
     type = models.CharField(_(u'Тип адреса'), max_length=50, choices=ADDRESS_TYPE,
                             default=ADDRESS_TYPE.customer_address)
