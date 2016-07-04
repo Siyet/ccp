@@ -1,4 +1,5 @@
 from time import time
+import os
 
 from PIL import Image, ImageChops
 import numpy
@@ -11,8 +12,8 @@ def compose(source, texture_arr, AA):
     size = source.shape[:2]
 
     # TODO: ensure cache
-    # source[..., 0] %= texture_arr.shape[0]
-    # source[..., 1] %= texture_arr.shape[1]
+    source[..., 0] %= texture_arr.shape[0]
+    source[..., 1] %= texture_arr.shape[1]
 
     start = time()
     source = source.astype('uint16')  # TODO: store cache in uint16
@@ -108,7 +109,23 @@ def apply_srgb(img):
     return res
 
 
+def load_texture(texture):
+    img = None
+    if isinstance(texture, basestring):
+        extension = os.path.splitext(texture)[1]
+        if extension == '.npy':
+            return numpy.load(texture)
+
+        img = Image.open(texture)
+    else:
+        img = texture
+
+    arr = numpy.asarray(img).transpose(1, 0, 2)
+    return arr[..., :3]
+
+
 def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=None, buttons_shadow=None, AA=True):
+    start = time()
     # op3
     lights_images = [Image.open(light) for light in lights]
     full_light = compose_light(*lights_images)
@@ -133,7 +150,7 @@ def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=No
     # alpha = uv.split()[-1]
 
     # op6
-    texture_arr = numpy.load(texture)
+    texture_arr = load_texture(texture)
 
     # op7: op1+op6
     result = compose(full_uv, texture_arr, AA)
@@ -155,5 +172,5 @@ def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=No
     # op10: op9 + op2
     result = apply_srgb(result)
     # result.putalpha(alpha)
-
+    print('renedered in %s' % (time() - start))
     return result

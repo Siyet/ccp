@@ -1,25 +1,21 @@
 # coding: UTF-8
-from django.contrib.contenttypes.fields import GenericForeignKey
+import re
 
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
-
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
-
 from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
+from ordered_model.models import OrderedModel
 
 from dictionaries.models import FabricCategory
 from backend import managers
-
-from ordered_model.models import OrderedModel
-
-import re
 
 SEX = Choices(
     ('male', _(u'Мужская')),
@@ -29,7 +25,8 @@ SEX = Choices(
 
 
 class Collection(OrderedModel):
-    storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections', blank=False, null=True)
+    storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections',
+                                   blank=False, null=True)
     title = models.CharField(_(u'Название'), max_length=255)
     text = models.TextField(_(u'Описание'))
     image = models.ImageField(_(u'Изображение'), upload_to='collection')
@@ -39,7 +36,6 @@ class Collection(OrderedModel):
     shawl = models.BooleanField(_(u'Платок'))
     sex = models.CharField(_(u'Пол коллекции'), choices=SEX, max_length=6, default=SEX.male, blank=False)
     tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
-
 
     def __unicode__(self):
         return "%s %s" % (self.title, self.get_sex_display().lower())
@@ -51,7 +47,9 @@ class Collection(OrderedModel):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse', 'category__prices').filter(filter_predicate)
+        return Fabric.objects.active.select_related('fabric_type').prefetch_related('residuals__storehouse',
+                                                                                    'category__prices').filter(
+            filter_predicate)
 
 
 class Storehouse(models.Model):
@@ -91,7 +89,8 @@ class Stays(OrderedModel):
 
 class FabricPrice(models.Model):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='prices')
-    fabric_category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория тканей'), related_name='prices')
+    fabric_category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория тканей'),
+                                        related_name='prices')
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
 
     def __unicode__(self):
@@ -102,19 +101,24 @@ class FabricPrice(models.Model):
         verbose_name_plural = _(u'Цены тканей')
 
     def get_shirts(self):
-        return Shirt.objects.filter(fabric__category=self.fabric_category, collection__storehouse=self.storehouse).values('id')
+        return Shirt.objects.filter(fabric__category=self.fabric_category,
+                                    collection__storehouse=self.storehouse).values('id')
 
 
 class Fabric(models.Model):
     code = models.CharField(_(u'Артикул'), max_length=20, unique=True)
-    category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics', blank=True, null=True)
-    fabric_type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics', null=True)
-    thickness = models.ForeignKey('dictionaries.Thickness', verbose_name=_(u'Толщина'), related_name='fabrics', null=True)
+    category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics',
+                                 blank=True, null=True)
+    fabric_type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics',
+                                    null=True)
+    thickness = models.ForeignKey('dictionaries.Thickness', verbose_name=_(u'Толщина'), related_name='fabrics',
+                                  null=True)
     short_description = models.TextField(_(u'Краткое описание'), blank=True, default="")
     long_description = models.TextField(_(u'Полное описание'), blank=True, default="")
     material = models.CharField(_(u'Материал'), max_length=255, default="")
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
-    designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'), related_name='design_fabrics')
+    designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'),
+                                     related_name='design_fabrics')
     texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True)
     dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
     active = models.BooleanField(_(u'Активна'), default=True)
@@ -124,6 +128,7 @@ class Fabric(models.Model):
     def __unicode__(self):
         return self.code
 
+    @property
     def get_sample(self):
         return self.texture.sample if self.texture else None
 
@@ -144,7 +149,7 @@ class Fabric(models.Model):
         return re.match(r'[A-Z]\d+$', code) if isinstance(code, basestring) else False
 
     class Meta(OrderedModel.Meta):
-        ordering = ('code', )
+        ordering = ('code',)
         verbose_name = _(u'Ткань')
         verbose_name_plural = _(u'Ткани')
 
@@ -293,7 +298,8 @@ class Shirt(OrderedModel):
 
     is_template = models.BooleanField(_(u'Используется как шаблон'))
     is_standard = models.BooleanField(_(u'Используется как стандартный вариант'), default=False, editable=False)
-    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False, null=True)
+    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False,
+                                   null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     individualization = models.TextField(_(u'Индивидуализация'), null=True)
 
@@ -301,14 +307,14 @@ class Shirt(OrderedModel):
 
     showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True, upload_to='showcase')
     showcase_image_list = ImageSpecField(source='showcase_image',
-                                      processors=[ResizeToFill(200, 300)],
-                                       format='JPEG',
-                                      options={'quality': 80})
+                                         processors=[ResizeToFill(200, 300)],
+                                         format='JPEG',
+                                         options={'quality': 80})
 
     showcase_image_detail = ImageSpecField(source='showcase_image',
-                                      processors=[ResizeToFill(400, 600)],
-                                      format='JPEG',
-                                      options={'quality': 80})
+                                           processors=[ResizeToFill(400, 600)],
+                                           format='JPEG',
+                                           options={'quality': 80})
 
     size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
     size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
@@ -316,20 +322,24 @@ class Shirt(OrderedModel):
     hem = models.ForeignKey('dictionaries.HemType', verbose_name=_(u'Низ'), related_name='hem_shirts')
     placket = models.ForeignKey('dictionaries.PlacketType', verbose_name=_(u'Полочка'), related_name='placket_shirts')
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
-    sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts', null=True)
+    sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
+                               null=True)
     tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=TUCK_OPTIONS, default=False)
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
 
-    custom_buttons_type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип кастомных пуговиц'), null=True, blank=True, related_name='back_shirts')
-    custom_buttons = ChainedForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'), chained_field='custom_buttons_type',
-                                 chained_model_field='type', show_all=False, null=True, blank=True)
+    custom_buttons_type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип кастомных пуговиц'),
+                                            null=True, blank=True, related_name='back_shirts')
+    custom_buttons = ChainedForeignKey(CustomButtons, verbose_name=_(u'Кастомные пуговицы'),
+                                       chained_field='custom_buttons_type',
+                                       chained_model_field='type', show_all=False, null=True, blank=True)
 
     shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True)
     yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 
-    STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')), ('5mm', _(u'5 мм')))
+    STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')),
+                     ('5mm', _(u'5 мм')))
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
 
     dickey = models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
@@ -354,24 +364,29 @@ class Shirt(OrderedModel):
         price += custom_buttons_price
 
         # Манишка
-        dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend', content_type__model='dickey').filter(Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
+        dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
+                                                       content_type__model='dickey').filter(
+            Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
         if dickey_price and self.dickey:
             price += dickey_price.price
 
         # Контрастные детали
-        contrast_detail_price = AccessoriesPrice.objects.filter(content_type__app_label='backend', content_type__model='contrastdetails').first()
+        contrast_detail_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
+                                                                content_type__model='contrastdetails').first()
         # Не зависимо от количества
         if contrast_detail_price and self.shirt_contrast_details.count() > 0:
             price += contrast_detail_price.price
 
         # Воротник или манжета. Наличие хотя бы одного прибавляем цену
         if hasattr(self, 'shirt_cuff') or hasattr(self, 'collar'):
-            cuff_price = AccessoriesPrice.objects.filter(Q(content_type__app_label='backend') & (Q(content_type__model='cuff') | Q(content_type__model='collar'))).order_by('-object_pk').first()
+            cuff_price = AccessoriesPrice.objects.filter(Q(content_type__app_label='backend') & (
+            Q(content_type__model='cuff') | Q(content_type__model='collar'))).order_by('-object_pk').first()
             if cuff_price:
                 price += cuff_price.price
 
         try:
-            fabric_prices = (x for x in self.collection.storehouse.prices.all() if x.fabric_category_id == self.fabric.category_id)
+            fabric_prices = (x for x in self.collection.storehouse.prices.all() if
+                             x.fabric_category_id == self.fabric.category_id)
             return price + next(fabric_prices).price
         except StopIteration:
             return price
@@ -396,7 +411,7 @@ class CustomShirt(Shirt):
         verbose_name_plural = _(u'Рубашки')
 
     def __unicode__(self):
-        return u"%s #%s" %(_(u"Рубашка"), self.id)
+        return u"%s #%s" % (_(u"Рубашка"), self.id)
 
 
 class TemplateShirt(Shirt):
@@ -412,7 +427,7 @@ class TemplateShirt(Shirt):
         verbose_name_plural = _(u'Шаблоны рубашек')
 
     def __unicode__(self):
-        return u"%s #%s" %(_(u"Шаблон"), self.code)
+        return u"%s #%s" % (_(u"Шаблон"), self.code)
 
 
 class StandardShirt(Shirt):
@@ -424,7 +439,7 @@ class StandardShirt(Shirt):
         verbose_name_plural = _(u'Стандартные варианты рубашек')
 
     def __unicode__(self):
-        return u"%s #%s" %(_(u"Стандартный вариант"), self.code)
+        return u"%s #%s" % (_(u"Стандартный вариант"), self.code)
 
     def save(self, *args, **kwargs):
         self.is_template = False
@@ -504,6 +519,7 @@ class ContrastStitch(models.Model):
         verbose_name = _(u'Контрастная отстрочка')
         verbose_name_plural = _(u'Контрастные отстрочки')
 
+
 content_type_names = {
     _(u'Контрастная деталь'): _(u'Контрастные ткани'),
     _(u'Воротник'): _(u' Воротник полностью белый'),
@@ -516,7 +532,8 @@ class AccessoriesPrice(models.Model):
     object_pk = models.IntegerField(_('object ID'), blank=True, null=True)
     content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
-    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='accessories_prices', blank=True)
+    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='accessories_prices',
+                                         blank=True)
 
     def __unicode__(self):
         print dir(self.content_type)
@@ -524,13 +541,14 @@ class AccessoriesPrice(models.Model):
 
     def content_type_title(self):
         return content_type_names.get(self.content_type.name, self.content_type.name)
+
     content_type_title.allow_tags = True
     content_type_title.short_description = _(u'Тип')
 
     class Meta:
         verbose_name = _(u'Цена надбавки')
         verbose_name_plural = _(u'Цены надбавок')
-        unique_together = [('content_type', 'object_pk', )]
+        unique_together = [('content_type', 'object_pk',)]
 
     def get_content_object(self):
         try:
@@ -542,4 +560,6 @@ class AccessoriesPrice(models.Model):
         if self.object_pk:
             return self.content_type.model_class().get_related_shirts(pk=self.object_pk)
         else:
-            return self.content_type.model_class().get_related_shirts(exclude=AccessoriesPrice.objects.filter(content_type=self.content_type, object_pk__isnull=False).values('object_pk'))
+            return self.content_type.model_class().get_related_shirts(
+                exclude=AccessoriesPrice.objects.filter(content_type=self.content_type, object_pk__isnull=False).values(
+                    'object_pk'))
