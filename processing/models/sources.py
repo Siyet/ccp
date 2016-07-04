@@ -14,6 +14,7 @@ from processing.storage import overwrite_storage
 from processing.cache import CacheBuilder
 from .configuration import CollarSource, CuffSource
 
+from .mixins import ModelDiffMixin
 
 class ProjectionModel(models.Model):
     PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
@@ -78,7 +79,7 @@ class CuffMask(ProjectionModel):
         verbose_name_plural = _(u'Маски манжет')
 
 
-class Texture(models.Model):
+class Texture(ModelDiffMixin, models.Model):
     TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
 
     texture = models.ImageField(_(u'Файл текстуры'), storage=overwrite_storage, upload_to='textures')
@@ -97,5 +98,11 @@ class Texture(models.Model):
         return self.texture.name
 
     def save(self, *args, **kwargs):
-        CacheBuilder.cache_texture(self, save=False)
+        changed_fields = self.changed_fields
+
         super(Texture, self).save(*args, **kwargs)
+        self.__initial = self._dict
+
+        if set(changed_fields).intersection(['texture', 'tiling']):
+            CacheBuilder.cache_texture(self)
+

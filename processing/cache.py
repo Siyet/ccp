@@ -7,6 +7,7 @@ from PIL import Image
 
 from .utils import Submatrix, exr_to_array, image_from_array
 
+RENDER_SIZE = (4096, 4096)
 
 class CacheBuilder(object):
     SCALE_MAP = {
@@ -73,16 +74,20 @@ class CacheBuilder(object):
         return (buffer, extension)
 
     @staticmethod
-    def cache_texture(texture, save=True):
+    def cache_texture(texture):
         if not texture.texture:
             return
-        try:
-            img = Image.open(texture.texture.path)
-            texture_arr = np.asarray(img).transpose(1, 0, 2)
-            print(texture_arr.shape)
-            buffer = BytesIO()
-            np.save(buffer, texture_arr)
-            filename = "%s.npy" % texture.texture.name
-            texture.cache.save(filename, ContentFile(buffer.getvalue()), save=save)
-        except:
-            return
+
+        img = Image.open(texture.texture.path)
+        size = img.size
+        tiled_size = (x/texture.tiling for x in RENDER_SIZE)
+        if size != tiled_size:
+            img = img.resize(tiled_size, Image.LANCZOS)
+
+        texture_arr = np.asarray(img).transpose(1, 0, 2)
+        buffer = BytesIO()
+        np.save(buffer, texture_arr, allow_pickle=False)
+        buffer.flush()
+        filename = "%s.npy" % texture.texture.name
+        texture.cache.save(filename, ContentFile(buffer.getvalue()))
+

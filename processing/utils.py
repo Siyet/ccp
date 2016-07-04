@@ -29,19 +29,6 @@ class Submatrix(object):
         self.values = self._source[x: x1, y: y1]
 
 
-def save_image_as_exr(image, filename):
-    image_array = numpy.asarray(image).astype('float32') / 255.
-    save_array_as_exr(image_array, filename)
-
-
-def save_array_as_exr(image_array, filename, size=None):
-    size = image_array.shape[:2] if size is None else size
-    channels = (image_array[..., 0].ravel(), image_array[..., 1].ravel(), image_array[..., 2].ravel())
-    (Rs, Gs, Bs) = [chan.tostring() for chan in channels]
-    out = OpenEXR.OutputFile(filename, OpenEXR.Header(size[0], size[1]))
-    out.writePixels({'R': Rs, 'G': Gs, 'B': Bs})
-
-
 def load_image(filename):
     extension = os.path.split(filename)[1]
     if extension in '.png':
