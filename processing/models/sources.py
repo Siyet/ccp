@@ -105,4 +105,6 @@ class Texture(ModelDiffMixin, models.Model):
 
         if set(changed_fields).intersection(['texture', 'tiling']):
             CacheBuilder.cache_texture(self)
+            self.sample.generate(force=True)
+            self.sample_thumbnail.generate(force=True)
 
