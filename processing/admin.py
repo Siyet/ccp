@@ -3,8 +3,22 @@
 from django.contrib import admin
 from imagekit.admin import AdminThumbnail
 from django.utils.text import ugettext_lazy as _
-import models
 from django.contrib.contenttypes.admin import GenericTabularInline
+
+import models
+
+
+class CuffTypesMixin(object):
+    def get_list_display(self, request):
+        fields = self.get_fields(request)
+        if 'cuff_types' in fields:
+            cuff_types = lambda source: ", ".join([cuff.title for cuff in source.cuff_types.all()])
+            cuff_types.short_description = _(u'Типы манжет')
+            setattr(self, "cuff_types_list", cuff_types)
+            fields.remove('cuff_types')
+            fields.append('cuff_types_list')
+
+        return ['id'] + fields
 
 
 class CollarMaskInline(admin.TabularInline):
@@ -19,11 +33,8 @@ class ComposingSourceInline(GenericTabularInline):
     max_num = 3
 
 
-class SourceAdmin(admin.ModelAdmin):
+class SourceAdmin(CuffTypesMixin, admin.ModelAdmin):
     inlines = [ComposingSourceInline]
-
-    def get_list_display(self, request):
-        return self.get_fields(request)
 
 
 class CollarSourceAdmin(SourceAdmin):
@@ -36,11 +47,8 @@ class ButtonsComposingSourceInline(GenericTabularInline):
     max_num = 3
 
 
-class ButtonsSourceAdmin(admin.ModelAdmin):
+class ButtonsSourceAdmin(CuffTypesMixin, admin.ModelAdmin):
     inlines = [ButtonsComposingSourceInline]
-
-    def get_list_display(self, request):
-        return self.get_fields(request)
 
 
 class CuffMaskInline(admin.TabularInline):
@@ -50,8 +58,8 @@ class CuffMaskInline(admin.TabularInline):
     max_num = 6
 
 
-class CuffMaskSourceAdmin(admin.ModelAdmin):
-    inlines = [CuffMaskInline]
+class CuffSourceAdmin(SourceAdmin):
+    inlines = [ComposingSourceInline, CuffMaskInline]
 
 
 class TextureAdmin(admin.ModelAdmin):
@@ -63,8 +71,7 @@ class TextureAdmin(admin.ModelAdmin):
 
 admin.site.register(models.BodySource, SourceAdmin)
 admin.site.register(models.CollarSource, CollarSourceAdmin)
-admin.site.register(models.CuffSource, SourceAdmin)
-admin.site.register(models.CuffMaskSource, CuffMaskSourceAdmin)
+admin.site.register(models.CuffSource, CuffSourceAdmin)
 admin.site.register(models.BackSource, SourceAdmin)
 admin.site.register(models.PocketSource, SourceAdmin)
 admin.site.register(models.PlacketSource, SourceAdmin)
