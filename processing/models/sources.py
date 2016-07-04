@@ -12,7 +12,7 @@ from processing.upload_path import UploadComposingSource
 from processing.specs import TextureSample, TextureSampleThumbnail, Generators
 from processing.storage import overwrite_storage
 from processing.cache import CacheBuilder
-from .configuration import CollarSource, CuffMaskSource
+from .configuration import CollarSource, CuffSource
 
 
 class ProjectionModel(models.Model):
@@ -67,7 +67,7 @@ class CollarMask(ProjectionModel):
 
 
 class CuffMask(ProjectionModel):
-    cuff = models.ForeignKey(CuffMaskSource)
+    cuff = models.ForeignKey(CuffSource)
     mask = models.FileField(verbose_name=_(u'Файл маски'), storage=overwrite_storage,
                             upload_to=UploadComposingSource('composesource/%s/%s'))
     element = models.CharField(_(u'Элемент'), choices=ContrastDetails.CUFF_ELEMENTS, max_length=20)

@@ -10,6 +10,5 @@ from configuration import (
     BodyButtonsSource,
     CollarButtonsSource,
     CuffButtonsSource,
-    SourceMixin,
-    CuffMaskSource
+    SourceMixin
 )
