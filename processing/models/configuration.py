@@ -98,8 +98,8 @@ class CollarButtonsSource(models.Model, SourceMixin):
 
 
 class CuffButtonsSource(models.Model, SourceMixin):
-    cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
-    rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
+    cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Тип мажеты'))
+    rounding_types = models.ManyToManyField(dictionaries.CuffRounding, verbose_name=_(u'Типы закругления'), blank=True)
 
     class Meta:
         verbose_name = _(u'Конфигурация сборки для пуговиц манжет')

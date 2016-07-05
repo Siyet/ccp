@@ -8,17 +8,37 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 import models
 
 
-class CuffTypesMixin(object):
-    def get_list_display(self, request):
-        fields = self.get_fields(request)
-        if 'cuff_types' in fields:
-            cuff_types = lambda source: ", ".join([cuff.title for cuff in source.cuff_types.all()])
-            cuff_types.short_description = _(u'Типы манжет')
-            setattr(self, "cuff_types_list", cuff_types)
-            fields.remove('cuff_types')
-            fields.append('cuff_types_list')
+class ManyToManyListFormatter(object):
+    def __init__(self, field, description, separator=', '):
+        self.field = field
+        self.separator = separator
+        self.short_description = description
 
-        return ['id'] + fields
+    def __call__(self, obj):
+        m2m_manager = getattr(obj, self.field)
+        return self.separator.join([unicode(related) for related in m2m_manager.all()])
+
+
+class ManyToManyMixin(object):
+    m2m_fields = []
+
+    def get_list_display(self, request):
+        list_display = self.get_fields(request)
+        present_fields = filter(lambda f: f in list_display, self.m2m_fields)
+        for field_name in present_fields:
+            field_idx = list_display.index(field_name)
+            m2m_field = next(f for f in self.model._meta.many_to_many if f.name == field_name)
+            formatter = ManyToManyListFormatter(field_name, m2m_field.verbose_name)
+
+            field_attr = list_display[field_idx] + "_list"
+            list_display[field_idx] = field_attr
+            setattr(self, field_attr, formatter)
+        return list_display
+
+    def get_queryset(self, request):
+        fields = self.get_fields(request)
+        prefetch_fields = filter(lambda f: f in fields, self.m2m_fields)
+        return super(ManyToManyMixin, self).get_queryset(request).prefetch_related(*prefetch_fields)
 
 
 class CollarMaskInline(admin.TabularInline):
@@ -33,8 +53,9 @@ class ComposingSourceInline(GenericTabularInline):
     max_num = 3
 
 
-class SourceAdmin(CuffTypesMixin, admin.ModelAdmin):
+class SourceAdmin(ManyToManyMixin, admin.ModelAdmin):
     inlines = [ComposingSourceInline]
+    m2m_fields = ['cuff_types']
 
 
 class CollarSourceAdmin(SourceAdmin):
@@ -47,8 +68,16 @@ class ButtonsComposingSourceInline(GenericTabularInline):
     max_num = 3
 
 
-class ButtonsSourceAdmin(CuffTypesMixin, admin.ModelAdmin):
+class ButtonsSourceAdmin(admin.ModelAdmin):
     inlines = [ButtonsComposingSourceInline]
+
+    def get_list_display(self, request):
+        return self.get_fields(request)
+
+
+class CuffButtonsAdmin(ManyToManyMixin, ButtonsSourceAdmin):
+    inlines = [ButtonsComposingSourceInline]
+    m2m_fields = ['rounding_types']
 
 
 class CuffMaskInline(admin.TabularInline):
@@ -77,5 +106,5 @@ admin.site.register(models.PocketSource, SourceAdmin)
 admin.site.register(models.PlacketSource, SourceAdmin)
 admin.site.register(models.BodyButtonsSource, ButtonsSourceAdmin)
 admin.site.register(models.CollarButtonsSource, ButtonsSourceAdmin)
-admin.site.register(models.CuffButtonsSource, ButtonsSourceAdmin)
+admin.site.register(models.CuffButtonsSource, CuffButtonsAdmin)
 admin.site.register(models.Texture, TextureAdmin)
