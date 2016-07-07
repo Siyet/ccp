@@ -7,7 +7,7 @@ from django.db import migrations, models
 def copy_sleeve_from_cuff_to_shirts(apps, schema_editor):
     Shirt = apps.get_model("backend", "Shirt")
     for shirt in Shirt.objects.all():
-        cuff = getattr(shirt, 'shirt_cuff', None)
+        cuff = getattr(shirt, 'cuff', None)
         if cuff:
             shirt.sleeve = cuff.sleeve
             shirt.save()

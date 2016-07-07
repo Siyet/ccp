@@ -1,6 +1,6 @@
-from cache import ComposeSourceCache, ButtonsSourceCache
-from sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask
-from configuration import (
+from .cache import ComposeSourceCache, ButtonsSourceCache
+from .sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask
+from .configuration import (
     BodySource,
     BackSource,
     CollarSource,
@@ -10,6 +10,5 @@ from configuration import (
     DickeyConfiguration,
     BodyButtonsSource,
     CollarButtonsSource,
-    CuffButtonsSource,
-    SourceMixin
+    CuffButtonsSource
 )

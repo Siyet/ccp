@@ -11,7 +11,6 @@ from backend.models import ContrastDetails
 from processing.upload_path import UploadComposingSource
 from processing.specs import TextureSample, TextureSampleThumbnail, Generators
 from processing.storage import overwrite_storage
-from processing.cache import CacheBuilder
 from .configuration import CollarSource, CuffSource
 
 from .mixins import ModelDiffMixin
@@ -96,15 +95,4 @@ class Texture(ModelDiffMixin, models.Model):
 
     def __unicode__(self):
         return self.texture.name
-
-    def save(self, *args, **kwargs):
-        changed_fields = self.changed_fields
-
-        super(Texture, self).save(*args, **kwargs)
-        self.__initial = self._dict
-
-        if set(changed_fields).intersection(['texture', 'tiling']):
-            CacheBuilder.cache_texture(self)
-            self.sample.generate(force=True)
-            self.sample_thumbnail.generate(force=True)
 

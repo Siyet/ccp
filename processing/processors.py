@@ -16,13 +16,10 @@ class ComposeSample(object):
         self.cached_file = cached_file
 
     def process(self, img):
-        sample = {
-            "texture": self.cached_file,
-            "uv": [localpath("sample/UV.npy")],
-            "lights": [localpath("sample/LIGHT.png")],
-            "pre_shadows": [localpath("sample/LIGHT.png")] if self.shadow else [],
-            "post_shadows": [],
-            "tiling": self.tiling,
-            "AA": False
-        }
-        return create(**sample)
+        sample = [
+            self.cached_file,
+            [localpath("sample/UV.npy")],
+            localpath("sample/LIGHT.png"),
+            localpath("sample/LIGHT.png") if self.shadow else None
+        ]
+        return create(*sample, AA=False)

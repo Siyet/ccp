@@ -38,6 +38,7 @@ openpyxl
 
 # misc
 django-debug-toolbar
+lazy
 
 # yandex-kassa
 django-yandex-kassa

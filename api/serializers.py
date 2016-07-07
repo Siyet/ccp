@@ -74,6 +74,7 @@ class FabricDesignSerializer(serializers.ModelSerializer):
 class CollarButtonsSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.CollarButtons
+        exclude = ('types', 'buttons')
 
 
 class CollarTypeSerializer(serializers.ModelSerializer):
@@ -87,6 +88,7 @@ class CollarTypeSerializer(serializers.ModelSerializer):
 class CuffRoundingSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.CuffRounding
+        exclude = ('types',)
 
 
 class CuffTypeSerializer(serializers.ModelSerializer):
@@ -237,6 +239,10 @@ class FAQSerializer(serializers.ModelSerializer):
 
 
 class ShirtDetailsSerializer(serializers.ModelSerializer):
+    collar = serializers.IntegerField(source='collar.type_id')
+    collar_buttons = serializers.IntegerField(source='collar.size_id')
+    cuff = serializers.IntegerField(source='cuff.type_id')
+    cuff_rounding = serializers.IntegerField(source='cuff.rounding_id')
 
     class Meta:
         model = models.Shirt

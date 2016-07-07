@@ -112,23 +112,4 @@ class ShirtDetails(RetrieveAPIView):
     """
     serializer_class = serializers.ShirtDetailsSerializer
 
-    related_fields = []
-    """ # uncomment in case depth > 0
-    related_fields = [
-        "collection",
-        "fabric",
-        "size_option",
-        "size",
-        "hem",
-        "placket",
-        "pocket",
-        "back",
-        "custom_buttons_type",
-        "custom_buttons",
-        "shawl",
-        "yoke",
-        "dickey",
-        "initials"
-    ]
-    """
-    queryset = models.Shirt.objects.select_related(*related_fields)
+    queryset = models.Shirt.objects.all()

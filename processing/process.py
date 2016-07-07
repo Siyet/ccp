@@ -56,23 +56,17 @@ def overlay(a, b):
 def compose_uv(*args):
     if len(args) == 0:
         return None
-    result = exr_to_array(args[0], channels=('R', 'G', 'B', 'A'))
+    result = exr_to_array(args[0], channels=('R', 'G'))
     if len(args) > 1:
         for arg in args[1:]:
-            arg_array = exr_to_array(arg, channels=('R', 'G', 'B', 'A'))
+            arg_array = exr_to_array(arg, channels=('R', 'G'))
             arg_mask = numpy.logical_or(arg_array[..., 0] > 0, arg_array[..., 1] > 0)
             result[arg_mask] = arg_array[arg_mask]
 
     return result
 
 
-def compose_light(*sources):
-    if len(sources) == 0:
-        return None
-    result = sources[0]
-    for source in sources[1:]:
-        result = Image.alpha_composite(result, source)
-    return result
+
 
 
 def uv_to_image(arr):
@@ -110,56 +104,48 @@ def apply_srgb(img):
 
 
 def load_texture(texture):
-    img = None
-    if isinstance(texture, basestring):
-        extension = os.path.splitext(texture)[1]
-        if extension == '.npy':
-            return numpy.load(texture)
-
-        img = Image.open(texture)
-    else:
-        img = texture
+    img = load_image(texture)
 
     arr = numpy.asarray(img).transpose(1, 0, 2)
     return arr[..., :3]
 
+def load_image(image):
 
-def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=None, buttons_shadow=None, AA=True):
-    start = time()
-    # op3
-    lights_images = [Image.open(light) for light in lights]
-    full_light = compose_light(*lights_images)
+    if isinstance(image, basestring):
+        extension = os.path.splitext(image)[1]
+        if extension == '.npy':
+            return numpy.load(image)
 
-    # op4
-    pre_shadow_images = [Image.open(shadow) for shadow in pre_shadows]
-    full_shadow = compose_light(*pre_shadow_images)
+        result = Image.open(image)
+    else:
+        result = image
 
-    # op5: op4
-    post_shadow_images = [Image.open(shadow) for shadow in post_shadows]
-    for shadow in post_shadow_images:
-        full_shadow = ImageChops.multiply(full_shadow, shadow)
+    if result.mode != "RGB":
+        result = result.convert("RGB")
+    return result
+
+
+
+def create(texture, uv, full_light, full_shadow, post_shadows=[], alpha=None, buttons=None, buttons_shadow=None, AA=True):
 
     # op1
     full_uv = compose_uv(*uv)
 
-    # op2: op1
-    # uv = Image.fromarray((full_uv * 255.0).astype('uint8'), "RGBA")
-    # if AA:
-    #     size = uv.size
-    #     uv = uv.resize((size[0] / 2, size[1] / 2), Image.LANCZOS)
-    # alpha = uv.split()[-1]
-
+    full_light = load_image(full_light)
     # op6
     texture_arr = load_texture(texture)
 
     # op7: op1+op6
     result = compose(full_uv, texture_arr, AA)
-
     # op8: op1+op6+op7
     if full_shadow is not None:
-        result = ImageChops.multiply(result, full_shadow)
+        result = ImageChops.multiply(result, load_image(full_shadow))
 
     result = overlay(full_light, result)
+
+    for shadow in post_shadows:
+        shadow = Image.open(shadow)
+        result.paste(shadow, mask=shadow)
 
     # op9: op8
     if buttons is not None and buttons_shadow is not None:
@@ -171,6 +157,8 @@ def create(texture, uv, lights, pre_shadows, tiling, post_shadows=[], buttons=No
 
     # op10: op9 + op2
     result = apply_srgb(result)
-    # result.putalpha(alpha)
-    print('renedered in %s' % (time() - start))
+    if alpha:
+        alpha = Image.open(alpha)
+        alpha = alpha.resize([x / 2 for x in alpha.size], Image.BILINEAR)
+        result.putalpha(alpha)
     return result

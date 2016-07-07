@@ -9,7 +9,21 @@ FLOAT = Imath.PixelType(Imath.PixelType.FLOAT)
 
 CHANNELS = ('R', 'G', 'B', 'A')
 
-class Submatrix(object):
+class Repickable(object):
+    def repick(self, bbox):
+        self.bbox = bbox
+        (x, y, x1, y1) = bbox
+        self.values = self._source[x: x1, y: y1]
+
+class Matrix(Repickable):
+    def __init__(self, arr):
+        size = arr.shape[:2]
+        self.values = arr
+        self.bbox = (0, 0, size[0], size[1])
+        self._source = arr
+
+
+class Submatrix(Repickable):
     def __init__(self, arr, mask=None):
         if mask is None:
             mask = arr[..., 3] > 0
@@ -23,10 +37,6 @@ class Submatrix(object):
         self.bbox = (x[0], y[0], x[1], y[1])
         self._source = arr
 
-    def repick(self, bbox):
-        self.bbox = bbox
-        (x, y, x1, y1) = bbox
-        self.values = self._source[x: x1, y: y1]
 
 
 def load_image(filename):
