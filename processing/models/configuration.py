@@ -11,8 +11,6 @@ from processing.storage import overwrite_storage
 
 
 class ConfigurationModel(models.Model):
-    sources = GenericRelation('processing.ComposeSource')
-
     def __unicode__(self):
         return "#%s" % self.id
 
@@ -20,7 +18,20 @@ class ConfigurationModel(models.Model):
         abstract = True
 
 
-class BodySource(ConfigurationModel):
+class PartConfigurationModel(ConfigurationModel):
+    sources = GenericRelation('processing.ComposeSource')
+
+    class Meta:
+        abstract = True
+
+class ButtonsConfigurationModel(ConfigurationModel):
+    sources = GenericRelation('processing.ButtonsSource')
+
+    class Meta:
+        abstract = True
+
+
+class BodySource(PartConfigurationModel):
     sleeve = models.ForeignKey(dictionaries.SleeveType, verbose_name=_(u'Рукав'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
     cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
@@ -30,7 +41,7 @@ class BodySource(ConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для основы')
 
 
-class BackSource(ConfigurationModel):
+class BackSource(PartConfigurationModel):
     back = models.ForeignKey(dictionaries.BackType, verbose_name=_(u'Спинка'))
     tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=backend.Shirt.TUCK_OPTIONS, default=False)
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
@@ -41,7 +52,7 @@ class BackSource(ConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для спинки')
 
 
-class CollarSource(ConfigurationModel):
+class CollarSource(PartConfigurationModel):
     collar = models.ForeignKey(dictionaries.CollarType, verbose_name=_(u'Воротник'))
     buttons = models.IntegerField(_(u'Количество пуговиц'), choices=dictionaries.CollarButtons.BUTTONS_CHOICES,
                                   default=1)
@@ -52,7 +63,7 @@ class CollarSource(ConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для воротника')
 
 
-class CuffSource(ConfigurationModel):
+class CuffSource(PartConfigurationModel):
     cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
     rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
     side_mask = models.FileField(verbose_name=_(u'Маска рукава (сбоку)'), storage=overwrite_storage,
@@ -63,7 +74,7 @@ class CuffSource(ConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для манжет')
 
 
-class PocketSource(ConfigurationModel):
+class PocketSource(PartConfigurationModel):
     pocket = models.OneToOneField(dictionaries.PocketType, verbose_name=_(u'Тип кармана'))
 
     class Meta:
@@ -71,7 +82,7 @@ class PocketSource(ConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для кармана')
 
 
-class PlacketSource(ConfigurationModel):
+class PlacketSource(PartConfigurationModel):
     placket = models.ForeignKey(dictionaries.PlacketType, verbose_name=_(u'Тип полочки'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
 
@@ -90,7 +101,8 @@ class DickeyConfiguration(models.Model, SourceMixin):
         verbose_name = _(u'Конфигурация сборки для манишки')
         verbose_name_plural = _(u'Конфигурации сборки для манишки')
 
-class BodyButtonsSource(ConfigurationModel):
+
+class BodyButtonsSource(ButtonsConfigurationModel):
     buttons = models.OneToOneField(dictionaries.CustomButtonsType, verbose_name=_(u'Пуговицы'))
 
     class Meta:
@@ -98,7 +110,7 @@ class BodyButtonsSource(ConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для основных пуговиц')
 
 
-class CollarButtonsSource(ConfigurationModel):
+class CollarButtonsSource(ButtonsConfigurationModel):
     collar = models.ForeignKey(dictionaries.CollarType, verbose_name=_(u'Воротник'))
     buttons = models.IntegerField(_(u'Количество пуговиц'), choices=dictionaries.CollarButtons.BUTTONS_CHOICES,
                                   default=1)
@@ -109,7 +121,7 @@ class CollarButtonsSource(ConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для пуговиц воротника')
 
 
-class CuffButtonsSource(ConfigurationModel):
+class CuffButtonsSource(ButtonsConfigurationModel):
     cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Тип мажеты'))
     rounding_types = models.ManyToManyField(dictionaries.CuffRounding, verbose_name=_(u'Типы закругления'), blank=True)
 

@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageChops
 import numpy
 import numexpr as ne
-
+from scipy.misc import imresize
 from utils import exr_to_array
 
 
@@ -125,12 +125,13 @@ def load_image(image):
     return result
 
 
+def load_uv(uv):
+    if isinstance(uv, numpy.ndarray):
+        return uv
 
-def create(texture, uv, full_light, full_shadow, post_shadows=[], alpha=None, buttons=None, buttons_shadow=None, AA=True):
+    return numpy.load(uv)
 
-    # op1
-    full_uv = compose_uv(*uv)
-
+def create(texture, full_uv, full_light, full_shadow, post_shadows=[], alpha=None, buttons=[], AA=True):
     full_light = load_image(full_light)
     # op6
     texture_arr = load_texture(texture)
@@ -142,23 +143,17 @@ def create(texture, uv, full_light, full_shadow, post_shadows=[], alpha=None, bu
         result = ImageChops.multiply(result, load_image(full_shadow))
 
     result = overlay(full_light, result)
-
-    for shadow in post_shadows:
-        shadow = Image.open(shadow)
-        result.paste(shadow, mask=shadow)
-
-    # op9: op8
-    if buttons is not None and buttons_shadow is not None:
-        buttons_image = Image.open(buttons)
-        buttons_shadow_image = Image.open(buttons_shadow)
-
-        result.paste(buttons_image, mask=buttons_image)
-        result.paste(buttons_shadow_image, mask=buttons_shadow_image)
-
     # op10: op9 + op2
     result = apply_srgb(result)
     if alpha:
-        alpha = Image.open(alpha)
-        alpha = alpha.resize([x / 2 for x in alpha.size], Image.BILINEAR)
         result.putalpha(alpha)
+
+    for button in buttons:
+        button_image = Image.open(button['image'])
+        result.paste(button_image, button['position'], mask=button_image)
+
+    for shadow in post_shadows:
+        shadow_image = Image.open(shadow['image'])
+        result.paste(shadow_image, shadow['position'], mask=shadow_image)
+
     return result

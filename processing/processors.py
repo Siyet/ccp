@@ -18,7 +18,7 @@ class ComposeSample(object):
     def process(self, img):
         sample = [
             self.cached_file,
-            [localpath("sample/UV.npy")],
+            localpath("sample/UV.npy"),
             localpath("sample/LIGHT.png"),
             localpath("sample/LIGHT.png") if self.shadow else None
         ]

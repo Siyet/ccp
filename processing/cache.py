@@ -22,7 +22,7 @@ class CacheBuilder(object):
     }
 
     EXR_FIELDS = ('uv',)
-    RGBA_FIELDS = ('body', 'light', 'ao')
+    RGBA_FIELDS = ('image', 'light', 'ao')
     L_FIELDS = ('uv_alpha',)
 
     @staticmethod
@@ -58,9 +58,8 @@ class CacheBuilder(object):
         if 'uv' in fields:
             (_, matrix, scale) = next(mx for mx in matrices if mx[0] == 'uv')
             alpha = copy(matrix)
-            alpha.values = matrix.values[..., 3]
             alpha._source = matrix._source[..., 3]
-            matrix.values = matrix.values[..., :2]  # cut redundant channels from matrix
+            matrix._source = matrix._source[..., :2] # cut redundant channels from matrix
             matrices.append(('uv_alpha', alpha, scale))
 
         for field, matrix, scale in matrices:
@@ -72,6 +71,8 @@ class CacheBuilder(object):
             (buffer, extension) = CacheBuilder.get_buffer(field, matrix.values)
             filename = "%s_%s_%s.%s" % (instance._meta.model_name, instance.id, field, extension)
             position = tuple(int(x) for x in scaled_bbox[:2])[::-1]
+            if field == 'uv_alpha':
+                position = tuple(x/2 for x in position)
             cache = cache_model(source_field=field, source=instance, position=position)
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
@@ -85,6 +86,7 @@ class CacheBuilder(object):
             extension = 'png'
             array = (array * 255.0).astype('uint8')
             img = Image.fromarray(array, mode='L')
+            img = img.resize((x / 2 for x in img.size), Image.LANCZOS)
             img.save(buffer, extension)
         else:
             extension = 'png'

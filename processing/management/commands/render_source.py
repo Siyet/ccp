@@ -19,6 +19,5 @@ class Command(BaseCommand):
             "custom_buttons": 7,
         }
 
-        bldr = ShirtBuilder(data, ProjectionModel.PROJECTION.front)
-        bldr.prepare()
-        bldr.build_body(fabric=569)
+        bldr = ShirtBuilder(data, ProjectionModel.PROJECTION.side)
+        bldr.build_shirt(fabric=569)
