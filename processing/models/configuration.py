@@ -78,6 +78,16 @@ class PlacketSource(models.Model, SourceMixin):
         verbose_name_plural = _(u'Конфигурации сборки для полочки')
 
 
+class DickeyConfiguration(models.Model, SourceMixin):
+    dickey = models.ForeignKey(dictionaries.DickeyType, verbose_name=_(u'Тип манишки'))
+    hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'), null=True, blank=True)
+
+    class Meta:
+        unique_together = ('dickey', 'hem')
+        verbose_name = _(u'Конфигурация сборки для манишки')
+        verbose_name_plural = _(u'Конфигурации сборки для манишки')
+
+
 class BodyButtonsSource(models.Model, SourceMixin):
     buttons = models.OneToOneField(dictionaries.CustomButtonsType, verbose_name=_(u'Пуговицы'))
 
