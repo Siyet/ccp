@@ -7,9 +7,9 @@ from configuration import (
     CuffSource,
     PocketSource,
     PlacketSource,
+    DickeyConfiguration,
     BodyButtonsSource,
     CollarButtonsSource,
     CuffButtonsSource,
-    SourceMixin,
-    CuffMaskSource
+    SourceMixin
 )

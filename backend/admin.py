@@ -5,39 +5,15 @@ from itertools import ifilter
 
 from django import forms
 from django.contrib import admin
-from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
-from imagekit.admin import AdminThumbnail
 from import_export.admin import ImportExportMixin
+from imagekit.admin import AdminThumbnail
 
 from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from conversions.mixin import TemplateAndFormatMixin
 from backend.widgets import ContentTypeSelect
 from grappelli_orderable.admin import GrappelliOrderableAdmin
-from .models import (
-    Collection,
-    Hardness,
-    Stays,
-    Storehouse,
-    Fabric,
-    FabricPrice,
-    FabricResidual,
-    Collar,
-    Cuff,
-    CustomButtons,
-    ShawlOptions,
-    Dickey,
-    Initials,
-    ContrastDetails,
-    ContrastStitch,
-    CustomShirt,
-    TemplateShirt,
-    ShirtImage,
-    AccessoriesPrice,
-    ElementStitch,
-    StandardShirt,
-    content_type_names,
-)
+from .models import *
 
 
 class ShirtImageInline(admin.TabularInline):

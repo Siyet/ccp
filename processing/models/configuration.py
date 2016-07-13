@@ -20,10 +20,9 @@ class SourceMixin(object):
 class BodySource(models.Model, SourceMixin):
     sleeve = models.ForeignKey(dictionaries.SleeveType, verbose_name=_(u'Рукав'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
-    cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Манжет'), blank=True, null=True)
+    cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
 
     class Meta:
-        unique_together = ('sleeve', 'hem', 'cuff')
         verbose_name = _(u'Конфигурация сборки для основы')
         verbose_name_plural = _(u'Конфигурации сборки для основы')
 
@@ -51,23 +50,14 @@ class CollarSource(models.Model, SourceMixin):
 
 
 class CuffSource(models.Model, SourceMixin):
-    cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Тип манжеты'))
+    cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
     rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
+    side_mask = models.FileField(verbose_name=_(u'Маска рукава (сбоку)'), storage=overwrite_storage,
+                                   upload_to=UploadComposingSource('composesource/%s/%s'), null=True)
 
     class Meta:
-        unique_together = ('cuff', 'rounding')
         verbose_name = _(u'Конфигурация сборки для манжет')
         verbose_name_plural = _(u'Конфигурации сборки для манжет')
-
-
-class CuffMaskSource(models.Model, SourceMixin):
-    cuff = models.OneToOneField(dictionaries.CuffType, verbose_name=_(u'Тип манжеты'))
-    dickey_mask = models.FileField(verbose_name=_(u'Маска манишки'), storage=overwrite_storage,
-                                   upload_to=UploadComposingSource('composesource/%s/%s'))
-
-    class Meta:
-        verbose_name = _(u'Маски манжеты')
-        verbose_name_plural = _(u'Маски манжет')
 
 
 class PocketSource(models.Model, SourceMixin):
@@ -86,6 +76,16 @@ class PlacketSource(models.Model, SourceMixin):
         unique_together = ('placket', 'hem')
         verbose_name = _(u'Конфигурация сборки для полочки')
         verbose_name_plural = _(u'Конфигурации сборки для полочки')
+
+
+class DickeyConfiguration(models.Model, SourceMixin):
+    dickey = models.ForeignKey(dictionaries.DickeyType, verbose_name=_(u'Тип манишки'))
+    hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'), null=True, blank=True)
+
+    class Meta:
+        unique_together = ('dickey', 'hem')
+        verbose_name = _(u'Конфигурация сборки для манишки')
+        verbose_name_plural = _(u'Конфигурации сборки для манишки')
 
 
 class BodyButtonsSource(models.Model, SourceMixin):
@@ -108,10 +108,9 @@ class CollarButtonsSource(models.Model, SourceMixin):
 
 
 class CuffButtonsSource(models.Model, SourceMixin):
-    cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Манжеты'))
-    rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
+    cuff = models.ForeignKey(dictionaries.CuffType, verbose_name=_(u'Тип мажеты'))
+    rounding_types = models.ManyToManyField(dictionaries.CuffRounding, verbose_name=_(u'Типы закругления'), blank=True)
 
     class Meta:
-        unique_together = ('cuff', 'rounding')
         verbose_name = _(u'Конфигурация сборки для пуговиц манжет')
         verbose_name_plural = _(u'Конфигурации сборки для пуговиц манжет')
