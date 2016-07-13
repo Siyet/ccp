@@ -12,7 +12,7 @@ from ordered_model.models import OrderedModel
 from yandex_kassa.models import Payment as YandexPayment
 from yandex_kassa.signals import payment_completed
 
-from core.utils import send_email
+from core.mail import CostumecodeMailer
 
 
 class Payment(YandexPayment):
@@ -221,9 +221,4 @@ class Discount(models.Model):
 
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
-    send_email(
-        _(u'НОВЫЙ ЗАКАЗ'),
-        'checkout/payment_completed_admin_email.html',
-        {'order': sender.order, 'SITE_DOMAIN': settings.SITE_DOMAIN},
-        [settings.ADMIN_ORDER_EMAIL]
-    )
+    CostumecodeMailer.send_order_payment_completed(sender.order)

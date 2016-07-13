@@ -31,6 +31,7 @@ class CertificateAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdm
 
 
 class DiscountAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
+    list_display = ('customer', 'discount_value', )
     skip_admin_log = True
     search_fields = ('customer__number', )
     resource_class = DiscountResource
