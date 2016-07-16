@@ -248,24 +248,17 @@ class ShawlOptions(OrderedModel):
 
 
 class Dickey(models.Model):
-    type = models.ForeignKey('dictionaries.DickeyType')
-    fabric = models.ForeignKey(Fabric, related_name='dickey_list')
+    type = models.ForeignKey('dictionaries.DickeyType', verbose_name=_(u'Тип'))
+    fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), related_name='dickey_list',
+                               limit_choices_to={'dickey': True})
+    shirt = models.OneToOneField('backend.Shirt', related_name='dickey')
 
     def __unicode__(self):
-        return self.type.title
+        return _(u'Манишка')
 
     class Meta:
         verbose_name = _(u'Манишка')
         verbose_name_plural = _(u'Манишки')
-
-    @staticmethod
-    def get_related_shirts(pk=None, exclude=None):
-        qs = Shirt.objects.filter(dickey__isnull=False)
-        if pk:
-            qs = qs.filter(dickey__id=pk)
-        if exclude:
-            qs = qs.exclude(dickey__id__in=exclude)
-        return qs.values('id').distinct()
 
 
 class Initials(models.Model):
@@ -345,7 +338,6 @@ class Shirt(OrderedModel):
                      ('5mm', _(u'5 мм')))
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
 
-    dickey = models.OneToOneField(Dickey, verbose_name=_(u'Манишка'), blank=True, null=True)
     initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
@@ -377,7 +369,7 @@ class Shirt(OrderedModel):
         contrast_detail_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
                                                                 content_type__model='contrastdetails').first()
         # Не зависимо от количества
-        if contrast_detail_price and self.shirt_contrast_details.count() > 0:
+        if contrast_detail_price and self.contrast_details.count() > 0:
             price += contrast_detail_price.price
 
         # Воротник или манжета. Наличие хотя бы одного прибавляем цену
@@ -399,6 +391,12 @@ class Shirt(OrderedModel):
     def save(self, *args, **kwargs):
         self.price = self.calculate_price()
         super(Shirt, self).save(*args, **kwargs)
+
+
+    class Meta:
+        verbose_name = _(u'Рубашка')
+        verbose_name_plural = _(u'Рубашки')
+
 
 
 class CustomShirt(Shirt):
@@ -482,7 +480,7 @@ class ContrastDetails(models.Model):
     ELEMENTS = COLLAR_ELEMENTS + CUFF_ELEMENTS
     element = models.CharField(_(u'Элемент'), choices=ELEMENTS, max_length=20)
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
-    shirt = models.ForeignKey(Shirt, verbose_name=_(u'Рубашка'), related_name='shirt_contrast_details')
+    shirt = models.ForeignKey(Shirt, verbose_name=_(u'Рубашка'), related_name='contrast_details')
 
     def __unicode__(self):
         return self.get_element_display()
@@ -494,7 +492,7 @@ class ContrastDetails(models.Model):
 
     @staticmethod
     def get_related_shirts(pk=None, exclude=None):
-        qs = Shirt.objects.filter(shirt_contrast_details__isnull=False)
+        qs = Shirt.objects.filter(contrast_details__isnull=False)
         return qs.values('id').distinct()
 
 

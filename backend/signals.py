@@ -20,7 +20,7 @@ def calculate_shirts_price(sender, instance, created, **kwargs):
 
         for shirt in models.Shirt.objects.filter(query).\
                 select_related('fabric', 'shawl', 'collection__storehouse', 'custom_buttons__type', 'cuff', 'collar', 'dickey').\
-                prefetch_related('collection__storehouse__prices', 'shirt_contrast_details'):
+                prefetch_related('collection__storehouse__prices', 'contrast_details'):
             shirt.save()
 
 # TODO: добавить 2 события для всех связанных моделей с ценой рубашки

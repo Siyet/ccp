@@ -238,14 +238,39 @@ class FAQSerializer(serializers.ModelSerializer):
         fields = ('question', 'answer', )
 
 
+class ShirtCollarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Collar
+        fields = ('type', 'hardness', 'size', 'stays')
+
+
+class ShirtCuffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Cuff
+        fields = ('type', 'rounding', 'hardness')
+
+
+class ShirtDickeySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Dickey
+        fields = ('type', 'fabric')
+
+
+class ContrastDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ContrastDetails
+        fields = ('element', 'fabric')
+
+
 class ShirtDetailsSerializer(serializers.ModelSerializer):
-    collar = serializers.IntegerField(source='collar.type_id')
-    collar_buttons = serializers.IntegerField(source='collar.size_id')
-    cuff = serializers.IntegerField(source='cuff.type_id')
-    cuff_rounding = serializers.IntegerField(source='cuff.rounding_id')
+    collar = ShirtCollarSerializer()
+    cuff = ShirtCuffSerializer()
+    dickey = ShirtDickeySerializer()
+    contrast_details = ContrastDetailsSerializer(many=True)
 
     class Meta:
         model = models.Shirt
+        depth = 0
         exclude = ["is_template", "is_standard", "code", "individualization", "showcase_image"]
 
 
