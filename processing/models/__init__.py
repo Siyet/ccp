@@ -1,14 +1,14 @@
 from .cache import ComposeSourceCache, ButtonsSourceCache
-from .sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask
+from .sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask, PROJECTION
 from .configuration import (
-    BodySource,
-    BackSource,
-    CollarSource,
-    CuffSource,
-    PocketSource,
-    PlacketSource,
+    BodyConfiguration,
+    BackConfiguration,
+    CollarConfiguration,
+    CuffConfiguration,
+    PocketConfiguration,
+    PlacketConfiguration,
     DickeyConfiguration,
-    BodyButtonsSource,
-    CollarButtonsSource,
-    CuffButtonsSource
+    BodyButtonsConfiguration,
+    CollarButtonsConfiguration,
+    CuffButtonsConfiguration
 )

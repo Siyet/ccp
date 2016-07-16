@@ -1,13 +1,13 @@
 from django.core.management import BaseCommand
 
-from processing.models.sources import ProjectionModel
+from processing.models.sources import PROJECTION
 from processing.builder import ShirtBuilder
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         data = {
-            "collar": 8,
+            "collar": 34,
             "collar_buttons": 2,
             "cuff": 3,
             "cuff_rounding": 1,
@@ -19,5 +19,5 @@ class Command(BaseCommand):
             "custom_buttons": 7,
         }
 
-        bldr = ShirtBuilder(data, ProjectionModel.PROJECTION.side)
+        bldr = ShirtBuilder(data, PROJECTION.side)
         bldr.build_shirt(fabric=569)

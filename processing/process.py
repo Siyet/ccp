@@ -1,7 +1,7 @@
 from time import time
 import os
 
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageOps
 import numpy
 import numexpr as ne
 from scipy.misc import imresize
@@ -131,7 +131,7 @@ def load_uv(uv):
 
     return numpy.load(uv)
 
-def create(texture, full_uv, full_light, full_shadow, post_shadows=[], alpha=None, buttons=[], AA=True):
+def create(texture, full_uv, full_light, full_shadow, post_shadows=[], alpha=None, buttons=[], base_layer=[], AA=True):
     full_light = load_image(full_light)
     # op6
     texture_arr = load_texture(texture)
@@ -155,5 +155,11 @@ def create(texture, full_uv, full_light, full_shadow, post_shadows=[], alpha=Non
     for shadow in post_shadows:
         shadow_image = Image.open(shadow['image'])
         result.paste(shadow_image, shadow['position'], mask=shadow_image)
+
+    if base_layer:
+        mask = result.split()[-1]
+        mask = ImageOps.invert(mask)
+        for layer in base_layer:
+            result.paste(layer, (0,0), mask=mask)
 
     return result

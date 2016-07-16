@@ -7,7 +7,7 @@ import numpy as np
 
 from PIL import Image
 
-from processing.models import BodySource
+from processing.models import BodyConfiguration
 from .utils import Matrix, Submatrix, exr_to_array, image_from_array
 
 RENDER_SIZE = (4096, 4096)
@@ -40,7 +40,7 @@ class CacheBuilder(object):
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
 
-            if isinstance(instance.content_object, BodySource):
+            if isinstance(instance.content_object, BodyConfiguration):
                 matrix = Matrix(array)
             else:
                 matrix = Submatrix(array)
