@@ -31,6 +31,7 @@ class CertificateAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdm
 
 
 class DiscountAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
+    list_display = ('customer', 'discount_value', )
     skip_admin_log = True
     search_fields = ('customer__number', )
     resource_class = DiscountResource
@@ -57,6 +58,13 @@ class CustomerDataInline(admin.StackedInline):
 
 
 class OrderAdmin(admin.ModelAdmin):
+    readonly_fields = ('get_full_amount', 'get_amount_to_pay', 'get_amount_paid', 'get_performed_datetime', )
+    fieldsets = (
+        (None, {
+            'fields': ('number', 'customer', 'discount_value', 'checkout_shop', 'certificate', 'certificate_value',
+                       'get_full_amount', 'get_amount_to_pay', 'get_amount_paid', 'get_performed_datetime', )
+        }),
+    )
     inlines = [CustomerDataInline, OrderDetailsInline]
 
 

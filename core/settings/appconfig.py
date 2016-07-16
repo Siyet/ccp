@@ -15,3 +15,7 @@ IMAGEKIT_CACHE_BACKEND = 'default'
 
 FABRIC_SAMPLE_SIZE = (512, 512)
 FABRIC_SAMPLE_THUMBNAIL_SIZE = (256, 256)
+
+SITE_DOMAIN = 'costumecode.ru'
+
+ADMIN_ORDER_EMAIL = 'example@example.com'
