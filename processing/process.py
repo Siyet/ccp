@@ -4,13 +4,10 @@ import os
 from PIL import Image, ImageChops, ImageOps
 import numpy
 import numexpr as ne
-from scipy.misc import imresize
 from utils import exr_to_array
 
 
 def compose(source, texture_arr, AA):
-    size = source.shape[:2]
-
     # TODO: ensure cache
     source[..., 0] %= texture_arr.shape[0]
     source[..., 1] %= texture_arr.shape[1]
