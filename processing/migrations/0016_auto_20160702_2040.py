@@ -39,7 +39,6 @@ class Migration(migrations.Migration):
                 'verbose_name': '\u041c\u0430\u0441\u043a\u0438 \u043c\u0430\u043d\u0436\u0435\u0442\u044b',
                 'verbose_name_plural': '\u041c\u0430\u0441\u043a\u0438 \u043c\u0430\u043d\u0436\u0435\u0442',
             },
-            bases=(models.Model, processing.models.configuration.SourceMixin),
         ),
         migrations.RemoveField(
             model_name='buttonssourcecache',

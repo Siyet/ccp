@@ -38,6 +38,12 @@ class SourceCache(models.Model):
 class ComposeSourceCache(SourceCache):
     source = models.ForeignKey(ComposeSource, related_name='cache')
 
+    class Meta:
+        unique_together = ('source', 'source_field')
+
 
 class ButtonsSourceCache(SourceCache):
-    source = models.ForeignKey(ButtonsSource)
+    source = models.ForeignKey(ButtonsSource, related_name='cache')
+
+    class Meta:
+        unique_together = ('source', 'source_field')

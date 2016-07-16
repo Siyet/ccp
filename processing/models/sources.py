@@ -11,13 +11,13 @@ from backend.models import ContrastDetails
 from processing.upload_path import UploadComposingSource
 from processing.specs import TextureSample, TextureSampleThumbnail, Generators
 from processing.storage import overwrite_storage
-from processing.cache import CacheBuilder
-from .configuration import CollarSource, CuffSource
+from .configuration import CollarConfiguration, CuffConfiguration
 
 from .mixins import ModelDiffMixin
 
+PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
+
 class ProjectionModel(models.Model):
-    PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
     projection = models.CharField(_(u'Проекция'), max_length=5, choices=PROJECTION)
 
     class Meta:
@@ -56,7 +56,7 @@ class ButtonsSource(ProjectionModel):
 
 
 class CollarMask(ProjectionModel):
-    collar = models.ForeignKey(CollarSource)
+    collar = models.ForeignKey(CollarConfiguration)
     mask = models.FileField(verbose_name=_(u'Файл маски'), storage=overwrite_storage,
                             upload_to=UploadComposingSource('composesource/%s/%s'))
     element = models.CharField(_(u'Элемент'), choices=ContrastDetails.COLLAR_ELEMENTS, max_length=20)
@@ -68,7 +68,7 @@ class CollarMask(ProjectionModel):
 
 
 class CuffMask(ProjectionModel):
-    cuff = models.ForeignKey(CuffSource)
+    cuff = models.ForeignKey(CuffConfiguration)
     mask = models.FileField(verbose_name=_(u'Файл маски'), storage=overwrite_storage,
                             upload_to=UploadComposingSource('composesource/%s/%s'))
     element = models.CharField(_(u'Элемент'), choices=ContrastDetails.CUFF_ELEMENTS, max_length=20)
@@ -96,15 +96,4 @@ class Texture(ModelDiffMixin, models.Model):
 
     def __unicode__(self):
         return self.texture.name
-
-    def save(self, *args, **kwargs):
-        changed_fields = self.changed_fields
-
-        super(Texture, self).save(*args, **kwargs)
-        self.__initial = self._dict
-
-        if set(changed_fields).intersection(['texture', 'tiling']):
-            CacheBuilder.cache_texture(self)
-            self.sample.generate(force=True)
-            self.sample_thumbnail.generate(force=True)
 

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='cuff',
             name='shirt',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='shirt_cuff', to='backend.Shirt'),
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='cuff', to='backend.Shirt'),
         ),
         migrations.AlterField(
             model_name='cuff',

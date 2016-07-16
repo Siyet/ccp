@@ -14,7 +14,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 from ordered_model.models import OrderedModel
 
-from dictionaries.models import FabricCategory
+from dictionaries.models import FabricCategory, SleeveType
 from backend import managers
 
 SEX = Choices(
@@ -196,11 +196,11 @@ class Collar(models.Model):
 
 class Cuff(models.Model):
     hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
-    type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='cuff')
+    type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='type_cuffs')
     rounding = ChainedForeignKey('dictionaries.CuffRounding', verbose_name=_(u'Тип закругления'), chained_field='type',
                                  chained_model_field='types', show_all=False, null=True)
 
-    shirt = models.OneToOneField('backend.Shirt', related_name='shirt_cuff')
+    shirt = models.OneToOneField('backend.Shirt', related_name='cuff')
 
     def __unicode__(self):
         return self.type.title
@@ -211,11 +211,11 @@ class Cuff(models.Model):
 
     @staticmethod
     def get_related_shirts(pk=None, exclude=None):
-        qs = Shirt.objects.filter(shirt_cuff__isnull=False)
+        qs = Shirt.objects.filter(cuff__isnull=False)
         if pk:
-            qs = qs.filter(shirt_cuff__id=pk)
+            qs = qs.filter(cuff__id=pk)
         if exclude:
-            qs = qs.exclude(shirt_cuff__id__in=exclude)
+            qs = qs.exclude(cuff__id__in=exclude)
         return qs.values('id').distinct()
 
 
@@ -293,6 +293,9 @@ class Initials(models.Model):
 
 
 class Shirt(OrderedModel):
+    related_fields = ["collection", "fabric", "size_option", "size", "hem", "placket", "pocket", "back",
+                      "custom_buttons_type", "custom_buttons", "shawl", "yoke", "dickey", "initials"]
+
     TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
@@ -323,7 +326,7 @@ class Shirt(OrderedModel):
     placket = models.ForeignKey('dictionaries.PlacketType', verbose_name=_(u'Полочка'), related_name='placket_shirts')
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
-                               null=True)
+                               default=2) # TODO: better default
     tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=TUCK_OPTIONS, default=False)
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
@@ -378,9 +381,9 @@ class Shirt(OrderedModel):
             price += contrast_detail_price.price
 
         # Воротник или манжета. Наличие хотя бы одного прибавляем цену
-        if hasattr(self, 'shirt_cuff') or hasattr(self, 'collar'):
+        if hasattr(self, 'cuff') or hasattr(self, 'collar'):
             cuff_price = AccessoriesPrice.objects.filter(Q(content_type__app_label='backend') & (
-            Q(content_type__model='cuff') | Q(content_type__model='collar'))).order_by('-object_pk').first()
+                Q(content_type__model='cuff') | Q(content_type__model='collar'))).order_by('-object_pk').first()
             if cuff_price:
                 price += cuff_price.price
 

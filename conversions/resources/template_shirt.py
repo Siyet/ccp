@@ -46,7 +46,7 @@ class TemplateShirtResource(resources.ModelResource):
     COLLECTION_ATTRIBUTE_MAP = {'collection'}
     TUCK_ATTRIBUTE_MAP = {'tuck'}
     CLASP_ATTRIBUTE_MAP = {'clasp'}
-    CUFF_ATTRIBUTE_LIST = ('shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__hardness')
+    CUFF_ATTRIBUTE_LIST = ('cuff__type', 'cuff__rounding', 'cuff__hardness')
     DICKEY_ATTRIBUTE_MAP = {'dickey__type', 'dickey__fabric'}
     INITIALS_ATTRIBUTE_MAP = {'initials__font', 'initials__color', 'initials__location'}
     INITIALS_CHOICES_ATTRIBUTE_MAP = {'initials__location'}
@@ -95,11 +95,11 @@ class TemplateShirtResource(resources.ModelResource):
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title'))
 
     # Импорт манжеты
-    shirt_cuff__type = fields.Field(attribute='shirt_cuff__type', column_name=CUFF_COLUMN_NAME,
+    cuff__type = fields.Field(attribute='cuff__type', column_name=CUFF_COLUMN_NAME,
                                     widget=CustomForeignKeyWidget(model=dictionaries.CuffType, field='title'))
-    shirt_cuff__rounding = fields.Field(attribute='shirt_cuff__rounding', column_name=u'Вид манжеты',
+    cuff__rounding = fields.Field(attribute='cuff__rounding', column_name=u'Вид манжеты',
                                         widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title'))
-    shirt_cuff__hardness = fields.Field(attribute='shirt_cuff__hardness', column_name=u'Жесткость манжеты',
+    cuff__hardness = fields.Field(attribute='cuff__hardness', column_name=u'Жесткость манжеты',
                                         widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     # Импорт пуговиц
     custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=u'Пуговицы',
@@ -158,7 +158,7 @@ class TemplateShirtResource(resources.ModelResource):
         fields = ('code',)
         skip_unchanged = True
         select_related = ['fabric', 'collection', 'collar__type', 'collar__hardness', 'collar__stays', 'collar__size',
-                      'shirt_cuff__type', 'shirt_cuff__rounding', 'shirt_cuff__hardness', 'hem',
+                      'cuff__type', 'cuff__rounding', 'cuff__hardness', 'hem',
                       'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke', 'dickey__fabric',
                       'dickey__type', 'initials__font', 'initials__color']
         prefetch_related = ['contrast_stitches', 'shirt_contrast_details']
@@ -198,16 +198,16 @@ class TemplateShirtResource(resources.ModelResource):
                 row += ['' for i in range(4)]
 
             # Манжета
-            if hasattr(obj, 'shirt_cuff'):
-                row.append(obj.shirt_cuff.type.title)
-                if obj.shirt_cuff.rounding:
-                    row.append(obj.shirt_cuff.rounding.title)
+            if hasattr(obj, 'cuff'):
+                row.append(obj.cuff.type.title)
+                if obj.cuff.rounding:
+                    row.append(obj.cuff.rounding.title)
                 else:
                     row.append('')
                 # пропускаем рукав
                 row.append('')
-                if obj.shirt_cuff.hardness:
-                    row.append(obj.shirt_cuff.hardness.title)
+                if obj.cuff.hardness:
+                    row.append(obj.cuff.hardness.title)
                 else:
                     row.append('')
             else:
@@ -354,10 +354,10 @@ class TemplateShirtResource(resources.ModelResource):
             save_relations(instance.collar, 'hardness')
             save_relations(instance.collar, 'stays')
             save_relations(instance.collar, 'size')
-            if hasattr(instance, 'shirt_cuff'):
-                save_relations(instance.shirt_cuff, 'type')
-                save_relations(instance.shirt_cuff, 'rounding')
-                save_relations(instance.shirt_cuff, 'hardness')
+            if hasattr(instance, 'cuff'):
+                save_relations(instance.cuff, 'type')
+                save_relations(instance.cuff, 'rounding')
+                save_relations(instance.cuff, 'hardness')
 
             if instance.dickey is not None:
                 save_relations(instance, 'dickey')
@@ -384,9 +384,9 @@ class TemplateShirtResource(resources.ModelResource):
         if not dry_run:
             instance.collar.shirt = instance
             save_relations(instance, 'collar')
-            if hasattr(instance, 'shirt_cuff'):
-                instance.shirt_cuff.shirt = instance
-                save_relations(instance, 'shirt_cuff')
+            if hasattr(instance, 'cuff'):
+                instance.cuff.shirt = instance
+                save_relations(instance, 'cuff')
 
             # контрастные отстрочки
             self.import_contrast_stitch(instance, u'Сорочка', instance.contrast_stitch_shirt)
@@ -414,8 +414,8 @@ class TemplateShirtResource(resources.ModelResource):
     def import_obj(self, obj, data, dry_run):
         if not hasattr(obj, 'collar'):
             obj.collar = Collar()
-        if data[self.CUFF_COLUMN_NAME] and not hasattr(obj, 'shirt_cuff'):
-            obj.shirt_cuff = Cuff()
+        if data[self.CUFF_COLUMN_NAME] and not hasattr(obj, 'cuff'):
+            obj.cuff = Cuff()
 
         if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False] and obj.initials is None:
             obj.initials = Initials()
@@ -445,7 +445,7 @@ class TemplateShirtResource(resources.ModelResource):
                 if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False]:
                     field.save(obj, data)
             elif field.attribute in self.CUFF_ATTRIBUTE_LIST:
-                if hasattr(obj, 'shirt_cuff'):
+                if hasattr(obj, 'cuff'):
                     field.save(obj, data)
             else:
                 field.save(obj, data)

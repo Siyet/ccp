@@ -193,6 +193,10 @@ class CollectionAdmin(GrappelliOrderableAdmin):
     list_display = ('title', 'sex')
 
 
+class CustomButtonsAdmin(GrappelliOrderableAdmin):
+    list_display = ('title', 'type')
+
+
 admin.site.register([
     Storehouse,
     Dickey,
@@ -200,7 +204,9 @@ admin.site.register([
     ElementStitch
 ])
 
-admin.site.register([Hardness, CustomButtons, ShawlOptions, Stays], GrappelliOrderableAdmin)
+admin.site.register([Hardness, ShawlOptions, Stays], GrappelliOrderableAdmin)
+
+admin.site.register(CustomButtons, CustomButtonsAdmin)
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Fabric, FabricAdmin)
