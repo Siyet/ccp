@@ -12,10 +12,10 @@ from processing.upload_path import UploadComposingSource
 from processing.specs import TextureSample, TextureSampleThumbnail, Generators
 from processing.storage import overwrite_storage
 from .configuration import CollarConfiguration, CuffConfiguration
-
 from .mixins import ModelDiffMixin
 
 PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
+
 
 class ProjectionModel(models.Model):
     projection = models.CharField(_(u'Проекция'), max_length=5, choices=PROJECTION)
@@ -26,8 +26,10 @@ class ProjectionModel(models.Model):
 
 class ComposeSource(ProjectionModel):
     uv = models.FileField(_(u'UV'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/uv/%s'))
-    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'))
-    light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'))
+    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'),
+                          blank=True)
+    light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'),
+                             blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -96,4 +98,3 @@ class Texture(ModelDiffMixin, models.Model):
 
     def __unicode__(self):
         return self.texture.name
-
