@@ -5,8 +5,6 @@ INSTALLED_APPS += (
     'debug_toolbar',
 )
 
-EMAIL_PORT = 1025
-
 DEBUG = True
 
 WSGI_APPLICATION = 'core.dev_wsgi.application'
