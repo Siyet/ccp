@@ -26,8 +26,8 @@ class ProjectionModel(models.Model):
 
 class ComposeSource(ProjectionModel):
     uv = models.FileField(_(u'UV'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/uv/%s'))
-    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'))
-    light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'))
+    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'), blank=True)
+    light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'), blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
