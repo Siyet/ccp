@@ -43,6 +43,14 @@ class CollectionFabricsList(APIView):
               type: integer
               paramType: query
               description: дизайн (id)
+            - name: thickness
+              type: string
+              paramType: query
+              description: толщина ткани
+            - name: fabric_type
+              type: string
+              paramType: query
+              description: тип ткани
         """
         collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=kwargs.get('pk'))
         collection.prices = collection.storehouse.prices.values('fabric_category', 'price')
@@ -54,6 +62,15 @@ class CollectionFabricsList(APIView):
         design = self.request.query_params.get('design', None)
         if design is not None:
             queryset = queryset.prefetch_related('designs').filter(designs__id=design)
+
+        thickness = self.request.query_params.get('thickness', None)
+        if thickness is not None:
+            queryset = queryset.filter(thickness__title=thickness)
+
+        fabric_type = self.request.query_params.get('fabric_type', None)
+        if fabric_type is not None:
+            queryset = queryset.filter(fabric_type__title=fabric_type)
+
         for fabric in queryset:
             fabric.cached_collection = collection
 
