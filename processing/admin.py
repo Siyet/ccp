@@ -66,17 +66,24 @@ class ButtonsComposingSourceInline(GenericTabularInline):
     model = models.ButtonsSource
     fields = ('projection', 'image', 'ao')
     max_num = 3
+    extra = 0
+
+
+class StitchesSourceInline(GenericTabularInline):
+    model = models.StitchesSource
+    fields = ('projection', 'type', 'image')
+    max_num = 3
+    extra = 0
 
 
 class ButtonsSourceAdmin(admin.ModelAdmin):
-    inlines = [ButtonsComposingSourceInline]
+    inlines = [ButtonsComposingSourceInline, StitchesSourceInline]
 
     def get_list_display(self, request):
         return self.get_fields(request)
 
 
 class CuffButtonsAdmin(ManyToManyMixin, ButtonsSourceAdmin):
-    inlines = [ButtonsComposingSourceInline]
     m2m_fields = ['rounding_types']
 
 

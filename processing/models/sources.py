@@ -81,6 +81,23 @@ class CuffMask(ProjectionModel):
         verbose_name_plural = _(u'Маски манжет')
 
 
+class StitchesSource(ProjectionModel):
+    STITCHES_TYPE = Choices(('under', _(u'Под пуговицами')), ('over', _(u'Над пуговицами')))
+    type = models.CharField(verbose_name=_(u'Расположение'), choices=STITCHES_TYPE, default=STITCHES_TYPE.under,
+                            blank=False, max_length=10)
+    image = models.FileField(verbose_name=_(u'Файл ниток'), storage=overwrite_storage,
+                             upload_to=UploadComposingSource('stitches/%s/%s'))
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        unique_together = ('content_type', 'object_id', 'projection')
+        verbose_name = _(u'Модель сборки ниток')
+        verbose_name_plural = _(u'Модели сборки ниток')
+
+
 class Texture(ModelDiffMixin, models.Model):
     TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
 
