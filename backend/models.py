@@ -178,7 +178,7 @@ class Collar(models.Model):
     shirt = models.OneToOneField('backend.Shirt', related_name='collar')
 
     def __unicode__(self):
-        return self.type.title
+        return u''
 
     class Meta:
         verbose_name = _(u'Воротник')
@@ -203,7 +203,7 @@ class Cuff(models.Model):
     shirt = models.OneToOneField('backend.Shirt', related_name='cuff')
 
     def __unicode__(self):
-        return self.type.title
+        return u''
 
     class Meta:
         verbose_name = _(u'Манжета')
@@ -254,7 +254,7 @@ class Dickey(models.Model):
     shirt = models.OneToOneField('backend.Shirt', related_name='dickey')
 
     def __unicode__(self):
-        return _(u'Манишка')
+        return u''
 
     class Meta:
         verbose_name = _(u'Манишка')
@@ -287,7 +287,7 @@ class Initials(models.Model):
 
 class Shirt(OrderedModel):
     related_fields = ["collection", "fabric", "size_option", "size", "hem", "placket", "pocket", "back",
-                      "custom_buttons_type", "custom_buttons", "shawl", "yoke", "dickey", "initials"]
+                      "custom_buttons_type", "custom_buttons", "shawl", "yoke", "initials"]
 
     TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
@@ -359,11 +359,12 @@ class Shirt(OrderedModel):
         price += custom_buttons_price
 
         # Манишка
-        dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
-                                                       content_type__model='dickey').filter(
-            Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
-        if dickey_price and self.dickey:
-            price += dickey_price.price
+        if hasattr(self, 'dickey'):
+            dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
+                                                           content_type__model='dickey').filter(
+                Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
+            if dickey_price:
+                price += dickey_price.price
 
         # Контрастные детали
         contrast_detail_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
@@ -514,7 +515,7 @@ class ContrastStitch(models.Model):
     shirt = models.ForeignKey(Shirt, related_name='contrast_stitches')
 
     def __unicode__(self):
-        return self.element.title
+        return u""
 
     class Meta:
         verbose_name = _(u'Контрастная отстрочка')
@@ -537,7 +538,6 @@ class AccessoriesPrice(models.Model):
                                          blank=True)
 
     def __unicode__(self):
-        print dir(self.content_type)
         return u'Цена: %s' % self.content_type
 
     def content_type_title(self):

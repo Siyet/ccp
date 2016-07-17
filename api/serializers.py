@@ -261,12 +261,18 @@ class ContrastDetailsSerializer(serializers.ModelSerializer):
         model = models.ContrastDetails
         fields = ('element', 'fabric')
 
+class ContrastStitchesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ContrastStitch
+        fields = ('element', 'color')
+
 
 class ShirtDetailsSerializer(serializers.ModelSerializer):
     collar = ShirtCollarSerializer()
     cuff = ShirtCuffSerializer()
     dickey = ShirtDickeySerializer()
     contrast_details = ContrastDetailsSerializer(many=True)
+    contrast_stitches = ContrastStitchesSerializer(many=True)
 
     class Meta:
         model = models.Shirt

@@ -33,10 +33,12 @@ class CollarInline(admin.StackedInline):
 
 class ContrastDetailsInline(admin.TabularInline):
     model = ContrastDetails
+    extra = 1
 
 
 class ContrastStitchInline(admin.TabularInline):
     model = ContrastStitch
+    extra = 1
 
 
 class CustomShirtAdmin(admin.ModelAdmin):
