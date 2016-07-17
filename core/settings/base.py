@@ -109,5 +109,6 @@ except:
 # Misc
 
 from .appconfig import *
-
+# noinspection PyUnresolvedReferences
+from .email import *
 GRAPPELLI_ADMIN_TITLE = APP_NAME
