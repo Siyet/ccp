@@ -231,6 +231,13 @@ class CertificateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DiscountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = checkout.Discount
+        fields = '__all__'
+
+
 class FAQSerializer(serializers.ModelSerializer):
 
     class Meta:
