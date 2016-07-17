@@ -33,10 +33,12 @@ class CollarInline(admin.StackedInline):
 
 class ContrastDetailsInline(admin.TabularInline):
     model = ContrastDetails
+    extra = 1
 
 
 class ContrastStitchInline(admin.TabularInline):
     model = ContrastStitch
+    extra = 1
 
 
 class CustomShirtAdmin(admin.ModelAdmin):
@@ -44,10 +46,19 @@ class CustomShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template', 'code', 'showcase_image', 'individualization']
 
 
+class DickeyInline(admin.StackedInline):
+    model = Dickey
+    inline_classes = ('grp-open',)
+    extra = 0
+    max_num = 1
+
+
 class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, GrappelliOrderableAdmin):
     resource_class = TemplateShirtResource
     exclude = ['is_template']
-    inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
+    inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
+    list_select_related = ('hem', 'placket', 'pocket', 'cuff__type', 'collar__type', 'collar__hardness')
+    list_display = ('code', 'cuff', 'collar', 'hem', 'placket', 'pocket')
 
 
 class StandardShirtAdmin(admin.ModelAdmin):
@@ -199,7 +210,6 @@ class CustomButtonsAdmin(GrappelliOrderableAdmin):
 
 admin.site.register([
     Storehouse,
-    Dickey,
     Initials,
     ElementStitch
 ])
