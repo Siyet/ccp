@@ -91,7 +91,7 @@ class StitchesSource(ProjectionModel):
     content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
-        unique_together = ('content_type', 'object_id', 'projection')
+        unique_together = ('content_type', 'object_id', 'projection', 'type')
         verbose_name = _(u'Модель сборки ниток')
         verbose_name_plural = _(u'Модели сборки ниток')
 
