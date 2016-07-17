@@ -1,5 +1,5 @@
 from .cache import ComposeSourceCache, ButtonsSourceCache
-from .sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask, PROJECTION
+from .sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask, StitchesSource, PROJECTION
 from .configuration import (
     BodyConfiguration,
     BackConfiguration,
