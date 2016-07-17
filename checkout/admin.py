@@ -2,8 +2,16 @@
 from __future__ import absolute_import
 
 import datetime
+from StringIO import StringIO
+
+from django.conf.urls import url
 from django.contrib import admin
+from django.http import HttpResponse
+from django.http.response import Http404
+from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
+from import_export.formats.base_formats import XLSX
+from openpyxl import Workbook
 
 from conversions.mixin import TemplateAndFormatMixin
 from conversions.resources import CertificateResource, DiscountResource
@@ -66,6 +74,49 @@ class OrderAdmin(admin.ModelAdmin):
         }),
     )
     inlines = [CustomerDataInline, OrderDetailsInline]
+
+    def get_urls(self):
+        urls = super(OrderAdmin, self).get_urls()
+        my_urls = [
+            url(r'^export/instance/(?P<pk>\d+)/(?P<shirt>\d+)/$', self.admin_site.admin_view(self.export_instance_action)),
+        ]
+        return my_urls + urls
+
+    def get_export_instance_filename(self):
+        return 'Orderform_single_shirt'
+
+    def export_instance_action(self, request, *args, **kwargs):
+        order = self.get_object(request, kwargs.get('pk'))
+        if not order:
+            raise Http404
+        shirt = order.get_shirt(kwargs.get('shirt'))
+        if not shirt:
+            raise Http404
+        wb = Workbook()
+        ws = wb.active
+        ws.append([u'%s' % _(u'Номер заказа'), order.number])
+        ws.append([u'%s' % _(u'ДАННЫЕ'), order.number])
+        customer_address = order.get_customer_address()
+        for line in customer_address.get_data():
+            ws.append(line)
+        for cat in shirt.get_data():
+            ws.append([cat[0]])
+            for line in cat[1]:
+                ws.append(line)
+
+        other_address = order.get_other_address()
+        delivery = (other_address or customer_address).get_data()
+        if order.checkout_shop:
+            delivery = order.get_delivery()
+        ws.append([u'%s' % _(u'ДОСТАВКА')])
+        for line in delivery:
+            ws.append(line)
+
+        export_data = StringIO()
+        wb.save(export_data)
+        response = HttpResponse(export_data.getvalue(), content_type=XLSX.CONTENT_TYPE)
+        response['Content-Disposition'] = 'attachment; filename=%s.xlsx' % self.get_export_instance_filename()
+        return response
 
 
 admin.site.register(Order, OrderAdmin)

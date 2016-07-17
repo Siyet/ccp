@@ -1,7 +1,7 @@
 # coding: utf-8
 import uuid
 
-from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.transaction import atomic
 from django.dispatch.dispatcher import receiver
@@ -72,6 +72,18 @@ class Order(models.Model):
 
     def __unicode__(self):
         return self.number
+
+    def get_delivery(self):
+        return [
+            (u'%s' % _(u'Фамилия'), '-', ),
+            (u'%s' % _(u'Имя'), '-', ),
+            (u'%s' % _(u'Отчество'), '-', ),
+            (u'%s' % _(u'Город'), self.checkout_shop.city, ),
+            (u'%s' % _(u'Адрес'), u'%s, %s' % (self.checkout_shop.street, self.checkout_shop.home), ),
+            (u'%s' % _(u'Индекс'), self.checkout_shop.index, ),
+            (u'%s' % _(u'Телефон'), '-', ),
+            (u'%s' % _(u'E-mail'), '-', ),
+        ]
 
     @property
     def paid(self):
@@ -144,6 +156,15 @@ class Order(models.Model):
             self.certificate.value = self.certificate.get_value() - self.certificate_value
             self.certificate.save(update_fields=['value'])
 
+    def get_shirt(self, shirt):
+        return self.order_details.filter(pk=shirt).first()
+
+    def get_customer_address(self):
+        return self.customer_data.filter(type=CustomerData.ADDRESS_TYPE.customer_address).first()
+
+    def get_other_address(self):
+        return self.customer_data.filter(type=CustomerData.ADDRESS_TYPE.other_address).first()
+
 
 class CustomerData(models.Model):
     ADDRESS_TYPE = Choices(
@@ -174,6 +195,18 @@ class CustomerData(models.Model):
     def __unicode__(self):
         return u'%s, %s (%s)' % (self.city, self.address, self.get_type_display())
 
+    def get_data(self):
+        return [
+            (u'%s' % _(u'Фамилия'), self.lastname, ),
+            (u'%s' % _(u'Имя'), self.name, ),
+            (u'%s' % _(u'Отчество'), self.midname, ),
+            (u'%s' % _(u'Город'), self.city, ),
+            (u'%s' % _(u'Адрес'), self.address, ),
+            (u'%s' % _(u'Индекс'), self.index, ),
+            (u'%s' % _(u'Телефон'), self.phone, ),
+            (u'%s' % _(u'E-mail'), self.email, ),
+        ]
+
 
 class OrderDetails(models.Model):
     order = models.ForeignKey(Order, verbose_name=_(u'Заказ'), related_name='order_details')
@@ -186,6 +219,43 @@ class OrderDetails(models.Model):
     class Meta:
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
+
+    def get_data(self):
+        data = []
+        try:
+            data.append(
+                [u'%s' % _(u'ВОРОТНИК'), [
+                    (u'%s' % _(u'Тип'), self.shirt.collar.type.title),
+                    (u'%s' % _(u'Размер'), self.shirt.collar.size.title),
+                    (u'%s' % _(u'Жесткость воротника'), self.shirt.collar.hardness.title),
+                    (u'%s' % _(u'Косточки'), self.shirt.collar.stays.title),
+                ]]
+            )
+        except ObjectDoesNotExist:
+            pass
+        try:
+            data.append(
+                [u'%s' % _(u'МАНЖЕТЫ'), [
+                    (u'%s' % _(u'Тип'), self.shirt.cuff.type.title),
+                    (u'%s' % _(u'Углы'), self.shirt.cuff.rounding.title),
+                    (u'%s' % _(u'Жесткость манжета'), self.shirt.cuff.hardness.title),
+                    (u'%s' % _(u'Планка рукава'), 'N/A'),
+                    (u'%s' % _(u'Складки на рукаве'), 'N/A'),
+                    (u'%s' % _(u'Рукав'), 'N/A'),
+                ]]
+            )
+        except ObjectDoesNotExist:
+            pass
+        try:
+            data.append(
+                [u'%s' % _(u'ТКАНЬ'), [
+                    (u'%s' % _(u'Ткань'), self.shirt.fabric.code),
+                    (u'%s' % _(u'Категория'), self.shirt.fabric.category.title),
+                ]]
+            )
+        except ObjectDoesNotExist:
+            pass
+        return data
 
 
 class Certificate(models.Model):
