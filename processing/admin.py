@@ -72,7 +72,7 @@ class ButtonsComposingSourceInline(GenericTabularInline):
 class StitchesSourceInline(GenericTabularInline):
     model = models.StitchesSource
     fields = ('projection', 'type', 'image')
-    max_num = 3
+    max_num = 6
     extra = 0
 
 
