@@ -2,14 +2,17 @@
 from __future__ import absolute_import
 
 import datetime
+import traceback
 from StringIO import StringIO
 
+import sys
 from django.conf.urls import url
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.utils.text import ugettext_lazy as _
-from import_export.admin import ImportExportMixin
+from import_export.admin import ImportExportMixin, ImportExportMixinBase
 from import_export.formats.base_formats import XLSX
 from openpyxl import Workbook
 
@@ -55,9 +58,15 @@ class ShopAdmin(GrappelliOrderableAdmin):
     list_display = ('city', 'street', 'home')
 
 
-class OrderDetailsInline(admin.TabularInline):
+class OrderDetailsInline(ImportExportMixinBase, admin.TabularInline):
     model = OrderDetails
     extra = 0
+    readonly_fields = ('shirt', 'amount', 'get_export_url', )
+
+    def get_export_url(self, instance):
+        return u'<a href="export/{}">{}</a>'.format(instance.pk, _(u'Экспорт'))
+    get_export_url.allow_tags = True
+    get_export_url.short_description = _(u'Экспорт')
 
 
 class CustomerDataInline(admin.StackedInline):
@@ -78,14 +87,14 @@ class OrderAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(OrderAdmin, self).get_urls()
         my_urls = [
-            url(r'^export/instance/(?P<pk>\d+)/(?P<shirt>\d+)/$', self.admin_site.admin_view(self.export_instance_action)),
+            url(r'^(?P<pk>\d+)/export/(?P<shirt>\d+)/$', self.admin_site.admin_view(self.export_shirt_action)),
         ]
         return my_urls + urls
 
-    def get_export_instance_filename(self):
+    def get_export_shirt_filename(self):
         return 'Orderform_single_shirt'
 
-    def export_instance_action(self, request, *args, **kwargs):
+    def export_shirt_action(self, request, *args, **kwargs):
         order = self.get_object(request, kwargs.get('pk'))
         if not order:
             raise Http404
@@ -94,11 +103,21 @@ class OrderAdmin(admin.ModelAdmin):
             raise Http404
         wb = Workbook()
         ws = wb.active
+
         ws.append([u'%s' % _(u'Номер заказа'), order.number])
+        number = 1
+        for ind, x in enumerate(order.order_details.all()):
+            if x.pk == shirt.pk:
+                number = ind + 1
+                break
+        ws.append([u'%s' % _(u'Позиция в заказе'), '#%i' % number])
+
         ws.append([u'%s' % _(u'ДАННЫЕ'), order.number])
         customer_address = order.get_customer_address()
         for line in customer_address.get_data():
             ws.append(line)
+
+        ws.append([u'%s' % _(u'СОРОЧКА'), order.number])
         for cat in shirt.get_data():
             ws.append([cat[0]])
             for line in cat[1]:
@@ -115,7 +134,7 @@ class OrderAdmin(admin.ModelAdmin):
         export_data = StringIO()
         wb.save(export_data)
         response = HttpResponse(export_data.getvalue(), content_type=XLSX.CONTENT_TYPE)
-        response['Content-Disposition'] = 'attachment; filename=%s.xlsx' % self.get_export_instance_filename()
+        response['Content-Disposition'] = 'attachment; filename=%s.xlsx' % self.get_export_shirt_filename()
         return response
 
 

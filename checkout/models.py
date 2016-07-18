@@ -255,6 +255,16 @@ class OrderDetails(models.Model):
             )
         except ObjectDoesNotExist:
             pass
+        data.append(
+            [u'%s' % _(u'ДЕТАЛИ 1'), [
+                (u'%s' % _(u'Низ'), self.shirt),
+                (u'%s' % _(u'Полочка'), self.shirt),
+                (u'%s' % _(u'Карман'), self.shirt),
+                (u'%s' % _(u'Вытачки'), self.shirt),
+                (u'%s' % _(u'Спинка'), self.shirt),
+                (u'%s' % _(u'Пуговицы'), self.shirt),
+            ]]
+        )
         return data
 
 
