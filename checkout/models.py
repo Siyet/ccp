@@ -1,7 +1,6 @@
 # coding: utf-8
 import uuid
 
-from django.conf import settings
 from django.db import models
 from django.db.transaction import atomic
 from django.dispatch.dispatcher import receiver
@@ -13,6 +12,7 @@ from yandex_kassa.models import Payment as YandexPayment
 from yandex_kassa.signals import payment_completed
 
 from core.mail import CostumecodeMailer
+from core.utils import first
 
 
 class Payment(YandexPayment):
@@ -56,8 +56,14 @@ class Shop(OrderedModel):
 
 class Order(models.Model):
     CERTIFICATE_ERROR = _(u'Сертификат уже был использован')
+    STATES = Choices(
+        ('new', _(u'Ожидает обработки', )),
+        ('completed', _(u'Обработан', )),
+    )
 
     number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True, default=uuid.uuid4)
+    state = models.CharField(_(u'Статус'), max_length=20, choices=STATES, default=STATES.new)
+    date_add = models.DateTimeField(verbose_name=_(u'Дата добавления'), auto_now_add=True, null=True)
     customer = models.ForeignKey(Customer, to_field='number', verbose_name=_(u'Клиент'), null=True, blank=True)
     discount_value = models.FloatField(_(u'Номинал скидки'), null=True, default=0)
     checkout_shop = models.ForeignKey(Shop, to_field='index', verbose_name=_(u'Магазин'), null=True, blank=True,
@@ -91,7 +97,7 @@ class Order(models.Model):
         except AttributeError:
             return None
     get_amount_to_pay.allow_tags = True
-    get_amount_to_pay.short_description = _(u'К оплате')
+    get_amount_to_pay.short_description = _(u'Сумма заказа')
 
     def get_amount_paid(self):
         try:
@@ -108,6 +114,26 @@ class Order(models.Model):
             return None
     get_performed_datetime.allow_tags = True
     get_performed_datetime.short_description = _(u'Дата обработки заказа')
+
+    def get_fio(self):
+        try:
+            return self.get_customer_address().get_fio()
+        except AttributeError:
+            return None
+    get_fio.allow_tags = True
+    get_fio.short_description = _(u'ФИО')
+
+    def get_city(self):
+        if self.checkout_shop:
+            return self.checkout_shop.city
+        return (self.get_other_address() or self.get_customer_address()).city
+    get_city.allow_tags = True
+    get_city.short_description = _(u'Город')
+
+    def get_count(self):
+        return sum([x.amount for x in self.order_details.all()])
+    get_count.allow_tags = True
+    get_count.short_description = _(u'Количество рубашек в заказе')
 
     def set_discount(self, amount):
         if self.customer:
@@ -144,6 +170,12 @@ class Order(models.Model):
             self.certificate.value = self.certificate.get_value() - self.certificate_value
             self.certificate.save(update_fields=['value'])
 
+    def get_customer_address(self):
+        return first((lambda x: x.type == CustomerData.ADDRESS_TYPE.customer_address), self.customer_data.all())
+
+    def get_other_address(self):
+        return first(lambda x: x.type == CustomerData.ADDRESS_TYPE.other_address, self.customer_data.all())
+
 
 class CustomerData(models.Model):
     ADDRESS_TYPE = Choices(
@@ -173,6 +205,9 @@ class CustomerData(models.Model):
 
     def __unicode__(self):
         return u'%s, %s (%s)' % (self.city, self.address, self.get_type_display())
+
+    def get_fio(self):
+        return u'%s %s.%s.' % (self.lastname, self.name[0], self.midname[0])
 
 
 class OrderDetails(models.Model):

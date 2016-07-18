@@ -14,6 +14,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 from ordered_model.models import OrderedModel
 
+from core.utils import first
 from dictionaries.models import FabricCategory, SleeveType
 from backend import managers
 
@@ -380,14 +381,11 @@ class Shirt(OrderedModel):
             if cuff_price:
                 price += cuff_price.price
 
-        try:
-            fabric_prices = (x for x in self.collection.storehouse.prices.all() if
-                             x.fabric_category_id == self.fabric.category_id)
-            return price + next(fabric_prices).price
-        except StopIteration:
-            return price
-        except AttributeError:
-            return price
+        fabric_price_filter = lambda x: x.fabric_category_id == self.fabric.category_id
+        fabric_price = first(fabric_price_filter, self.collection.storehouse.prices.all())
+        if fabric_price is not None:
+            price += fabric_price.price
+        return price
 
     def save(self, *args, **kwargs):
         self.price = self.calculate_price()
