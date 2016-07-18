@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import datetime
 from django.contrib import admin
+from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
 
 from conversions.mixin import TemplateAndFormatMixin
@@ -72,6 +73,18 @@ class OrderAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(OrderAdmin, self).get_queryset(request)
         return qs.prefetch_related(*self.list_prefetch_related)
+
+    def get_print_url(self, instance):
+        # TODO: будет дописана в следующих задачах
+        return ''
+    get_print_url.allow_tags = True
+    get_print_url.short_description = _(u'Распечатать инфо о заказе')
+
+    def get_export_url(self, instance):
+        # TODO: будет дописана в следующих задачах
+        return ''
+    get_export_url.allow_tags = True
+    get_export_url.short_description = _(u'Сохранить инфо о заказе')
 
 
 admin.site.register(Order, OrderAdmin)

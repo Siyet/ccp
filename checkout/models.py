@@ -1,7 +1,6 @@
 # coding: utf-8
 import uuid
 
-from django.conf import settings
 from django.db import models
 from django.db.transaction import atomic
 from django.dispatch.dispatcher import receiver
@@ -13,6 +12,7 @@ from yandex_kassa.models import Payment as YandexPayment
 from yandex_kassa.signals import payment_completed
 
 from core.mail import CostumecodeMailer
+from core.utils import first
 
 
 class Payment(YandexPayment):
@@ -135,18 +135,6 @@ class Order(models.Model):
     get_count.allow_tags = True
     get_count.short_description = _(u'Количество рубашек в заказе')
 
-    def get_print_url(self):
-        # TODO: будет дописана в следующих задачах
-        return ''
-    get_print_url.allow_tags = True
-    get_print_url.short_description = _(u'Распечатать инфо о заказе')
-
-    def get_export_url(self):
-        # TODO: будет дописана в следующих задачах
-        return ''
-    get_export_url.allow_tags = True
-    get_export_url.short_description = _(u'Сохранить инфо о заказе')
-
     def set_discount(self, amount):
         if self.customer:
             self.discount_value = amount * self.customer.get_discount_value()
@@ -183,10 +171,10 @@ class Order(models.Model):
             self.certificate.save(update_fields=['value'])
 
     def get_customer_address(self):
-        return next((x for x in self.customer_data.all() if x.type == CustomerData.ADDRESS_TYPE.customer_address), None)
+        return first((lambda x: x.type == CustomerData.ADDRESS_TYPE.customer_address), self.customer_data.all())
 
     def get_other_address(self):
-        return next((x for x in self.customer_data.all() if x.type == CustomerData.ADDRESS_TYPE.other_address), None)
+        return first(lambda x: x.type == CustomerData.ADDRESS_TYPE.other_address, self.customer_data.all())
 
 
 class CustomerData(models.Model):

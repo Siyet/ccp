@@ -1,8 +1,6 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from itertools import ifilter
-
 from django import forms
 from django.contrib import admin
 from django.utils.text import ugettext_lazy as _
@@ -12,6 +10,7 @@ from imagekit.admin import AdminThumbnail
 from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from conversions.mixin import TemplateAndFormatMixin
 from backend.widgets import ContentTypeSelect
+from core.utils import first
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 from .models import *
 
@@ -113,7 +112,7 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
 
     def get_residual(self, fabric, storehouse):
         residual_predicate = lambda residual: residual.storehouse == storehouse
-        residual = next(ifilter(residual_predicate, fabric.residuals.all()), None)
+        residual = first(residual_predicate, fabric.residuals.all())
         return residual.amount if residual else None
 
     def get_list_display(self, request):
