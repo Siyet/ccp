@@ -32,7 +32,7 @@ class TemplateShirtResource(resources.ModelResource):
         True: u'Я хочу использовать манишку',
         False: u'Я не хочу использовать манишку',
     }
-    SHIRT_CONTRAST_DETAILS_USE_DICT = {
+    CONTRAST_DETAILS_USE_DICT = {
         True: u'Я хочу использовать контрастные ткани',
         False: u'Я не хочу использовать контрастные ткани',
     }
@@ -161,7 +161,7 @@ class TemplateShirtResource(resources.ModelResource):
                       'cuff__type', 'cuff__rounding', 'cuff__hardness', 'hem',
                       'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke', 'dickey__fabric',
                       'dickey__type', 'initials__font', 'initials__color']
-        prefetch_related = ['contrast_stitches', 'shirt_contrast_details']
+        prefetch_related = ['contrast_stitches', 'contrast_details']
         instance_loader_class = CachedWithPrefetchedInstanceLoader.prepare(select_related, prefetch_related)
 
 
@@ -259,16 +259,16 @@ class TemplateShirtResource(resources.ModelResource):
                 row += ['' for i in range(2)]
 
             # Контрастные ткани
-            row.append(self.SHIRT_CONTRAST_DETAILS_USE_DICT[len(obj.shirt_contrast_details.all()) > 0])
+            row.append(self.CONTRAST_DETAILS_USE_DICT[len(obj.contrast_details.all()) > 0])
             row += [
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar'), ''),
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_face'), ''),
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_bottom'), ''),
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_outer'), ''),
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'collar_inner'), ''),
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'cuff'), ''),
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'cuff_outer'), ''),
-                next((x.fabric.code for x in obj.shirt_contrast_details.all() if x.element == 'cuff_inner'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'collar'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'collar_face'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'collar_bottom'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'collar_outer'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'collar_inner'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'cuff'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'cuff_outer'), ''),
+                next((x.fabric.code for x in obj.contrast_details.all() if x.element == 'cuff_inner'), ''),
             ]
 
             # Инициалы

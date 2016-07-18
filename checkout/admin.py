@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import datetime
 from django.contrib import admin
+from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
 
 from conversions.mixin import TemplateAndFormatMixin
@@ -58,14 +59,32 @@ class CustomerDataInline(admin.StackedInline):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    readonly_fields = ('get_full_amount', 'get_amount_to_pay', 'get_amount_paid', 'get_performed_datetime', )
-    fieldsets = (
-        (None, {
-            'fields': ('number', 'customer', 'discount_value', 'checkout_shop', 'certificate', 'certificate_value',
-                       'get_full_amount', 'get_amount_to_pay', 'get_amount_paid', 'get_performed_datetime', )
-        }),
-    )
+    list_display = ('number', 'state', 'date_add', 'get_fio', 'get_city', 'get_count', 'get_amount_to_pay',
+                    'get_print_url', 'get_export_url', )
+    search_fields = ('number', 'customer_data__lastname', 'customer_data__name', 'customer_data__midname',
+                     'customer_data__city', 'checkout_shop__city', )
+    list_filter = ('state', 'date_add', )
+    list_select_related = ('checkout_shop', )
+    list_prefetch_related = ('customer_data', 'order_details', )
+    readonly_fields = ('date_add', 'get_full_amount', 'get_amount_to_pay', 'get_amount_paid',
+                       'get_performed_datetime', )
     inlines = [CustomerDataInline, OrderDetailsInline]
+
+    def get_queryset(self, request):
+        qs = super(OrderAdmin, self).get_queryset(request)
+        return qs.prefetch_related(*self.list_prefetch_related)
+
+    def get_print_url(self, instance):
+        # TODO: будет дописана в следующих задачах
+        return ''
+    get_print_url.allow_tags = True
+    get_print_url.short_description = _(u'Распечатать инфо о заказе')
+
+    def get_export_url(self, instance):
+        # TODO: будет дописана в следующих задачах
+        return ''
+    get_export_url.allow_tags = True
+    get_export_url.short_description = _(u'Сохранить инфо о заказе')
 
 
 admin.site.register(Order, OrderAdmin)

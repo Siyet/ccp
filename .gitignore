@@ -1,8 +1,9 @@
 # IDE Settings
 .idea/
 
-# DB Settings
+# default settings
 core/settings/database.py
+core/settings/email.py
 
 # Compiled files
 *.pyc

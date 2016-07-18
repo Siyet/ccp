@@ -6,6 +6,7 @@ checkout_urls = [
     url(r'^order/$', views.OrderCreateView.as_view()),
     url(r'^order/(?P<number>[0-9a-f-]+)/payment/$', views.OrderPaymentData.as_view()),
     url(r'^cert/(?P<pk>[0-9-]+)/$', views.CertificateDetailView.as_view()),
+    url(r'^discount/(?P<pk>[0-9-]+)/$', views.DiscountDetailView.as_view()),
 ]
 
 shirt_urls = [

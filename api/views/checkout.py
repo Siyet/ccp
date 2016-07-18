@@ -27,6 +27,14 @@ class CertificateDetailView(RetrieveAPIView):
     serializer_class = serializers.CertificateSerializer
 
 
+class DiscountDetailView(RetrieveAPIView):
+    """
+    Информация о скидке
+    """
+    queryset = checkout.Discount.objects.all()
+    serializer_class = serializers.DiscountSerializer
+
+
 class OrderCreateView(CreateAPIView):
     """
     Создание заказа

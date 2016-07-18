@@ -7,6 +7,7 @@ from model_utils import Choices
 
 from ordered_model.models import OrderedModel
 
+
 class ComponentModel(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
     picture = models.ImageField(_(u'Изображение'), upload_to='component')
@@ -55,7 +56,8 @@ class FabricColor(models.Model):
 
     @staticmethod
     def used():
-        return FabricColor.objects.prefetch_related('color_fabrics').annotate(fabrics_count=Count('color_fabrics')).filter(fabrics_count__gt=0)
+        return FabricColor.objects.prefetch_related('color_fabrics').annotate(
+            fabrics_count=Count('color_fabrics')).filter(fabrics_count__gt=0)
 
 
 class FabricCategory(models.Model):
@@ -87,7 +89,8 @@ class FabricDesign(ComponentModel):
 
     @staticmethod
     def used():
-        return FabricDesign.objects.prefetch_related('design_fabrics').annotate(fabrics_count=Count('design_fabrics')).filter(fabrics_count__gt=0)
+        return FabricDesign.objects.prefetch_related('design_fabrics').annotate(
+            fabrics_count=Count('design_fabrics')).filter(fabrics_count__gt=0)
 
 
 class CollarType(ComponentModel):
@@ -104,7 +107,7 @@ class CollarButtons(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     types = models.ManyToManyField('CollarType', verbose_name=_(u'Типы воротников'), through=CollarType.buttons.through,
                                    blank=True)
-    buttons = models.IntegerField(_(u'Количество пуговиц'), choices=BUTTONS_CHOICES, default = 1)
+    buttons = models.IntegerField(_(u'Количество пуговиц'), choices=BUTTONS_CHOICES, default=1)
 
     def __unicode__(self):
         return self.title
@@ -172,6 +175,16 @@ class DickeyType(ComponentModel):
         verbose_name = _(u'Тип манишки')
         verbose_name_plural = _(u'Типы манишки')
 
+    def get_related_shirts(self, exclude=None):
+        return []
+        # self.dickey_set.all().
+        # qs = Shirt.objects.filter(dickey__isnull=False)
+        # if pk:
+        #     qs = qs.filter(dickey__id=pk)
+        # if exclude:
+        #     qs = qs.exclude(dickey__id__in=exclude)
+        # return qs.values('id').distinct()
+
 
 class ShirtInfo(models.Model):
     title = models.CharField(_(u'Заголовок'), max_length=255, unique=True)
@@ -183,6 +196,7 @@ class ShirtInfo(models.Model):
     class Meta:
         verbose_name = _(u'Информация о рубашках')
         verbose_name_plural = _(u'Информация о рубашках')
+
 
 class ShirtInfoImage(models.Model):
     image = models.ImageField(_(u'Файл'), upload_to='shirtinfo')
@@ -266,7 +280,7 @@ class FAQ(models.Model):
     class Meta:
         verbose_name = _(u'Вопрос')
         verbose_name_plural = _(u'Вопросы и ответы')
-        ordering = ('-date_add', )
+        ordering = ('-date_add',)
 
     def __unicode__(self):
         return self.question
