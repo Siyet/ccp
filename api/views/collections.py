@@ -49,22 +49,13 @@ class CollectionFabricsList(ListAPIView):
 
     def get_queryset(self):
         if not hasattr(self, '_queryset'):
-            self._queryset = self.get_collection().fabrics().select_related('texture').prefetch_related('colors', 'designs')
+            self._queryset = self.get_collection().fabrics()
         return self._queryset
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
+    def get_serializer(self, queryset, **kwargs):
         for fabric in queryset:
             fabric.cached_collection = self.get_collection()
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return super(CollectionFabricsList, self).get_serializer(queryset, **kwargs)
 
 
 class CollectionFabricColorsList(ListAPIView):
