@@ -1,0 +1,36 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+import django.utils.timezone
+import model_utils.fields
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('backend', '0065_auto_20160717_1712'),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name='fabric',
+            name='created',
+            field=model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False),
+        ),
+        migrations.AddField(
+            model_name='fabric',
+            name='modified',
+            field=model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False),
+        ),
+        migrations.AddField(
+            model_name='fabricprice',
+            name='created',
+            field=model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False),
+        ),
+        migrations.AddField(
+            model_name='fabricprice',
+            name='modified',
+            field=model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False),
+        ),
+    ]
