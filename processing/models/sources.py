@@ -7,6 +7,8 @@ from imagekit.models import ImageSpecField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
+from model_utils.models import TimeStampedModel
+
 from backend.models import ContrastDetails
 from processing.upload_path import UploadComposingSource
 from processing.specs import TextureSample, TextureSampleThumbnail, Generators
@@ -96,7 +98,7 @@ class StitchesSource(ProjectionModel):
         verbose_name_plural = _(u'Модели сборки ниток')
 
 
-class Texture(ModelDiffMixin, models.Model):
+class Texture(ModelDiffMixin, TimeStampedModel):
     TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
 
     texture = models.ImageField(_(u'Файл текстуры'), storage=overwrite_storage, upload_to='textures')

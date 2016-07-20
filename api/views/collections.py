@@ -3,11 +3,17 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import filters
-from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey, Fabric
 from django.shortcuts import get_object_or_404
 from django.utils.text import ugettext_lazy as _
+from rest_framework_extensions.cache.mixins import ListCacheResponseMixin
+from last_modified.decorators import last_modified
+from lazy import lazy
+
+from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey
 from dictionaries import models as dictionaries
 from api import serializers
+from api.cache import fabric_last_modified
+from api.filters import CollectionFabricsFilter
 
 
 class CollectionsListView(ListAPIView):
@@ -26,13 +32,7 @@ class ShirtInfoListView(ListAPIView):
     serializer_class = serializers.ShirtInfoSerializer
 
 
-class CollectionFabricsFilter(filters.FilterSet):
-    class Meta:
-        model = Fabric
-        fields = ('colors', 'designs', 'fabric_type', 'thickness', )
-
-
-class CollectionFabricsList(ListAPIView):
+class CollectionFabricsList(ListCacheResponseMixin, ListAPIView):
     """
     Список доступных тканей для выбранной коллекции.
     Может быть отфильтрован по полям "цвет" и "дизайн"
@@ -41,20 +41,22 @@ class CollectionFabricsList(ListAPIView):
     filter_class = CollectionFabricsFilter
     filter_backends = (filters.DjangoFilterBackend,)
 
-    def get_collection(self):
-        if not hasattr(self, '_collection'):
-            self._collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=self.kwargs.get('pk'))
-            self._collection.prices = self._collection.storehouse.prices.values('fabric_category', 'price')
-        return self._collection
+    @lazy
+    def collection(self):
+        collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=self.kwargs.get('pk'))
+        collection.prices = collection.storehouse.prices.values('fabric_category', 'price')
+        return collection
 
     def get_queryset(self):
-        if not hasattr(self, '_queryset'):
-            self._queryset = self.get_collection().fabrics()
-        return self._queryset
+        return self.collection.fabrics().select_related('texture')
+
+    @last_modified(last_modified_func=fabric_last_modified)
+    def get(self, request, *args, **kwargs):
+        return super(CollectionFabricsList, self).get(request, *args, **kwargs)
 
     def get_serializer(self, queryset, **kwargs):
         for fabric in queryset:
-            fabric.cached_collection = self.get_collection()
+            fabric.cached_collection = self.collection
         return super(CollectionFabricsList, self).get_serializer(queryset, **kwargs)
 
 
@@ -112,7 +114,8 @@ class CollectionAccessoriesPriceList(APIView):
 
     def get(self, request, *args, **kwargs):
         collection = get_object_or_404(Collection.objects.prefetch_related('stays'), pk=self.kwargs['pk'])
-        prices = AccessoriesPrice.objects.filter(collections=collection, content_type__app_label='backend', content_type__model=self.model.__name__.lower()).distinct().first()
+        prices = AccessoriesPrice.objects.filter(collections=collection, content_type__app_label='backend',
+                                                 content_type__model=self.model.__name__.lower()).distinct().first()
         result = [{'key': False, 'value': _(u'Не использовать'), 'extra_price': None}]
         if prices:
             result.append({'key': True, 'value': _(u'Использовать'), 'extra_price': prices.price})
@@ -142,5 +145,6 @@ class CollectionStitchesList(APIView):
         collection = get_object_or_404(Collection.objects.prefetch_related('stitches'), pk=self.kwargs['pk'])
         return Response({
             'elements': [{'id': x.pk, 'title': x.title} for x in collection.stitches.all()],
-            'colors': [{'id': x.pk, 'title': x.title, 'color': x.color} for x in dictionaries.StitchColor.objects.all()],
+            'colors': [{'id': x.pk, 'title': x.title, 'color': x.color} for x in
+                       dictionaries.StitchColor.objects.all()],
         })
