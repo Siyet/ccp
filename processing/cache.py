@@ -35,7 +35,14 @@ class CacheBuilder(object):
             if not image or not image.path:
                 continue
             image = getattr(instance, field)
-            array = exr_to_array(image.path)
+            try:
+                array = exr_to_array(image.path)
+            except:
+                print(image.path)
+                array = np.asarray(Image.open(image.path)).astype('float32') / 255.0
+
+            if array.shape[2] == 1:
+                continue
             if field == 'uv':
                 size = array.shape[:2]
                 array[..., 0] *= size[0]
@@ -47,6 +54,9 @@ class CacheBuilder(object):
                 matrix = Submatrix(array)
             scale = CacheBuilder.SCALE_MAP.get(field, 1)
             matrices.append((field, matrix, scale))
+
+        if not matrices:
+            raise Exception("Failed to cache source: fields %s are not found" % fields)
 
         size_array = []
         for _, matrix, scale in matrices:

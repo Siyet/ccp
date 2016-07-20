@@ -2,7 +2,7 @@ import os
 
 from django.conf import settings
 
-from .process import create
+from .compose import create
 
 
 def localpath(file):

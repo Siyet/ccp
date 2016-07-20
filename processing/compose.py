@@ -128,26 +128,34 @@ def load_uv(uv):
 
     return numpy.load(uv)
 
-def create(texture, full_uv, full_light, full_shadow, post_shadows=[], alpha=None, buttons=[], base_layer=[], AA=True):
-    full_light = load_image(full_light)
+def create(texture, uv, light, shadow, post_shadows=[], alpha=None, buttons=[], lower_stitches=[], upper_stitches=[], base_layer=[], AA=True):
+    light = load_image(light)
     # op6
     texture_arr = load_texture(texture)
 
     # op7: op1+op6
-    result = compose(full_uv, texture_arr, AA)
+    result = compose(uv, texture_arr, AA)
     # op8: op1+op6+op7
-    if full_shadow is not None:
-        result = ImageChops.multiply(result, load_image(full_shadow))
+    if shadow is not None:
+        result = ImageChops.multiply(result, load_image(shadow))
 
-    result = overlay(full_light, result)
+    result = overlay(light, result)
     # op10: op9 + op2
     result = apply_srgb(result)
     if alpha:
         result.putalpha(alpha)
 
+    for stitches in lower_stitches:
+        stitches_image = Image.open(stitches["image"])
+        result.paste(stitches_image, stitches["position"], mask=stitches_image)
+
     for button in buttons:
         button_image = Image.open(button['image'])
         result.paste(button_image, button['position'], mask=button_image)
+
+    for stitches in upper_stitches:
+        stitches_image = Image.open(stitches["image"])
+        result.paste(stitches_image, stitches["position"], mask=stitches_image)
 
     for shadow in post_shadows:
         shadow_image = Image.open(shadow['image'])

@@ -9,7 +9,7 @@ class Command(BaseCommand):
         data = {
             "collar": 34,
             "collar_buttons": 2,
-            "cuff": 3,
+            "cuff": 11,
             "cuff_rounding": 1,
             "hem": 1,
             "placket": 2,
@@ -17,7 +17,10 @@ class Command(BaseCommand):
             "sleeve": 2,
             "custom_buttons_type": 1,
             "custom_buttons": 7,
+            'back': 1,
+            'dickey': 2,
+            'tuck': True
         }
 
-        bldr = ShirtBuilder(data, PROJECTION.side)
+        bldr = ShirtBuilder(data, PROJECTION.front)
         bldr.build_shirt(fabric=569)

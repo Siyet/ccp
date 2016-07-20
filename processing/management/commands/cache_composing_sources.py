@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
 from processing.models import ComposeSourceCache, ComposeSource
 from processing.cache import CacheBuilder
-from processing.process import create
+from processing.compose import create
 
 class Command(BaseCommand):
     def handle(self, *args, **options):

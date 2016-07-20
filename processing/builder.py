@@ -4,23 +4,40 @@ import numpy as np
 from backend.models import Fabric
 from dictionaries import models as dictionaries
 import models as compose
-from process import create
+from compose import create
+from .cache import CacheBuilder
+from django.db.models import ObjectDoesNotExist
 
 
 class ShirtBuilder(object):
     def __init__(self, shirt_data, projection):
         self.projection = projection
         self.shirt_data = shirt_data
-        self.collar_type = shirt_data.get('collar')  # check
+        self.collar_type = shirt_data.get('collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=shirt_data.get('collar_buttons')).buttons
-        self.pocket = shirt_data.get('pocket')  # check
-        self.cuff = shirt_data.get('cuff')  # check
-        self.cuff_rounding = shirt_data.get('cuff_rounding')  # check
+        self.pocket = shirt_data.get('pocket')
+        self.cuff = shirt_data.get('cuff')
+        self.cuff_rounding = shirt_data.get('cuff_rounding')
         self.custom_buttons_type = shirt_data.get('custom_buttons_type')
         self.custom_buttons = shirt_data.get('custom_buttons')
-        self.sleeve = shirt_data.get('sleeve')  # check
-        self.hem = shirt_data.get('hem')  # check
-        self.placket = shirt_data.get('placket')  # check
+        self.sleeve = shirt_data.get('sleeve')
+        self.hem = shirt_data.get('hem')
+        self.placket = shirt_data.get('placket')
+        self.tuck = shirt_data.get('tuck')
+        self.back = shirt_data.get('back')
+        self.dickey = shirt_data.get('dickey')
+        self.reset()
+
+    def reset(self):
+        self.uv = []
+        self.lights = []
+        self.shadows = []
+        self.post_shadows = []
+        self.alphas = []
+        self.buttons = []
+        self.lower_stitches = []
+        self.upper_stitches = []
+        self.base_layer = []
 
     def build_shirt(self, fabric):
         from time import time
@@ -30,87 +47,129 @@ class ShirtBuilder(object):
 
         texture = fabric.texture
 
-        uv = []
-        lights = []
-        shadows = []
-        post_shadows = []
-        alphas = []
-        buttons = []
-        base_layer = []
+        self.append_conf(self.get_compose_configuration(compose.BodyConfiguration, {
+            'sleeve_id': self.sleeve,
+            'hem_id': self.hem,
+            'cuff_types__id': self.cuff
+        }))
 
-        def append_buttons(conf):
-            if conf is None:
-                return
-            # CacheBuilder.create_cache(conf, ('image', 'ao'), compose.ButtonsSourceCache)
-            buttons_cache = conf.cache.get(source_field='image')
-            ao = conf.cache.filter(source_field='ao').first()
-            if conf.projection == compose.PROJECTION.front or not isinstance(conf.content_object,
-                                                                             compose.BodyButtonsConfiguration):
-                buttons.append({
-                    'image': buttons_cache.file.path,
-                    'position': buttons_cache.position
-                })
-
-                if ao:
-                    post_shadows.append({
-                        'image': ao.file.path,
-                        'position': ao.position
-                    })
-            else:
-                buttons_base = Image.new("RGBA", (2048, 2048), 0)
-                img = Image.open(buttons_cache.file.path)
-                buttons_base.paste(img, buttons_cache.position, mask=img)
-                if ao:
-                    shadow = Image.open(ao.file.path)
-                    buttons_base.paste(shadow, ao.position, mask=shadow)
-                base_layer.append(buttons_base)
-
-        def append_conf(conf, post_shadow=False):
-            if conf is None:
-                return
-            # CacheBuilder.create_cache(conf, ('uv','ao','light'), compose.ComposeSourceCache)
-            uv.append(conf.cache.get(source_field='uv'))
-            lights.append(conf.cache.get(source_field='light'))
-            if post_shadow:
-                cache = conf.cache.get(source_field='ao')
-                post_shadows.append({
-                    'image': cache.file.path,
-                    'position': cache.position
-                })
-            else:
-                shadows.append(conf.cache.get(source_field='ao'))
-            alphas.append(conf.cache.get(source_field='uv_alpha'))
-
-        append_conf(self.get_body())
-        append_conf(self.get_collar())
-        append_conf(self.get_cuff())
-        append_conf(self.get_pocket())
-        append_conf(self.get_placket(), post_shadow=True)
+        self.append_conf(self.get_compose_configuration(compose.DickeyConfiguration, {
+            'dickey_id': self.dickey,
+            'hem_id': self.hem,
+        }))
+        self.append_conf(self.get_collar())
+        self.append_conf(self.get_cuff())
+        self.append_conf(self.get_pocket())
+        self.append_conf(self.get_back())
+        self.append_conf(self.get_placket(), post_shadow=True)
 
         if self.projection != compose.PROJECTION.back:
-            append_buttons(self.get_buttons())
+            (buttons, stitches) = self.get_buttons()
+            self.append_buttons(buttons)
+            self.append_stitches(stitches)
 
-        append_buttons(self.get_cuff_buttons())
-        # append_buttons(self.get_collar_buttons())
+        (buttons, stitches) = self.get_cuff_buttons()
+        self.append_buttons(buttons)
+        self.append_stitches(stitches)
 
-        uv = self.compose_uv(*uv)
-        light = self.compose_light(lights)
-        shadow = self.compose_light(shadows)
-        alpha = self.compose_alpha(alphas)
+        (buttons, stitches) = self.get_collar_buttons()
+        self.append_buttons(buttons)
+        self.append_stitches(stitches)
+
+        uv = self.compose_uv(*self.uv)
+        light = self.compose_light(self.lights)
+        shadow = self.compose_light(self.shadows)
+        alpha = self.compose_alpha(self.alphas)
 
         print("preparation", time() - start)
         start = time()
-
-        res = create(texture.cache.path, uv, light, shadow, post_shadows, alpha, buttons, base_layer)
+        light.save("/tmp/light.png")
+        res = create(
+            texture=texture.cache.path,
+            uv=uv,
+            light=light,
+            shadow=shadow,
+            post_shadows=self.post_shadows,
+            alpha=alpha,
+            buttons=self.buttons,
+            lower_stitches=self.lower_stitches,
+            upper_stitches=self.upper_stitches,
+            base_layer=self.base_layer
+        )
 
         print("compose", time() - start)
         print("total", time() - total)
 
         res.save("/tmp/res.png")
 
-    def get_body(self):
-        configuration = compose.BodyConfiguration.objects.get(sleeve_id=self.sleeve, hem_id=self.hem,
-                                                              cuff_types__id=self.cuff)
+    def append_conf(self, conf, post_shadow=False):
+        if conf is None:
+            return
+        CacheBuilder.create_cache(conf, ('uv', 'ao', 'light'), compose.ComposeSourceCache)
+        self.uv.append(conf.cache.get(source_field='uv'))
+        self.lights.append(conf.cache.get(source_field='light'))
+        try:
+            shadow = conf.cache.get(source_field='ao')
+            if post_shadow:
+                self.post_shadows.append({
+                    'image': shadow.file.path,
+                    'position': shadow.position
+                })
+            else:
+                self.shadows.append(conf.cache.get(source_field='ao'))
+        except ObjectDoesNotExist:
+            pass
+        self.alphas.append(conf.cache.get(source_field='uv_alpha'))
+
+    def append_stitches(self, stitches):
+        for conf in stitches:
+            try:
+                CacheBuilder.create_cache(conf, ['image'], compose.StitchesSourceCache)
+            except:
+                continue
+            cache = conf.cache.get(source_field='image')
+            image = {
+                'image': cache.file.path,
+                'position': cache.position
+            }
+            if conf.type == compose.StitchesSource.STITCHES_TYPE.under:
+                self.lower_stitches.append(image)
+            else:
+                self.upper_stitches.append(image)
+
+    def append_buttons(self, conf):
+        if conf is None:
+            return
+
+        try:
+            CacheBuilder.create_cache(conf, ('image', 'ao'), compose.ButtonsSourceCache)
+        except:
+            return
+        buttons_cache = conf.cache.get(source_field='image')
+        ao = conf.cache.filter(source_field='ao').first()
+        if conf.projection == compose.PROJECTION.front or not isinstance(conf.content_object,
+                                                                         compose.BodyButtonsConfiguration):
+            self.buttons.append({
+                'image': buttons_cache.file.path,
+                'position': buttons_cache.position
+            })
+
+            if ao:
+                self.post_shadows.append({
+                    'image': ao.file.path,
+                    'position': ao.position
+                })
+        else:
+            buttons_base = Image.new("RGBA", (2048, 2048), 0)
+            img = Image.open(buttons_cache.file.path)
+            buttons_base.paste(img, buttons_cache.position, mask=img)
+            if ao:
+                shadow = Image.open(ao.file.path)
+                buttons_base.paste(shadow, ao.position, mask=shadow)
+            self.base_layer.append(buttons_base)
+
+    def get_compose_configuration(self, model, filters):
+        configuration = model.objects.get(**filters)
         return configuration.sources.filter(projection=self.projection).first()
 
     def get_collar(self):
@@ -129,19 +188,26 @@ class ShirtBuilder(object):
         placket_conf = compose.PlacketConfiguration.objects.get(placket_id=self.placket, hem_id=self.hem)
         return placket_conf.sources.filter(projection=self.projection).first()
 
+    def get_back(self):
+        back_conf = compose.BackConfiguration.objects.get(back_id=self.back, tuck=self.tuck, hem_id=self.hem)
+        return back_conf.sources.filter(projection=self.projection).first()
+
     def get_buttons(self):
         buttons_conf = compose.BodyButtonsConfiguration.objects.get(buttons_id=self.custom_buttons_type)
-        return buttons_conf.sources.filter(projection=self.projection).first()
+        return (buttons_conf.sources.filter(projection=self.projection).first(),
+                buttons_conf.stitches.filter(projection=self.projection))
 
     def get_collar_buttons(self):
         collar_buttons_conf = compose.CollarButtonsConfiguration.objects.get(collar_id=self.collar_type,
                                                                              buttons=self.collar_buttons)
-        return collar_buttons_conf.sources.filter(projection=self.projection).first()
+        return (collar_buttons_conf.sources.filter(projection=self.projection).first(),
+                collar_buttons_conf.stitches.filter(projection=self.projection))
 
     def get_cuff_buttons(self):
         cuff_buttons_conf = compose.CuffButtonsConfiguration.objects.get(cuff_id=self.cuff,
                                                                          rounding_types__id=self.cuff_rounding)
-        return cuff_buttons_conf.sources.filter(projection=self.projection).first()
+        return (cuff_buttons_conf.sources.filter(projection=self.projection).first(),
+                cuff_buttons_conf.stitches.filter(projection=self.projection))
 
     def compose_uv(self, *sources):
         base = np.load(sources[0].file.path)

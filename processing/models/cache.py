@@ -5,7 +5,7 @@ from django.db import models
 from processing.upload_path import UploadComposeCache
 from processing.storage import overwrite_storage
 
-from .sources import ComposeSource, ButtonsSource
+from .sources import ComposeSource, ButtonsSource, StitchesSource
 from ast import literal_eval
 
 class SourceCache(models.Model):
@@ -15,6 +15,7 @@ class SourceCache(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ('source', 'source_field')
 
     @property
     def position(self):
@@ -38,12 +39,10 @@ class SourceCache(models.Model):
 class ComposeSourceCache(SourceCache):
     source = models.ForeignKey(ComposeSource, related_name='cache')
 
-    class Meta:
-        unique_together = ('source', 'source_field')
-
 
 class ButtonsSourceCache(SourceCache):
     source = models.ForeignKey(ButtonsSource, related_name='cache')
 
-    class Meta:
-        unique_together = ('source', 'source_field')
+
+class StitchesSourceCache(SourceCache):
+    source = models.ForeignKey(StitchesSource, related_name='cache')
