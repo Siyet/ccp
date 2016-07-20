@@ -20,13 +20,13 @@ from import_export.results import Result, Error, RowResult
 
 from import_export import resources
 from backend.models import Fabric, FabricResidual, Storehouse
+from core.utils import first
 
 
 class FabricResidualResource(resources.ModelResource):
 
     class Meta:
         model = Fabric
-
 
     def save_instance(self, instance, dry_run=False):
         self.before_save_instance(instance, dry_run)
@@ -40,11 +40,9 @@ class FabricResidualResource(resources.ModelResource):
                         amount = float(amount)
                     except (ValueError, TypeError):
                         amount = 0
-                    storehouse = next(storehouse for pk, storehouse in self.get_storehouses().iteritems()
-                                      if storehouse.country == country)
-                    try:
-                        residual = next(x for x in instance.residuals.all() if x.storehouse == storehouse)
-                    except StopIteration:
+                    storehouse = first(lambda x: x.country == country, self.get_storehouses().items())
+                    residual = first(lambda x: x.storehouse == storehouse, instance.residuals.all())
+                    if residual is None:
                         residual = FabricResidual.objects.create(fabric=instance, storehouse=storehouse)
                     residual.amount = amount
                     residual.save()

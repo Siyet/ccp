@@ -1,10 +1,9 @@
 # coding: utf-8
-from django.http import Http404
-
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey
+from rest_framework import filters
+from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey, Fabric
 from django.shortcuts import get_object_or_404
 from django.utils.text import ugettext_lazy as _
 from dictionaries import models as dictionaries
@@ -27,37 +26,36 @@ class ShirtInfoListView(ListAPIView):
     serializer_class = serializers.ShirtInfoSerializer
 
 
-class CollectionFabricsList(APIView):
+class CollectionFabricsFilter(filters.FilterSet):
+    class Meta:
+        model = Fabric
+        fields = ('colors', 'designs', 'fabric_type', 'thickness', )
 
-    def get(self, request, *args, **kwargs):
-        """
-        Список доступных тканей для выбранной коллекции.
-        Может быть отфильтрован по полям "цвет" и "дизайн"
-        ---
-        parameters:
-            - name: color
-              type: integer
-              paramType: query
-              description: цвет (id)
-            - name: design
-              type: integer
-              paramType: query
-              description: дизайн (id)
-        """
-        collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=kwargs.get('pk'))
-        collection.prices = collection.storehouse.prices.values('fabric_category', 'price')
-        queryset = collection.fabrics().select_related('texture')
-        color = self.request.query_params.get('color', None)
-        if color is not None:
-            queryset = queryset.prefetch_related('colors').filter(colors__id=color)
 
-        design = self.request.query_params.get('design', None)
-        if design is not None:
-            queryset = queryset.prefetch_related('designs').filter(designs__id=design)
+class CollectionFabricsList(ListAPIView):
+    """
+    Список доступных тканей для выбранной коллекции.
+    Может быть отфильтрован по полям "цвет" и "дизайн"
+    """
+    serializer_class = serializers.FabricSerializer
+    filter_class = CollectionFabricsFilter
+    filter_backends = (filters.DjangoFilterBackend,)
+
+    def get_collection(self):
+        if not hasattr(self, '_collection'):
+            self._collection = get_object_or_404(Collection.objects.select_related('storehouse'), pk=self.kwargs.get('pk'))
+            self._collection.prices = self._collection.storehouse.prices.values('fabric_category', 'price')
+        return self._collection
+
+    def get_queryset(self):
+        if not hasattr(self, '_queryset'):
+            self._queryset = self.get_collection().fabrics()
+        return self._queryset
+
+    def get_serializer(self, queryset, **kwargs):
         for fabric in queryset:
-            fabric.cached_collection = collection
-
-        return Response(serializers.FabricSerializer(queryset, many=True, context={'request': request}).data)
+            fabric.cached_collection = self.get_collection()
+        return super(CollectionFabricsList, self).get_serializer(queryset, **kwargs)
 
 
 class CollectionFabricColorsList(ListAPIView):

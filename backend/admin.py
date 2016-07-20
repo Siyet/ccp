@@ -1,8 +1,6 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from itertools import ifilter
-
 from django import forms
 from django.contrib import admin
 from django.utils.text import ugettext_lazy as _
@@ -12,6 +10,7 @@ from imagekit.admin import AdminThumbnail
 from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from conversions.mixin import TemplateAndFormatMixin
 from backend.widgets import ContentTypeSelect
+from core.utils import first
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 from .models import *
 
@@ -33,10 +32,12 @@ class CollarInline(admin.StackedInline):
 
 class ContrastDetailsInline(admin.TabularInline):
     model = ContrastDetails
+    extra = 1
 
 
 class ContrastStitchInline(admin.TabularInline):
     model = ContrastStitch
+    extra = 1
 
 
 class CustomShirtAdmin(admin.ModelAdmin):
@@ -44,10 +45,19 @@ class CustomShirtAdmin(admin.ModelAdmin):
     exclude = ['is_template', 'code', 'showcase_image', 'individualization']
 
 
+class DickeyInline(admin.StackedInline):
+    model = Dickey
+    inline_classes = ('grp-open',)
+    extra = 0
+    max_num = 1
+
+
 class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, GrappelliOrderableAdmin):
     resource_class = TemplateShirtResource
     exclude = ['is_template']
-    inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
+    inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
+    list_select_related = ('hem', 'placket', 'pocket', 'cuff__type', 'collar__type', 'collar__hardness')
+    list_display = ('code', 'cuff', 'collar', 'hem', 'placket', 'pocket')
 
 
 class StandardShirtAdmin(admin.ModelAdmin):
@@ -113,7 +123,7 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
 
     def get_residual(self, fabric, storehouse):
         residual_predicate = lambda residual: residual.storehouse == storehouse
-        residual = next(ifilter(residual_predicate, fabric.residuals.all()), None)
+        residual = first(residual_predicate, fabric.residuals.all())
         return residual.amount if residual else None
 
     def get_list_display(self, request):
@@ -199,7 +209,6 @@ class CustomButtonsAdmin(GrappelliOrderableAdmin):
 
 admin.site.register([
     Storehouse,
-    Dickey,
     Initials,
     ElementStitch
 ])

@@ -12,10 +12,10 @@ from processing.upload_path import UploadComposingSource
 from processing.specs import TextureSample, TextureSampleThumbnail, Generators
 from processing.storage import overwrite_storage
 from .configuration import CollarConfiguration, CuffConfiguration
+
 from .mixins import ModelDiffMixin
 
 PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
-
 
 class ProjectionModel(models.Model):
     projection = models.CharField(_(u'Проекция'), max_length=5, choices=PROJECTION)
@@ -26,10 +26,8 @@ class ProjectionModel(models.Model):
 
 class ComposeSource(ProjectionModel):
     uv = models.FileField(_(u'UV'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/uv/%s'))
-    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'),
-                          blank=True)
-    light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'),
-                             blank=True)
+    ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'), blank=True)
+    light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'), blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -81,6 +79,23 @@ class CuffMask(ProjectionModel):
         verbose_name_plural = _(u'Маски манжет')
 
 
+class StitchesSource(ProjectionModel):
+    STITCHES_TYPE = Choices(('under', _(u'Под пуговицами')), ('over', _(u'Над пуговицами')))
+    type = models.CharField(verbose_name=_(u'Расположение'), choices=STITCHES_TYPE, default=STITCHES_TYPE.under,
+                            blank=False, max_length=10)
+    image = models.FileField(verbose_name=_(u'Файл ниток'), storage=overwrite_storage,
+                             upload_to=UploadComposingSource('stitches/%s/%s'))
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        unique_together = ('content_type', 'object_id', 'projection', 'type')
+        verbose_name = _(u'Модель сборки ниток')
+        verbose_name_plural = _(u'Модели сборки ниток')
+
+
 class Texture(ModelDiffMixin, models.Model):
     TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
 
@@ -98,3 +113,4 @@ class Texture(ModelDiffMixin, models.Model):
 
     def __unicode__(self):
         return self.texture.name
+

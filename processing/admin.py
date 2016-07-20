@@ -6,6 +6,7 @@ from django.utils.text import ugettext_lazy as _
 from django.contrib.contenttypes.admin import GenericTabularInline
 
 import models
+from core.utils import first
 
 
 class ManyToManyListFormatter(object):
@@ -27,7 +28,8 @@ class ManyToManyMixin(object):
         present_fields = filter(lambda f: f in list_display, self.m2m_fields)
         for field_name in present_fields:
             field_idx = list_display.index(field_name)
-            m2m_field = next(f for f in self.model._meta.many_to_many if f.name == field_name)
+            m2m_field = first(lambda x: x.name == field_name, self.model._meta.many_to_many)
+            assert m2m_field is not None
             formatter = ManyToManyListFormatter(field_name, m2m_field.verbose_name)
 
             field_attr = list_display[field_idx] + "_list"
@@ -66,17 +68,24 @@ class ButtonsComposingSourceInline(GenericTabularInline):
     model = models.ButtonsSource
     fields = ('projection', 'image', 'ao')
     max_num = 3
+    extra = 0
+
+
+class StitchesSourceInline(GenericTabularInline):
+    model = models.StitchesSource
+    fields = ('projection', 'type', 'image')
+    max_num = 6
+    extra = 0
 
 
 class ButtonsSourceAdmin(admin.ModelAdmin):
-    inlines = [ButtonsComposingSourceInline]
+    inlines = [ButtonsComposingSourceInline, StitchesSourceInline]
 
     def get_list_display(self, request):
         return self.get_fields(request)
 
 
 class CuffButtonsAdmin(ManyToManyMixin, ButtonsSourceAdmin):
-    inlines = [ButtonsComposingSourceInline]
     m2m_fields = ['rounding_types']
 
 

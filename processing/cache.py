@@ -7,6 +7,7 @@ import numpy as np
 
 from PIL import Image
 
+from core.utils import first
 from processing.models import BodyConfiguration
 from .utils import Matrix, Submatrix, exr_to_array, image_from_array
 
@@ -56,7 +57,7 @@ class CacheBuilder(object):
         bbox = (min(x0), min(y0), max(x1), max(y1))
 
         if 'uv' in fields:
-            (_, matrix, scale) = next(mx for mx in matrices if mx[0] == 'uv')
+            (_, matrix, scale) = first(lambda x: x[0] == 'uv', matrices)
             alpha = copy(matrix)
             alpha._source = matrix._source[..., 3]
             matrix._source = matrix._source[..., :2] # cut redundant channels from matrix
