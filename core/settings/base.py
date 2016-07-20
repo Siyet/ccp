@@ -69,11 +69,11 @@ REST_FRAMEWORK = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+        'LOCATION': 'costumecode',
     },
     'staticfiles': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'staticfiles-filehashes'
+        'LOCATION': 'costumecode-static'
     }
 }
 

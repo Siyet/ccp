@@ -1,5 +1,5 @@
 # coding: utf-8
-import django_filters
+
 from django.conf import settings
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import pagination
@@ -10,19 +10,7 @@ from rest_framework.views import APIView
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
-
-
-class TemplateShirtsFilter(filters.FilterSet):
-    fabric = django_filters.ModelMultipleChoiceFilter(queryset=models.Fabric.objects.all())
-    fabric_type = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.FabricType.objects.all(),
-                                                           name='fabric__fabric_type')
-    thickness = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.Thickness.objects.all(),
-                                                         name='fabric__thickness')
-    collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
-
-    class Meta:
-        model = models.Shirt
-        fields = ['fabric', 'fabric_type', 'thickness', 'fabric__colors', 'fabric__designs', 'collection__sex']
+from api.filters import TemplateShirtsFilter
 
 
 class TemplateShirtsList(ListAPIView):
@@ -91,8 +79,8 @@ class TemplateShirtsFiltersList(APIView):
             design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
         sex_values = models.Collection.objects.filter(
-             shirts__is_template=True,
-             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
+            shirts__is_template=True,
+            shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         ).values_list('sex', flat=True).distinct()
 
         sex_pairs = map(lambda sex: {"id": sex, "title": models.SEX[sex]}, sex_values)

@@ -18,6 +18,10 @@ djangorestframework
 django-rest-swagger
 djoser
 
+# Caching
+drf-extensions
+djangorestframework-last-modified
+
 # Choice fields
 django-model-utils
 
