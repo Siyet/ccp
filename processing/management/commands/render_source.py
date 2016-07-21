@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
 
 from processing.models.sources import PROJECTION
-from processing.builder import ShirtBuilder
+from processing.rendering.builder import ShirtBuilder
 
 
 class Command(BaseCommand):
@@ -18,9 +18,12 @@ class Command(BaseCommand):
             "custom_buttons_type": 1,
             "custom_buttons": 7,
             'back': 1,
-            'dickey': 2,
+            'dickey': {
+                "type": 2,
+                "fabric": 433
+            },
             'tuck': True
         }
 
         bldr = ShirtBuilder(data, PROJECTION.front)
-        bldr.build_shirt(fabric=569)
+        bldr.build_shirt(fabric=576)

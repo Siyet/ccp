@@ -104,6 +104,14 @@ class DickeyConfiguration(PartConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для манишки')
 
 
+class YokeConfiguration(PartConfigurationModel):
+    yoke = models.OneToOneField(dictionaries.YokeType, verbose_name=_(u'Тип кокетки'))
+
+    class Meta:
+        verbose_name = _(u'Конфигурация сборки для кокетки')
+        verbose_name_plural = _(u'Конфигурации сборки для кокетки')
+
+
 class BodyButtonsConfiguration(ButtonsConfigurationModel):
     buttons = models.OneToOneField(dictionaries.CustomButtonsType, verbose_name=_(u'Пуговицы'))
 

@@ -4,8 +4,9 @@ from django.db import models
 
 from processing.upload_path import UploadComposeCache
 from processing.storage import overwrite_storage
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
-from .sources import ComposeSource, ButtonsSource, StitchesSource
 from ast import literal_eval
 
 class SourceCache(models.Model):
@@ -13,9 +14,12 @@ class SourceCache(models.Model):
     pos_repr = models.CommaSeparatedIntegerField(max_length=20)
     file = models.FileField(storage=overwrite_storage, upload_to=UploadComposeCache('composecache/%s/%s'))
 
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
     class Meta:
-        abstract = True
-        unique_together = ('source', 'source_field')
+        unique_together = ('content_type', 'object_id', 'source_field')
 
     @property
     def position(self):
@@ -34,15 +38,3 @@ class SourceCache(models.Model):
             raise ex()
 
         self.pos_repr = val
-
-
-class ComposeSourceCache(SourceCache):
-    source = models.ForeignKey(ComposeSource, related_name='cache')
-
-
-class ButtonsSourceCache(SourceCache):
-    source = models.ForeignKey(ButtonsSource, related_name='cache')
-
-
-class StitchesSourceCache(SourceCache):
-    source = models.ForeignKey(StitchesSource, related_name='cache')

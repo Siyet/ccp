@@ -1,15 +1,35 @@
 from django.core.management import BaseCommand
-from processing.models import ComposeSourceCache, ComposeSource
+
+from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, Texture
 from processing.cache import CacheBuilder
-from processing.compose import create
+import sys
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        count = ComposeSource.objects.count()
-        i = 0
-        for src in ComposeSource.objects.all():
-            if not src.cache.count():
-                CacheBuilder.create_cache(src, ['uv', 'light', 'ao'], ComposeSourceCache)
-            i += 1
-            print("processed (%s/%s)" % (i, count))
+        self.cache_sources(ComposeSource, ['uv', 'light', 'ao'])
+        self.cache_sources(ButtonsSource, ['image', 'ao'])
+        self.cache_sources(StitchesSource, ['image'])
+        self.cache_sources(CuffMask, ['mask'])
+        self.cache_sources(CollarMask, ['mask'])
+        self.cache_textures()
 
+
+    def cache_sources(self, model, fields):
+        sys.stdout.write(u'%s\n' % model.__name__)
+        count = model.objects.count()
+        i = 0
+        for src in model.objects.all():
+            if src.cache.count() < len(fields):
+                try:
+                    CacheBuilder.create_cache(src, fields)
+                except:
+                    print("failed to create cache for %s" % src.object_id)
+                    raise
+            i += 1
+            sys.stdout.write("\rprocessed (%s/%s)" % (i, count))
+            sys.stdout.flush()
+        sys.stdout.write('\n')
+
+    def cache_textures(self):
+        for texture in Texture.objects.all():
+            CacheBuilder.cache_texture(texture)
