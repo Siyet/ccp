@@ -325,7 +325,7 @@ class OrderSerializer(serializers.ModelSerializer):
         customer_data = validated_data.pop('customer_data')
         order = checkout.Order.objects.create(**validated_data)
         for detail in order_details:
-            checkout.OrderDetails.objects.create(order=order, **detail)
+            checkout.OrderDetails.objects.create(order=order, price=detail['shirt'].price, **detail)
         for data in customer_data:
             checkout.CustomerData.objects.create(order=order, **data)
         order.create_payment()

@@ -86,7 +86,7 @@ class Order(models.Model):
     def get_full_amount(self):
         result = 0
         for detail in self.order_details.all():
-            result += float(detail.shirt.price) * detail.amount
+            result += float(detail.price) * detail.amount
         return result
     get_full_amount.allow_tags = True
     get_full_amount.short_description = _(u'Общая стоимость заказа')
@@ -214,6 +214,7 @@ class OrderDetails(models.Model):
     order = models.ForeignKey(Order, verbose_name=_(u'Заказ'), related_name='order_details')
     shirt = models.ForeignKey('backend.Shirt', verbose_name=_(u'Рубашка'))
     amount = models.IntegerField(_(u'Количество'))
+    price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
     def __unicode__(self):
         return self.order.number
