@@ -12,6 +12,7 @@ from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
+from model_utils.models import TimeStampedModel
 from ordered_model.models import OrderedModel
 
 from core.utils import first
@@ -87,7 +88,7 @@ class Stays(OrderedModel):
         verbose_name_plural = _(u'Косточки')
 
 
-class FabricPrice(models.Model):
+class FabricPrice(TimeStampedModel):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='prices')
     fabric_category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория тканей'),
                                         related_name='prices')
@@ -105,7 +106,7 @@ class FabricPrice(models.Model):
                                     collection__storehouse=self.storehouse).values('id')
 
 
-class Fabric(models.Model):
+class Fabric(TimeStampedModel):
     code = models.CharField(_(u'Артикул'), max_length=20, unique=True)
     category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics',
                                  blank=True, null=True)

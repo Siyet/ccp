@@ -96,7 +96,7 @@ class CuffTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = dictionaries.CuffType
-        fields = ('title', 'picture', 'rounding')
+        fields = ('id', 'title', 'picture', 'rounding')
 
 
 class HemTypeSerializer(serializers.ModelSerializer):
