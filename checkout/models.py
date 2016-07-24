@@ -216,12 +216,15 @@ class OrderDetails(models.Model):
     amount = models.IntegerField(_(u'Количество'))
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
-    def __unicode__(self):
-        return self.order.number
-
     class Meta:
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
+
+    def __unicode__(self):
+        return self.order.number
+
+    def get_total(self):
+        return self.price * self.amount
 
 
 class Certificate(models.Model):

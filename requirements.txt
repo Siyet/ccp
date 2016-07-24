@@ -46,3 +46,6 @@ lazy
 
 # yandex-kassa
 django-yandex-kassa
+
+# wkhtmltopdf
+django-wkhtmltopdf

@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^api/', include('api.urls')),
     url(r'^backend/', include('backend.urls')),
     url(r'^kassa/order-check/?$', checkout_views.CheckOrderView.as_view(), name='kassa_check_order'),
+    url(r'^test-pdf/?$', checkout_views.TestPdfView.as_view(), name='kassa_check_order'),
     url(r'^kassa/', include('yandex_kassa.urls')),
 ]
 

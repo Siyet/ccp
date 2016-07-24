@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'conversions',
     'import_export',
     'yandex_kassa',
+    'wkhtmltopdf',
 
     'corsheaders',
 
@@ -111,4 +112,5 @@ except:
 from .appconfig import *
 # noinspection PyUnresolvedReferences
 from .email import *
+from .htmltopdf import *
 GRAPPELLI_ADMIN_TITLE = APP_NAME
