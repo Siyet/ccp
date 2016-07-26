@@ -81,15 +81,42 @@
         .text-center {
             text-align: center;
         }
+        .text-right {
+            text-align: right;
+        }
+        .text-left {
+            text-align: left;
+        }
         .order-table {
             width: 100%;
+            border-collapse: collapse;
+        }
+        .order-table td {
+            vertical-align: top;
+        }
+        .order-table thead th {
+            border-top: 1px solid #4A4A4A;
+            padding: 10px 0 20px;
+        }
+        .order-table tbody td {
+            border-bottom: 10px solid #fff;
         }
         footer .left {
             float: left;
             width: 50%;
         }
         footer .right {
-            margin-left: 50%;
+            float: right;
+            width: 49%;
+        }
+        footer .right .label {
+            display: inline-block;
+            width: 50%;
+            float: left;
+        }
+        footer .right .value {
+            display: inline-block;
+            width: 49%;
         }
         .clear {
             clear: both;
@@ -110,16 +137,16 @@
 <table class="order-table">
     <thead>
         <tr>
-            <th>Изображение</th>
-            <th>Описание</th>
-            <th>Количество</th>
-            <th>Цена</th>
-            <th>Итого</th>
+            <th class="text-left" width="20%">Изображение</th>
+            <th class="text-left" width="25%">Описание</th>
+            <th class="text-right" width="15%">Количество</th>
+            <th class="text-right" width="15%">Цена</th>
+            <th class="text-right" width="15%">Итого</th>
         </tr>
     </thead>
     <tbody>
         {% for order_detail in order.order_details.all %}
-            <tr class="text-gray">
+            <tr class="text-black">
                 <td>
                     <img src="{{ order_detail.shirt.showcase_image_list.url }}" alt="">
                 </td>
@@ -128,14 +155,15 @@
                     <p>{{ order_detail.shirt.size }}</p>
                     <p>{{ order_detail.shirt.collection.tailoring_time }}</p>
                 </td>
-                <td>{{ order_detail.amount }}</td>
-                <td>{{ order_detail.amount }} x {{ order_detail.price }}</td>
-                <td>{{ order_detail.get_total|floatformat:2 }}</td>
+                <td class="text-right">{{ order_detail.amount }}</td>
+                <td class="text-right">{{ order_detail.amount }} x {{ order_detail.price }} {% trans 'руб.' %}</td>
+                <td class="text-right">{{ order_detail.get_total|floatformat:2 }} {% trans 'руб.' %}</td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
-
+<br>
+<br>
 <footer>
     <div class="left">
         <div class="phone"></div>
@@ -147,25 +175,25 @@
     </div>
     <div class="right">
         <div>
-            <span class="label">{% trans 'Итого' %}</span>
-            <span class="value"></span>
+            <span class="label text-right">{% trans 'Итого' %}:</span>
+            <span class="value text-right">{{ order.get_full_amount|floatformat:2 }} {% trans 'руб.' %}</span>
         </div>
         <div>
-            <span class="label">{% trans 'Доставка' %}</span>
-            <span class="value"></span>
+            <span class="label text-right">{% trans 'Доставка' %}:</span>
+            <span class="value text-right">0 {% trans 'руб.' %}</span>
         </div>
         <div>
-            <span class="label">{% trans 'Сертификат' %}</span>
-            <span class="value"></span>
+            <span class="label text-right">{% trans 'Сертификат' %}:</span>
+            <span class="value text-right">{{ order.certificate_value }} {% trans 'руб.' %}</span>
         </div>
         <div>
-            <span class="label">{% trans 'Скидка' %}</span>
-            <span class="value"></span>
+            <span class="label text-right">{% trans 'Скидка' %}:</span>
+            <span class="value text-right">{{ order.discount_value }} {% trans 'руб.' %}</span>
         </div>
         <br>
         <div>
-            <span class="label">{% trans 'Всего' %}</span>
-            <span class="value"></span>
+            <span class="label text-right">{% trans 'Всего' %}:</span>
+            <span class="value text-right">{{ order.get_amount_to_pay }} {% trans 'руб.' %}</span>
         </div>
     </div>
     <div class="clear"></div>
