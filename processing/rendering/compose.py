@@ -6,6 +6,16 @@ import numpy as np
 import numexpr as ne
 
 
+class ImageConf(object):
+    def __init__(self, image, position):
+        self.image = image
+        self.position = position
+
+    @classmethod
+    def for_cache(cls, cache):
+        return cls(cache.file.path, cache.position)
+
+
 def STMap(source, texture_arr, AA):
     # TODO: ensure cache
     source[..., 0] %= texture_arr.shape[0]
@@ -97,14 +107,14 @@ def load_uv(uv):
     return np.load(uv)
 
 
-def paste(source, image_info):
-    if not image_info:
+def paste(source, image_conf):
+    if not image_conf:
         return
-    image = image_info['image']
+    image = image_conf.image
     if not isinstance(image, Image.Image):
         image = Image.open(image)
 
-    source.paste(image, image_info['position'], mask=image)
+    source.paste(image, image_conf.position, mask=image)
 
 
 class Composer(object):

@@ -33,6 +33,13 @@ class ButtonsConfigurationModel(ConfigurationModel):
         abstract = True
 
 
+class CachedSource(models.Model):
+    cache = GenericRelation('processing.SourceCache')
+
+    class Meta:
+        abstract = True
+
+
 class BodyConfiguration(PartConfigurationModel):
     sleeve = models.ForeignKey(dictionaries.SleeveType, verbose_name=_(u'Рукав'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
@@ -65,7 +72,7 @@ class CollarConfiguration(PartConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для воротника')
 
 
-class CuffConfiguration(PartConfigurationModel):
+class CuffConfiguration(CachedSource, PartConfigurationModel):
     cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
     rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
     side_mask = models.FileField(verbose_name=_(u'Маска рукава (сбоку)'), storage=overwrite_storage,

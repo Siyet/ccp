@@ -24,7 +24,7 @@ class CacheBuilder(object):
 
     EXR_FIELDS = ('uv',)
     RGBA_FIELDS = ('image', 'light', 'ao')
-    L_FIELDS = ('uv_alpha', 'mask')
+    L_FIELDS = ('uv_alpha', 'mask', 'side_mask')
 
     @staticmethod
     def create_cache(instance, fields):

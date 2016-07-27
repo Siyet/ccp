@@ -8,7 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 from model_utils.models import TimeStampedModel
-from django.contrib.contenttypes.fields import GenericRelation
+from .configuration import CachedSource
 
 from backend.models import ContrastDetails
 from processing.upload_path import UploadComposingSource
@@ -26,12 +26,6 @@ class ProjectionModel(models.Model):
     class Meta:
         abstract = True
 
-
-class CachedSource(models.Model):
-    cache = GenericRelation('processing.SourceCache')
-
-    class Meta:
-        abstract = True
 
 
 class ComposeSource(CachedSource, ProjectionModel):

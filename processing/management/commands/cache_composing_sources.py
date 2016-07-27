@@ -1,8 +1,10 @@
 from django.core.management import BaseCommand
 
-from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, Texture
+from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration, \
+    Texture
 from processing.cache import CacheBuilder
 import sys
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -11,6 +13,7 @@ class Command(BaseCommand):
         self.cache_sources(StitchesSource, ['image'])
         self.cache_sources(CuffMask, ['mask'])
         self.cache_sources(CollarMask, ['mask'])
+        self.cache_sources(CuffConfiguration, ['side_mask'])
         self.cache_textures()
 
 

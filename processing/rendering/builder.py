@@ -9,7 +9,7 @@ from backend.models import ContrastDetails
 from backend.models import Fabric
 from dictionaries import models as dictionaries
 import processing.models as compose
-from processing.rendering.compose import Composer
+from processing.rendering.compose import Composer, ImageConf
 
 from lazy import lazy
 
@@ -51,8 +51,27 @@ class ShirtBuilder(object):
         fabric = Fabric.objects.select_related('texture').get(pk=fabric_id)
         return fabric.texture
 
+    @lazy
+    def collar_conf(self):
+        return compose.CollarConfiguration.objects.prefetch_related('masks').get(collar_id=self.collar['type'],
+                                                                                 buttons=self.collar_buttons)
 
-    def build_dickey(self):
+    @lazy
+    def collar_model(self):
+        return self.collar_conf.sources.filter(projection=self.projection).first()
+
+    @lazy
+    def cuff_conf(self):
+        return compose.CuffConfiguration.objects.get(cuff_types__id=self.cuff['type'],
+                                                     rounding_id=self.cuff['rounding'])
+
+    @lazy
+    def cuff_model(self):
+        return self.cuff_conf.sources.filter(projection=self.projection).first()
+
+    def append_dickey(self):
+        if self.projection == compose.PROJECTION.back or not self.dickey:
+            return None
         start = time()
         conf = self.get_compose_configuration(compose.DickeyConfiguration, {
             'dickey_id': self.dickey['type'],
@@ -61,17 +80,22 @@ class ShirtBuilder(object):
         light = conf.cache.get(source_field='light')
         alpha = conf.cache.get(source_field='uv_alpha')
         alpha_img = Image.open(alpha.file.path)
-        for alpha_conf in self.alphas:
-            if isinstance(alpha_conf.source.content_object, compose.CollarConfiguration) or \
-                    isinstance(alpha_conf.source.content_object, compose.CuffConfiguration):
-                part_alpha = Image.open(alpha_conf.file.path)
-                inversed = ImageOps.invert(part_alpha)
-                alpha_img.paste(inversed,
-                                (
-                                    alpha_conf.position[0] - alpha.position[0],
-                                    alpha_conf.position[1] - alpha.position[1]
-                                ),
-                                mask=part_alpha)
+        dickey_alphas = []
+        for alpha_cache in self.alphas:
+            if isinstance(alpha_cache.content_object.content_object, compose.CollarConfiguration) or \
+                    isinstance(alpha_cache.content_object.content_object, compose.CuffConfiguration):
+                dickey_alphas.append(alpha_cache)
+        if self.projection == compose.PROJECTION.side:
+            dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask'))
+        for alpha_cache in dickey_alphas:
+            part_alpha = Image.open(alpha_cache.file.path)
+            inverted = ImageOps.invert(part_alpha)
+            alpha_img.paste(inverted,
+                            (
+                                alpha_cache.position[0] - alpha.position[0],
+                                alpha_cache.position[1] - alpha.position[1]
+                            ),
+                            mask=part_alpha)
         texture = self.get_fabric_texture(self.dickey['fabric'])
         dickey = Composer.create(
             texture=texture.cache.path,
@@ -80,10 +104,8 @@ class ShirtBuilder(object):
             alpha=alpha_img
         )
         print("dickey", time() - start)
-        return {
-            'image': dickey,
-            'position': light.position,
-        }
+        return ImageConf(dickey, light.position)
+
 
     def build_shirt(self):
         total = time()
@@ -95,8 +117,8 @@ class ShirtBuilder(object):
             'hem_id': self.hem,
             'cuff_types__id': self.cuff['type']
         }))
-        self.append_collar_conf()
-        self.append_cuff_conf()
+        self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
+        self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
         self.append_model(self.get_compose_configuration(compose.PocketConfiguration, {
             'pocket_id': self.pocket
         }))
@@ -132,8 +154,7 @@ class ShirtBuilder(object):
         else:
             shadow = None
         alpha = Composer.compose_alpha(self.alphas)
-        # dickey = self.build_dickey()
-        dickey = None
+        dickey = self.append_dickey()
         print("preparation", time() - start)
         start = time()
 
@@ -176,12 +197,9 @@ class ShirtBuilder(object):
         try:
             shadow = model.cache.get(source_field='ao')
             if post_shadow:
-                self.post_shadows.append({
-                    'image': shadow.file.path,
-                    'position': shadow.position
-                })
+                self.post_shadows.append(ImageConf.for_cache(shadow))
             else:
-                self.shadows.append(model.cache.get(source_field='ao'))
+                self.shadows.append(shadow)
         except ObjectDoesNotExist:
             pass
         self.alphas.append(model.cache.get(source_field='uv_alpha'))
@@ -199,9 +217,9 @@ class ShirtBuilder(object):
                 'position': cache.position
             }
             if conf.type == compose.StitchesSource.STITCHES_TYPE.under:
-                self.lower_stitches.append(image)
+                self.lower_stitches.append(ImageConf.for_cache(cache))
             else:
-                self.upper_stitches.append(image)
+                self.upper_stitches.append(ImageConf.for_cache(cache))
 
     def append_buttons(self, conf):
         if conf is None:
@@ -214,16 +232,10 @@ class ShirtBuilder(object):
         ao = conf.cache.filter(source_field='ao').first()
         if conf.projection == compose.PROJECTION.front or not isinstance(conf.content_object,
                                                                          compose.BodyButtonsConfiguration):
-            self.buttons.append({
-                'image': buttons_cache.file.path,
-                'position': buttons_cache.position
-            })
-
+            self.buttons.append(ImageConf.for_cache(buttons_cache))
             if ao:
-                self.post_shadows.append({
-                    'image': ao.file.path,
-                    'position': ao.position
-                })
+                self.post_shadows.append(ImageConf.for_cache(ao))
+
         else:
             buttons_base = Image.new("RGBA", (2048, 2048), 0)
             img = Image.open(buttons_cache.file.path)
@@ -241,24 +253,6 @@ class ShirtBuilder(object):
         except ObjectDoesNotExist:
             return None
 
-    @lazy
-    def collar_conf(self):
-        return compose.CollarConfiguration.objects.prefetch_related('masks').get(collar_id=self.collar['type'],
-                                                                                 buttons=self.collar_buttons)
-
-    @lazy
-    def collar_model(self):
-        return self.collar_conf.sources.filter(projection=self.projection).first()
-
-    @lazy
-    def cuff_conf(self):
-        return compose.CuffConfiguration.objects.get(cuff_types__id=self.cuff['type'],
-                                                     rounding_id=self.cuff['rounding'])
-
-    @lazy
-    def cuff_model(self):
-        return self.cuff_conf.sources.filter(projection=self.projection).first()
-
     def get_back(self):
         back_conf = compose.BackConfiguration.objects.get(back_id=self.back, tuck=self.tuck, hem_id=self.hem)
         return back_conf.sources.filter(projection=self.projection).first()
@@ -274,12 +268,40 @@ class ShirtBuilder(object):
             print('params: %s' % filters)
             return None
 
+    def append_solid_contrasting_part(self, ao, light_conf, model, part_details, uv):
+        fabric = part_details[0]['fabric']
+        texture = self.get_fabric_texture(fabric)
+        alpha_cache = model.cache.get(source_field='uv_alpha')
+        self.alphas.append(alpha_cache)
+        composed_detail = Composer.create(
+            texture=texture.cache.path,
+            uv=uv,
+            light=Image.open(light_conf.file.path),
+            shadow=Image.open(ao) if texture.needs_shadow else None,
+            alpha=Image.open(alpha_cache.file.path)
+        )
+        self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
-    def append_cuff_conf(self):
-        self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
-
-    def append_collar_conf(self):
-        self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
+    def append_granular_contrasting_part(self, ao, detail_masks, light_conf, uv):
+        light_image = Image.open(light_conf.file.path)
+        ao = Image.open(ao)
+        for detail_mask in detail_masks:
+            detail, mask = detail_mask
+            fabric = detail['fabric']
+            texture = self.get_fabric_texture(fabric)
+            alpha_cache = mask.cache.get(source_field='mask')
+            alpha = Image.new("L", light_image.size, color=0)
+            alpha_image = Image.open(alpha_cache.file.path)
+            position = tuple(alpha_cache.position[x] - light_conf.position[x] for x in [0, 1])
+            alpha.paste(alpha_image, position)
+            composed_detail = Composer.create(
+                texture.cache.path,
+                uv,
+                light_image,
+                ao if texture.needs_shadow else None,
+                alpha=alpha
+            )
+            self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
     def append_contrasting_part(self, conf, model, elements):
         if not self.contrast_details:
@@ -294,23 +316,9 @@ class ShirtBuilder(object):
         uv = np.load(model.cache.get(source_field='uv').file.path)
         light_conf = model.cache.get(source_field='light')
         ao = model.cache.get(source_field='ao').file.path
-        if sorted(present_part_keys) == sorted(part_keys):
-            print("eee, ecomonia!")
-            fabric = part_details[0]['fabric']
-            texture = self.get_fabric_texture(fabric)
-            alpha_cache = model.cache.get(source_field='uv_alpha')
-            self.alphas.append(alpha_cache)
-            composed_detail = Composer.create(
-                texture=texture.cache.path,
-                uv=uv,
-                light=Image.open(light_conf.file.path),
-                shadow=Image.open(ao) if texture.needs_shadow else None,
-                alpha=Image.open(alpha_cache.file.path)
-            )
-            self.extra_details.append({
-                'image': composed_detail,
-                'position': light_conf.position
-            })
+        fabrics = set(map(lambda d: d['fabric'], part_details))
+        if sorted(present_part_keys) == sorted(part_keys) and len(fabrics) == 1:
+            self.append_solid_contrasting_part(ao, light_conf, model, part_details, uv)
         else:
             self.append_model(model)
             detail_masks = []
@@ -319,27 +327,5 @@ class ShirtBuilder(object):
                 if mask:
                     detail_masks.append((detail, mask))
 
-            if not detail_masks:
-                return
-            light_image = Image.open(light_conf.file.path)
-            ao = Image.open(ao)
-            for detail_mask in detail_masks:
-                detail, mask = detail_mask
-                fabric = detail['fabric']
-                texture = self.get_fabric_texture(fabric)
-                alpha_cache = mask.cache.get(source_field='mask')
-                alpha = Image.new("L", light_image.size, color=0)
-                alpha_image = Image.open(alpha_cache.file.path)
-                position = tuple(alpha_cache.position[x] - light_conf.position[x] for x in [0, 1])
-                alpha.paste(alpha_image, position)
-                composed_detail = Composer.create(
-                    texture.cache.path,
-                    uv,
-                    light_image,
-                    ao if texture.needs_shadow else None,
-                    alpha=alpha
-                )
-                self.extra_details.append({
-                    'image': composed_detail,
-                    'position': light_conf.position
-                })
+            if detail_masks:
+                self.append_granular_contrasting_part(ao, detail_masks, light_conf, uv)
