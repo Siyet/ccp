@@ -238,6 +238,8 @@ class HemType(ComponentModel):
 
 
 class SleeveType(ComponentModel):
+    cuffs = models.BooleanField(_(u'Манжеты'), default=True)
+
     class Meta:
         verbose_name = _(u'Тип рукава')
         verbose_name_plural = _(u'Типы рукавов')

@@ -206,6 +206,14 @@ class Cuff(models.Model):
     def __unicode__(self):
         return u''
 
+    def save(self, *args, **kwargs):
+        if not self.shirt.sleeve.cuffs:
+            if self.id:
+                self.delete()
+            return None
+
+        return super(Cuff, self).save(*args, **kwargs)
+
     class Meta:
         verbose_name = _(u'Манжета')
         verbose_name_plural = _(u'Манжеты')
@@ -388,6 +396,11 @@ class Shirt(OrderedModel):
         return price
 
     def save(self, *args, **kwargs):
+        cuff = getattr(self, 'cuff', None)
+        if cuff and not self.sleeve.cuffs:
+            if cuff.id:
+                cuff.delete()
+
         self.price = self.calculate_price()
         super(Shirt, self).save(*args, **kwargs)
 
@@ -395,7 +408,6 @@ class Shirt(OrderedModel):
     class Meta:
         verbose_name = _(u'Рубашка')
         verbose_name_plural = _(u'Рубашки')
-
 
 
 class CustomShirt(Shirt):
