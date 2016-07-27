@@ -199,7 +199,7 @@ class Cuff(models.Model):
     hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
     type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='type_cuffs')
     rounding = ChainedForeignKey('dictionaries.CuffRounding', verbose_name=_(u'Тип закругления'), chained_field='type',
-                                 chained_model_field='types', show_all=False, null=True)
+                                 chained_model_field='types', show_all=False, null=True, blank=True)
 
     shirt = models.OneToOneField('backend.Shirt', related_name='cuff')
 
