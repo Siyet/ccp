@@ -24,7 +24,7 @@ class ShirtBuilder(object):
         self.cuff = shirt_data.get('cuff')
         self.custom_buttons_type = shirt_data.get('custom_buttons_type')
         self.custom_buttons = shirt_data.get('custom_buttons')
-        self.sleeve = shirt_data.get('sleeve')
+        self.sleeve = dictionaries.SleeveType.objects.get(pk=shirt_data.get('sleeve'))
         self.hem = shirt_data.get('hem')
         self.placket = shirt_data.get('placket')
         self.tuck = shirt_data.get('tuck')
@@ -62,8 +62,8 @@ class ShirtBuilder(object):
 
     @lazy
     def cuff_conf(self):
-        return compose.CuffConfiguration.objects.get(cuff_types__id=self.cuff['type'],
-                                                     rounding_id=self.cuff['rounding'])
+        return compose.CuffConfiguration.objects.get(cuff_types__id=self.cuff['type'] if self.cuff else None,
+                                                     rounding_id=self.cuff['rounding'] if self.cuff else None)
 
     @lazy
     def cuff_model(self):
@@ -113,12 +113,13 @@ class ShirtBuilder(object):
         texture = self.get_fabric_texture(self.fabric)
 
         self.append_model(self.get_compose_configuration(compose.BodyConfiguration, {
-            'sleeve_id': self.sleeve,
+            'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,
-            'cuff_types__id': self.cuff['type']
+            'cuff_types__id': self.cuff['type'] if self.cuff else None
         }))
         self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
-        self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
+        if self.sleeve.cuffs:
+            self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
         self.append_model(self.get_compose_configuration(compose.PocketConfiguration, {
             'pocket_id': self.pocket
         }))
@@ -138,10 +139,11 @@ class ShirtBuilder(object):
                 'buttons_id': self.custom_buttons_type
             }))
 
-        self.append_buttons_stitches(self.get_buttons_conf(compose.CuffButtonsConfiguration, {
-            'cuff_id': self.cuff['type'],
-            'rounding_types__id': self.cuff['rounding']
-        }))
+        if self.cuff:
+            self.append_buttons_stitches(self.get_buttons_conf(compose.CuffButtonsConfiguration, {
+                'cuff_id': self.cuff['type'],
+                'rounding_types__id': self.cuff['rounding']
+            }))
         self.append_buttons_stitches(self.get_buttons_conf(compose.CollarButtonsConfiguration, {
             'collar_id': self.collar['type'],
             'buttons': self.collar_buttons

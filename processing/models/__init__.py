@@ -11,5 +11,6 @@ from .configuration import (
     YokeConfiguration,
     BodyButtonsConfiguration,
     CollarButtonsConfiguration,
-    CuffButtonsConfiguration
+    CuffButtonsConfiguration,
+    StitchColor
 )

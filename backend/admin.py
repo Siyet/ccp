@@ -5,15 +5,18 @@ from django.contrib import admin
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
 from imagekit.admin import AdminThumbnail
+from django.conf.urls import url
 
 from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from conversions.mixin import TemplateAndFormatMixin
 
 from grappelli_orderable.admin import GrappelliOrderableAdmin
+from django.http.response import HttpResponse
+from dictionaries.models import SleeveType
 from .models import *
 
 from .forms import AccessoriesPriceAdminForm, CuffInlineForm
-
+import json
 
 class ShirtImageInline(admin.TabularInline):
     model = ShirtImage
@@ -41,6 +44,25 @@ class ContrastStitchInline(admin.TabularInline):
     extra = 1
 
 
+class BaseShirtAdmin(GrappelliOrderableAdmin):
+    class Media:
+        js = ('backend/admin/shirt/scripts.js',)
+
+    def get_urls(self):
+        urls = super(BaseShirtAdmin, self).get_urls()
+        return [
+            url(r'^[0-9]+/show_cuffs/(?P<pk>[0-9]+)/$', self.show_cuffs),
+        ] + urls
+
+    def show_cuffs(self, request, pk):
+        try:
+            sleeve = SleeveType.objects.get(pk=pk)
+            show_cuffs = sleeve.cuffs
+        except:
+            show_cuffs = True
+        return HttpResponse(json.dumps(show_cuffs))
+
+
 class CustomShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
     exclude = ['is_template', 'code', 'showcase_image', 'individualization']
@@ -53,7 +75,7 @@ class DickeyInline(admin.StackedInline):
     max_num = 1
 
 
-class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, GrappelliOrderableAdmin):
+class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, BaseShirtAdmin):
     resource_class = TemplateShirtResource
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
@@ -94,6 +116,7 @@ class FabricResidualAdminInline(admin.TabularInline):
 
 
 class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
+
     RESIDUAL_KEY = "storehouse_%s"
     list_per_page = 20
     resource_class = FabricResource

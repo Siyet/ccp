@@ -2,7 +2,9 @@
 
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
+
 
 from dictionaries import models as dictionaries
 from backend import models as backend
@@ -145,3 +147,22 @@ class CuffButtonsConfiguration(ButtonsConfigurationModel):
     class Meta:
         verbose_name = _(u'Конфигурация сборки для пуговиц манжет')
         verbose_name_plural = _(u'Конфигурации сборки для пуговиц манжет')
+
+
+
+class StitchColor(models.Model):
+    _buttons_ct_id = [
+        ContentType.objects.get_for_model(BodyButtonsConfiguration).id,
+        ContentType.objects.get_for_model(CollarButtonsConfiguration).id,
+        ContentType.objects.get_for_model(CuffButtonsConfiguration).id,
+    ]
+
+    content_type = models.OneToOneField(ContentType, verbose_name=_(u'Тип конфигурации'), limit_choices_to={
+        'id__in': _buttons_ct_id
+    })
+    buttons_type = models.OneToOneField(backend.ElementStitch, verbose_name=_(u'Отстрочка'))
+
+    class Meta:
+
+        verbose_name = _(u'Конфигурация отстрочки')
+        verbose_name_plural = _(u'Конфигурации отстрочек')
