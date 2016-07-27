@@ -41,6 +41,9 @@ INSTALLED_APPS = (
     'backend',
     'checkout',
     'processing',
+
+    # should be the last
+    'django_cleanup'
 )
 
 MIDDLEWARE_CLASSES = (

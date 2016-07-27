@@ -1,8 +1,10 @@
 import os
 
 from django.conf import settings
+import numpy as np
+from PIL import Image
 
-from .process import create
+from processing.rendering.compose import Composer
 
 
 def localpath(file):
@@ -16,10 +18,9 @@ class ComposeSample(object):
         self.cached_file = cached_file
 
     def process(self, img):
-        sample = [
-            self.cached_file,
-            localpath("sample/UV.npy"),
-            localpath("sample/LIGHT.png"),
-            localpath("sample/LIGHT.png") if self.shadow else None
-        ]
-        return create(*sample, AA=False)
+
+        texture = self.cached_file
+        uv = np.load(localpath("sample/UV.npy"))
+        light = Image.open(localpath("sample/LIGHT.png"))
+        shadow = Image.open(localpath("sample/AO.png")) if self.shadow else None
+        return Composer.create(texture, uv, light, shadow, AA=False)
