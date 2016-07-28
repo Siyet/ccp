@@ -12,6 +12,8 @@ from ordered_model.models import OrderedModel
 from yandex_kassa.models import Payment as YandexPayment
 from yandex_kassa.signals import payment_completed
 
+from backend.models import ContrastDetails, ElementStitch
+from backend.models import ContrastDetails
 from core.mail import CostumecodeMailer
 from core.utils import first, achain
 
@@ -249,6 +251,7 @@ class OrderDetails(models.Model):
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
 
+    @property
     def get_data(self):
         data = []
         try:
@@ -304,68 +307,26 @@ class OrderDetails(models.Model):
                 ]]
             )
 
-        data.append(
-            [_(u'ДЕТАЛИ 2'), [
-                (
-                    _(u'Сорочка (ОЦ)'),
-                    next((x.color.title for x in self.shirt.contrast_stitches.all() if x.element.title == u'Сорочка'), '-'),
-                ),
-                (
-                    _(u'Воротник (ОЦ)'),
-                    next((x.color.title for x in self.shirt.contrast_stitches.all() if x.element.title == u'Воротник'), '-'),
+        contrast_stitches = {x.element.title: x.color.title for x in self.shirt.contrast_stitches.all()}
+        detail_rows = []
+        for element in ElementStitch.objects.filter(collections=self.shirt.collection):
+            detail_rows.append((element.title, contrast_stitches.get(element.title, '-')))
+        detail_rows += [
+            (_(u'Платок'), achain(self.shirt, u'Нет', 'shawl', 'title')),
+            (_(u'Цельная кокетка'), achain(self.shirt, u'Нет', 'yoke', 'title')),
+            (_(u'Застежка под штифты'), self.shirt.get_clasp_display()),
+            (_(u'Отстрочка (воротник и манжеты)'), self.shirt.get_stitch_display()),
+        ]
+        data.append([_(u'ДЕТАЛИ 2'), detail_rows])
 
-                ),
-                (
-                    _(u'Манжеты (ОЦ)'),
-                    next((x.color.title for x in self.shirt.contrast_stitches.all() if x.element.title == u'Манжета'), '-'),
-                ),
-                (
-                    _(u'Петель/ниток (ОЦ)'),
-                    next((x.color.title for x in self.shirt.contrast_stitches.all() if x.element.title == u'Петели/нитки'), '-'),
-                ),
-                (_(u'Платок'), achain(self.shirt, u'Нет', 'shawl', 'title')),
-                (_(u'Цельная кокетка'), achain(self.shirt, u'Нет', 'yoke', 'title')),
-                (_(u'Застежка под штифты'), self.shirt.get_clasp_display()),
-                (_(u'Отстрочка (воротник и манжеты)'), self.shirt.get_stitch_display()),
-            ]]
-        )
-
-        data.append(
-            [_(u'КОНТРАСТНЫЕ ДЕТАЛИ'), [
-                (
-                    _(u'Воротник'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'collar'), '-'),
-                ),
-                (
-                    _(u'Воротник лицевая сторона'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'collar_face'), '-'),
-                ),
-                (
-                    _(u'Воротник низ'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'collar_bottom'), '-'),
-                ),
-                (
-                    _(u'Воротник внешняя стойка'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'collar_outer'), '-'),
-                ),
-                (
-                    _(u'Воротник внутренняя стойка'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'collar_inner'), '-'),
-                ),
-                (
-                    _(u'Манжета'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'cuff'), '-'),
-                ),
-                (
-                    _(u'Манжета внутренняя'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'cuff_outer'), '-'),
-                ),
-                (
-                    _(u'Манжета внешняя'),
-                    next((x.fabric.code for x in self.shirt.contrast_details.all() if x.element == 'cuff_inner'), '-'),
-                ),
-            ]]
-        )
+        contrast_details = {x.element: x.fabric.code for x in self.shirt.contrast_details.all()}
+        contrast_detail_rows = [(_(u'Воротник'), '-',)]
+        for element in ContrastDetails.COLLAR_ELEMENTS:
+            contrast_detail_rows.append((element[1], contrast_details.get(element[0], '-')))
+        contrast_detail_rows.append((_(u'Манжета'), '-',))
+        for element in ContrastDetails.CUFF_ELEMENTS:
+            contrast_detail_rows.append((element[1], contrast_details.get(element[0], '-')))
+        data.append([_(u'КОНТРАСТНЫЕ ДЕТАЛИ'), contrast_detail_rows])
         return data
 
 
