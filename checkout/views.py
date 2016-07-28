@@ -1,10 +1,4 @@
-from django.http.response import HttpResponse
-from django.template import loader
-from wkhtmltopdf import render_pdf_from_template
-from wkhtmltopdf.views import PDFTemplateView
 from yandex_kassa.views import CheckOrderView as YandexCheckOrderView
-
-from checkout.models import Order
 
 
 class CheckOrderView(YandexCheckOrderView):
@@ -17,14 +11,3 @@ class CheckOrderView(YandexCheckOrderView):
             return self.get_response(content)
         payment.order.save_certificate()
         return response
-
-
-class TestPdfView(PDFTemplateView):
-    show_content_in_browser = True
-    template_name = 'checkout/payment_completed_customer_email.html'
-
-    def get(self, request, *args, **kwargs):
-        t = loader.get_template(self.template_name)
-        order = Order.objects.last()
-        content = render_pdf_from_template(t, None, None, {'order': order})
-        return HttpResponse(content, content_type='application/pdf')

@@ -261,3 +261,4 @@ class Discount(models.Model):
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
     CostumecodeMailer.send_order_payment_completed(sender.order)
+    CostumecodeMailer.send_to_customer_order_payment_completed(sender.order)
