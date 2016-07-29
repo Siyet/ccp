@@ -1,7 +1,6 @@
 # coding: utf-8
 import uuid
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.transaction import atomic
 from django.dispatch.dispatcher import receiver
@@ -12,10 +11,8 @@ from ordered_model.models import OrderedModel
 from yandex_kassa.models import Payment as YandexPayment
 from yandex_kassa.signals import payment_completed
 
-from backend.models import ContrastDetails, ElementStitch
-from backend.models import ContrastDetails
 from core.mail import CostumecodeMailer
-from core.utils import first, achain
+from core.utils import first
 
 
 class Payment(YandexPayment):
@@ -81,18 +78,6 @@ class Order(models.Model):
 
     def __unicode__(self):
         return self.number
-
-    def get_delivery(self):
-        return [
-            (u'%s' % _(u'Фамилия'), '-', ),
-            (u'%s' % _(u'Имя'), '-', ),
-            (u'%s' % _(u'Отчество'), '-', ),
-            (u'%s' % _(u'Город'), self.checkout_shop.city, ),
-            (u'%s' % _(u'Адрес'), u'%s, %s' % (self.checkout_shop.street, self.checkout_shop.home), ),
-            (u'%s' % _(u'Индекс'), self.checkout_shop.index, ),
-            (u'%s' % _(u'Телефон'), '-', ),
-            (u'%s' % _(u'E-mail'), '-', ),
-        ]
 
     @property
     def paid(self):
@@ -187,6 +172,7 @@ class Order(models.Model):
 
     def get_shirt(self, shirt):
         return self.order_details.filter(pk=shirt).first()
+
     def get_customer_address(self):
         return first((lambda x: x.type == CustomerData.ADDRESS_TYPE.customer_address), self.customer_data.all())
 
@@ -223,18 +209,6 @@ class CustomerData(models.Model):
     def __unicode__(self):
         return u'%s, %s (%s)' % (self.city, self.address, self.get_type_display())
 
-    def get_data(self):
-        return [
-            (_(u'Фамилия'), self.lastname, ),
-            (_(u'Имя'), self.name, ),
-            (_(u'Отчество'), self.midname, ),
-            (_(u'Город'), self.city, ),
-            (_(u'Адрес'), self.address, ),
-            (_(u'Индекс'), self.index, ),
-            (_(u'Телефон'), self.phone, ),
-            (_(u'E-mail'), self.email, ),
-        ]
-
     def get_fio(self):
         return u'%s %s.%s.' % (self.lastname, self.name[0], self.midname[0])
 
@@ -250,84 +224,6 @@ class OrderDetails(models.Model):
     class Meta:
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
-
-    @property
-    def get_data(self):
-        data = []
-        try:
-            data.append(
-                [_(u'ВОРОТНИК'), [
-                    (_(u'Тип'), self.shirt.collar.type.title),
-                    (_(u'Размер'), self.shirt.collar.size.title),
-                    (_(u'Жесткость воротника'), self.shirt.collar.hardness.title),
-                    (_(u'Косточки'), self.shirt.collar.stays.title),
-                ]]
-            )
-        except ObjectDoesNotExist:
-            pass
-        try:
-            data.append(
-                [_(u'МАНЖЕТЫ'), [
-                    (_(u'Тип'), self.shirt.cuff.type.title),
-                    (_(u'Углы'), self.shirt.cuff.rounding.title),
-                    (_(u'Жесткость манжета'), self.shirt.cuff.hardness.title),
-                    (_(u'Планка рукава'), 'N/A'),
-                    (_(u'Складки на рукаве'), 'N/A'),
-                    (_(u'Рукав'), 'N/A'),
-                ]]
-            )
-        except ObjectDoesNotExist:
-            pass
-        try:
-            data.append(
-                [_(u'ТКАНЬ'), [
-                    (_(u'Ткань'), self.shirt.fabric.code),
-                    (_(u'Категория'), self.shirt.fabric.category.title),
-                ]]
-            )
-        except ObjectDoesNotExist:
-            pass
-        data.append(
-            [_(u'ДЕТАЛИ 1'), [
-                (_(u'Низ'), achain(self.shirt, 'N/A', 'hem', 'title')),
-                (_(u'Полочка'), achain(self.shirt, 'N/A', 'placket', 'title')),
-                (_(u'Карман'), achain(self.shirt, 'N/A', 'pocket', 'title')),
-                (_(u'Вытачки'), self.shirt.get_tuck_display()),
-                (_(u'Спинка'), achain(self.shirt, 'N/A', 'back', 'title')),
-                (_(u'Пуговицы'), achain(self.shirt, 'N/A', 'custom_buttons', 'title')),
-            ]]
-        )
-        if self.shirt.initials:
-            data.append(
-                [_(u'ИНИЦИАЛЫ'), [
-                    (_(u'Текст'), self.shirt.initials.text),
-                    (_(u'Шрифт'), achain(self.shirt.initials, 'N/A', 'font', 'title')),
-                    (_(u'Цвет'), achain(self.shirt.initials, 'N/A', 'color', 'title')),
-                    (_(u'Расположение'), self.shirt.initials.get_location_display()),
-                ]]
-            )
-
-        contrast_stitches = {x.element.title: x.color.title for x in self.shirt.contrast_stitches.all()}
-        detail_rows = []
-        for element in ElementStitch.objects.filter(collections=self.shirt.collection):
-            detail_rows.append((element.title, contrast_stitches.get(element.title, '-')))
-        detail_rows += [
-            (_(u'Платок'), achain(self.shirt, u'Нет', 'shawl', 'title')),
-            (_(u'Цельная кокетка'), achain(self.shirt, u'Нет', 'yoke', 'title')),
-            (_(u'Застежка под штифты'), self.shirt.get_clasp_display()),
-            (_(u'Отстрочка (воротник и манжеты)'), self.shirt.get_stitch_display()),
-        ]
-        data.append([_(u'ДЕТАЛИ 2'), detail_rows])
-
-        contrast_details = {x.element: x.fabric.code for x in self.shirt.contrast_details.all()}
-        contrast_detail_rows = [(_(u'Воротник'), '-',)]
-        for element in ContrastDetails.COLLAR_ELEMENTS:
-            contrast_detail_rows.append((element[1], contrast_details.get(element[0], '-')))
-        contrast_detail_rows.append((_(u'Манжета'), '-',))
-        for element in ContrastDetails.CUFF_ELEMENTS:
-            contrast_detail_rows.append((element[1], contrast_details.get(element[0], '-')))
-        data.append([_(u'КОНТРАСТНЫЕ ДЕТАЛИ'), contrast_detail_rows])
-        return data
 
 
 class Certificate(models.Model):
