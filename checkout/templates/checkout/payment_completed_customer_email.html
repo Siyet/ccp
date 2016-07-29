@@ -9,69 +9,6 @@
             font-weight: normal;
             font-style: normal;
         }
-        .invoice-table {
-            font-family: 'robotoregular', 'Times New Roman', sans-serif;
-            border-collapse: collapse;
-            width: 100%;
-            border: 1px solid white;
-            page-break-after: always;
-        }
-        tr.invoice-row > td:first-child {
-            padding-left: 25px;
-        }
-        .invoice-table > tbody > tr > td {
-            border: 3px solid black;
-            padding: 5px;
-        }
-        .invoice-table > tbody > tr > td:first-child {
-            vertical-align: bottom;
-            width: 30%;
-        }
-        .heading {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .font-size-14 {
-            font-size: 14px;
-        }
-        .font-size-13 {
-            font-size: 13px;
-        }
-        span.period {
-            display: block;
-            float: right;
-            margin-right: 20%;
-        }
-        table.payment-details {
-            border-collapse: collapse;
-            margin-top: 10px;
-            width: 100%;
-            border-width: 0px;
-        }
-        table.payment-details thead td {
-            text-align: center;
-        }
-        table.payment-details td {
-            border: 0.3mm solid black;
-            vertical-align: top;
-            padding: 2px;
-            height: 20px;
-        }
-        table.payment-details tbody td {
-            text-align: right;
-        }
-        table.payment-details tbody td:first-child {
-            text-align: left;
-        }
-        span.sign-date {
-            margin-left: 150px;
-        }
-        span.years-space {
-            display: inline-block;
-            width: 20px;
-        }
         .text-gray {
             color: #D0D9E7;
         }
@@ -137,11 +74,11 @@
 <table class="order-table">
     <thead>
         <tr>
-            <th class="text-left" width="20%">Изображение</th>
-            <th class="text-left" width="25%">Описание</th>
-            <th class="text-right" width="15%">Количество</th>
-            <th class="text-right" width="15%">Цена</th>
-            <th class="text-right" width="15%">Итого</th>
+            <th class="text-left" width="20%">{% trans 'Изображение' %}</th>
+            <th class="text-left" width="25%">{% trans 'Описание' %}</th>
+            <th class="text-right" width="15%">{% trans 'Количество' %}</th>
+            <th class="text-right" width="15%">{% trans 'Цена' %}</th>
+            <th class="text-right" width="15%">{% trans 'Итого' %}</th>
         </tr>
     </thead>
     <tbody>
