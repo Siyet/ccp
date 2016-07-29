@@ -21,7 +21,7 @@ class ShirtImageCache(object):
 
         full_path = os.path.join(settings.RENDER_CACHE_PATH, filename)
         if not os.path.isfile(full_path):
-            builder = ShirtBuilder(data)
+            builder = ShirtBuilder(data, projection)
             image = builder.build_shirt()
             image.save(full_path)
             # TODO: придумать механизм кеширования получше
