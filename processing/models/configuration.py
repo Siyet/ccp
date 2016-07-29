@@ -5,7 +5,6 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 
-
 from dictionaries import models as dictionaries
 from backend import models as backend
 from processing.upload_path import UploadComposingSource
@@ -149,7 +148,6 @@ class CuffButtonsConfiguration(ButtonsConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для пуговиц манжет')
 
 
-
 class StitchColor(models.Model):
     _buttons_ct_id = [
         ContentType.objects.get_for_model(BodyButtonsConfiguration).id,
@@ -160,9 +158,8 @@ class StitchColor(models.Model):
     content_type = models.OneToOneField(ContentType, verbose_name=_(u'Тип конфигурации'), limit_choices_to={
         'id__in': _buttons_ct_id
     })
-    buttons_type = models.ForeignKey(backend.ElementStitch, verbose_name=_(u'Отстрочка'))
+    element = models.ForeignKey(backend.ElementStitch, verbose_name=_(u'Отстрочка'))
 
     class Meta:
-
         verbose_name = _(u'Конфигурация отстрочки')
         verbose_name_plural = _(u'Конфигурации отстрочек')

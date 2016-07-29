@@ -13,8 +13,14 @@ from django.contrib.contenttypes.models import ContentType
 
 RENDER_SIZE = (4096, 4096)
 
+EXR_FIELD = 'EXR'
+RGBA_FIELD = 'RGBA'
+L_FIELD = 'L'
+STITCHES = 'S'
 
 class CacheBuilder(object):
+
+
     SCALE_MAP = {
         'uv': 2.0,
         'light': 1.0,
@@ -22,12 +28,18 @@ class CacheBuilder(object):
         'body': 1.0,
     }
 
-    EXR_FIELDS = ('uv',)
-    RGBA_FIELDS = ('image', 'light', 'ao')
-    L_FIELDS = ('uv_alpha', 'mask', 'side_mask')
+    DEFAULT_FIELD_TYPES = {
+        'uv': EXR_FIELD,
+        'image': RGBA_FIELD,
+        'light': RGBA_FIELD,
+        'ao': RGBA_FIELD,
+        'uv_alpha': L_FIELD,
+        'mask': L_FIELD,
+        'side_mask': L_FIELD
+    }
 
     @staticmethod
-    def create_cache(instance, fields):
+    def create_cache(instance, fields, field_types):
         matrices = []
 
         for field in fields:
@@ -80,33 +92,36 @@ class CacheBuilder(object):
             instance.cache.filter(source_field=field).delete()
             scaled_bbox = tuple(x * scale for x in bbox)
             matrix.repick(scaled_bbox)
-
-            (buffer, extension) = CacheBuilder.get_buffer(field, matrix.values)
+            field_type = field_types.get(field) or CacheBuilder.DEFAULT_FIELD_TYPES.get(field)
+            (buffer, extension) = CacheBuilder.get_buffer(field, matrix.values, field_type)
             filename = "%s_%s_%s.%s" % (instance._meta.model_name, instance.id, field, extension)
             position = tuple(int(x) for x in scaled_bbox[:2])[::-1]
-            if field in CacheBuilder.L_FIELDS:
+            if field_type == L_FIELD:
                 position = tuple(x/2 for x in position)
             ct = ContentType.objects.get_for_model(instance)
             cache = SourceCache(source_field=field, object_id=instance.id, content_type=ct, position=position)
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
     @staticmethod
-    def get_buffer(field, array):
+    def get_buffer(field, array, field_type):
         buffer = BytesIO()
-        if field in CacheBuilder.EXR_FIELDS:
+        if field_type == EXR_FIELD:
             extension = 'npy'
             np.save(buffer, array)
-        elif field in CacheBuilder.L_FIELDS:
+        elif field_type == L_FIELD or field_type == STITCHES:
             extension = 'png'
             array = (array * 255.0).astype('uint8')
             if len(array.shape) > 2:
+                if array.shape[2] > 1:
+                    array = array[..., -1] # only take alpha
                 array = array.reshape(array.shape[:2])
             img = Image.fromarray(array, mode='L')
-            img = img.resize((x / 2 for x in img.size), Image.LANCZOS)
+            if field_type == L_FIELD:
+                img = img.resize((x / 2 for x in img.size), Image.LANCZOS)
             img.save(buffer, extension)
         else:
             extension = 'png'
-            channels = ('R', 'G', 'B', 'A') if field in CacheBuilder.RGBA_FIELDS else ('R', 'G', 'B')
+            channels = ('R', 'G', 'B', 'A') if field_type == RGBA_FIELD else ('R', 'G', 'B')
             if array.shape[2] == 1:
                 channels = ['L']
             img = image_from_array(array, channels=channels)

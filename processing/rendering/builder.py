@@ -4,6 +4,7 @@ from PIL import Image, ImageOps
 import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 
 from backend.models import ContrastDetails
 from backend.models import Fabric
@@ -11,8 +12,14 @@ from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
 
+from core.utils import first
+
 from lazy import lazy
 
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 class ShirtBuilder(object):
     def __init__(self, shirt_data, projection):
@@ -33,6 +40,7 @@ class ShirtBuilder(object):
         self.fabric = shirt_data.get('fabric')
         self.yoke = shirt_data.get('yoke')
         self.contrast_details = shirt_data.get('contrast_details')
+        self.contrast_stitches = shirt_data.get('contrast_stitches')
         self.reset()
 
     def reset(self):
@@ -214,14 +222,24 @@ class ShirtBuilder(object):
                 print(e.message)
                 continue
 
-            image = {
-                'image': cache.file.path,
-                'position': cache.position
-            }
+            stitches_conf = ImageConf.for_cache(cache)
+            if self.contrast_stitches:
+                ct = ContentType.objects.get_for_model(conf.content_object)
+
+                relation = compose.StitchColor.objects.get(content_type_id=ct.id)
+                element = relation.element_id
+                element_info = first(lambda s: s['element'] == element, self.contrast_stitches)
+                image = Image.open(cache.file.path)
+                if image.mode == 'L' and element_info:
+                    color = dictionaries.StitchColor.objects.get(pk=element_info["color"])
+                    back = Image.new('RGB', image.size, hex_to_rgb(color.color))
+                    back.putalpha(image)
+                    stitches_conf.image = back
+
             if conf.type == compose.StitchesSource.STITCHES_TYPE.under:
-                self.lower_stitches.append(ImageConf.for_cache(cache))
+                self.lower_stitches.append(stitches_conf)
             else:
-                self.upper_stitches.append(ImageConf.for_cache(cache))
+                self.upper_stitches.append(stitches_conf)
 
     def append_buttons(self, conf):
         if conf is None:
