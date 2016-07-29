@@ -17,9 +17,8 @@ from .utils import hex_to_rgb
 
 
 class ShirtBuilder(object):
-    def __init__(self, shirt_data, projection):
-        self.projection = projection
-        self.shirt_data = shirt_data
+    def __init__(self, shirt_data):
+        self.projection = shirt_data.get('projection')
         self.collar = shirt_data.get('collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
         self.pocket = shirt_data.get('pocket', None)

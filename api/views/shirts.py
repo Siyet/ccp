@@ -18,7 +18,7 @@ from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
 from api.filters import TemplateShirtsFilter
-from api.cache import TempFileToken
+from api.cache import ShirtImageCache
 from processing.rendering.builder import ShirtBuilder
 
 
@@ -129,15 +129,6 @@ class ShirtImage(APIView):
             required: true
         """
         data = request.data
-        key = sha1(json.dumps(data, sort_keys=True)).hexdigest()
-        filename = "%s.png" % key
-
-        full_path = os.path.join(settings.RENDER_CACHE_PATH, filename)
-        if not os.path.isfile(full_path):
-            builder = ShirtBuilder(data, projection)
-            image = builder.build_shirt()
-            image.save(full_path)
-            # TODO: придумать механизм кеширования получше
-            cache.set(filename, TempFileToken(full_path), timeout=5 * 60)
-
-        return Response(request.build_absolute_uri(os.path.join(settings.RENDER_CACHE_URL, filename)))
+        image_url = ShirtImageCache.get_image_url(data, projection)
+        print(image_url)
+        return Response(request.build_absolute_uri(image_url))
