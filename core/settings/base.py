@@ -21,7 +21,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
     'grappelli_orderable',
     'smart_selects',
     'imagekit',
@@ -42,6 +41,9 @@ INSTALLED_APPS = (
     'backend',
     'checkout',
     'processing',
+
+    # should be the last
+    'django_cleanup'
 )
 
 MIDDLEWARE_CLASSES = (

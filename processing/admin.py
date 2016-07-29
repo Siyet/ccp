@@ -101,7 +101,7 @@ class CuffSourceAdmin(SourceAdmin):
 
 
 class TextureAdmin(admin.ModelAdmin):
-    list_display = ['__unicode__', 'thumbnail']
+    list_display = ['__unicode__', 'tiling', 'needs_shadow', 'thumbnail']
 
     thumbnail = AdminThumbnail(image_field='sample', template='processing/sample.html')
     thumbnail.short_description = _(u'Лоскут')
@@ -114,7 +114,9 @@ admin.site.register(models.BackConfiguration, SourceAdmin)
 admin.site.register(models.PocketConfiguration, SourceAdmin)
 admin.site.register(models.PlacketConfiguration, SourceAdmin)
 admin.site.register(models.DickeyConfiguration, SourceAdmin)
+admin.site.register(models.YokeConfiguration, SourceAdmin)
 admin.site.register(models.BodyButtonsConfiguration, ButtonsSourceAdmin)
 admin.site.register(models.CollarButtonsConfiguration, ButtonsSourceAdmin)
 admin.site.register(models.CuffButtonsConfiguration, CuffButtonsAdmin)
 admin.site.register(models.Texture, TextureAdmin)
+admin.site.register(models.StitchColor)

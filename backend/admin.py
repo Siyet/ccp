@@ -1,19 +1,22 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from django import forms
 from django.contrib import admin
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
 from imagekit.admin import AdminThumbnail
+from django.conf.urls import url
 
 from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from conversions.mixin import TemplateAndFormatMixin
-from backend.widgets import ContentTypeSelect
-from core.utils import first
+
 from grappelli_orderable.admin import GrappelliOrderableAdmin
+from django.http.response import HttpResponse
+from dictionaries.models import SleeveType
 from .models import *
 
+from .forms import AccessoriesPriceAdminForm, CuffInlineForm
+import json
 
 class ShirtImageInline(admin.TabularInline):
     model = ShirtImage
@@ -23,6 +26,7 @@ class ShirtImageInline(admin.TabularInline):
 class CuffInline(admin.StackedInline):
     model = Cuff
     inline_classes = ('grp-open',)
+    form = CuffInlineForm
 
 
 class CollarInline(admin.StackedInline):
@@ -40,6 +44,25 @@ class ContrastStitchInline(admin.TabularInline):
     extra = 1
 
 
+class BaseShirtAdmin(GrappelliOrderableAdmin):
+    class Media:
+        js = ('backend/admin/shirt/scripts.js',)
+
+    def get_urls(self):
+        urls = super(BaseShirtAdmin, self).get_urls()
+        return [
+            url(r'^[0-9]+/show_cuffs/(?P<pk>[0-9]+)/$', self.show_cuffs),
+        ] + urls
+
+    def show_cuffs(self, request, pk):
+        try:
+            sleeve = SleeveType.objects.get(pk=pk)
+            show_cuffs = sleeve.cuffs
+        except:
+            show_cuffs = True
+        return HttpResponse(json.dumps(show_cuffs))
+
+
 class CustomShirtAdmin(admin.ModelAdmin):
     inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
     exclude = ['is_template', 'code', 'showcase_image', 'individualization']
@@ -52,7 +75,7 @@ class DickeyInline(admin.StackedInline):
     max_num = 1
 
 
-class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, GrappelliOrderableAdmin):
+class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, BaseShirtAdmin):
     resource_class = TemplateShirtResource
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
@@ -93,6 +116,7 @@ class FabricResidualAdminInline(admin.TabularInline):
 
 
 class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
+
     RESIDUAL_KEY = "storehouse_%s"
     list_per_page = 20
     resource_class = FabricResource
@@ -154,43 +178,6 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
         return "; ".join([unicode(design) for design in fabric.designs.all()])
 
     get_designs.short_description = _(u'Дизайн')
-
-
-class AccessoriesPriceAdminForm(forms.ModelForm):
-    content_type = forms.ModelChoiceField(label=_('content type'), queryset=ContentType.objects.all(),
-                                          widget=ContentTypeSelect(related_field='id_object_pk'))
-    object_pk = forms.ChoiceField(required=False)
-
-    class Meta:
-        model = AccessoriesPrice
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(AccessoriesPriceAdminForm, self).__init__(*args, **kwargs)
-        instance = kwargs.get('instance')
-        if instance:
-            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in
-                                                               instance.content_type.model_class().objects.all()]
-        content_type_pk = [x.pk for x in self.fields['content_type'].queryset if
-                           hasattr(x.model_class(), 'get_related_shirts')]
-        self.fields['content_type'].queryset = self.fields['content_type'].queryset.filter(pk__in=content_type_pk)
-        self.fields['content_type'].choices = [(pk, content_type_names.get(title, title)) for pk, title in
-                                               self.fields['content_type'].choices]
-
-    def clean_content_type(self):
-        content_type = self.cleaned_data.get('content_type')
-        if not hasattr(content_type.model_class(), 'get_related_shirts'):
-            raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
-        if not self.fields['object_pk'].choices:
-            self.fields['object_pk'].choices = [(None, '')] + [(x.pk, unicode(x)) for x in
-                                                               content_type.model_class().objects.all()]
-        return content_type
-
-    def clean_object_pk(self):
-        object_pk = self.cleaned_data.get('object_pk')
-        if not object_pk:
-            return None
-        return object_pk
 
 
 class AccessoriesPriceAdmin(admin.ModelAdmin):
