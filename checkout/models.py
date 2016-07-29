@@ -126,7 +126,8 @@ class Order(models.Model):
     def get_city(self):
         if self.checkout_shop:
             return self.checkout_shop.city
-        return (self.get_other_address() or self.get_customer_address()).city
+        address = self.get_other_address() or self.get_customer_address()
+        return address.city if address else ''
     get_city.allow_tags = True
     get_city.short_description = _(u'Город')
 
