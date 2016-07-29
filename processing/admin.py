@@ -107,6 +107,11 @@ class TextureAdmin(admin.ModelAdmin):
     thumbnail.short_description = _(u'Лоскут')
 
 
+class StitchColorAdmin(admin.ModelAdmin):
+    list_display = ('content_type', 'element')
+    list_select_related = ('content_type', 'element')
+
+
 admin.site.register(models.BodyConfiguration, SourceAdmin)
 admin.site.register(models.CollarConfiguration, CollarSourceAdmin)
 admin.site.register(models.CuffConfiguration, CuffSourceAdmin)
@@ -119,4 +124,4 @@ admin.site.register(models.BodyButtonsConfiguration, ButtonsSourceAdmin)
 admin.site.register(models.CollarButtonsConfiguration, ButtonsSourceAdmin)
 admin.site.register(models.CuffButtonsConfiguration, CuffButtonsAdmin)
 admin.site.register(models.Texture, TextureAdmin)
-admin.site.register(models.StitchColor)
+admin.site.register(models.StitchColor, StitchColorAdmin)

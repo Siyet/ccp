@@ -21,28 +21,21 @@ def STMap(source, texture_arr, AA):
     source[..., 0] %= texture_arr.shape[0]
     source[..., 1] %= texture_arr.shape[1]
 
-    start = time()
     result = texture_arr[source[..., 0], source[..., 1]]
-    print("mapping", time() - start)
 
     result = Image.fromarray(result, "RGB")
     if AA:
-        start = time()
         result = result.resize(tuple(x / 2 for x in result.size), Image.LANCZOS)
-        print("resize", time() - start)
 
     return result
 
 
 def overlay_arrays(A, B):
-    start = time()
     res = ne.evaluate("""where(
                             B < 0.5,
                             2. * A * B,
                             1.0 - 2.0 * (1. - A) * (1. - B)
                          )""")
-
-    print("overlay", time() - start)
     return res
 
 
@@ -118,6 +111,7 @@ def paste(source, image_conf):
 
 
 class Composer(object):
+    from .utils import uv_to_image
     @staticmethod
     def compose_uv(sources):
         base = np.load(sources[0].file.path)
