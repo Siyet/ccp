@@ -277,6 +277,12 @@ class ContrastStitchesSerializer(serializers.ModelSerializer):
         fields = ('element', 'color')
 
 
+class InitialsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Initials
+        fields = ('font', 'location', 'text', 'color', )
+
+
 class ShirtDetailsSerializer(serializers.ModelSerializer):
     required_fields = {'collection', 'sleeve'}
 
@@ -285,6 +291,7 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
     dickey = ShirtDickeySerializer()
     contrast_details = ContrastDetailsSerializer(many=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
+    initials = InitialsSerializer(required=False)
 
     class Meta:
         model = models.Shirt
@@ -311,12 +318,17 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         collar = shirt.pop('collar')
         cuff = shirt.pop('cuff')
         dickey = shirt.pop('dickey')
+        initials = shirt.pop('initials')
         contrast_details = shirt.pop('contrast_details')
         contrast_stitches = shirt.pop('contrast_stitches')
         shirt = models.Shirt.objects.create(**shirt)
         models.Collar.objects.create(shirt=shirt, **collar)
         models.Cuff.objects.create(shirt=shirt, **cuff)
         models.Dickey.objects.create(shirt=shirt, **dickey)
+
+        if initials:
+            shirt.initials = models.Initials.objects.create(**initials)
+            shirt.save()
 
         for contrast_detail in contrast_details:
             models.ContrastDetails.objects.create(shirt=shirt, **contrast_detail)
