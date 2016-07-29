@@ -27,7 +27,7 @@ class Command(BaseCommand):
         count = model.objects.count()
         i = 0
         for src in model.objects.all():
-            if src.cache.count() < len(fields) or True:
+            if src.cache.count() < len(fields):
                 try:
                     CacheBuilder.create_cache(src, fields, field_types)
                 except:
