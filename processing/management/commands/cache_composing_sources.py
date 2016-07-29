@@ -1,12 +1,14 @@
 # coding: utf-8
 
+import sys
+
 from django.core.management import BaseCommand
 
 from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration, \
     Texture
 from processing.cache import CacheBuilder, STITCHES
-import sys
 
+from os import path
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -18,7 +20,6 @@ class Command(BaseCommand):
         self.cache_sources(CuffConfiguration, ['side_mask'])
         self.cache_textures()
 
-
     def cache_sources(self, model, fields, field_types=None):
         if not field_types:
             field_types = {}
@@ -26,7 +27,7 @@ class Command(BaseCommand):
         count = model.objects.count()
         i = 0
         for src in model.objects.all():
-            if src.cache.count() < len(fields):
+            if src.cache.count() < len(fields) or True:
                 try:
                     CacheBuilder.create_cache(src, fields, field_types)
                 except:
@@ -38,5 +39,9 @@ class Command(BaseCommand):
         sys.stdout.write('\n')
 
     def cache_textures(self):
+        print("Textures...")
         for texture in Texture.objects.all():
-            CacheBuilder.cache_texture(texture)
+            has_cache = bool(texture.cache)
+            has_cache = path.isfile(texture.cache.path) if has_cache else False
+            if not has_cache:
+                CacheBuilder.cache_texture(texture)

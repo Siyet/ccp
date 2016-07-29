@@ -14,9 +14,8 @@ def cache_texture(instance, **kwargs):
     has_cache = bool(instance.cache)
     has_cache = path.isfile(instance.cache.path) if has_cache else False
     if set(instance.changed_fields).intersection(['texture', 'tiling', 'needs_shadow']) or not has_cache:
-        CacheBuilder.cache_texture(instance)
         instance._updating_cache = True
-        instance.save()
+        CacheBuilder.cache_texture(instance)
         instance._updating_cache = False
         instance.sample.generate(force=True)
         instance.sample_thumbnail.generate(force=True)

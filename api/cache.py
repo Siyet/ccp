@@ -1,5 +1,16 @@
+import os
+
 from backend.models import Fabric, FabricPrice
 from processing.models import Texture
+
+
+class TempFileToken(object):
+    def __init__(self, path):
+        self.path = path
+
+    def __del__(self):
+        if os.path.isfile(self.path):
+            os.remove(self.path)
 
 
 def get_latest_date(model):

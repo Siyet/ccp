@@ -69,6 +69,18 @@ REST_FRAMEWORK = {
     )
 }
 
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.7/howto/static-files/
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+
+RENDER_CACHE_PATH = os.path.join(MEDIA_ROOT, "rendercache")
+RENDER_CACHE_URL = os.path.join(MEDIA_URL, 'rendercache')
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -114,5 +126,8 @@ except:
 from .appconfig import *
 # noinspection PyUnresolvedReferences
 from .email import *
-from .htmltopdf import *
+try:
+    from htmltopdf import *
+except:
+    print("htmltopdf config not found: PDF creation will fail.")
 GRAPPELLI_ADMIN_TITLE = APP_NAME
