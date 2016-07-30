@@ -11,11 +11,12 @@ from os import path
 def cache_texture(instance, **kwargs):
     if getattr(instance, '_updating_cache', False):
         return
-    has_cache = bool(instance.cache)
-    has_cache = path.isfile(instance.cache.path) if has_cache else False
+    cache = instance.get_cache()
+    has_cache = path.isfile(cache) if cache else False
     if set(instance.changed_fields).intersection(['texture', 'tiling', 'needs_shadow']) or not has_cache:
         instance._updating_cache = True
         CacheBuilder.cache_texture(instance)
+        print(instance.get_cache())
         instance._updating_cache = False
         instance.sample.generate(force=True)
         instance.sample_thumbnail.generate(force=True)

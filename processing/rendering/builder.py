@@ -15,7 +15,7 @@ from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
 from .utils import hex_to_rgb, scale_tuple
 from core.settings.base import RENDER
-
+from processing.cache import CacheBuilder
 
 class ShirtBuilder(object):
     def __init__(self, shirt_data, projection):
@@ -101,7 +101,7 @@ class ShirtBuilder(object):
                             mask=part_alpha)
         texture = self.get_fabric_texture(self.dickey['fabric'])
         dickey = Composer.create(
-            texture=texture.cache.path,
+            texture=texture.get_cache(preview=True),
             uv=np.load(conf.cache.get(source_field='uv').file.path),
             light=Image.open(light.file.path),
             alpha=alpha_img
@@ -113,7 +113,7 @@ class ShirtBuilder(object):
         total = time()
         start = time()
         texture = self.get_fabric_texture(self.fabric)
-
+        # CacheBuilder.cache_texture(texture)
         self.append_model(self.get_compose_configuration(compose.BodyConfiguration, {
             'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,
@@ -162,7 +162,7 @@ class ShirtBuilder(object):
         start = time()
 
         res = Composer.create(
-            texture=texture.cache.path,
+            texture=texture.get_cache(preview=True),
             uv=uv,
             light=light,
             shadow=shadow,
@@ -297,7 +297,7 @@ class ShirtBuilder(object):
         alpha_cache = model.cache.get(source_field='uv_alpha')
         self.alphas.append(alpha_cache)
         composed_detail = Composer.create(
-            texture=texture.cache.path,
+            texture=texture.get_cache(preview=True),
             uv=uv,
             light=Image.open(light_conf.file.path),
             shadow=Image.open(ao) if texture.needs_shadow else None,
@@ -318,7 +318,7 @@ class ShirtBuilder(object):
             position = tuple(alpha_cache.position[x] - light_conf.position[x] for x in [0, 1])
             alpha.paste(alpha_image, position)
             composed_detail = Composer.create(
-                texture.cache.path,
+                texture.get_cache(preview=True),
                 uv,
                 light_image,
                 ao if texture.needs_shadow else None,
