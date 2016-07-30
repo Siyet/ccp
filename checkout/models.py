@@ -171,6 +171,9 @@ class Order(models.Model):
             self.certificate.value = self.certificate.get_value() - self.certificate_value
             self.certificate.save(update_fields=['value'])
 
+    def get_shirt(self, shirt):
+        return self.order_details.filter(pk=shirt).first()
+
     def get_customer_address(self):
         return first((lambda x: x.type == CustomerData.ADDRESS_TYPE.customer_address), self.customer_data.all())
 

@@ -2,11 +2,12 @@
 from __future__ import absolute_import
 
 import datetime
+
 from django.contrib import admin
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
 
-from conversions.mixin import TemplateAndFormatMixin
+from conversions.mixin import TemplateAndFormatMixin, OrderExportMixin
 from conversions.resources import CertificateResource, DiscountResource
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 from yandex_kassa.admin import Payment as YandexPayment, PaymentAdmin
@@ -51,7 +52,12 @@ class ShopAdmin(GrappelliOrderableAdmin):
 class OrderDetailsInline(admin.TabularInline):
     model = OrderDetails
     extra = 0
-    readonly_fields = ('shirt', 'amount', 'price', )
+    readonly_fields = ('shirt', 'amount', 'price', 'get_export_url', )
+
+    def get_export_url(self, instance):
+        return u'<a href="export/{}">{}</a>'.format(instance.pk, _(u'Экспорт'))
+    get_export_url.allow_tags = True
+    get_export_url.short_description = _(u'Экспорт')
 
 
 class CustomerDataInline(admin.StackedInline):
@@ -59,7 +65,7 @@ class CustomerDataInline(admin.StackedInline):
     extra = 0
 
 
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(OrderExportMixin, admin.ModelAdmin):
     list_display = ('number', 'state', 'date_add', 'get_fio', 'get_city', 'get_count', 'get_amount_to_pay',
                     'get_print_url', 'get_export_url', )
     search_fields = ('number', 'customer_data__lastname', 'customer_data__name', 'customer_data__midname',
