@@ -15,6 +15,7 @@ def rename_content_types(apps, schema_editor):
             ct.model = rename.new_name.lower()
             ct.save()
         except ContentType.DoesNotExist:
+        	# exception if run first time
             pass
 
 
