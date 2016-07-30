@@ -101,10 +101,15 @@ class CuffSourceAdmin(SourceAdmin):
 
 
 class TextureAdmin(admin.ModelAdmin):
-    list_display = ['__unicode__', 'tiling', 'needs_shadow', 'thumbnail']
+    list_display = ['__unicode__', 'needs_shadow', 'thumbnail']
 
     thumbnail = AdminThumbnail(image_field='sample', template='processing/sample.html')
     thumbnail.short_description = _(u'Лоскут')
+
+
+class StitchColorAdmin(admin.ModelAdmin):
+    list_display = ('content_type', 'element')
+    list_select_related = ('content_type', 'element')
 
 
 admin.site.register(models.BodyConfiguration, SourceAdmin)
@@ -119,4 +124,4 @@ admin.site.register(models.BodyButtonsConfiguration, ButtonsSourceAdmin)
 admin.site.register(models.CollarButtonsConfiguration, ButtonsSourceAdmin)
 admin.site.register(models.CuffButtonsConfiguration, CuffButtonsAdmin)
 admin.site.register(models.Texture, TextureAdmin)
-admin.site.register(models.StitchColor)
+admin.site.register(models.StitchColor, StitchColorAdmin)

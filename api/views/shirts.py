@@ -1,16 +1,25 @@
 # coding: utf-8
 
-from django.conf import settings
+import os
+import json
+from hashlib import sha1
+
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import pagination
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.core.cache import cache
+
+from django.conf import settings
+
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
 from api.filters import TemplateShirtsFilter
+from api.cache import ShirtImageCache
+from processing.rendering.builder import ShirtBuilder
 
 
 class TemplateShirtsList(ListAPIView):
@@ -101,3 +110,25 @@ class ShirtDetails(RetrieveAPIView):
     serializer_class = serializers.ShirtDetailsSerializer
 
     queryset = models.Shirt.objects.all()
+
+
+class ShirtImage(APIView):
+    def post(self, request, projection, *args, **kwargs):
+        """
+        Генерация ссылки на изображение рубашки в заданной проекции.
+
+        ---
+        parameters:
+          - name: body
+            description: json-объект рубашки, см. /api/shirt/{pk}/
+            paramType: body
+            required: true
+          - name: projection
+            description: проекция, одно из трех значений (front|side|back)
+            paramType: path
+            required: true
+        """
+        data = request.data
+        image_url = ShirtImageCache.get_image_url(data, projection)
+        print(image_url)
+        return Response(request.build_absolute_uri(image_url))

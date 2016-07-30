@@ -4,6 +4,7 @@
 # default settings
 core/settings/database.py
 core/settings/email.py
+core/settings/htmltopdf.py
 
 # Compiled files
 *.pyc

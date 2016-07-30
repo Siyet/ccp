@@ -14,6 +14,3 @@ def shirt(request, pk, *args, **kwargs):
     image = bldr.build_shirt()
     image.save(response, "PNG")
     return response
-
-
-

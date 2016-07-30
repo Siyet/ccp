@@ -4,35 +4,38 @@ from PIL import Image, ImageOps
 import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
+from lazy import lazy
 
 from backend.models import ContrastDetails
 from backend.models import Fabric
 from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
-
-from lazy import lazy
-
+from core.utils import first
+from .utils import hex_to_rgb, scale_tuple
+from core.settings.base import RENDER
+from processing.cache import CacheBuilder
 
 class ShirtBuilder(object):
     def __init__(self, shirt_data, projection):
         self.projection = projection
-        self.shirt_data = shirt_data
         self.collar = shirt_data.get('collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
-        self.pocket = shirt_data.get('pocket')
-        self.cuff = shirt_data.get('cuff')
-        self.custom_buttons_type = shirt_data.get('custom_buttons_type')
-        self.custom_buttons = shirt_data.get('custom_buttons')
+        self.pocket = shirt_data.get('pocket', None)
+        self.cuff = shirt_data.get('cuff', None)
+        self.custom_buttons_type = shirt_data.get('custom_buttons_type', None)
+        self.custom_buttons = shirt_data.get('custom_buttons', None)
         self.sleeve = dictionaries.SleeveType.objects.get(pk=shirt_data.get('sleeve'))
         self.hem = shirt_data.get('hem')
-        self.placket = shirt_data.get('placket')
-        self.tuck = shirt_data.get('tuck')
-        self.back = shirt_data.get('back')
-        self.dickey = shirt_data.get('dickey')
+        self.placket = shirt_data.get('placket', None)
+        self.tuck = shirt_data.get('tuck', False)
+        self.back = shirt_data.get('back', None)
+        self.dickey = shirt_data.get('dickey', None)
         self.fabric = shirt_data.get('fabric')
         self.yoke = shirt_data.get('yoke')
-        self.contrast_details = shirt_data.get('contrast_details')
+        self.contrast_details = shirt_data.get('contrast_details', [])
+        self.contrast_stitches = shirt_data.get('contrast_stitches', [])
         self.reset()
 
     def reset(self):
@@ -98,14 +101,13 @@ class ShirtBuilder(object):
                             mask=part_alpha)
         texture = self.get_fabric_texture(self.dickey['fabric'])
         dickey = Composer.create(
-            texture=texture.cache.path,
+            texture=texture.get_cache(preview=True),
             uv=np.load(conf.cache.get(source_field='uv').file.path),
             light=Image.open(light.file.path),
             alpha=alpha_img
         )
         print("dickey", time() - start)
         return ImageConf(dickey, light.position)
-
 
     def build_shirt(self):
         total = time()
@@ -128,7 +130,6 @@ class ShirtBuilder(object):
             'placket_id': self.placket,
             'hem_id': self.hem
         }), post_shadow=True)
-
         if self.projection == compose.PROJECTION.back:
             self.append_model(self.get_compose_configuration(compose.YokeConfiguration, {
                 'yoke_id': self.yoke
@@ -161,7 +162,7 @@ class ShirtBuilder(object):
         start = time()
 
         res = Composer.create(
-            texture=texture.cache.path,
+            texture=texture.get_cache(preview=True),
             uv=uv,
             light=light,
             shadow=shadow,
@@ -189,8 +190,10 @@ class ShirtBuilder(object):
         self.append_stitches(stitches)
 
     def append_model(self, model, post_shadow=False):
+
         if model is None:
             return
+        # CacheBuilder.create_cache(model, ('uv', 'light', 'ao'))
         self.uv.append(model.cache.get(source_field='uv'))
         try:
             self.lights.append(model.cache.get(source_field='light'))
@@ -207,26 +210,41 @@ class ShirtBuilder(object):
         self.alphas.append(model.cache.get(source_field='uv_alpha'))
 
     def append_stitches(self, stitches):
+        if not self.contrast_stitches:
+            return
+
         for conf in stitches:
             try:
+                # CacheBuilder.create_cache(stitches, ('image',))
                 cache = conf.cache.get(source_field='image')
             except Exception as e:
                 print(e.message)
                 continue
 
-            image = {
-                'image': cache.file.path,
-                'position': cache.position
-            }
+            stitches_conf = ImageConf.for_cache(cache)
+
+            ct = ContentType.objects.get_for_model(conf.content_object)
+
+            relation = compose.StitchColor.objects.get(content_type_id=ct.id)
+            element = relation.element_id
+            element_info = first(lambda s: s['element'] == element, self.contrast_stitches)
+            image = Image.open(cache.file.path)
+            if image.mode == 'L' and element_info:
+                color = dictionaries.StitchColor.objects.get(pk=element_info["color"])
+                back = Image.new('RGB', image.size, hex_to_rgb(color.color))
+                back.putalpha(image)
+                stitches_conf.image = back
+
             if conf.type == compose.StitchesSource.STITCHES_TYPE.under:
-                self.lower_stitches.append(ImageConf.for_cache(cache))
+                self.lower_stitches.append(stitches_conf)
             else:
-                self.upper_stitches.append(ImageConf.for_cache(cache))
+                self.upper_stitches.append(stitches_conf)
 
     def append_buttons(self, conf):
         if conf is None:
             return
         try:
+            # CacheBuilder.create_cache(conf, ('image', 'ao'))
             buttons_cache = conf.cache.get(source_field='image')
         except Exception as e:
             print(e.message)
@@ -239,7 +257,8 @@ class ShirtBuilder(object):
                 self.post_shadows.append(ImageConf.for_cache(ao))
 
         else:
-            buttons_base = Image.new("RGBA", (2048, 2048), 0)
+            size = scale_tuple(RENDER['default_size'], RENDER['preview_scale'])
+            buttons_base = Image.new("RGBA", size, 0)
             img = Image.open(buttons_cache.file.path)
             buttons_base.paste(img, buttons_cache.position, mask=img)
             if ao:
@@ -256,6 +275,8 @@ class ShirtBuilder(object):
             return None
 
     def get_back(self):
+        if not self.back:
+            return None
         back_conf = compose.BackConfiguration.objects.get(back_id=self.back, tuck=self.tuck, hem_id=self.hem)
         return back_conf.sources.filter(projection=self.projection).first()
 
@@ -276,7 +297,7 @@ class ShirtBuilder(object):
         alpha_cache = model.cache.get(source_field='uv_alpha')
         self.alphas.append(alpha_cache)
         composed_detail = Composer.create(
-            texture=texture.cache.path,
+            texture=texture.get_cache(preview=True),
             uv=uv,
             light=Image.open(light_conf.file.path),
             shadow=Image.open(ao) if texture.needs_shadow else None,
@@ -297,7 +318,7 @@ class ShirtBuilder(object):
             position = tuple(alpha_cache.position[x] - light_conf.position[x] for x in [0, 1])
             alpha.paste(alpha_image, position)
             composed_detail = Composer.create(
-                texture.cache.path,
+                texture.get_cache(preview=True),
                 uv,
                 light_image,
                 ao if texture.needs_shadow else None,
@@ -315,6 +336,7 @@ class ShirtBuilder(object):
             return self.append_model(model)
         present_part_keys = filter(lambda k: k in part_keys, all_detail_keys)
         part_details = filter(lambda k: k['element'] in part_keys, self.contrast_details)
+        # CacheBuilder.create_cache(model, ('uv', 'light', 'ao'))
         uv = np.load(model.cache.get(source_field='uv').file.path)
         light_conf = model.cache.get(source_field='light')
         ao = model.cache.get(source_field='ao').file.path
@@ -327,6 +349,7 @@ class ShirtBuilder(object):
             for detail in part_details:
                 mask = conf.masks.filter(element=detail['element'], projection=self.projection).first()
                 if mask:
+                    # CacheBuilder.create_cache(mask, ('mask',))
                     detail_masks.append((detail, mask))
 
             if detail_masks:

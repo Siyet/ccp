@@ -1,6 +1,9 @@
 (function ($) {
     $(document).ready(function () {
         const sleeveSelect = $("#id_sleeve");
+        if (!sleeveSelect.length) {
+            return
+        }
         toggleCuffs(sleeveSelect.val());
         sleeveSelect.change(function () {
             toggleCuffs(this.value)

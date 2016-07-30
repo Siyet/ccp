@@ -7,6 +7,7 @@ OpenEXR
 django-imagekit==3.2.6
 numpy
 numexpr
+scipy
 
 # Admin
 django-grappelli==2.7.3
@@ -47,3 +48,6 @@ lazy
 
 # yandex-kassa
 django-yandex-kassa
+
+# wkhtmltopdf
+django-wkhtmltopdf

@@ -1,9 +1,12 @@
+from os import path
+
 from imagekit import ImageSpec, register
 from imagekit.processors import ResizeToFit
 from imagekit.utils import get_field_info
-from .processors import ComposeSample
 from django.conf import settings
-from os import path
+
+from .processors import ComposeSample
+
 
 class Generators(object):
     sample = 'costumecode:sample'
@@ -18,13 +21,12 @@ class TextureSample(ImageSpec):
     @property
     def processors(self):
         instance, field_name = get_field_info(self.source)
-        if not bool(instance.cache):
-            return []
-        if not path.isfile(instance.cache.path):
+        cache = instance.get_cache()
+        if not cache or not path.isfile(cache):
             return []
 
         return [
-            ComposeSample(instance.cache.path, instance.tiling, instance.needs_shadow),
+            ComposeSample(cache, instance.needs_shadow),
             ResizeToFit(*self.size)
         ]
 
@@ -35,7 +37,6 @@ class TextureSampleThumbnail(TextureSample):
     processors = [
         ResizeToFit(*settings.FABRIC_SAMPLE_THUMBNAIL_SIZE)
     ]
-
 
 
 register.generator(Generators.sample, TextureSample)

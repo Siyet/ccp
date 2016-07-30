@@ -51,6 +51,7 @@ class ShopAdmin(GrappelliOrderableAdmin):
 class OrderDetailsInline(admin.TabularInline):
     model = OrderDetails
     extra = 0
+    readonly_fields = ('shirt', 'amount', 'price', )
 
 
 class CustomerDataInline(admin.StackedInline):

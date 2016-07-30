@@ -120,7 +120,7 @@ class Fabric(TimeStampedModel):
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'),
                                      related_name='design_fabrics')
-    texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True)
+    texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True, on_delete=models.SET_NULL)
     dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
     active = models.BooleanField(_(u'Активна'), default=True)
 
