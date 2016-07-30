@@ -19,7 +19,11 @@ class Migration(migrations.Migration):
             name='shirt',
             field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='cuff', to='backend.Shirt'),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='cuff',
+            name='sleeve',
+        ),
+        migrations.AddField(
             model_name='cuff',
             name='sleeve',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sleeve_cuff', to='dictionaries.SleeveType', verbose_name='\u0420\u0443\u043a\u0430\u0432'),
@@ -29,22 +33,38 @@ class Migration(migrations.Migration):
             name='type',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cuff', to='dictionaries.CuffType', verbose_name='\u0422\u0438\u043f'),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='shirt',
+            name='back',
+        ),
+        migrations.AddField(
             model_name='shirt',
             name='back',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='back_shirts', to='dictionaries.BackType', verbose_name='\u0421\u043f\u0438\u043d\u043a\u0430'),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='shirt',
+            name='hem',
+        ),
+        migrations.AddField(
             model_name='shirt',
             name='hem',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='hem_shirts', to='dictionaries.HemType', verbose_name='\u041d\u0438\u0437'),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='shirt',
+            name='placket',
+        ),
+        migrations.AddField(
             model_name='shirt',
             name='placket',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='placket_shirts', to='dictionaries.PlacketType', verbose_name='\u041f\u043e\u043b\u043e\u0447\u043a\u0430'),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='shirt',
+            name='pocket',
+        ),
+        migrations.AddField(
             model_name='shirt',
             name='pocket',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='pocket_shirts', to='dictionaries.PocketType', verbose_name='\u041a\u0430\u0440\u043c\u0430\u043d'),

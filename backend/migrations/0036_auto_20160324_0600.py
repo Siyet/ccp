@@ -25,7 +25,11 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': '\u041e\u0442\u0441\u0442\u0440\u043e\u0447\u043a\u0438',
             },
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='contraststitch',
+            name='element',
+        ),
+        migrations.AddField(
             model_name='contraststitch',
             name='element',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='backend.ElementStitch', verbose_name='\u042d\u043b\u0435\u043c\u0435\u043d\u0442'),

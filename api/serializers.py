@@ -1,4 +1,6 @@
 # coding: utf-8
+from django.db import transaction
+from django.db.transaction import atomic
 from rest_framework import serializers
 from django.utils.text import ugettext_lazy as _
 from backend import models
@@ -268,23 +270,39 @@ class ContrastDetailsSerializer(serializers.ModelSerializer):
         model = models.ContrastDetails
         fields = ('element', 'fabric')
 
+
 class ContrastStitchesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ContrastStitch
         fields = ('element', 'color')
 
 
+class InitialsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Initials
+        fields = ('font', 'location', 'text', 'color', )
+
+
 class ShirtDetailsSerializer(serializers.ModelSerializer):
+    required_fields = {'collection', 'sleeve'}
+
     collar = ShirtCollarSerializer()
     cuff = ShirtCuffSerializer()
     dickey = ShirtDickeySerializer()
     contrast_details = ContrastDetailsSerializer(many=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
+    initials = InitialsSerializer(required=False)
 
     class Meta:
         model = models.Shirt
         depth = 0
         exclude = ["is_template", "is_standard", "code", "individualization", "showcase_image"]
+
+    def __init__(self, *args, **kwargs):
+        super(ShirtDetailsSerializer, self).__init__(*args, **kwargs)
+        for field_name in self.required_fields:
+            self.fields[field_name].allow_null = False
+            self.fields[field_name].required = True
 
 
 class OrderDetailsSerializer(serializers.ModelSerializer):
@@ -292,6 +310,32 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = checkout.OrderDetails
         fields = ('shirt', 'amount', )
+
+    shirt = ShirtDetailsSerializer()
+
+    def create(self, validated_data):
+        shirt = validated_data.pop('shirt')
+        collar = shirt.pop('collar')
+        cuff = shirt.pop('cuff')
+        dickey = shirt.pop('dickey')
+        initials = shirt.pop('initials')
+        contrast_details = shirt.pop('contrast_details')
+        contrast_stitches = shirt.pop('contrast_stitches')
+        shirt = models.Shirt.objects.create(**shirt)
+        models.Collar.objects.create(shirt=shirt, **collar)
+        models.Cuff.objects.create(shirt=shirt, **cuff)
+        models.Dickey.objects.create(shirt=shirt, **dickey)
+
+        if initials:
+            shirt.initials = models.Initials.objects.create(**initials)
+            shirt.save()
+
+        for contrast_detail in contrast_details:
+            models.ContrastDetails.objects.create(shirt=shirt, **contrast_detail)
+        for contrast_stitche in contrast_stitches:
+            models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
+
+        return checkout.OrderDetails.objects.create(shirt=shirt, **validated_data)
 
 
 class CustomerDataSerializer(serializers.ModelSerializer):
@@ -324,9 +368,12 @@ class OrderSerializer(serializers.ModelSerializer):
         order_details = validated_data.pop('order_details')
         customer_data = validated_data.pop('customer_data')
         order = checkout.Order.objects.create(**validated_data)
-        for detail in order_details:
-            checkout.OrderDetails.objects.create(order=order, price=detail['shirt'].price, **detail)
-        for data in customer_data:
-            checkout.CustomerData.objects.create(order=order, **data)
+        order_details_serializer = OrderDetailsSerializer()
+        with transaction.atomic():
+            for detail in order_details:
+                detail['order'] = order
+                order_details_serializer.create(detail)
+            for data in customer_data:
+                checkout.CustomerData.objects.create(order=order, **data)
         order.create_payment()
         return order
