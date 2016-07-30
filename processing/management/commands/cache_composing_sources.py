@@ -9,6 +9,7 @@ from processing.models import ComposeSource, ButtonsSource, StitchesSource, Cuff
 from processing.cache import CacheBuilder, STITCHES
 
 from os import path
+from multiprocessing import Pool
 
 class Command(BaseCommand):
     def handle(self, *args, **options):

@@ -336,7 +336,7 @@ class ShirtBuilder(object):
             return self.append_model(model)
         present_part_keys = filter(lambda k: k in part_keys, all_detail_keys)
         part_details = filter(lambda k: k['element'] in part_keys, self.contrast_details)
-
+        # CacheBuilder.create_cache(model, ('uv', 'light', 'ao'))
         uv = np.load(model.cache.get(source_field='uv').file.path)
         light_conf = model.cache.get(source_field='light')
         ao = model.cache.get(source_field='ao').file.path
@@ -349,6 +349,7 @@ class ShirtBuilder(object):
             for detail in part_details:
                 mask = conf.masks.filter(element=detail['element'], projection=self.projection).first()
                 if mask:
+                    # CacheBuilder.create_cache(mask, ('mask',))
                     detail_masks.append((detail, mask))
 
             if detail_masks:

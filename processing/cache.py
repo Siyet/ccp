@@ -20,7 +20,6 @@ L_FIELD = 'L'
 STITCHES = 'S'
 
 
-
 class CacheBuilder(object):
 
     SCALE_MAP = {
@@ -41,7 +40,7 @@ class CacheBuilder(object):
     }
 
     @staticmethod
-    def create_cache(instance, fields, field_types=None, scale=RENDER['preview_scale']):
+    def create_cache(instance, fields, field_types=None, cache_scale=RENDER['preview_scale']):
         matrices = []
         field_types = field_types or CacheBuilder.DEFAULT_FIELD_TYPES
 
@@ -60,11 +59,11 @@ class CacheBuilder(object):
 
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
-                array = ndimage.zoom(array, [scale, scale, 1], order=1)
+                array = ndimage.zoom(array, [cache_scale, cache_scale, 1], order=1)
 
             else:
                 img = image_from_array(array)
-                img = img.resize(scale_tuple(img.size, scale), Image.LANCZOS)
+                img = img.resize(scale_tuple(img.size, cache_scale), Image.LANCZOS)
                 array = np.asarray(img).astype('float32') / 255.0
 
             if isinstance(getattr(instance, 'content_object', None), BodyConfiguration):
