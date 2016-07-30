@@ -25,7 +25,7 @@ class ShirtImageCache(object):
             image = builder.build_shirt()
             image.save(full_path)
             # TODO: придумать механизм кеширования получше
-            cache.set(filename, TempFileToken(full_path), timeout=5 * 60)
+#            cache.set(filename, TempFileToken(full_path), timeout=5 * 60)
 
         return os.path.join(settings.RENDER_CACHE_URL, filename)
 
