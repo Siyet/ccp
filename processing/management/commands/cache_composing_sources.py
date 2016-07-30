@@ -4,12 +4,9 @@ import sys
 
 from django.core.management import BaseCommand
 
-from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration, \
-    Texture
+from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration
 from processing.cache import CacheBuilder, STITCHES
 
-from os import path
-from multiprocessing import Pool
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -19,7 +16,6 @@ class Command(BaseCommand):
         self.cache_sources(CuffMask, ['mask'])
         self.cache_sources(CollarMask, ['mask'])
         self.cache_sources(CuffConfiguration, ['side_mask'])
-        self.cache_textures()
 
     def cache_sources(self, model, fields, field_types=None):
         if not field_types:
@@ -38,11 +34,3 @@ class Command(BaseCommand):
             sys.stdout.write("\rprocessed (%s/%s)" % (i, count))
             sys.stdout.flush()
         sys.stdout.write('\n')
-
-    def cache_textures(self):
-        print("Textures...")
-        for texture in Texture.objects.all():
-            has_cache = bool(texture.cache)
-            has_cache = path.isfile(texture.cache.path) if has_cache else False
-            if not has_cache:
-                CacheBuilder.cache_texture(texture)

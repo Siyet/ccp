@@ -101,7 +101,7 @@ class CuffSourceAdmin(SourceAdmin):
 
 
 class TextureAdmin(admin.ModelAdmin):
-    list_display = ['__unicode__', 'tiling', 'needs_shadow', 'thumbnail']
+    list_display = ['__unicode__', 'needs_shadow', 'thumbnail']
 
     thumbnail = AdminThumbnail(image_field='sample', template='processing/sample.html')
     thumbnail.short_description = _(u'Лоскут')

@@ -12,13 +12,11 @@ def localpath(file):
 
 
 class ComposeSample(object):
-    def __init__(self, cached_file, tiling, shadow):
-        self.tiling = tiling
+    def __init__(self, cached_file, shadow):
         self.shadow = shadow
         self.cached_file = cached_file
 
     def process(self, img):
-
         texture = self.cached_file
         uv = np.load(localpath("sample/UV.npy"))
         light = Image.open(localpath("sample/LIGHT.png"))

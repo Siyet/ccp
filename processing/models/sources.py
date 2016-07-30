@@ -100,16 +100,13 @@ class StitchesSource(CachedSource, ProjectionModel):
         verbose_name_plural = _(u'Модели сборки ниток')
 
 
-class Texture(ModelDiffMixin, TimeStampedModel):
-    TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
+class Texture(ModelDiffMixin, TimeStampedModel, CachedSource):
 
     texture = models.ImageField(_(u'Файл текстуры'), storage=overwrite_storage, upload_to='textures')
-    tiling = models.PositiveIntegerField(_(u'Тайлинг'), choices=TILING, default=TILING.default)
     needs_shadow = models.BooleanField(_(u'Использовать тени'), default=True)
+
     sample = ImageSpecField(source='texture', spec=TextureSample, id=Generators.sample)
     sample_thumbnail = ImageSpecField(source='sample', spec=TextureSampleThumbnail, id=Generators.sample_thumbnail)
-
-    cache = models.FileField(storage=overwrite_storage, upload_to='textures/cache', editable=False, null=True)
 
     class Meta:
         verbose_name = _(u'Текстура')
@@ -117,3 +114,8 @@ class Texture(ModelDiffMixin, TimeStampedModel):
 
     def __unicode__(self):
         return self.texture.name
+
+    def get_cache(self, preview=False):
+        field = 'preview' if preview else 'texture'
+        cache = self.cache.filter(source_field=field).first()
+        return cache.file.path if cache else None

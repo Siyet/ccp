@@ -55,11 +55,11 @@ class CacheBuilder(object):
                 array = np.asarray(Image.open(image.path)).astype('float32') / 255.0
 
             if field == 'uv':
-                size = array.shape[:2]
 
+                array = ndimage.zoom(array, [cache_scale, cache_scale, 1], order=1)
+                size = array.shape[:2]
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
-                array = ndimage.zoom(array, [cache_scale, cache_scale, 1], order=1)
 
             else:
                 img = image_from_array(array)
@@ -141,15 +141,20 @@ class CacheBuilder(object):
         if not texture.texture:
             return
 
-        img = Image.open(texture.texture.path)
-        size = img.size
-        tiled_size = tuple(x / texture.tiling for x in RENDER['source_size'])
-        if size != tiled_size:
-            img = img.resize(tiled_size, Image.LANCZOS)
-
-        texture_arr = np.asarray(img).transpose(1, 0, 2)
-        buffer = BytesIO()
-        np.save(buffer, texture_arr)
-        buffer.flush()
         filename = "%s.npy" % texture.texture.name
-        texture.cache.save(filename, ContentFile(buffer.getvalue()))
+        ct = ContentType.objects.get_for_model(texture)
+
+        def save_to_cache(image, field):
+            texture_arr = np.asarray(image).transpose(1, 0, 2)
+            buffer = BytesIO()
+            np.save(buffer, texture_arr)
+            buffer.flush()
+            cache = SourceCache(source_field=field, object_id=texture.id, content_type=ct, position=(0, 0))
+            cache.file.save(filename, ContentFile(buffer.getvalue()))
+
+        img = Image.open(texture.texture.path)
+
+        save_to_cache(img, 'texture')
+
+        img = img.resize(scale_tuple(img.size, RENDER['preview_scale']), Image.LANCZOS)
+        save_to_cache(img, 'preview')

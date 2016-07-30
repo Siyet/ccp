@@ -31,16 +31,10 @@ class Command(BaseCommand):
                 continue
 
             texture = Texture(
-                tiling=Texture.TILING.frequent,
-                needs_shadow=True
+                needs_shadow=False,
+                texture=path.join('textures', texture_file)
             )
-            buffer = BytesIO()
-
-            image = Image.open(path.join(folder, texture_file))
-            image.save(buffer, 'png')
-            buffer.flush()
-
-            texture.texture.save(texture_name + '.png', ContentFile(buffer.getvalue()))
+            texture.save()
             fabric = Fabric.objects.filter(code=texture_name).first()
             if fabric:
                 fabric.texture = texture
