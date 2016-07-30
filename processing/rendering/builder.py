@@ -113,7 +113,7 @@ class ShirtBuilder(object):
         total = time()
         start = time()
         texture = self.get_fabric_texture(self.fabric)
-        # CacheBuilder.cache_texture(texture)
+
         self.append_model(self.get_compose_configuration(compose.BodyConfiguration, {
             'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,

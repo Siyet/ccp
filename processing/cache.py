@@ -6,7 +6,7 @@ from django.core.files.base import ContentFile
 import numpy as np
 from PIL import Image
 from django.contrib.contenttypes.models import ContentType
-from skimage import transform
+from scipy import ndimage
 
 from core.utils import first
 from processing.models import BodyConfiguration, SourceCache
@@ -56,7 +56,7 @@ class CacheBuilder(object):
 
             if field == 'uv':
 
-                array = transform.rescale(array, scale=cache_scale, order=3, preserve_range=True)
+                array = ndimage.zoom(array, [cache_scale, cache_scale, 1], order=1)
                 size = array.shape[:2]
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
