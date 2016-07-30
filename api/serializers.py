@@ -284,7 +284,7 @@ class InitialsSerializer(serializers.ModelSerializer):
 
 
 class ShirtDetailsSerializer(serializers.ModelSerializer):
-    required_fields = {'collection', 'sleeve'}
+    required_fields = {'collection', 'sleeve', 'fabric'}
 
     collar = ShirtCollarSerializer()
     cuff = ShirtCuffSerializer()
@@ -335,7 +335,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
 
-        return checkout.OrderDetails.objects.create(shirt=shirt, **validated_data)
+        return checkout.OrderDetails.objects.create(shirt=shirt, price=shirt.price, **validated_data)
 
 
 class CustomerDataSerializer(serializers.ModelSerializer):
