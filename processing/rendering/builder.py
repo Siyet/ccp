@@ -13,7 +13,8 @@ from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
-from .utils import hex_to_rgb
+from .utils import hex_to_rgb, scale_tuple
+from core.settings.base import RENDER
 
 
 class ShirtBuilder(object):
@@ -256,7 +257,8 @@ class ShirtBuilder(object):
                 self.post_shadows.append(ImageConf.for_cache(ao))
 
         else:
-            buttons_base = Image.new("RGBA", (2048, 2048), 0)
+            size = scale_tuple(RENDER['default_size'], RENDER['preview_scale'])
+            buttons_base = Image.new("RGBA", size, 0)
             img = Image.open(buttons_cache.file.path)
             buttons_base.paste(img, buttons_cache.position, mask=img)
             if ao:

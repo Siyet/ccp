@@ -109,3 +109,10 @@ def hex_to_rgb(value):
     value = value.lstrip('#')
     lv = len(value)
     return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
+
+def scale_tuple(tpl, scale):
+    if abs(scale - 1.0) < 0.001:
+        return tuple(int(x) for x in tpl)
+    res = tuple(int(round(float(x) * scale)) for x in tpl)
+    return res

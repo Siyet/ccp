@@ -10,24 +10,18 @@ from scipy import ndimage
 
 from core.utils import first
 from processing.models import BodyConfiguration, SourceCache
-from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array
+from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
 
-RENDER_SIZE = (4096, 4096)
+from core.settings.base import RENDER
 
 EXR_FIELD = 'EXR'
 RGBA_FIELD = 'RGBA'
 L_FIELD = 'L'
 STITCHES = 'S'
 
-def scale_tuple(tpl, scale):
-    if abs(scale - 1.0) < 0.001:
-        return tuple(int(x) for x in tpl)
-    res = tuple(int(round(float(x) * scale)) for x in tpl)
-    return res
+
 
 class CacheBuilder(object):
-
-    RESIZE = 0.25
 
     SCALE_MAP = {
         'uv': 2.0,
@@ -47,7 +41,7 @@ class CacheBuilder(object):
     }
 
     @staticmethod
-    def create_cache(instance, fields, field_types=None):
+    def create_cache(instance, fields, field_types=None, scale=RENDER['preview_scale']):
         matrices = []
         field_types = field_types or CacheBuilder.DEFAULT_FIELD_TYPES
 
@@ -66,11 +60,11 @@ class CacheBuilder(object):
 
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
-                array = ndimage.zoom(array, [CacheBuilder.RESIZE, CacheBuilder.RESIZE, 1], order=1)
+                array = ndimage.zoom(array, [scale, scale, 1], order=1)
 
             else:
                 img = image_from_array(array)
-                img = img.resize(scale_tuple(img.size, CacheBuilder.RESIZE), Image.LANCZOS)
+                img = img.resize(scale_tuple(img.size, scale), Image.LANCZOS)
                 array = np.asarray(img).astype('float32') / 255.0
 
             if isinstance(getattr(instance, 'content_object', None), BodyConfiguration):
@@ -150,7 +144,7 @@ class CacheBuilder(object):
 
         img = Image.open(texture.texture.path)
         size = img.size
-        tiled_size = tuple(x / texture.tiling for x in RENDER_SIZE)
+        tiled_size = tuple(x / texture.tiling for x in RENDER['source_size'])
         if size != tiled_size:
             img = img.resize(tiled_size, Image.LANCZOS)
 
