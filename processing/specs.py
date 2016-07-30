@@ -1,9 +1,12 @@
+from os import path
+
 from imagekit import ImageSpec, register
 from imagekit.processors import ResizeToFit
 from imagekit.utils import get_field_info
-from .processors import ComposeSample
 from django.conf import settings
-from os import path
+
+from .processors import ComposeSample
+
 
 class Generators(object):
     sample = 'costumecode:sample'
@@ -34,7 +37,6 @@ class TextureSampleThumbnail(TextureSample):
     processors = [
         ResizeToFit(*settings.FABRIC_SAMPLE_THUMBNAIL_SIZE)
     ]
-
 
 
 register.generator(Generators.sample, TextureSample)
