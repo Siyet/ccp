@@ -21,7 +21,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
     'grappelli_orderable',
     'smart_selects',
     'imagekit',
@@ -36,12 +35,16 @@ INSTALLED_APPS = (
     'conversions',
     'import_export',
     'yandex_kassa',
+    'wkhtmltopdf',
 
     'corsheaders',
 
     'backend',
     'checkout',
     'processing',
+
+    # should be the last
+    'django_cleanup'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -65,6 +68,18 @@ REST_FRAMEWORK = {
         'rest_framework.filters.DjangoFilterBackend',
     )
 }
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.7/howto/static-files/
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+
+RENDER_CACHE_PATH = os.path.join(MEDIA_ROOT, "rendercache")
+RENDER_CACHE_URL = os.path.join(MEDIA_URL, 'rendercache')
 
 CACHES = {
     'default': {
@@ -106,9 +121,22 @@ try:
 except:
     raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")
 
+
+# Render
+
+RENDER = {
+    'source_size': (4096, 4096),
+    'default_size': (2048, 2048),
+    'preview_scale': 0.25
+}
+
 # Misc
 
 from .appconfig import *
 # noinspection PyUnresolvedReferences
 from .email import *
+try:
+    from htmltopdf import *
+except:
+    print("htmltopdf config not found: PDF creation will fail.")
 GRAPPELLI_ADMIN_TITLE = APP_NAME

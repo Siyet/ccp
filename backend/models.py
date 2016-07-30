@@ -120,7 +120,7 @@ class Fabric(TimeStampedModel):
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'),
                                      related_name='design_fabrics')
-    texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True)
+    texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True, on_delete=models.SET_NULL)
     dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
     active = models.BooleanField(_(u'Активна'), default=True)
 
@@ -199,12 +199,20 @@ class Cuff(models.Model):
     hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
     type = models.ForeignKey('dictionaries.CuffType', verbose_name=_(u'Тип'), related_name='type_cuffs')
     rounding = ChainedForeignKey('dictionaries.CuffRounding', verbose_name=_(u'Тип закругления'), chained_field='type',
-                                 chained_model_field='types', show_all=False, null=True)
+                                 chained_model_field='types', show_all=False, null=True, blank=True)
 
     shirt = models.OneToOneField('backend.Shirt', related_name='cuff')
 
     def __unicode__(self):
         return u''
+
+    def save(self, *args, **kwargs):
+        if not self.shirt.sleeve.cuffs:
+            if self.id:
+                self.delete()
+            return None
+
+        return super(Cuff, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _(u'Манжета')
@@ -388,6 +396,11 @@ class Shirt(OrderedModel):
         return price
 
     def save(self, *args, **kwargs):
+        cuff = getattr(self, 'cuff', None)
+        if cuff and not self.sleeve.cuffs:
+            if cuff.id:
+                cuff.delete()
+
         self.price = self.calculate_price()
         super(Shirt, self).save(*args, **kwargs)
 
@@ -395,7 +408,6 @@ class Shirt(OrderedModel):
     class Meta:
         verbose_name = _(u'Рубашка')
         verbose_name_plural = _(u'Рубашки')
-
 
 
 class CustomShirt(Shirt):

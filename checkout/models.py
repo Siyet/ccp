@@ -86,7 +86,7 @@ class Order(models.Model):
     def get_full_amount(self):
         result = 0
         for detail in self.order_details.all():
-            result += float(detail.shirt.price) * detail.amount
+            result += float(detail.price) * detail.amount
         return result
     get_full_amount.allow_tags = True
     get_full_amount.short_description = _(u'Общая стоимость заказа')
@@ -217,13 +217,17 @@ class OrderDetails(models.Model):
     order = models.ForeignKey(Order, verbose_name=_(u'Заказ'), related_name='order_details')
     shirt = models.ForeignKey('backend.Shirt', verbose_name=_(u'Рубашка'))
     amount = models.IntegerField(_(u'Количество'))
-
-    def __unicode__(self):
-        return self.order.number
+    price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
     class Meta:
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
+
+    def __unicode__(self):
+        return self.order.number
+
+    def get_total(self):
+        return self.price * self.amount
 
 
 class Certificate(models.Model):
@@ -260,3 +264,4 @@ class Discount(models.Model):
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
     CostumecodeMailer.send_order_payment_completed(sender.order)
+    CostumecodeMailer.send_to_customer_order_payment_completed(sender.order)

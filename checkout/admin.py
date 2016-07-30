@@ -52,7 +52,7 @@ class ShopAdmin(GrappelliOrderableAdmin):
 class OrderDetailsInline(admin.TabularInline):
     model = OrderDetails
     extra = 0
-    readonly_fields = ('shirt', 'amount', 'get_export_url', )
+    readonly_fields = ('shirt', 'amount', 'price', 'get_export_url', )
 
     def get_export_url(self, instance):
         return u'<a href="export/{}">{}</a>'.format(instance.pk, _(u'Экспорт'))

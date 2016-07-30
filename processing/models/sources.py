@@ -8,6 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 from model_utils.models import TimeStampedModel
+from .configuration import CachedSource
 
 from backend.models import ContrastDetails
 from processing.upload_path import UploadComposingSource
@@ -26,7 +27,8 @@ class ProjectionModel(models.Model):
         abstract = True
 
 
-class ComposeSource(ProjectionModel):
+
+class ComposeSource(CachedSource, ProjectionModel):
     uv = models.FileField(_(u'UV'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/uv/%s'))
     ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'), blank=True)
     light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'), blank=True)
@@ -41,7 +43,7 @@ class ComposeSource(ProjectionModel):
         verbose_name_plural = _(u'Модели сборки')
 
 
-class ButtonsSource(ProjectionModel):
+class ButtonsSource(CachedSource, ProjectionModel):
     image = models.FileField(_(u'Изображение'), storage=overwrite_storage,
                              upload_to=UploadComposingSource("%s/buttons/image/%s"))
     ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource("%s/buttons/ao/%s"),
@@ -57,8 +59,8 @@ class ButtonsSource(ProjectionModel):
         verbose_name_plural = _(u'Модели сборки пуговиц')
 
 
-class CollarMask(ProjectionModel):
-    collar = models.ForeignKey(CollarConfiguration)
+class CollarMask(CachedSource, ProjectionModel):
+    collar = models.ForeignKey(CollarConfiguration, related_name='masks')
     mask = models.FileField(verbose_name=_(u'Файл маски'), storage=overwrite_storage,
                             upload_to=UploadComposingSource('composesource/%s/%s'))
     element = models.CharField(_(u'Элемент'), choices=ContrastDetails.COLLAR_ELEMENTS, max_length=20)
@@ -69,8 +71,8 @@ class CollarMask(ProjectionModel):
         verbose_name_plural = _(u'Маски воротника')
 
 
-class CuffMask(ProjectionModel):
-    cuff = models.ForeignKey(CuffConfiguration)
+class CuffMask(CachedSource, ProjectionModel):
+    cuff = models.ForeignKey(CuffConfiguration, related_name='masks')
     mask = models.FileField(verbose_name=_(u'Файл маски'), storage=overwrite_storage,
                             upload_to=UploadComposingSource('composesource/%s/%s'))
     element = models.CharField(_(u'Элемент'), choices=ContrastDetails.CUFF_ELEMENTS, max_length=20)
@@ -81,7 +83,7 @@ class CuffMask(ProjectionModel):
         verbose_name_plural = _(u'Маски манжет')
 
 
-class StitchesSource(ProjectionModel):
+class StitchesSource(CachedSource, ProjectionModel):
     STITCHES_TYPE = Choices(('under', _(u'Под пуговицами')), ('over', _(u'Над пуговицами')))
     type = models.CharField(verbose_name=_(u'Расположение'), choices=STITCHES_TYPE, default=STITCHES_TYPE.under,
                             blank=False, max_length=10)
@@ -98,16 +100,13 @@ class StitchesSource(ProjectionModel):
         verbose_name_plural = _(u'Модели сборки ниток')
 
 
-class Texture(ModelDiffMixin, TimeStampedModel):
-    TILING = Choices((4, "default", _(u'Стандартный')), (8, "frequent", _(u'Учащенный (х2)')))
+class Texture(ModelDiffMixin, TimeStampedModel, CachedSource):
 
     texture = models.ImageField(_(u'Файл текстуры'), storage=overwrite_storage, upload_to='textures')
-    tiling = models.PositiveIntegerField(_(u'Тайлинг'), choices=TILING, default=TILING.default)
     needs_shadow = models.BooleanField(_(u'Использовать тени'), default=True)
+
     sample = ImageSpecField(source='texture', spec=TextureSample, id=Generators.sample)
     sample_thumbnail = ImageSpecField(source='sample', spec=TextureSampleThumbnail, id=Generators.sample_thumbnail)
-
-    cache = models.FileField(storage=overwrite_storage, upload_to='textures/cache', editable=False, null=True)
 
     class Meta:
         verbose_name = _(u'Текстура')
@@ -116,3 +115,7 @@ class Texture(ModelDiffMixin, TimeStampedModel):
     def __unicode__(self):
         return self.texture.name
 
+    def get_cache(self, preview=False):
+        field = 'preview' if preview else 'texture'
+        cache = self.cache.filter(source_field=field).first()
+        return cache.file.path if cache else None
