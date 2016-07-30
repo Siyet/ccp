@@ -10,9 +10,13 @@ from django.contrib.contenttypes.models import ContentType
 def rename_content_types(apps, schema_editor):
     rename_operations = filter(lambda op: isinstance(op, migrations.RenameModel), Migration.operations)
     for rename in rename_operations:
-        ct = ContentType.objects.get(model=rename.old_name.lower())
-        ct.model = rename.new_name.lower()
-        ct.save()
+        try:
+            ct = ContentType.objects.get(model=rename.old_name.lower())
+            ct.model = rename.new_name.lower()
+            ct.save()
+        except ContentType.DoesNotExist:
+        	# exception if run first time
+            pass
 
 
 class Migration(migrations.Migration):

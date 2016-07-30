@@ -25,7 +25,11 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': '\u041a\u043e\u0441\u0442\u043e\u0447\u043a\u0438',
             },
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='collar',
+            name='stays',
+        ),
+        migrations.AddField(
             model_name='collar',
             name='stays',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='backend.Stays', verbose_name='\u041a\u043e\u0441\u0442\u043e\u0447\u043a\u0438'),

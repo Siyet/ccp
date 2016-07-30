@@ -301,10 +301,9 @@ class Shirt(OrderedModel):
     TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
-    is_template = models.BooleanField(_(u'Используется как шаблон'))
+    is_template = models.BooleanField(_(u'Используется как шаблон'), default=False)
     is_standard = models.BooleanField(_(u'Используется как стандартный вариант'), default=False, editable=False)
-    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', blank=False,
-                                   null=True)
+    collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
     individualization = models.TextField(_(u'Индивидуализация'), null=True)
 

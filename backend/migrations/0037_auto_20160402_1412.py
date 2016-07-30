@@ -14,7 +14,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='initials',
+            name='font',
+        ),
+        migrations.AddField(
             model_name='initials',
             name='font',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='dictionaries.Font', verbose_name='\u0428\u0440\u0438\u0444\u0442'),
