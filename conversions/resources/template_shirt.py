@@ -249,11 +249,12 @@ class TemplateShirtResource(resources.ModelResource):
             ]
             row.append(self.CLASP_USE_DICT[obj.clasp is not None])
             # Манишка
-            row.append(self.DICKEY_USE_DICT[obj.dickey is not None])
-            if obj.dickey:
+            dickey = getattr(obj, 'dickey', None)
+            row.append(self.DICKEY_USE_DICT[dickey is not None])
+            if dickey:
                 row += [
-                    obj.dickey.fabric.code,
-                    obj.dickey.type.title,
+                    dickey.fabric.code,
+                    dickey.type.title,
                 ]
             else:
                 row += ['' for i in range(2)]
@@ -359,8 +360,7 @@ class TemplateShirtResource(resources.ModelResource):
                 save_relations(instance.cuff, 'rounding')
                 save_relations(instance.cuff, 'hardness')
 
-            if instance.dickey is not None:
-                save_relations(instance, 'dickey')
+            if hasattr(instance, 'dickey'):
                 save_relations(instance.dickey, 'type')
                 save_relations(instance.dickey, 'fabric')
 
@@ -380,13 +380,20 @@ class TemplateShirtResource(resources.ModelResource):
                 except StopIteration:
                     instance.initials.location = instance.initials.LOCATION.button2
 
+
+    def save_related(self, shirt, field):
+            entity = getattr(shirt, field, None)
+            if not entity:
+                return
+            entity.shirt = shirt
+            save_relations(shirt, field)
+
+
     def after_save_instance(self, instance, dry_run):
         if not dry_run:
-            instance.collar.shirt = instance
-            save_relations(instance, 'collar')
-            if hasattr(instance, 'cuff'):
-                instance.cuff.shirt = instance
-                save_relations(instance, 'cuff')
+            self.save_related(instance, 'collar')
+            self.save_related(instance, 'cuff')
+            self.save_related(instance, 'dickey')
 
             # контрастные отстрочки
             self.import_contrast_stitch(instance, u'Сорочка', instance.contrast_stitch_shirt)

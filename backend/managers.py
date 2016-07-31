@@ -29,3 +29,9 @@ class FabricManager(models.Manager):
     @property
     def active(self):
         return self.get_queryset().filter(active=True)
+
+
+class TypedManager(models.Manager):
+    def get_queryset(self):
+        queryset = super(TypedManager, self).get_queryset().select_related('type')
+        return queryset

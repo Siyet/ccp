@@ -178,8 +178,10 @@ class Collar(models.Model):
                              verbose_name=_(u'Пуговицы'), null=True)
     shirt = models.OneToOneField('backend.Shirt', related_name='collar')
 
+    objects = managers.TypedManager()
+
     def __unicode__(self):
-        return u''
+        return unicode(self.type)
 
     class Meta:
         verbose_name = _(u'Воротник')
@@ -203,8 +205,10 @@ class Cuff(models.Model):
 
     shirt = models.OneToOneField('backend.Shirt', related_name='cuff')
 
+    objects = managers.TypedManager()
+
     def __unicode__(self):
-        return u''
+        return unicode(self.type)
 
     def save(self, *args, **kwargs):
         if not self.shirt.sleeve.cuffs:
@@ -262,8 +266,10 @@ class Dickey(models.Model):
                                limit_choices_to={'dickey': True})
     shirt = models.OneToOneField('backend.Shirt', related_name='dickey')
 
+    objects = managers.TypedManager()
+
     def __unicode__(self):
-        return u''
+        return unicode(self.type)
 
     class Meta:
         verbose_name = _(u'Манишка')
