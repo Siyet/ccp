@@ -87,15 +87,13 @@ class TemplateShirtsFiltersList(APIView):
             design_fabrics__shirt__is_template=True,
             design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
-        sex_values = models.Collection.objects.filter(
+        collections = models.Collection.objects.filter(
             shirts__is_template=True,
             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
-        ).values_list('sex', flat=True).distinct()
-
-        sex_pairs = map(lambda sex: {"id": sex, "title": models.SEX[sex]}, sex_values)
+        )
 
         return Response([
-            self.build_filter(u'Пол', 'collection__sex', sex_pairs),
+            self.build_filter(u'Коллекция', 'collection', list(collections.values('id', 'title').distinct())),
             self.build_filter(u'Цвет', 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
             self.build_filter(u'Тип ткани', u'fabric_type', list(fabric_types.values('id', 'title').distinct())),
             self.build_filter(u'Толщина ткани', u'thickness', list(thickness.values('id', 'title').distinct())),
