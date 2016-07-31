@@ -4,6 +4,8 @@ from django.conf import settings
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from api.views.mixins import ManyModelsView
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
@@ -137,17 +139,10 @@ class TemplateInitialsList(APIView):
         ])
 
 
-class DickeyList(APIView):
+class DickeyList(ManyModelsView, APIView):
     """
     Список тканей и типов манишек
     """
-
-    def build_filter(self, title, name, values):
-        return {
-            'title': title,
-            'id': name,
-            'values': values
-        }
 
     def get(self, request, *args, **kwargs):
         fabrics = models.Fabric.objects.active.filter(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL, dickey=True)
