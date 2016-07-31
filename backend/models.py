@@ -334,6 +334,11 @@ class Shirt(OrderedModel):
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
                                default=2) # TODO: better default
+    FIT = Choices(('classic', u'Классическая'), ('fitted', u'Приталенная'), ('very_fitted', u'Очень приталенная'))
+    fit = models.CharField(_(u'Талия'), max_length=30, blank=True, null=True, choices=FIT)
+    SLEEVE_LENGTH = Choices(('normal', u'Обычный'), ('long', u'Длинный'), ('shorter', u'Укороченный'))
+    sleeve_length = models.CharField(_(u'Длина рукава'), max_length=30, blank=True, null=True, choices=SLEEVE_LENGTH)
+
     tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=TUCK_OPTIONS, default=False)
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
