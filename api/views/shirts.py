@@ -1,25 +1,19 @@
 # coding: utf-8
 
-import os
-import json
-from hashlib import sha1
-
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework import pagination
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django.core.cache import cache
-
 from django.conf import settings
+from django.utils.text import ugettext_lazy as _
 
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
 from api.filters import TemplateShirtsFilter
 from api.cache import ShirtImageCache
-from processing.rendering.builder import ShirtBuilder
 
 
 class TemplateShirtsList(ListAPIView):
@@ -93,11 +87,11 @@ class TemplateShirtsFiltersList(APIView):
         )
 
         return Response([
-            self.build_filter(u'Коллекция', 'collection', list(collections.values('id', 'title').distinct())),
-            self.build_filter(u'Цвет', 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
-            self.build_filter(u'Тип ткани', u'fabric_type', list(fabric_types.values('id', 'title').distinct())),
-            self.build_filter(u'Толщина ткани', u'thickness', list(thickness.values('id', 'title').distinct())),
-            self.build_filter(u'Дизайн', 'fabric__designs', self.build_design_list(designs.distinct(), request)),
+            self.build_filter(_(u'Коллекция'), 'collection', list(collections.values('id', 'title').distinct())),
+            self.build_filter(_(u'Цвет'), 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
+            self.build_filter(_(u'Тип ткани'), 'fabric_type', list(fabric_types.values('id', 'title').distinct())),
+            self.build_filter(_(u'Толщина ткани'), 'thickness', list(thickness.values('id', 'title').distinct())),
+            self.build_filter(_(u'Дизайн'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
         ])
 
 
