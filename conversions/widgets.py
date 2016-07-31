@@ -31,8 +31,15 @@ class CustomForeignKeyWidget(ModelCacheMixin, ForeignKeyWidget):
     def clean(self, value):
         if value:
             obj = self.get_object(value)
-            if not obj and self.create_missing:
-                obj = self.add_object(value)
+            if not obj:
+                if self.create_missing:
+                    obj = self.add_object(value)
+                else:
+                    raise ValueError(u"'%s' with '%s' equal to '%s' was not found" % (
+                        self.model._meta.verbose_name,
+                        self.model._meta.get_field(self.field).verbose_name,
+                        value
+                    ))
             return obj
         else:
             return None
