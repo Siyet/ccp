@@ -53,15 +53,18 @@ def load_image(filename):
         return None
 
 
-def image_from_array(array, channels=None):
-    array = array * 255.0
-    channels_count = len(channels) if channels else array.shape[2]
-    real_channels = channels if channels else CHANNELS[:channels_count]
-    if channels_count == 1:
-        array = array.reshape(array.shape[:2])
-        real_channels = ['L']
-    else:
+def image_from_array(input_array, channels=None):
+    array = input_array * 255.0
+
+    if len(array.shape) > 2 and array.shape[2] > 1:
+        channels_count = len(channels) if channels else array.shape[2]
+        real_channels = channels if channels else CHANNELS[:channels_count]
         array = array[..., :channels_count]
+    else:
+        real_channels = ['L']
+        if len(array.shape) > 2:
+            array = array.reshape(array.shape[:2])
+
     return Image.fromarray(array.astype('uint8'), ''.join(real_channels))
 
 
@@ -111,7 +114,7 @@ def hex_to_rgb(value):
     return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 
-def scale_tuple(tpl, scale):
+def scale_tuple(tpl, scale=1):
     if abs(scale - 1.0) < 0.001:
         return tuple(int(x) for x in tpl)
     res = tuple(int(round(float(x) * scale)) for x in tpl)

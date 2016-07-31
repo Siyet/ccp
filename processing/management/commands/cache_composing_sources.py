@@ -27,7 +27,8 @@ class Command(BaseCommand):
             if src.cache.count() < len(fields):
                 try:
                     CacheBuilder.create_cache(src, fields, field_types)
-                except:
+                except Exception as e:
+                    print("ERROR: %s" % e.message)
                     print("failed to create cache for %s" % src.object_id)
                     raise
             i += 1

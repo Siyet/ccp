@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 from django.contrib.contenttypes.models import ContentType
 from scipy import ndimage
-
+from PIL import ImageFilter
 from core.utils import first
 from processing.models import BodyConfiguration, SourceCache
 from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
@@ -55,15 +55,21 @@ class CacheBuilder(object):
                 array = np.asarray(Image.open(image.path)).astype('float32') / 255.0
 
             if field == 'uv':
+                alpha = image_from_array(array[..., 3])
+                alpha = alpha.resize(scale_tuple(alpha.size, cache_scale / 2.0), Image.LANCZOS)
+                alpha_array = np.asarray(alpha).astype('float32') / 255.0
+                matrices.append(('uv_alpha', Submatrix(alpha_array), CacheBuilder.SCALE_MAP['uv'] / 2.0))
 
-                array = ndimage.zoom(array, [cache_scale, cache_scale, 1], order=1)
+                array = ndimage.zoom(array, [cache_scale, cache_scale, 1], order=0)
                 size = array.shape[:2]
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
 
             else:
                 img = image_from_array(array)
-                img = img.resize(scale_tuple(img.size, cache_scale), Image.LANCZOS)
+                field_type = field_types.get(field) or CacheBuilder.DEFAULT_FIELD_TYPES.get(field)
+                resize_factor = cache_scale / 2.0 if field_type == L_FIELD else cache_scale
+                img = img.resize(scale_tuple(img.size, resize_factor), Image.LANCZOS)
                 array = np.asarray(img).astype('float32') / 255.0
 
             if isinstance(getattr(instance, 'content_object', None), BodyConfiguration):
@@ -74,6 +80,10 @@ class CacheBuilder(object):
                 except:
                     print(image.path)
                     raise
+
+            if field == 'uv':
+                matrix._source = matrix._source[..., :2].astype('uint16') # cut redundant channels from uv
+
             scale = CacheBuilder.SCALE_MAP.get(field, 1)
             matrices.append((field, matrix, scale))
 
@@ -88,23 +98,15 @@ class CacheBuilder(object):
 
         bbox = (min(x0), min(y0), max(x1), max(y1))
 
-        if 'uv' in fields:
-            (_, matrix, scale) = first(lambda x: x[0] == 'uv', matrices)
-            alpha = copy(matrix)
-            alpha._source = matrix._source[..., 3]
-            matrix._source = matrix._source[..., :2] # cut redundant channels from matrix
-            matrix._source = matrix._source.astype('uint16')
-            matrices.append(('uv_alpha', alpha, scale))
-
         for field, matrix, scale in matrices:
             # remove old cache
             instance.cache.filter(source_field=field).delete()
-            scaled_bbox = tuple(x * scale for x in bbox)
+            scaled_bbox = scale_tuple(bbox, scale)
             matrix.repick(scaled_bbox)
             field_type = field_types.get(field) or CacheBuilder.DEFAULT_FIELD_TYPES.get(field)
             (buffer, extension) = CacheBuilder.get_buffer(matrix.values, field_type)
             filename = "%s_%s_%s.%s" % (instance._meta.model_name, instance.id, field, extension)
-            position = scale_tuple(scaled_bbox[:2][::-1], 0.5 if field_type == L_FIELD else 1)
+            position = scaled_bbox[:2][::-1]
             ct = ContentType.objects.get_for_model(instance)
             cache = SourceCache(source_field=field, object_id=instance.id, content_type=ct, position=position)
             cache.file.save(filename, ContentFile(buffer.getvalue()))
@@ -123,8 +125,6 @@ class CacheBuilder(object):
                     array = array[..., -1] # only take alpha
                 array = array.reshape(array.shape[:2])
             img = Image.fromarray(array, mode='L')
-            if field_type == L_FIELD:
-                img = img.resize(scale_tuple(img.size, 0.5), Image.LANCZOS)
             img.save(buffer, extension)
         else:
             extension = 'png'
@@ -143,7 +143,7 @@ class CacheBuilder(object):
 
         filename = "%s.npy" % texture.texture.name
         ct = ContentType.objects.get_for_model(texture)
-
+        SourceCache.objects.filter(object_id=texture.id, content_type=ct).delete()
         def save_to_cache(image, field):
             texture_arr = np.asarray(image).transpose(1, 0, 2)
             buffer = BytesIO()
@@ -157,4 +157,8 @@ class CacheBuilder(object):
         save_to_cache(img, 'texture')
 
         img = img.resize(scale_tuple(img.size, RENDER['preview_scale']), Image.LANCZOS)
+
+        if texture.moire_filter:
+            img = img.filter(ImageFilter.GaussianBlur(radius=1.5))
+            img = img.filter(ImageFilter.UnsharpMask(radius=1, percent=120))
         save_to_cache(img, 'preview')

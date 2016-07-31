@@ -17,9 +17,6 @@ class ImageConf(object):
 
 
 def STMap(source, texture_arr, AA):
-    # TODO: ensure cache
-    source[..., 0] %= texture_arr.shape[0]
-    source[..., 1] %= texture_arr.shape[1]
 
     result = texture_arr[source[..., 0], source[..., 1]]
 
@@ -71,8 +68,11 @@ def apply_srgb(img):
 
 
 def load_texture(texture):
-    img = load_image(texture)
-    arr = np.asarray(img)
+    texture = load_image(texture)
+    if isinstance(texture, np.ndarray):
+        return texture
+
+    arr = np.asarray(texture)
     return arr[..., :3]
 
 
@@ -143,6 +143,18 @@ class Composer(object):
             base = ImageChops.add(base, layer)
 
         return base
+
+    @staticmethod
+    def create_dickey(texture, uv, alpha, AA=True):
+        texture_arr = load_texture(texture)
+
+        result = STMap(uv, texture_arr, AA)
+
+        if alpha:
+            result.putalpha(alpha)
+
+        return result
+
 
     @staticmethod
     def create(texture, uv, light=None, shadow=None, post_shadows=[], alpha=None, buttons=[], lower_stitches=[],
