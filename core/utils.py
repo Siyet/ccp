@@ -1,5 +1,5 @@
-def first(key, sequence):
-    return next((x for x in sequence if key(x)), None)
+def first(key, sequence, default=None):
+    return next((x for x in sequence if key(x)), default)
 
 
 def achain(obj, default, *attrs):

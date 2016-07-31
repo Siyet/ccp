@@ -1,9 +1,9 @@
 # coding: utf-8
 from django.db import transaction
-from django.db.transaction import atomic
 from rest_framework import serializers
 from django.utils.text import ugettext_lazy as _
 from backend import models
+from core.utils import first
 from dictionaries import models as dictionaries
 from checkout import models as checkout
 
@@ -44,22 +44,23 @@ class FabricSerializer(serializers.ModelSerializer):
     thickness = serializers.StringRelatedField(source='thickness.title')
     price = serializers.SerializerMethodField()
     texture = serializers.SerializerMethodField()
+    tailoring_time = serializers.SerializerMethodField()
 
     def get_texture(self, obj):
         if obj.texture:
             return self.context['request'].build_absolute_uri(obj.texture.sample_thumbnail.url)
         return None
 
-    def get_price(self, object):
-        for price_info in object.cached_collection.prices:
-            if price_info["fabric_category"] == object.category_id:
-                return price_info["price"]
-        return None
+    def get_price(self, obj):
+        return first(lambda x: x["fabric_category"] == obj.category_id, obj.cached_collection.prices, {}).get('price')
 
+    def get_tailoring_time(self, obj):
+        return obj.cached_collection.tailoring_time
 
     class Meta:
         model = models.Fabric
-        fields = ['id', 'fabric_type', 'thickness', 'code', 'short_description', 'long_description', 'texture', 'price']
+        fields = ['id', 'fabric_type', 'thickness', 'code', 'short_description', 'long_description', 'texture', 'price',
+                  'tailoring_time']
 
 
 class FabricColorSerializer(serializers.ModelSerializer):
