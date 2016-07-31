@@ -102,13 +102,17 @@ class StitchesSource(CachedSource, ProjectionModel):
 
 class Texture(ModelDiffMixin, TimeStampedModel, CachedSource):
 
+    MOIRE_FILTER = Choices((0, _(u'Нет')), (1, _(u'Включен')))
+
     texture = models.ImageField(_(u'Файл текстуры'), storage=overwrite_storage, upload_to='textures')
     needs_shadow = models.BooleanField(_(u'Использовать тени'), default=True)
+    moire_filter = models.IntegerField(_(u'Муар фильтр'), choices=MOIRE_FILTER, default=0)
 
     sample = ImageSpecField(source='texture', spec=TextureSample, id=Generators.sample)
     sample_thumbnail = ImageSpecField(source='sample', spec=TextureSampleThumbnail, id=Generators.sample_thumbnail)
 
     class Meta:
+        ordering = ('texture',)
         verbose_name = _(u'Текстура')
         verbose_name_plural = _(u'Текстуры')
 

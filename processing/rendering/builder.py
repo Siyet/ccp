@@ -17,8 +17,22 @@ from .utils import hex_to_rgb, scale_tuple
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder
 
+class CacheBuilderMock(object):
+    @staticmethod
+    def cache_texture(*args, **kwargs):
+        pass
+
+    @staticmethod
+    def create_cache(*args, **kwargs):
+        pass
+
+
+cache_builder = CacheBuilderMock
+# cache_builder = CacheBuilder
+
 class ShirtBuilder(object):
-    def __init__(self, shirt_data, projection):
+    def __init__(self, shirt_data, projection, preview=True):
+        self.preview = preview
         self.projection = projection
         self.collar = shirt_data.get('collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
@@ -52,6 +66,7 @@ class ShirtBuilder(object):
 
     def get_fabric_texture(self, fabric_id):
         fabric = Fabric.objects.select_related('texture').get(pk=fabric_id)
+        cache_builder.cache_texture(fabric.texture)
         return fabric.texture
 
     @lazy
@@ -80,6 +95,7 @@ class ShirtBuilder(object):
             'dickey_id': self.dickey['type'],
             'hem_id': self.hem
         })
+        cache_builder.create_cache(conf, ('light', 'uv'))
         light = conf.cache.get(source_field='light')
         alpha = conf.cache.get(source_field='uv_alpha')
         alpha_img = Image.open(alpha.file.path)
@@ -88,7 +104,7 @@ class ShirtBuilder(object):
             if isinstance(alpha_cache.content_object.content_object, compose.CollarConfiguration) or \
                     isinstance(alpha_cache.content_object.content_object, compose.CuffConfiguration):
                 dickey_alphas.append(alpha_cache)
-        if self.projection == compose.PROJECTION.side:
+        if self.projection == compose.PROJECTION.side and self.sleeve.cuffs:
             dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask'))
         for alpha_cache in dickey_alphas:
             part_alpha = Image.open(alpha_cache.file.path)
@@ -100,10 +116,10 @@ class ShirtBuilder(object):
                             ),
                             mask=part_alpha)
         texture = self.get_fabric_texture(self.dickey['fabric'])
-        dickey = Composer.create(
-            texture=texture.get_cache(preview=True),
+        dickey = Composer.create_dickey(
+            texture=texture.get_cache(preview=self.preview),
             uv=np.load(conf.cache.get(source_field='uv').file.path),
-            light=Image.open(light.file.path),
+            # light=Image.open(light.file.path),
             alpha=alpha_img
         )
         print("dickey", time() - start)
@@ -113,7 +129,7 @@ class ShirtBuilder(object):
         total = time()
         start = time()
         texture = self.get_fabric_texture(self.fabric)
-
+        cache_builder.cache_texture(texture)
         self.append_model(self.get_compose_configuration(compose.BodyConfiguration, {
             'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,
@@ -162,7 +178,7 @@ class ShirtBuilder(object):
         start = time()
 
         res = Composer.create(
-            texture=texture.get_cache(preview=True),
+            texture=texture.get_cache(preview=self.preview),
             uv=uv,
             light=light,
             shadow=shadow,
@@ -193,7 +209,7 @@ class ShirtBuilder(object):
 
         if model is None:
             return
-        # CacheBuilder.create_cache(model, ('uv', 'light', 'ao'))
+        cache_builder.create_cache(model, ('uv', 'light', 'ao'))
         self.uv.append(model.cache.get(source_field='uv'))
         try:
             self.lights.append(model.cache.get(source_field='light'))
@@ -215,7 +231,7 @@ class ShirtBuilder(object):
 
         for conf in stitches:
             try:
-                # CacheBuilder.create_cache(stitches, ('image',))
+                cache_builder.create_cache(stitches, ('image',))
                 cache = conf.cache.get(source_field='image')
             except Exception as e:
                 print(e.message)
@@ -244,7 +260,7 @@ class ShirtBuilder(object):
         if conf is None:
             return
         try:
-            # CacheBuilder.create_cache(conf, ('image', 'ao'))
+            cache_builder.create_cache(conf, ('image', 'ao'))
             buttons_cache = conf.cache.get(source_field='image')
         except Exception as e:
             print(e.message)
@@ -297,7 +313,7 @@ class ShirtBuilder(object):
         alpha_cache = model.cache.get(source_field='uv_alpha')
         self.alphas.append(alpha_cache)
         composed_detail = Composer.create(
-            texture=texture.get_cache(preview=True),
+            texture=texture.get_cache(preview=self.preview),
             uv=uv,
             light=Image.open(light_conf.file.path),
             shadow=Image.open(ao) if texture.needs_shadow else None,
@@ -318,7 +334,7 @@ class ShirtBuilder(object):
             position = tuple(alpha_cache.position[x] - light_conf.position[x] for x in [0, 1])
             alpha.paste(alpha_image, position)
             composed_detail = Composer.create(
-                texture.get_cache(preview=True),
+                texture.get_cache(preview=self.preview),
                 uv,
                 light_image,
                 ao if texture.needs_shadow else None,
@@ -336,7 +352,7 @@ class ShirtBuilder(object):
             return self.append_model(model)
         present_part_keys = filter(lambda k: k in part_keys, all_detail_keys)
         part_details = filter(lambda k: k['element'] in part_keys, self.contrast_details)
-        # CacheBuilder.create_cache(model, ('uv', 'light', 'ao'))
+        cache_builder.create_cache(model, ('uv', 'light', 'ao'))
         uv = np.load(model.cache.get(source_field='uv').file.path)
         light_conf = model.cache.get(source_field='light')
         ao = model.cache.get(source_field='ao').file.path
@@ -349,7 +365,7 @@ class ShirtBuilder(object):
             for detail in part_details:
                 mask = conf.masks.filter(element=detail['element'], projection=self.projection).first()
                 if mask:
-                    # CacheBuilder.create_cache(mask, ('mask',))
+                    cache_builder.create_cache(mask, ('mask',))
                     detail_masks.append((detail, mask))
 
             if detail_masks:
