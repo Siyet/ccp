@@ -34,23 +34,27 @@ class ShirtBuilder(object):
     def __init__(self, shirt_data, projection, preview=True):
         self.preview = preview
         self.projection = projection
-        self.collar = shirt_data.get('collar')
+        self.collar = self.extract(shirt_data, 'collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
-        self.pocket = shirt_data.get('pocket', None)
-        self.cuff = shirt_data.get('cuff', None)
-        self.custom_buttons_type = shirt_data.get('custom_buttons_type', None)
-        self.custom_buttons = shirt_data.get('custom_buttons', None)
+        self.pocket = self.extract(shirt_data, 'pocket')
+        self.cuff = self.extract(shirt_data, 'cuff')
+        self.custom_buttons_type = self.extract(shirt_data, 'custom_buttons_type')
+        self.custom_buttons = self.extract(shirt_data, 'custom_buttons')
         self.sleeve = dictionaries.SleeveType.objects.get(pk=shirt_data.get('sleeve'))
-        self.hem = shirt_data.get('hem')
-        self.placket = shirt_data.get('placket', None)
+        self.hem = self.extract(shirt_data, 'hem')
+        self.placket = self.extract(shirt_data, 'placket')
         self.tuck = shirt_data.get('tuck', False)
-        self.back = shirt_data.get('back', None)
-        self.dickey = shirt_data.get('dickey', None)
+        self.back = self.extract(shirt_data, 'back')
+        self.dickey = self.extract(shirt_data, 'dickey')
         self.fabric = shirt_data.get('fabric')
-        self.yoke = shirt_data.get('yoke')
+        self.yoke = self.extract(shirt_data, 'yoke')
         self.contrast_details = shirt_data.get('contrast_details', [])
         self.contrast_stitches = shirt_data.get('contrast_stitches', [])
         self.reset()
+
+    def extract(self, data, param):
+        value = data.get(param, None)
+        return value or None # skip empty strings
 
     def reset(self):
         self.uv = []
@@ -146,7 +150,7 @@ class ShirtBuilder(object):
             'placket_id': self.placket,
             'hem_id': self.hem
         }), post_shadow=True)
-        if self.projection == compose.PROJECTION.back:
+        if self.projection == compose.PROJECTION.back and self.yoke:
             self.append_model(self.get_compose_configuration(compose.YokeConfiguration, {
                 'yoke_id': self.yoke
             }))
