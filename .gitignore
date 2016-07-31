@@ -21,3 +21,5 @@ media
 
 # merge leftovers
 *.orig
+
+credentials.py
