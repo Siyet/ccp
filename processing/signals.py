@@ -13,7 +13,7 @@ def cache_texture(instance, **kwargs):
         return
     cache = instance.get_cache()
     has_cache = path.isfile(cache) if cache else False
-    if set(instance.changed_fields).intersection(['texture', 'remove_moir', 'needs_shadow']) or not has_cache:
+    if set(instance.changed_fields).intersection(['texture', 'moire_filter', 'needs_shadow']) or not has_cache:
         instance._updating_cache = True
         CacheBuilder.cache_texture(instance)
         instance._updating_cache = False
