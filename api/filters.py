@@ -11,6 +11,7 @@ class TemplateShirtsFilter(filters.FilterSet):
                                                            name='fabric__fabric_type')
     thickness = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.Thickness.objects.all(),
                                                          name='fabric__thickness')
+    collection = django_filters.ModelMultipleChoiceFilter(queryset=models.Collection.objects.all())
     collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
 
     class Meta:

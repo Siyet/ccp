@@ -159,6 +159,7 @@ class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     showcase_image = serializers.ImageField(source='showcase_image_list')
     sex = serializers.SerializerMethodField()
     material = serializers.StringRelatedField(source='fabric.material')
+    collection = serializers.StringRelatedField(source='collection.title')
 
     def get_sex(self, object):
         try:
@@ -168,7 +169,7 @@ class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'thickness', 'price', 'sex']
+        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'thickness', 'price', 'sex', 'collection']
 
 
 class ShirtImageSerializer(serializers.ModelSerializer):
