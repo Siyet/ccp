@@ -311,7 +311,7 @@ class Shirt(OrderedModel):
     is_standard = models.BooleanField(_(u'Используется как стандартный вариант'), default=False, editable=False)
     collection = models.ForeignKey(Collection, verbose_name=_(u'Коллекция'), related_name='shirts', null=True)
     code = models.CharField(_(u'Артикул'), max_length=255, null=True)
-    individualization = models.TextField(_(u'Индивидуализация'), null=True)
+    individualization = models.TextField(_(u'Индивидуализация'), null=True, blank=True)
 
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), null=True)
 
