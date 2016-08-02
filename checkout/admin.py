@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import datetime
 
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 from django.utils.text import ugettext_lazy as _
 from import_export.admin import ImportExportMixin
 
@@ -52,7 +53,15 @@ class ShopAdmin(GrappelliOrderableAdmin):
 class OrderDetailsInline(admin.TabularInline):
     model = OrderDetails
     extra = 0
-    readonly_fields = ('shirt', 'amount', 'price', 'get_export_url', )
+    exclude = ('shirt', )
+    readonly_fields = ('get_shirt_url', 'amount', 'price', 'get_export_url', )
+
+    def get_shirt_url(self, instance):
+        return u'<a href="{}">{}</a>'.format(
+            reverse('admin:backend_customshirt_change', args=(instance.shirt_id, )), _(u'Рубашка')
+        )
+    get_shirt_url.allow_tags = True
+    get_shirt_url.short_description = _(u'Рубашка')
 
     def get_export_url(self, instance):
         return u'<a href="export/{}">{}</a>'.format(instance.pk, _(u'Экспорт'))
