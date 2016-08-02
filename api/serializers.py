@@ -1,5 +1,5 @@
 # coding: utf-8
-from django.db import transaction
+from django.db.transaction import atomic
 from rest_framework import serializers
 from django.utils.text import ugettext_lazy as _
 from backend import models
@@ -290,7 +290,7 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
 
     collar = ShirtCollarSerializer()
     cuff = ShirtCuffSerializer()
-    dickey = ShirtDickeySerializer()
+    dickey = ShirtDickeySerializer(required=False)
     contrast_details = ContrastDetailsSerializer(many=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
     initials = InitialsSerializer(required=False)
@@ -319,14 +319,16 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         shirt = validated_data.pop('shirt')
         collar = shirt.pop('collar')
         cuff = shirt.pop('cuff')
-        dickey = shirt.pop('dickey')
-        initials = shirt.pop('initials')
+        dickey = shirt.pop('dickey', None)
+        initials = shirt.pop('initials', None)
         contrast_details = shirt.pop('contrast_details')
         contrast_stitches = shirt.pop('contrast_stitches')
         shirt = models.Shirt.objects.create(**shirt)
         models.Collar.objects.create(shirt=shirt, **collar)
         models.Cuff.objects.create(shirt=shirt, **cuff)
-        models.Dickey.objects.create(shirt=shirt, **dickey)
+
+        if dickey:
+            models.Dickey.objects.create(shirt=shirt, **dickey)
 
         if initials:
             shirt.initials = models.Initials.objects.create(**initials)
@@ -366,16 +368,16 @@ class OrderSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_(u'Данные клиента обязательны'))
         return attrs
 
+    @atomic
     def create(self, validated_data):
         order_details = validated_data.pop('order_details')
         customer_data = validated_data.pop('customer_data')
         order = checkout.Order.objects.create(**validated_data)
         order_details_serializer = OrderDetailsSerializer()
-        with transaction.atomic():
-            for detail in order_details:
-                detail['order'] = order
-                order_details_serializer.create(detail)
-            for data in customer_data:
-                checkout.CustomerData.objects.create(order=order, **data)
+        for detail in order_details:
+            detail['order'] = order
+            order_details_serializer.create(detail)
+        for data in customer_data:
+            checkout.CustomerData.objects.create(order=order, **data)
         order.create_payment()
         return order
