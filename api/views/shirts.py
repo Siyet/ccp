@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from django.conf import settings
 from django.utils.text import ugettext_lazy as _
 
-from api.views.mixins import ManyModelsView
+from api.views.mixins import FilterHelpersMixin
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
@@ -48,7 +48,7 @@ class TemplateShirtDetails(RetrieveAPIView):
         select_related('fabric', 'collection__storehouse').prefetch_related('shirt_images')
 
 
-class TemplateShirtsFiltersList(ManyModelsView, APIView):
+class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
     def build_design_list(self, desings, request):
         return map(
             lambda x: {'id': x.pk, 'title': x.title, 'image': request.build_absolute_uri(x.picture.url)},

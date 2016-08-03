@@ -4,7 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.views.mixins import ManyModelsView
+from api.views.mixins import FilterHelpersMixin
 from backend.models import Shirt
 from dictionaries.models import Size, SizeOptions
 from api import serializers
@@ -18,7 +18,7 @@ class SizeOptionsList(ListAPIView):
     serializer_class = serializers.SizeOptionSerializer
 
 
-class SizesList(ManyModelsView, APIView):
+class SizesList(FilterHelpersMixin, APIView):
     """
     Список конкретных размеров рубашек для отображения в выпадающем списке на экране "Размеры"
     """

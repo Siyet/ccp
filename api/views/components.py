@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.views.mixins import ManyModelsView
+from api.views.mixins import FilterHelpersMixin
 from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
@@ -139,7 +139,7 @@ class TemplateInitialsList(APIView):
         ])
 
 
-class DickeyList(ManyModelsView, APIView):
+class DickeyList(FilterHelpersMixin, APIView):
     """
     Список тканей и типов манишек
     """

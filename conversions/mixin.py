@@ -165,7 +165,6 @@ class OrderExportMixin(object):
         for line in self.get_address_data(order.get_customer_address()):
             ws.append(map(unicode, line))
 
-        # ws.append([u'%s' % _(u'СОРОЧКА'), order.number])
         for cat in self.get_shirt_data(shirt.shirt):
             ws.append([unicode(cat[0])])
             for line in cat[1]:
