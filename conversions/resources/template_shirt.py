@@ -11,7 +11,7 @@ from conversions.utils import save_relations
 from conversions.instance_loaders import CachedWithPrefetchedInstanceLoader
 from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionWidget, ChoicesWidget
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
-    Initials, ContrastStitch, ElementStitch, ContrastDetails
+    Initials, ContrastStitch, ElementStitch, ContrastDetails, ShawlOptions
 from dictionaries import models as dictionaries
 
 
@@ -422,6 +422,12 @@ class TemplateShirtResource(resources.ModelResource):
             else:
                 self.import_contrast_detail(instance, 'cuff_outer', instance.contrast_detail_cuff_outer)
                 self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff_inner)
+
+            # Пробуем найти и добавить значение платка "Без платка"
+            if not instance.shawl:
+                shawl, created = ShawlOptions.objects.get_or_create(title=u'Без платка', extra_price=0)
+                instance.shawl = shawl
+                instance.save()
 
     def import_obj(self, obj, data, dry_run):
         if not hasattr(obj, 'collar'):
