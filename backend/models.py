@@ -16,7 +16,7 @@ from model_utils.models import TimeStampedModel
 from ordered_model.models import OrderedModel
 
 from core.utils import first
-from dictionaries.models import FabricCategory, SleeveType
+from dictionaries.models import FabricCategory, SleeveType, ResolveDefault
 from backend import managers
 
 SEX = Choices(
@@ -349,7 +349,7 @@ class Shirt(OrderedModel):
                                        chained_field='custom_buttons_type',
                                        chained_model_field='type', show_all=False, null=True, blank=True)
 
-    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True)
+    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True, default=ResolveDefault(ShawlOptions))
     yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 

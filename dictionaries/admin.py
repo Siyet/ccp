@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from dictionaries.forms import DefaultElementAdminForm
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 
 from .models import (
@@ -27,6 +29,7 @@ from .models import (
     SleeveType,
     Thickness,
     FAQ,
+    DefaultElement,
 )
 
 
@@ -43,7 +46,12 @@ class SizeAdmin(GrappelliOrderableAdmin):
     list_display = ('size',)
 
 
+class DefaultElementAdmin(admin.ModelAdmin):
+    form = DefaultElementAdminForm
+
+
 admin.site.register(ShirtInfo, ShirtInfoAdmin)
+admin.site.register(DefaultElement, DefaultElementAdmin)
 admin.site.register([
     Color,
     Font,

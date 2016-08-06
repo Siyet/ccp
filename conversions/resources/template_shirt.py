@@ -423,12 +423,6 @@ class TemplateShirtResource(resources.ModelResource):
                 self.import_contrast_detail(instance, 'cuff_outer', instance.contrast_detail_cuff_outer)
                 self.import_contrast_detail(instance, 'cuff_inner', instance.contrast_detail_cuff_inner)
 
-            # Пробуем найти и добавить значение платка "Без платка"
-            if not instance.shawl:
-                shawl, created = ShawlOptions.objects.get_or_create(title=u'Без платка', extra_price=0)
-                instance.shawl = shawl
-                instance.save()
-
     def import_obj(self, obj, data, dry_run):
         if not hasattr(obj, 'collar'):
             obj.collar = Collar()
