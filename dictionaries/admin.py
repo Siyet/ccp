@@ -68,7 +68,6 @@ admin.site.register([
     PocketType,
     SleeveType,
     FAQ,
-    DefaultElement,
 ])
 
 admin.site.register(Size, SizeAdmin)
