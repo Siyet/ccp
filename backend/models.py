@@ -16,7 +16,7 @@ from model_utils.models import TimeStampedModel
 from ordered_model.models import OrderedModel
 
 from core.utils import first
-from dictionaries.models import FabricCategory, SleeveType
+from dictionaries.models import FabricCategory, SleeveType, ResolveDefault
 from backend import managers
 
 SEX = Choices(
@@ -333,7 +333,7 @@ class Shirt(OrderedModel):
     placket = models.ForeignKey('dictionaries.PlacketType', verbose_name=_(u'Полочка'), related_name='placket_shirts')
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
-                               default=2) # TODO: better default
+                               default=ResolveDefault(SleeveType))
     FIT = Choices(('classic', u'Классическая'), ('fitted', u'Приталенная'), ('very_fitted', u'Очень приталенная'))
     fit = models.CharField(_(u'Талия'), max_length=30, blank=True, null=True, choices=FIT)
     SLEEVE_LENGTH = Choices(('normal', u'Обычный'), ('long', u'Длинный'), ('shorter', u'Укороченный'))
@@ -349,7 +349,7 @@ class Shirt(OrderedModel):
                                        chained_field='custom_buttons_type',
                                        chained_model_field='type', show_all=False, null=True, blank=True)
 
-    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True)
+    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True, default=ResolveDefault(ShawlOptions))
     yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 

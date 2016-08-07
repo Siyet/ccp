@@ -1,5 +1,8 @@
 # coding: utf-8
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.deconstruct import deconstructible
 from django.utils.text import ugettext_lazy as _
 from colorful.fields import RGBColorField
 from django.db.models import Count
@@ -286,3 +289,32 @@ class FAQ(models.Model):
 
     def __unicode__(self):
         return self.question
+
+
+class DefaultElement(models.Model):
+    LIMIT_CHOICES = {'model__in': ['shawloptions', 'sleevetype']}
+
+    content_type = models.OneToOneField(ContentType, verbose_name=_(u'Тип элемента'), limit_choices_to=LIMIT_CHOICES)
+    object_pk = models.PositiveIntegerField(_(u'Элемент по умолчанию'))
+    content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+
+    class Meta:
+        verbose_name = _(u'Элемент по умолчанию')
+        verbose_name_plural = _(u'Элементы по умолчанию')
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.content_type, self.content_object)
+
+
+@deconstructible
+class ResolveDefault(object):
+    def __init__(self, model):
+        self.model = model
+
+    def __call__(self):
+        model_ct = ContentType.objects.get_for_model(self.model)
+        try:
+            default = DefaultElement.objects.get(content_type=model_ct)
+            return default.content_object
+        except DefaultElement.DoesNotExist:
+            return None

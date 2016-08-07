@@ -11,7 +11,7 @@ from conversions.utils import save_relations
 from conversions.instance_loaders import CachedWithPrefetchedInstanceLoader
 from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionWidget, ChoicesWidget
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
-    Initials, ContrastStitch, ElementStitch, ContrastDetails
+    Initials, ContrastStitch, ElementStitch, ContrastDetails, ShawlOptions
 from dictionaries import models as dictionaries
 
 
