@@ -292,7 +292,7 @@ class FAQ(models.Model):
 
 
 class DefaultElement(models.Model):
-    LIMIT_CHOICES = {'model__in': ['shawloptions']}
+    LIMIT_CHOICES = {'model__in': ['shawloptions', 'sleevetype']}
 
     content_type = models.OneToOneField(ContentType, verbose_name=_(u'Тип элемента'), limit_choices_to=LIMIT_CHOICES)
     object_pk = models.PositiveIntegerField(_(u'Элемент по умолчанию'))
@@ -301,9 +301,6 @@ class DefaultElement(models.Model):
     class Meta:
         verbose_name = _(u'Элемент по умолчанию')
         verbose_name_plural = _(u'Элементы по умолчанию')
-        unique_together = (
-            ('content_type', 'object_pk'),
-        )
 
     def __unicode__(self):
         return u'%s: %s' % (self.content_type, self.content_object)

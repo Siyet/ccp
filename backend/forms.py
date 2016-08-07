@@ -1,16 +1,17 @@
 # coding: utf-8
 
 from django import forms
-from backend.widgets import ContentTypeSelect
-from backend.models import AccessoriesPrice, content_type_names
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 
+from backend.widgets import ContentTypeSelect
+from backend.models import AccessoriesPrice, content_type_names
+
 
 class RelatedContentTypeForm(forms.ModelForm):
-    content_type = forms.ModelChoiceField(label=_('content type'), queryset=ContentType.objects.all(),
+    content_type = forms.ModelChoiceField(label=_(u'Тип содержимого'), queryset=ContentType.objects.all(),
                                           widget=ContentTypeSelect(related_field='id_object_pk'))
-    object_pk = forms.ChoiceField(required=False)
+    object_pk = forms.ChoiceField(label=_(u'Значение'), required=False)
 
     class Meta:
         model = None
@@ -29,6 +30,13 @@ class RelatedContentTypeForm(forms.ModelForm):
             return None
         return object_pk
 
+    def clean_content_type(self):
+        content_type = self.cleaned_data.get('content_type')
+        if not self.fields['object_pk'].choices:
+            self.fields['object_pk'].choices = \
+                [(None, '')] + [(x.pk, unicode(x)) for x in content_type.model_class().objects.all()]
+        return content_type
+
 
 class AccessoriesPriceAdminForm(RelatedContentTypeForm):
     class Meta:
@@ -44,19 +52,11 @@ class AccessoriesPriceAdminForm(RelatedContentTypeForm):
             [(pk, content_type_names.get(title, title)) for pk, title in self.fields['content_type'].choices]
 
     def clean_content_type(self):
-        content_type = self.cleaned_data.get('content_type')
+        content_type = super(AccessoriesPriceAdminForm, self).clean_content_type()
         if not hasattr(content_type.model_class(), 'get_related_shirts'):
             raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
-        if not self.fields['object_pk'].choices:
-            self.fields['object_pk'].choices = \
-                [(None, '')] + [(x.pk, unicode(x)) for x in content_type.model_class().objects.all()]
-        return content_type
 
-    def clean_object_pk(self):
-        object_pk = self.cleaned_data.get('object_pk')
-        if not object_pk:
-            return None
-        return object_pk
+        return content_type
 
 
 class CuffInlineForm(forms.ModelForm):

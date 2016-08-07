@@ -333,7 +333,7 @@ class Shirt(OrderedModel):
     placket = models.ForeignKey('dictionaries.PlacketType', verbose_name=_(u'Полочка'), related_name='placket_shirts')
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
-                               default=2) # TODO: better default
+                               default=ResolveDefault(SleeveType))
     FIT = Choices(('classic', u'Классическая'), ('fitted', u'Приталенная'), ('very_fitted', u'Очень приталенная'))
     fit = models.CharField(_(u'Талия'), max_length=30, blank=True, null=True, choices=FIT)
     SLEEVE_LENGTH = Choices(('normal', u'Обычный'), ('long', u'Длинный'), ('shorter', u'Укороченный'))
