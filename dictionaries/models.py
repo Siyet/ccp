@@ -315,6 +315,6 @@ class ResolveDefault(object):
         model_ct = ContentType.objects.get_for_model(self.model)
         try:
             default = DefaultElement.objects.get(content_type=model_ct)
-            return default.content_object
+            return default.object_pk
         except DefaultElement.DoesNotExist:
             return None
