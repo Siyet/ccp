@@ -30,6 +30,7 @@ class Collection(OrderedModel):
     storehouse = models.ForeignKey('backend.Storehouse', verbose_name=_(u'Склад'), related_name='collections',
                                    blank=False, null=True)
     title = models.CharField(_(u'Название'), max_length=255)
+    filter_title = models.CharField(_(u'Наименование для фильтра'), max_length=255)
     text = models.TextField(_(u'Описание'))
     image = models.ImageField(_(u'Изображение'), upload_to='collection')
     dickey = models.BooleanField(_(u'Манишка'))
@@ -116,7 +117,7 @@ class Fabric(TimeStampedModel):
                                   null=True)
     short_description = models.TextField(_(u'Краткое описание'), blank=True, default="")
     long_description = models.TextField(_(u'Полное описание'), blank=True, default="")
-    material = models.CharField(_(u'Материал'), max_length=255, default="")
+    material = models.CharField(_(u'Материал'), max_length=255, default="", blank=True)
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'),
                                      related_name='design_fabrics')
@@ -416,6 +417,7 @@ class Shirt(OrderedModel):
 
 
     class Meta:
+        ordering = ('code',)
         verbose_name = _(u'Рубашка')
         verbose_name_plural = _(u'Рубашки')
 

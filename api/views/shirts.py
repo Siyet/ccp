@@ -80,12 +80,16 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
 
+        collections_list =  list(collections.values('id', 'filter_title').distinct())
+        for collection in collections_list:
+            collection['title'] = collection.pop('filter_title')
+
         return Response([
-            self.build_filter(_(u'Коллекция'), 'collection', list(collections.values('id', 'title').distinct())),
+            self.build_filter(_(u'Коллекция'), 'collection', collections_list),
             self.build_filter(_(u'Цвет'), 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
+            self.build_filter(_(u'Дизайн'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
             self.build_filter(_(u'Тип ткани'), 'fabric_type', list(fabric_types.values('id', 'title').distinct())),
             self.build_filter(_(u'Толщина ткани'), 'thickness', list(thickness.values('id', 'title').distinct())),
-            self.build_filter(_(u'Дизайн'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
         ])
 
 
