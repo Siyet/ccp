@@ -27,9 +27,16 @@ class TemplateShirtsList(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         """
-        Список рубашек для отображения в разделе "витрина.
+        Список рубашек для отображения в разделе "витрина".
         ---
         parameters:
+            - name: ordering
+              type: string
+              paramType: query
+              description: |
+                сортировка по цене, примеры:<br/>
+                 /?ordering=price - по возрастанию<br/>
+                 /?ordering=-price - по убыванию<br/>
             - name: limit
               type: integer
               paramType: query
