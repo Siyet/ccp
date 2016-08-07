@@ -33,8 +33,10 @@ class EmailSender(threading.Thread):
 class CostumecodeMailer(object):
     sender_class = EmailSender
     order_subject = _(u'НОВЫЙ ЗАКАЗ')
+    order_customer_subject = _(u'COSTUME CODE - Ваш заказ подтвержден и оплачен')
     order_admin_template_name = 'checkout/payment_completed_admin_email.html'
     order_pdf_template_name = 'checkout/payment_completed_customer_email.html'
+    order_customer_template_name = 'checkout/payment_completed_customer_email.html'
 
     @classmethod
     def send_order_payment_completed(cls, order):
@@ -50,5 +52,9 @@ class CostumecodeMailer(object):
     def send_to_customer_order_payment_completed(cls, order):
         t = loader.get_template(cls.order_pdf_template_name)
         pdf = render_pdf_from_template(t, None, None, {'order': order})
-        subject = cls.order_subject
-        cls.sender_class(subject, '', [order.get_customer_address().email], pdf).start()
+        subject = cls.order_customer_subject
+        data = {
+            'SITE_DOMAIN': settings.SITE_DOMAIN
+        }
+        html_content = mark_safe(render_to_string(cls.order_customer_template_name, data))
+        cls.sender_class(subject, html_content, [order.get_customer_address().email], pdf).start()

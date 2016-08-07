@@ -161,6 +161,7 @@ class Order(models.Model):
                                          payment_type=Payment.PAYMENT_TYPE.AC)
         self.payment = payment
         self.save(update_fields=['payment'])
+        CostumecodeMailer.send_to_customer_order_payment_completed(self)
         return payment
 
     def check_certificate(self):
