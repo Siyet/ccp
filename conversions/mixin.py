@@ -61,7 +61,13 @@ class OrderExportMixin(object):
         return self.get_address_data(address)
 
     def get_shirt_data(self, shirt):
-        data = []
+        data = [[
+            _(u'СОРОЧКА'), [
+                (_(u'Размер'), shirt.size.size if shirt.size else ''),
+                (_(u'Талия'), shirt.get_fit_display() if shirt.fit else ''),
+                (_(u'Длина рукава'), shirt.get_sleeve_length_display() if shirt.sleeve_length else ''),
+            ]
+        ]]
         try:
             data.append(
                 [_(u'ВОРОТНИК'), [
@@ -77,7 +83,7 @@ class OrderExportMixin(object):
             data.append(
                 [_(u'МАНЖЕТЫ'), [
                     (_(u'Тип'), shirt.cuff.type.title),
-                    (_(u'Углы'), shirt.cuff.rounding.title),
+                    (_(u'Углы'), achain(shirt, 'N/A', 'cuff', 'rounding', 'title')),
                     (_(u'Жесткость манжета'), shirt.cuff.hardness.title),
                     (_(u'Планка рукава'), 'N/A'),
                     (_(u'Складки на рукаве'), 'N/A'),
@@ -159,7 +165,6 @@ class OrderExportMixin(object):
         for line in self.get_address_data(order.get_customer_address()):
             ws.append(map(unicode, line))
 
-        ws.append([u'%s' % _(u'СОРОЧКА'), order.number])
         for cat in self.get_shirt_data(shirt.shirt):
             ws.append([unicode(cat[0])])
             for line in cat[1]:
