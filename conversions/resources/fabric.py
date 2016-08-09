@@ -33,7 +33,7 @@ class FabricResource(resources.ModelResource):
         model = Fabric
         import_id_fields = ('code',)
         fields = ('code',)
-        skip_unchanged = True
+        skip_unchanged = False
         select_related = ['thickness', 'fabric_type', 'category']
         prefetch_related = ['designs', 'colors']
         instance_loader_class = CachedWithPrefetchedInstanceLoader.prepare(select_related, prefetch_related)

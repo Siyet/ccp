@@ -301,7 +301,7 @@ class Initials(models.Model):
         verbose_name_plural = _(u'Инициалы')
 
 
-class Shirt(OrderedModel):
+class Shirt(models.Model):
     related_fields = ["collection", "fabric", "size_option", "size", "hem", "placket", "pocket", "back",
                       "custom_buttons_type", "custom_buttons", "shawl", "yoke", "initials"]
 
@@ -445,7 +445,7 @@ class TemplateShirt(Shirt):
         self.is_template = True
         super(TemplateShirt, self).save(*args, **kwargs)
 
-    class Meta(OrderedModel.Meta):
+    class Meta:
         proxy = True
         verbose_name = _(u'Шаблон рубашки')
         verbose_name_plural = _(u'Шаблоны рубашек')
