@@ -39,17 +39,24 @@ class SizeSerializer(serializers.ModelSerializer):
         model = dictionaries.Size
 
 
-class FabricSerializer(serializers.ModelSerializer):
-    fabric_type = serializers.StringRelatedField(source='fabric_type.title')
-    thickness = serializers.StringRelatedField(source='thickness.title')
-    price = serializers.SerializerMethodField()
+class BaseFabricSerializer(serializers.ModelSerializer):
     texture = serializers.SerializerMethodField()
-    tailoring_time = serializers.SerializerMethodField()
 
     def get_texture(self, obj):
         if obj.texture:
             return self.context['request'].build_absolute_uri(obj.texture.sample_thumbnail.url)
         return None
+
+    class Meta:
+        model = models.Fabric
+        fields = ['id', 'code', 'texture']
+
+
+class FabricSerializer(BaseFabricSerializer):
+    fabric_type = serializers.StringRelatedField(source='fabric_type.title')
+    thickness = serializers.StringRelatedField(source='thickness.title')
+    price = serializers.SerializerMethodField()
+    tailoring_time = serializers.SerializerMethodField()
 
     def get_price(self, obj):
         return first(lambda x: x["fabric_category"] == obj.category_id, obj.cached_collection.prices, {}).get('price')
@@ -57,8 +64,7 @@ class FabricSerializer(serializers.ModelSerializer):
     def get_tailoring_time(self, obj):
         return obj.cached_collection.tailoring_time
 
-    class Meta:
-        model = models.Fabric
+    class Meta(BaseFabricSerializer.Meta):
         fields = ['id', 'fabric_type', 'thickness', 'code', 'short_description', 'long_description', 'texture', 'price',
                   'tailoring_time']
 
@@ -129,7 +135,12 @@ class PocketTypeSerializer(serializers.ModelSerializer):
 
 class YokeTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = dictionaries.PocketType
+        model = dictionaries.YokeType
+
+
+class DickeyTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = dictionaries.DickeyType
 
 
 class CustomButtonsSerializer(serializers.ModelSerializer):
