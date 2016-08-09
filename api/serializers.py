@@ -382,3 +382,15 @@ class OrderSerializer(serializers.ModelSerializer):
             checkout.CustomerData.objects.create(order=order, **data)
         order.create_payment()
         return order
+
+
+class OrderDetailSerializer(OrderSerializer):
+    class Meta:
+        model = checkout.Order
+        fields = OrderSerializer.Meta.fields + ('state', 'payment_status', 'full_amount', 'discount_value',
+                                                'certificate_value',)
+
+    checkout_shop = ShopSerializer()
+    certificate = CertificateSerializer()
+    payment_status = serializers.StringRelatedField(source='payment.status')
+    full_amount = serializers.StringRelatedField(source='get_full_amount')

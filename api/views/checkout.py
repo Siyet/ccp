@@ -43,6 +43,16 @@ class OrderCreateView(CreateAPIView):
     serializer_class = serializers.OrderSerializer
 
 
+class OrderDetailView(RetrieveAPIView):
+    """
+    Информация о заказе
+    """
+    lookup_field = 'number'
+    queryset = checkout.Order.objects.select_related('checkout_shop', 'certificate', 'payment')\
+        .prefetch_related('order_details__shirt', 'customer_data')
+    serializer_class = serializers.OrderDetailSerializer
+
+
 class OrderPaymentData(APIView):
     """
     Получение данных для перехода на страницу оплаты
