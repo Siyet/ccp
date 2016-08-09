@@ -9,55 +9,70 @@
             font-weight: normal;
             font-style: normal;
         }
+
         .text-gray {
             color: #D0D9E7;
         }
+
         .text-black {
             color: #4A4A4A;
         }
+
         .text-center {
             text-align: center;
         }
+
         .text-right {
             text-align: right;
         }
+
         .text-left {
             text-align: left;
         }
+
         .order-table {
             width: 100%;
             border-collapse: collapse;
         }
+
         .order-table td {
             vertical-align: top;
         }
+
         .order-table thead th {
             border-top: 1px solid #4A4A4A;
             padding: 10px 0 20px;
         }
+
         .order-table tbody td {
             border-bottom: 10px solid #fff;
         }
+
         footer .left {
             float: left;
             width: 50%;
         }
+
         footer .right {
             float: right;
             width: 49%;
         }
+
         footer .right .label {
             display: inline-block;
             width: 50%;
             float: left;
         }
+
         footer .right .value {
             display: inline-block;
             width: 49%;
         }
+
         .clear {
             clear: both;
         }
+
         .phone {
             float: left;
             width: 150px;
@@ -70,33 +85,38 @@
 <p class="text-black">
     {% trans 'Спасибо большое за ваш заказ. В этом файле указана подробная информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!' %}
 </p>
+
 <h1 class="text-center text-black">{% trans 'Ваш заказ' %}</h1>
 <table class="order-table">
     <thead>
-        <tr>
-            <th class="text-left" width="20%">{% trans 'Изображение' %}</th>
-            <th class="text-left" width="25%">{% trans 'Описание' %}</th>
-            <th class="text-right" width="15%">{% trans 'Количество' %}</th>
-            <th class="text-right" width="15%">{% trans 'Цена' %}</th>
-            <th class="text-right" width="15%">{% trans 'Итого' %}</th>
-        </tr>
+    <tr>
+        <th class="text-left" width="20%">{% trans 'Изображение' %}</th>
+        <th class="text-left" width="25%">{% trans 'Описание' %}</th>
+        <th class="text-right" width="15%">{% trans 'Количество' %}</th>
+        <th class="text-right" width="15%">{% trans 'Цена' %}</th>
+        <th class="text-right" width="15%">{% trans 'Итого' %}</th>
+    </tr>
     </thead>
     <tbody>
-        {% for order_detail in order.order_details.all %}
-            <tr class="text-black">
-                <td>
+    {% for order_detail in order.order_details.all %}
+        <tr class="text-black">
+            <td>
+                {% if order_detail.shirt.showcase_image %}
                     <img src="{{ order_detail.shirt.showcase_image_list.url }}" alt="">
-                </td>
-                <td>
-                    <p><b>{% trans 'Сорочка' %}</b></p>
-                    <p>{{ order_detail.shirt.size }}</p>
-                    <p>{{ order_detail.shirt.collection.tailoring_time }}</p>
-                </td>
-                <td class="text-right">{{ order_detail.amount }}</td>
-                <td class="text-right">{{ order_detail.amount }} x {{ order_detail.price }} {% trans 'руб.' %}</td>
-                <td class="text-right">{{ order_detail.get_total|floatformat:2 }} {% trans 'руб.' %}</td>
-            </tr>
-        {% endfor %}
+                {% endif %}
+            </td>
+            <td>
+                <p><b>{% trans 'Сорочка' %}</b></p>
+
+                <p>{{ order_detail.shirt.size }}</p>
+
+                <p>{{ order_detail.shirt.collection.tailoring_time }}</p>
+            </td>
+            <td class="text-right">{{ order_detail.amount }}</td>
+            <td class="text-right">{{ order_detail.amount }} x {{ order_detail.price }} {% trans 'руб.' %}</td>
+            <td class="text-right">{{ order_detail.get_total|floatformat:2 }} {% trans 'руб.' %}</td>
+        </tr>
+    {% endfor %}
     </tbody>
 </table>
 <br>
@@ -106,7 +126,9 @@
         <div class="phone"></div>
         <div class="detail text-black">
             <p><b>{% trans 'Вопросы' %}</b></p>
+
             <p>{% trans 'Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, позвоните нам!' %}</p>
+
             <p>{% trans '+7 495 649-63-77' %}</p>
         </div>
     </div>
@@ -128,6 +150,7 @@
             <span class="value text-right">{{ order.discount_value }} {% trans 'руб.' %}</span>
         </div>
         <br>
+
         <div>
             <span class="label text-right">{% trans 'Всего' %}:</span>
             <span class="value text-right">{{ order.get_amount_to_pay }} {% trans 'руб.' %}</span>
