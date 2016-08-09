@@ -1,6 +1,7 @@
 # coding: utf-8
 import uuid
 
+import datetime
 from django.db import models
 from django.db.transaction import atomic
 from django.dispatch.dispatcher import receiver
@@ -21,6 +22,16 @@ class Payment(YandexPayment):
         ordering = ('-created', )
         verbose_name = _(u'Платеж')
         verbose_name_plural = _(u'Платежи')
+
+    def set_success(self):
+        if self.is_payed:
+            return True
+        self.status = self.STATUS.SUCCESS
+        if not self.performed_datetime:
+            self.performed_datetime = datetime.datetime.now()
+        self.save(update_fields=['status', 'performed_datetime'])
+        self.send_signals()
+        return True
 
 
 class Customer(models.Model):
@@ -115,6 +126,14 @@ class Order(models.Model):
     get_performed_datetime.allow_tags = True
     get_performed_datetime.short_description = _(u'Дата обработки заказа')
 
+    def get_payment_status(self):
+        try:
+            return self.payment.get_status_display()
+        except AttributeError:
+            return None
+    get_payment_status.allow_tags = True
+    get_payment_status.short_description = _(u'Статус оплаты')
+
     def get_fio(self):
         try:
             return self.get_customer_address().get_fio()
@@ -162,6 +181,9 @@ class Order(models.Model):
         self.payment = payment
         self.save(update_fields=['payment'])
         CostumecodeMailer.send_to_customer_order_payment_completed(self)
+        if payment.order_amount <= 0:
+            self.save_certificate()
+            payment.set_success()
         return payment
 
     def check_certificate(self):
