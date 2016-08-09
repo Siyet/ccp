@@ -146,8 +146,10 @@ class DickeyList(FilterHelpersMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         fabrics = models.Fabric.objects.active.filter(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL, dickey=True)
+        fabrics_data = serializers.BaseFabricSerializer(fabrics.distinct(), many=True, context={'request': request}).data
         dickey_types = dictionaries.DickeyType.objects.all()
+        dickey_types_data = serializers.DickeyTypeSerializer(dickey_types, many=True).data
         return Response([
-            self.build_filter(u'Ткань', 'fabric', list(fabrics.values('id', 'code').distinct())),
-            self.build_filter(u'Тип манишки', 'type', list(dickey_types.values())),
+            self.build_filter(u'Ткань', 'fabric', fabrics_data),
+            self.build_filter(u'Тип манишки', 'type', dickey_types_data),
         ])
