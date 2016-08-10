@@ -405,3 +405,15 @@ class OrderDetailSerializer(OrderSerializer):
     certificate = CertificateSerializer()
     payment_status = serializers.StringRelatedField(source='payment.status')
     full_amount = serializers.StringRelatedField(source='get_full_amount')
+
+
+class ThicknessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = dictionaries.Thickness
+        fields = '__all__'
+
+
+class FabricTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = dictionaries.FabricType
+        fields = '__all__'
