@@ -54,7 +54,7 @@ class CostumecodeMailer(object):
         pdf = render_pdf_from_template(t, None, None, {'order': order})
         subject = cls.order_customer_subject
         data = {
-            'SITE_DOMAIN': settings.SITE_DOMAIN
+            'SITE_INFO_EMAIL': settings.SITE_INFO_EMAIL
         }
         html_content = mark_safe(render_to_string(cls.order_customer_template_name, data))
         cls.sender_class(subject, html_content, [order.get_customer_address().email], pdf).start()
