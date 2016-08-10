@@ -10,12 +10,12 @@ from processing.cache import CacheBuilder, STITCHES
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        # self.cache_sources(ComposeSource, ['uv', 'light', 'ao'])
-        # self.cache_sources(ButtonsSource, ['image', 'ao'])
-        # self.cache_sources(StitchesSource, ['image'], {'image': STITCHES})
-        # self.cache_sources(CuffMask, ['mask'])
-        # self.cache_sources(CollarMask, ['mask'])
-        # self.cache_sources(CuffConfiguration, ['side_mask'])
+        self.cache_sources(ComposeSource, ['uv', 'light', 'ao'])
+        self.cache_sources(ButtonsSource, ['image', 'ao'])
+        self.cache_sources(StitchesSource, ['image'], {'image': STITCHES})
+        self.cache_sources(CuffMask, ['mask'])
+        self.cache_sources(CollarMask, ['mask'])
+        self.cache_sources(CuffConfiguration, ['side_mask'])
         self.cache_textures()
 
     def cache_sources(self, model, fields, field_types=None):
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             if src.cache.count() < len(fields):
                 try:
                     CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.full, field_types)
-                    CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.normal, field_types)
+                    CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.preview, field_types)
                 except Exception as e:
                     print("ERROR: %s" % e.message)
                     print("failed to create cache for %s" % src.object_id)
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         sys.stdout.write('\n')
 
     def cache_textures(self):
-        sys.stdout.write('Textures')
+        sys.stdout.write('Textures\n')
         count = Texture.objects.count()
         i = 0
         for texture in Texture.objects.all():
