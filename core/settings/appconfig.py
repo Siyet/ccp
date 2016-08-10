@@ -18,4 +18,4 @@ FABRIC_SAMPLE_THUMBNAIL_SIZE = (256, 256)
 
 SITE_DOMAIN = 'costumecode.ru'
 
-ADMIN_ORDER_EMAIL = 'example@example.com'
+ADMIN_ORDER_EMAIL = 'test.cc@wecreateapps.ru'
