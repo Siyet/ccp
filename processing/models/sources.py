@@ -118,8 +118,3 @@ class Texture(ModelDiffMixin, TimeStampedModel, CachedSource):
 
     def __unicode__(self):
         return self.texture.name
-
-    def get_cache(self, preview=False):
-        field = 'preview' if preview else 'texture'
-        cache = self.cache.filter(source_field=field).first()
-        return cache.file.path if cache else None

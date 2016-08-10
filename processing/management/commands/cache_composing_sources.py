@@ -4,7 +4,7 @@ import sys
 
 from django.core.management import BaseCommand
 
-from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration
+from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration, CACHE_RESOLUTION
 from processing.cache import CacheBuilder, STITCHES
 
 
@@ -26,7 +26,8 @@ class Command(BaseCommand):
         for src in model.objects.all():
             if src.cache.count() < len(fields):
                 try:
-                    CacheBuilder.create_cache(src, fields, field_types)
+                    CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.full, field_types)
+                    CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.normal, field_types)
                 except Exception as e:
                     print("ERROR: %s" % e.message)
                     print("failed to create cache for %s" % src.object_id)

@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from scipy import ndimage
 from PIL import ImageFilter
 from core.utils import first
-from processing.models import BodyConfiguration, SourceCache
+from processing.models import BodyConfiguration, SourceCache, CACHE_RESOLUTION
 from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
 
 from core.settings.base import RENDER
@@ -39,10 +39,13 @@ class CacheBuilder(object):
         'side_mask': L_FIELD
     }
 
+
     @staticmethod
-    def create_cache(instance, fields, field_types=None, cache_scale=RENDER['preview_scale']):
+    def create_cache(instance, fields, resolution, field_types=None):
         matrices = []
         field_types = field_types or CacheBuilder.DEFAULT_FIELD_TYPES
+        preview_scale = RENDER["preview_scale"]
+        is_preview = resolution == CACHE_RESOLUTION.preview
 
         for field in fields:
             image = getattr(instance, field, None)
@@ -56,11 +59,12 @@ class CacheBuilder(object):
 
             if field == 'uv':
                 alpha = image_from_array(array[..., 3])
-                alpha = alpha.resize(scale_tuple(alpha.size, cache_scale / 2.0), Image.LANCZOS)
+                alpha_scale = preview_scale / 2.0 if is_preview else 0.5
+                alpha = alpha.resize(scale_tuple(alpha.size, alpha_scale), Image.LANCZOS)
                 alpha_array = np.asarray(alpha).astype('float32') / 255.0
                 matrices.append(('uv_alpha', Submatrix(alpha_array), CacheBuilder.SCALE_MAP['uv'] / 2.0))
-
-                array = ndimage.zoom(array, [cache_scale, cache_scale, 1], order=0)
+                if is_preview:
+                    array = ndimage.zoom(array, [preview_scale, preview_scale, 1], order=0)
                 size = array.shape[:2]
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
@@ -68,8 +72,12 @@ class CacheBuilder(object):
             else:
                 img = image_from_array(array)
                 field_type = field_types.get(field) or CacheBuilder.DEFAULT_FIELD_TYPES.get(field)
-                resize_factor = cache_scale / 2.0 if field_type == L_FIELD else cache_scale
-                img = img.resize(scale_tuple(img.size, resize_factor), Image.LANCZOS)
+
+                if field_type == L_FIELD or is_preview:
+                    resize_factor = preview_scale if is_preview else 1
+                    if field_type == L_FIELD:
+                        resize_factor /= 2.0
+                    img = img.resize(scale_tuple(img.size, resize_factor), Image.LANCZOS)
                 array = np.asarray(img).astype('float32') / 255.0
 
             if isinstance(getattr(instance, 'content_object', None), BodyConfiguration):
@@ -108,7 +116,7 @@ class CacheBuilder(object):
             filename = "%s_%s_%s.%s" % (instance._meta.model_name, instance.id, field, extension)
             position = scaled_bbox[:2][::-1]
             ct = ContentType.objects.get_for_model(instance)
-            cache = SourceCache(source_field=field, object_id=instance.id, content_type=ct, position=position)
+            cache = SourceCache(source_field=field, resolution=resolution, object_id=instance.id, content_type=ct, position=position)
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
     @staticmethod
@@ -144,21 +152,21 @@ class CacheBuilder(object):
         filename = "%s.npy" % texture.texture.name
         ct = ContentType.objects.get_for_model(texture)
         SourceCache.objects.filter(object_id=texture.id, content_type=ct).delete()
-        def save_to_cache(image, field):
+        def save_to_cache(image, resolution):
             texture_arr = np.asarray(image).transpose(1, 0, 2)
             buffer = BytesIO()
             np.save(buffer, texture_arr)
             buffer.flush()
-            cache = SourceCache(source_field=field, object_id=texture.id, content_type=ct, position=(0, 0))
+            cache = SourceCache(source_field='texture', resolution=resolution, object_id=texture.id, content_type=ct, position=(0, 0))
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
         img = Image.open(texture.texture.path)
 
-        save_to_cache(img, 'texture')
+        save_to_cache(img, CACHE_RESOLUTION.full)
 
         img = img.resize(scale_tuple(img.size, RENDER['preview_scale']), Image.LANCZOS)
 
         if texture.moire_filter:
             img = img.filter(ImageFilter.GaussianBlur(radius=1.5))
             img = img.filter(ImageFilter.UnsharpMask(radius=1, percent=120))
-        save_to_cache(img, 'preview')
+        save_to_cache(img, CACHE_RESOLUTION.preview)

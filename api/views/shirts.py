@@ -110,10 +110,9 @@ class ShirtDetails(RetrieveAPIView):
 
 
 class ShirtImage(APIView):
-    def post(self, request, projection, *args, **kwargs):
+    def post(self, request, projection, resolution, *args, **kwargs):
         """
         Генерация ссылки на изображение рубашки в заданной проекции.
-
         ---
         parameters:
           - name: body
@@ -124,8 +123,11 @@ class ShirtImage(APIView):
             description: проекция, одно из трех значений (front|side|back)
             paramType: path
             required: true
+          - name: resolution
+            description: разрешение (preview|full)
+            paramType: path
+            required: false
         """
         data = request.data
-        image_url = ShirtImageCache.get_image_url(data, projection)
-        print(image_url)
+        image_url = ShirtImageCache.get_image_url(data, projection, resolution)
         return Response(request.build_absolute_uri(image_url))
