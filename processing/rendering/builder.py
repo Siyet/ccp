@@ -31,8 +31,8 @@ cache_builder = CacheBuilderMock
 # cache_builder = CacheBuilder
 
 class ShirtBuilder(object):
-    def __init__(self, shirt_data, projection, preview=True):
-        self.preview = preview
+    def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
+        self.resolution = resolution
         self.projection = projection
         self.collar = self.extract(shirt_data, 'collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
@@ -99,9 +99,9 @@ class ShirtBuilder(object):
             'dickey_id': self.dickey['type'],
             'hem_id': self.hem
         })
-        cache_builder.create_cache(conf, ('light', 'uv'))
-        light = conf.cache.get(source_field='light')
-        alpha = conf.cache.get(source_field='uv_alpha')
+        cache_builder.create_cache(conf, ('light', 'uv'), resolution=self.resolution)
+        light = conf.cache.get(source_field='light', resolution=self.resolution)
+        alpha = conf.cache.get(source_field='uv_alpha', resolution=self.resolution)
         alpha_img = Image.open(alpha.file.path)
         dickey_alphas = []
         for alpha_cache in self.alphas:
@@ -109,7 +109,7 @@ class ShirtBuilder(object):
                     isinstance(alpha_cache.content_object.content_object, compose.CuffConfiguration):
                 dickey_alphas.append(alpha_cache)
         if self.projection == compose.PROJECTION.side and self.sleeve.cuffs:
-            dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask'))
+            dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask', resolution=self.resolution))
         for alpha_cache in dickey_alphas:
             part_alpha = Image.open(alpha_cache.file.path)
             inverted = ImageOps.invert(part_alpha)
@@ -121,8 +121,8 @@ class ShirtBuilder(object):
                             mask=part_alpha)
         texture = self.get_fabric_texture(self.dickey['fabric'])
         dickey = Composer.create_dickey(
-            texture=texture.get_cache(preview=self.preview),
-            uv=np.load(conf.cache.get(source_field='uv').file.path),
+            texture=texture.cache.get(resolution=self.resolution).file.path,
+            uv=np.load(conf.cache.get(source_field='uv', resolution=self.resolution).file.path),
             # light=Image.open(light.file.path),
             alpha=alpha_img
         )
@@ -182,7 +182,7 @@ class ShirtBuilder(object):
         start = time()
 
         res = Composer.create(
-            texture=texture.get_cache(preview=self.preview),
+            texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
             light=light,
             shadow=shadow,
@@ -213,21 +213,21 @@ class ShirtBuilder(object):
 
         if model is None:
             return
-        cache_builder.create_cache(model, ('uv', 'light', 'ao'))
-        self.uv.append(model.cache.get(source_field='uv'))
+        cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
+        self.uv.append(model.cache.get(source_field='uv', resolution=self.resolution))
         try:
-            self.lights.append(model.cache.get(source_field='light'))
+            self.lights.append(model.cache.get(source_field='light', resolution=self.resolution))
         except ObjectDoesNotExist:
             pass
         try:
-            shadow = model.cache.get(source_field='ao')
+            shadow = model.cache.get(source_field='ao', resolution=self.resolution)
             if post_shadow:
                 self.post_shadows.append(ImageConf.for_cache(shadow))
             else:
                 self.shadows.append(shadow)
         except ObjectDoesNotExist:
             pass
-        self.alphas.append(model.cache.get(source_field='uv_alpha'))
+        self.alphas.append(model.cache.get(source_field='uv_alpha', resolution=self.resolution))
 
     def append_stitches(self, stitches):
         if not self.contrast_stitches:
@@ -235,8 +235,8 @@ class ShirtBuilder(object):
 
         for conf in stitches:
             try:
-                cache_builder.create_cache(stitches, ('image',))
-                cache = conf.cache.get(source_field='image')
+                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution)
+                cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
                 print(e.message)
                 continue
@@ -264,12 +264,12 @@ class ShirtBuilder(object):
         if conf is None:
             return
         try:
-            cache_builder.create_cache(conf, ('image', 'ao'))
-            buttons_cache = conf.cache.get(source_field='image')
+            cache_builder.create_cache(conf, ('image', 'ao'), resolution=self.resolution)
+            buttons_cache = conf.cache.get(source_field='image', resolution=self.resolution)
         except Exception as e:
             print(e.message)
             return
-        ao = conf.cache.filter(source_field='ao').first()
+        ao = conf.cache.filter(source_field='ao', resolution=self.resolution).first()
         if conf.projection == compose.PROJECTION.front or not isinstance(conf.content_object,
                                                                          compose.BodyButtonsConfiguration):
             self.buttons.append(ImageConf.for_cache(buttons_cache))
@@ -314,10 +314,10 @@ class ShirtBuilder(object):
     def append_solid_contrasting_part(self, ao, light_conf, model, part_details, uv):
         fabric = part_details[0]['fabric']
         texture = self.get_fabric_texture(fabric)
-        alpha_cache = model.cache.get(source_field='uv_alpha')
+        alpha_cache = model.cache.get(source_field='uv_alpha', resolution=self.resolution)
         self.alphas.append(alpha_cache)
         composed_detail = Composer.create(
-            texture=texture.get_cache(preview=self.preview),
+            texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
             light=Image.open(light_conf.file.path),
             shadow=Image.open(ao) if texture.needs_shadow else None,
@@ -332,13 +332,13 @@ class ShirtBuilder(object):
             detail, mask = detail_mask
             fabric = detail['fabric']
             texture = self.get_fabric_texture(fabric)
-            alpha_cache = mask.cache.get(source_field='mask')
+            alpha_cache = mask.cache.get(source_field='mask', resolution=self.resolution)
             alpha = Image.new("L", light_image.size, color=0)
             alpha_image = Image.open(alpha_cache.file.path)
             position = tuple(alpha_cache.position[x] - light_conf.position[x] for x in [0, 1])
             alpha.paste(alpha_image, position)
             composed_detail = Composer.create(
-                texture.get_cache(preview=self.preview),
+                texture.cache.get(resolution=self.resolution).file.path,
                 uv,
                 light_image,
                 ao if texture.needs_shadow else None,
@@ -356,10 +356,10 @@ class ShirtBuilder(object):
             return self.append_model(model)
         present_part_keys = filter(lambda k: k in part_keys, all_detail_keys)
         part_details = filter(lambda k: k['element'] in part_keys, self.contrast_details)
-        cache_builder.create_cache(model, ('uv', 'light', 'ao'))
-        uv = np.load(model.cache.get(source_field='uv').file.path)
-        light_conf = model.cache.get(source_field='light')
-        ao = model.cache.get(source_field='ao').file.path
+        cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
+        uv = np.load(model.cache.get(source_field='uv', resolution=self.resolution).file.path)
+        light_conf = model.cache.get(source_field='light', resolution=self.resolution)
+        ao = model.cache.get(source_field='ao', resolution=self.resolution).file.path
         fabrics = set(map(lambda d: d['fabric'], part_details))
         if sorted(present_part_keys) == sorted(part_keys) and len(fabrics) == 1:
             self.append_solid_contrasting_part(ao, light_conf, model, part_details, uv)
@@ -369,7 +369,7 @@ class ShirtBuilder(object):
             for detail in part_details:
                 mask = conf.masks.filter(element=detail['element'], projection=self.projection).first()
                 if mask:
-                    cache_builder.create_cache(mask, ('mask',))
+                    cache_builder.create_cache(mask, ('mask',), resolution=self.resolution)
                     detail_masks.append((detail, mask))
 
             if detail_masks:

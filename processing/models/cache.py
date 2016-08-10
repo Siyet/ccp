@@ -7,19 +7,24 @@ from processing.storage import overwrite_storage
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
+from model_utils.choices import Choices
+
 from ast import literal_eval
 
+CACHE_RESOLUTION = Choices('full', 'preview')
+
 class SourceCache(models.Model):
+    resolution = models.CharField(max_length=10, choices=CACHE_RESOLUTION, default=CACHE_RESOLUTION.preview)
     source_field = models.CharField(max_length=10)
     pos_repr = models.CommaSeparatedIntegerField(max_length=20)
-    file = models.FileField(storage=overwrite_storage, upload_to=UploadComposeCache('composecache/%s/%s'))
+    file = models.FileField(storage=overwrite_storage, upload_to=UploadComposeCache('composecache/%s/%s/%s'))
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
-        unique_together = ('content_type', 'object_id', 'source_field')
+        unique_together = ('content_type', 'object_id', 'source_field', 'resolution')
 
     @property
     def position(self):
