@@ -27,7 +27,7 @@ class TextureSample(ImageSpec):
             return []
 
         return [
-            ComposeSample(cache, instance.needs_shadow),
+            ComposeSample(cache.file.path, instance.needs_shadow),
             ResizeToFit(*self.size)
         ]
 
