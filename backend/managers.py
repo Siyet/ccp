@@ -10,9 +10,11 @@ class CustomShirtManager(models.Manager):
 
 class TemplateShirtManager(models.Manager):
     def available(self):
-        return self.filter(fabric__active=True,
-                           fabric__residuals__storehouse_id=models.F('collection__storehouse_id'),
-                           fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL).select_related('collection')
+        return self.filter(
+            fabric__active=True,
+            fabric__residuals__storehouse_id=models.F('collection__storehouse_id'),
+            fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
+        ).select_related('collection').exclude(fabric__texture=None)
 
     def get_queryset(self):
         queryset = super(TemplateShirtManager, self).get_queryset().filter(is_template=True, is_standard=False)

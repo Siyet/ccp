@@ -14,6 +14,7 @@ from dictionaries import models as dictionaries
 from api import serializers
 from api.cache import fabric_last_modified
 from api.filters import CollectionFabricsFilter
+from django.db.models import Q
 
 
 class CollectionsListView(ListAPIView):
@@ -48,7 +49,9 @@ class CollectionFabricsList(ListCacheResponseMixin, ListAPIView):
         return collection
 
     def get_queryset(self):
-        return self.collection.fabrics().select_related('texture')
+        return self.collection.fabrics().select_related('texture').exclude(texture=None).exclude(
+            Q(short_description='') & Q(long_description='')
+        )
 
     @last_modified(last_modified_func=fabric_last_modified)
     def get(self, request, *args, **kwargs):
