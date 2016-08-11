@@ -108,7 +108,7 @@ class CacheBuilder(object):
 
         for field, matrix, scale in matrices:
             # remove old cache
-            instance.cache.filter(source_field=field).delete()
+            instance.cache.filter(source_field=field, resolution=resolution).delete()
             scaled_bbox = scale_tuple(bbox, scale)
             matrix.repick(scaled_bbox)
             field_type = field_types.get(field) or CacheBuilder.DEFAULT_FIELD_TYPES.get(field)
