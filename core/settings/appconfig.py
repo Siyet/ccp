@@ -3,7 +3,7 @@ from import_export.formats import base_formats
 
 APP_NAME = 'CostumeCode'
 
-MIN_FABRIC_RESIDUAL = 5
+MIN_FABRIC_RESIDUAL = 7
 
 IMPORT_EXPORT_FORMATS = (
     base_formats.CSV,
