@@ -29,6 +29,8 @@ from .models import (
     SleeveType,
     Thickness,
     FAQ,
+    Fit,
+    SleeveLength,
     DefaultElement,
 )
 
@@ -68,6 +70,8 @@ admin.site.register([
     PocketType,
     SleeveType,
     FAQ,
+    Fit,
+    SleeveLength,
 ])
 
 admin.site.register(Size, SizeAdmin)

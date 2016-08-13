@@ -306,6 +306,8 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
     contrast_details = ContrastDetailsSerializer(many=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
     initials = InitialsSerializer(required=False)
+    fit = serializers.StringRelatedField(source='fit.title')
+    sleeve_length = serializers.StringRelatedField(source='sleeve_length.title')
 
     class Meta:
         model = models.Shirt
