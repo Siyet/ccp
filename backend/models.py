@@ -14,6 +14,7 @@ from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from ordered_model.models import OrderedModel
+from colorful.fields import RGBColorField
 
 from core.utils import first
 from dictionaries.models import FabricCategory, SleeveType, ResolveDefault
@@ -237,6 +238,7 @@ class CustomButtons(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     picture = models.ImageField(_(u'Изображение'), upload_to='custombuttons')
     type = models.ForeignKey('dictionaries.CustomButtonsType', verbose_name=_(u'Тип'), related_name='buttons')
+    color = RGBColorField(_(u'Цвет'), default="#FFFFFF")
 
     def __unicode__(self):
         return self.title
