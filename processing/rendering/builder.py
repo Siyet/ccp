@@ -1,6 +1,6 @@
 from time import time
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageChops
 import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
@@ -17,6 +17,7 @@ from .utils import hex_to_rgb, scale_tuple
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder
 
+
 class CacheBuilderMock(object):
     @staticmethod
     def cache_texture(*args, **kwargs):
@@ -29,6 +30,7 @@ class CacheBuilderMock(object):
 
 cache_builder = CacheBuilderMock
 # cache_builder = CacheBuilder
+
 
 class ShirtBuilder(object):
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
@@ -54,7 +56,7 @@ class ShirtBuilder(object):
 
     def extract(self, data, param):
         value = data.get(param, None)
-        return value or None # skip empty strings
+        return value or None  # skip empty strings
 
     def reset(self):
         self.uv = []
@@ -100,6 +102,7 @@ class ShirtBuilder(object):
             'hem_id': self.hem
         })
         cache_builder.create_cache(conf, ('light', 'uv'), resolution=self.resolution)
+        cache_builder.create_cache(self.cuff_conf, ('side_mask',), resolution=self.resolution)
         light = conf.cache.get(source_field='light', resolution=self.resolution)
         alpha = conf.cache.get(source_field='uv_alpha', resolution=self.resolution)
         alpha_img = Image.open(alpha.file.path)
@@ -112,18 +115,18 @@ class ShirtBuilder(object):
             dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask', resolution=self.resolution))
         for alpha_cache in dickey_alphas:
             part_alpha = Image.open(alpha_cache.file.path)
-            inverted = ImageOps.invert(part_alpha)
-            alpha_img.paste(inverted,
-                            (
-                                alpha_cache.position[0] - alpha.position[0],
-                                alpha_cache.position[1] - alpha.position[1]
-                            ),
-                            mask=part_alpha)
+            part_position = alpha_cache.position
+            part_layer = Image.new(alpha_img.mode, alpha_img.size)
+            part_layer.paste(part_alpha, (
+                part_position[0] - alpha.position[0],
+                part_position[1] - alpha.position[1]
+            ))
+            alpha_img = ImageChops.subtract(alpha_img, part_layer)
+
         texture = self.get_fabric_texture(self.dickey['fabric'])
         dickey = Composer.create_dickey(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=np.load(conf.cache.get(source_field='uv', resolution=self.resolution).file.path),
-            # light=Image.open(light.file.path),
             alpha=alpha_img
         )
         print("dickey", time() - start)
