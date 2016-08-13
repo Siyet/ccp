@@ -28,7 +28,7 @@ class CacheBuilderMock(object):
 
 
 cache_builder = CacheBuilderMock
-cache_builder = CacheBuilder
+# cache_builder = CacheBuilder
 
 
 class ShirtBuilder(object):
