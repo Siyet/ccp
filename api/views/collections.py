@@ -12,6 +12,7 @@ from lazy import lazy
 from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey
 from dictionaries import models as dictionaries
 from api import serializers
+from .mixins import CollectionMixin
 from api.cache import fabric_last_modified
 from api.filters import CollectionFabricsFilter
 
@@ -22,25 +23,6 @@ class CollectionsListView(ListAPIView):
     """
     queryset = Collection.objects.all()
     serializer_class = serializers.CollectionSerializer
-
-
-class CollectionMixin(object):
-    """
-    Миксин для получения коллекции из БД или из кэша
-    """
-    _collection = None
-
-    def _get_collection(self):
-        if self._collection is None:
-            self._collection = get_object_or_404(
-                Collection.objects.select_related('storehouse'), pk=self.kwargs.get('pk')
-            )
-        return self._collection
-
-    @property
-    def collection(self):
-        return self._get_collection()
-
 
 
 class ShirtInfoListView(ListAPIView):
@@ -62,7 +44,7 @@ class CollectionFabricsList(CollectionMixin, ListCacheResponseMixin, ListAPIView
 
     @lazy
     def collection(self):
-        collection = self._get_collection()
+        collection = super(CollectionFabricsList, self).collection
         collection.prices = collection.storehouse.prices.values('fabric_category', 'price')
         return collection
 
