@@ -1,20 +1,20 @@
 from time import time
 
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageColor
 import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from lazy import lazy
 
-from backend.models import ContrastDetails
-from backend.models import Fabric
+from backend.models import ContrastDetails, Fabric, CustomButtons
 from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
 from .utils import hex_to_rgb, scale_tuple
 from core.settings.base import RENDER
+from processing.cache import CacheBuilder
 
 
 class CacheBuilderMock(object):
@@ -28,9 +28,7 @@ class CacheBuilderMock(object):
 
 
 cache_builder = CacheBuilderMock
-
-
-# cache_builder = CacheBuilder
+cache_builder = CacheBuilder
 
 
 class ShirtBuilder(object):
@@ -75,6 +73,15 @@ class ShirtBuilder(object):
         fabric = Fabric.objects.select_related('texture').get(pk=fabric_id)
         cache_builder.cache_texture(fabric.texture)
         return fabric.texture
+
+    @lazy
+    def buttons_color(self):
+        if self.custom_buttons:
+            buttons = CustomButtons.objects.filter(pk=self.custom_buttons).first()
+            if buttons:
+                return ImageColor.getrgb(buttons.color) + (255,)
+
+        return None
 
     @lazy
     def collar_conf(self):
@@ -286,7 +293,13 @@ class ShirtBuilder(object):
         ao = conf.cache.filter(source_field='ao', resolution=self.resolution).first()
         if conf.projection == compose.PROJECTION.front or not isinstance(conf.content_object,
                                                                          compose.BodyButtonsConfiguration):
-            self.buttons.append(ImageConf.for_cache(buttons_cache))
+            buttons_conf = ImageConf.for_cache(buttons_cache)
+            if self.buttons_color:
+                buttons_image = Image.open(buttons_conf.image)
+                color_layer = Image.new("RGBA", buttons_image.size, color=self.buttons_color)
+                buttons_conf.image = ImageChops.multiply(buttons_image, color_layer)
+
+            self.buttons.append(buttons_conf)
             if ao:
                 self.post_shadows.append(ImageConf.for_cache(ao))
 

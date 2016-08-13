@@ -139,4 +139,6 @@ try:
     from htmltopdf import *
 except:
     print("htmltopdf config not found: PDF creation will fail.")
+
 GRAPPELLI_ADMIN_TITLE = APP_NAME
+GRAPPELLI_CLEAN_INPUT_TYPES = False
