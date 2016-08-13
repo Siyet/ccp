@@ -15,7 +15,6 @@ from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
 from .utils import hex_to_rgb, scale_tuple
 from core.settings.base import RENDER
-from processing.cache import CacheBuilder
 
 
 class CacheBuilderMock(object):
@@ -29,6 +28,8 @@ class CacheBuilderMock(object):
 
 
 cache_builder = CacheBuilderMock
+
+
 # cache_builder = CacheBuilder
 
 
@@ -77,8 +78,13 @@ class ShirtBuilder(object):
 
     @lazy
     def collar_conf(self):
-        return compose.CollarConfiguration.objects.prefetch_related('masks').get(collar_id=self.collar['type'],
-                                                                                 buttons=self.collar_buttons)
+        try:
+            collar_conf = compose.CollarConfiguration.objects.prefetch_related('masks').get(
+                collar_id=self.collar['type'],
+                buttons=self.collar_buttons)
+            return collar_conf
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist("Collar configuration not found for given parameters: %s" % self.collar)
 
     @lazy
     def collar_model(self):
@@ -86,8 +92,12 @@ class ShirtBuilder(object):
 
     @lazy
     def cuff_conf(self):
-        return compose.CuffConfiguration.objects.get(cuff_types__id=self.cuff['type'] if self.cuff else None,
-                                                     rounding_id=self.cuff['rounding'] if self.cuff else None)
+        try:
+            cuff_conf = compose.CuffConfiguration.objects.get(cuff_types__id=self.cuff['type'] if self.cuff else None,
+                                                              rounding_id=self.cuff['rounding'] if self.cuff else None)
+            return cuff_conf
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist("Collar configuration not found for given parameters: %s" % self.collar)
 
     @lazy
     def cuff_model(self):
@@ -163,11 +173,12 @@ class ShirtBuilder(object):
                 'buttons_id': self.custom_buttons_type
             }))
 
-        if self.cuff:
+        if self.cuff and self.sleeve.cuffs:
             self.append_buttons_stitches(self.get_buttons_conf(compose.CuffButtonsConfiguration, {
                 'cuff_id': self.cuff['type'],
                 'rounding_types__id': self.cuff['rounding']
             }))
+
         self.append_buttons_stitches(self.get_buttons_conf(compose.CollarButtonsConfiguration, {
             'collar_id': self.collar['type'],
             'buttons': self.collar_buttons
