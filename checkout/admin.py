@@ -98,7 +98,8 @@ class OrderAdmin(OrderExportMixin, admin.ModelAdmin):
 
     def get_export_url(self, instance):
         # TODO: будет дописана в следующих задачах
-        return ''
+        return u'<a href="{}">{}</a>'\
+            .format(reverse('admin:checkout_order_export', args=(instance.pk, )), _(u'Экспорт'))
     get_export_url.allow_tags = True
     get_export_url.short_description = _(u'Сохранить инфо о заказе')
 
