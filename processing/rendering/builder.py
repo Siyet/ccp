@@ -55,6 +55,9 @@ class ShirtBuilder(object):
 
     def extract(self, data, param):
         value = data.get(param, None)
+        if isinstance(value, dict):
+            for k in value.keys():
+                value[k] = self.extract(value, k)
         return value or None  # skip empty strings
 
     def reset(self):
