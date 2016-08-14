@@ -5,8 +5,12 @@ import datetime
 
 from django.contrib import admin
 from django.core.urlresolvers import reverse
+from django.conf.urls import url
+from django.http import HttpResponse
 from django.utils.text import ugettext_lazy as _
+from django.template import loader
 from import_export.admin import ImportExportMixin
+from wkhtmltopdf import render_pdf_from_template
 
 from conversions.mixin import TemplateAndFormatMixin, OrderExportMixin
 from conversions.resources import CertificateResource, DiscountResource
@@ -86,22 +90,44 @@ class OrderAdmin(OrderExportMixin, admin.ModelAdmin):
                        'get_performed_datetime', )
     inlines = [CustomerDataInline, OrderDetailsInline]
 
+    order_pdf_template_name = 'checkout/payment_completed_customer_pdf_email.html'
+    CONTENT_TYPE_PDF = 'application/pdf'
+
     def get_queryset(self, request):
         qs = super(OrderAdmin, self).get_queryset(request)
         return qs.prefetch_related(*self.list_prefetch_related)
 
+    def get_urls(self):
+        urls = super(OrderAdmin, self).get_urls()
+        my_urls = [
+            url(
+                r'^(?P<pk>\d+)/pdf/$',
+                self.admin_site.admin_view(self.pdf_action),
+                name='checkout_order_pdf'
+            ),
+        ]
+        return my_urls + urls
+
+    def pdf_action(self, request, *args, **kwargs):
+        order = self.get_object(request, kwargs.get('pk'))
+        t = loader.get_template(self.order_pdf_template_name)
+        pdf = render_pdf_from_template(t, None, None, {'order': order})
+        response = HttpResponse(pdf, content_type=self.CONTENT_TYPE_PDF)
+        response['Content-Disposition'] = 'inline; filename=%s.pdf' % self.get_export_filename()
+        return response
+
     def get_print_url(self, instance):
-        # TODO: будет дописана в следующих задачах
-        return ''
+        return u'<a href="{}">{}</a>'\
+            .format(reverse('admin:checkout_order_pdf', args=(instance.pk, )), _(u'PDF'))
     get_print_url.allow_tags = True
     get_print_url.short_description = _(u'Распечатать инфо о заказе')
 
     def get_export_url(self, instance):
-        # TODO: будет дописана в следующих задачах
         return u'<a href="{}">{}</a>'\
             .format(reverse('admin:checkout_order_export', args=(instance.pk, )), _(u'Экспорт'))
     get_export_url.allow_tags = True
     get_export_url.short_description = _(u'Сохранить инфо о заказе')
+
 
 
 admin.site.register(Order, OrderAdmin)

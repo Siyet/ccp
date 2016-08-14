@@ -29,8 +29,8 @@ class OrderExportMixin(object):
         urls = super(OrderExportMixin, self).get_urls()
         my_urls = [
             url(
-                r'^(?P<pk>\d+)/export/$', 
-                self.admin_site.admin_view(self.export_action), 
+                r'^(?P<pk>\d+)/export/$',
+                self.admin_site.admin_view(self.export_action),
                 name='checkout_order_export'
             ),
             url(r'^(?P<pk>\d+)/export/(?P<shirt>\d+)/$', self.admin_site.admin_view(self.export_shirt_action)),
