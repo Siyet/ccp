@@ -44,6 +44,8 @@ class ShirtBuilder(object):
         self.sleeve = dictionaries.SleeveType.objects.get(pk=shirt_data.get('sleeve'))
         self.hem = self.extract(shirt_data, 'hem')
         self.placket = self.extract(shirt_data, 'placket')
+        if self.placket:
+            self.placket = dictionaries.PlacketType.objects.get(pk=self.placket)
         self.tuck = shirt_data.get('tuck', False)
         self.back = self.extract(shirt_data, 'back')
         self.dickey = self.extract(shirt_data, 'dickey')
@@ -170,7 +172,7 @@ class ShirtBuilder(object):
         }))
         self.append_model(self.get_back())
         self.append_model(self.get_compose_configuration(compose.PlacketConfiguration, {
-            'placket_id': self.placket,
+            'plackets': self.placket.id,
             'hem_id': self.hem
         }), post_shadow=True)
         if self.projection == compose.PROJECTION.back and self.yoke:
@@ -178,10 +180,9 @@ class ShirtBuilder(object):
                 'yoke_id': self.yoke
             }))
 
-        if self.projection != compose.PROJECTION.back:
-            self.append_buttons_stitches(self.get_buttons_conf(compose.BodyButtonsConfiguration, {
-                'buttons_id': self.custom_buttons_type
-            }))
+        if self.projection != compose.PROJECTION.back and self.placket.show_buttons:
+            buttons_conf = self.get_buttons_conf(compose.BodyButtonsConfiguration, {})
+            self.append_buttons_stitches(buttons_conf)
 
         if self.cuff and self.sleeve.cuffs:
             self.append_buttons_stitches(self.get_buttons_conf(compose.CuffButtonsConfiguration, {
@@ -294,27 +295,25 @@ class ShirtBuilder(object):
             print(e.message)
             return
         ao = conf.cache.filter(source_field='ao', resolution=self.resolution).first()
-        if conf.projection == compose.PROJECTION.front or not isinstance(conf.content_object,
-                                                                         compose.BodyButtonsConfiguration):
-            buttons_conf = ImageConf.for_cache(buttons_cache)
-            if self.buttons_color:
-                buttons_image = Image.open(buttons_conf.image)
-                color_layer = Image.new("RGBA", buttons_image.size, color=self.buttons_color)
-                buttons_conf.image = ImageChops.multiply(buttons_image, color_layer)
+        buttons_image = Image.open(buttons_cache.file.path)
+        if self.buttons_color:
+            color_layer = Image.new("RGBA", buttons_image.size, color=self.buttons_color)
+            buttons_image = ImageChops.multiply(buttons_image, color_layer)
 
-            self.buttons.append(buttons_conf)
-            if ao:
-                self.post_shadows.append(ImageConf.for_cache(ao))
-
-        else:
-            size = scale_tuple(RENDER['default_size'], RENDER['preview_scale'])
+        if conf.projection == compose.PROJECTION.side and isinstance(conf.content_object,
+                                                                     compose.BodyButtonsConfiguration):
+            scale = 1.0 if self.resolution == compose.CACHE_RESOLUTION.full else RENDER['preview_scale']
+            size = scale_tuple(RENDER['default_size'], scale)
             buttons_base = Image.new("RGBA", size, 0)
-            img = Image.open(buttons_cache.file.path)
-            buttons_base.paste(img, buttons_cache.position, mask=img)
+            buttons_base.paste(buttons_image, buttons_cache.position, mask=buttons_image)
             if ao:
                 shadow = Image.open(ao.file.path)
                 buttons_base.paste(shadow, ao.position, mask=shadow)
             self.base_layer.append(buttons_base)
+        else:
+            self.buttons.append(ImageConf(image=buttons_image, position=buttons_cache.position))
+            if ao:
+                self.post_shadows.append(ImageConf.for_cache(ao))
 
     def get_compose_configuration(self, model, filters):
         filters = map(lambda (k, v): Q(**{k: v}) | Q(**{"%s__isnull" % k: True}), filters.iteritems())
@@ -332,14 +331,15 @@ class ShirtBuilder(object):
 
     def get_buttons_conf(self, model, filters):
         filters = map(lambda (k, v): Q(**{k: v}) | Q(**{"%s__isnull" % k: True}), filters.iteritems())
-        try:
-            configuration = model.objects.get(*filters)
-            return (configuration.sources.filter(projection=self.projection).first(),
-                    configuration.stitches.filter(projection=self.projection))
-        except ObjectDoesNotExist:
+
+        configuration = model.objects.filter(*filters).first()
+        if not configuration:
             print('not found: %s' % model._meta.verbose_name)
             print('params: %s' % filters)
             return None
+
+        return (configuration.sources.filter(projection=self.projection).first(),
+                configuration.stitches.filter(projection=self.projection))
 
     def append_solid_contrasting_part(self, ao, light_conf, model, part_details, uv):
         fabric = part_details[0]['fabric']
@@ -404,3 +404,7 @@ class ShirtBuilder(object):
 
             if detail_masks:
                 self.append_granular_contrasting_part(ao, detail_masks, light_conf, uv)
+
+            # for external cuff part there's no mask: we just replace whole manget
+            elif ContrastDetails.CUFF_ELEMENTS.cuff_outer in present_part_keys:
+                self.append_solid_contrasting_part(ao, light_conf, model, part_details, uv)

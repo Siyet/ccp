@@ -249,6 +249,8 @@ class SleeveType(ComponentModel):
 
 
 class PlacketType(ComponentModel):
+    show_buttons = models.BooleanField(_(u'Пуговицы видны'), default=True)
+
     class Meta:
         verbose_name = _(u'Тип полочки')
         verbose_name_plural = _(u'Типы полочек')

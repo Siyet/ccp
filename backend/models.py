@@ -389,7 +389,7 @@ class Shirt(models.Model):
         # Контрастные детали
         contrast_detail_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
                                                                 content_type__model='contrastdetails').first()
-        # Не зависимо от количества
+        # Независимо от количества
         if contrast_detail_price and self.contrast_details.count() > 0:
             price += contrast_detail_price.price
 
@@ -490,13 +490,13 @@ class ShirtImage(models.Model):
 
 
 class ContrastDetails(models.Model):
-    COLLAR_ELEMENTS = (
+    COLLAR_ELEMENTS = Choices(
         ('collar_face', _(u'Воротник лицевая сторона')),
         ('collar_bottom', _(u'Воротник низ')),
         ('collar_outer', _(u'Воротник внешняя стойка')),
         ('collar_inner', _(u'Воротник внутрення стойка'))
     )
-    CUFF_ELEMENTS = (
+    CUFF_ELEMENTS = Choices(
         ('cuff_outer', _(u'Манжета внешняя')),
         ('cuff_inner', _(u'Манжета внутрення'))
     )
