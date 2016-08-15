@@ -93,11 +93,10 @@ class PocketConfiguration(PartConfigurationModel):
 
 
 class PlacketConfiguration(PartConfigurationModel):
-    placket = models.ForeignKey(dictionaries.PlacketType, verbose_name=_(u'Тип полочки'))
+    plackets = models.ManyToManyField(dictionaries.PlacketType, verbose_name=_(u'Тип полочки'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
 
     class Meta:
-        unique_together = ('placket', 'hem')
         verbose_name = _(u'Конфигурация сборки для полочки')
         verbose_name_plural = _(u'Конфигурации сборки для полочки')
 

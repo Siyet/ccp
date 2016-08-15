@@ -2,8 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import processing.storage
-import processing.upload_path
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -15,12 +13,11 @@ def rename_content_types(apps, schema_editor):
             ct.model = rename.new_name.lower()
             ct.save()
         except ContentType.DoesNotExist:
-        	# exception if run first time
+            # exception if run first time
             pass
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('dictionaries', '0026_auto_20160702_2354'),
         ('processing', '0022_merge'),
