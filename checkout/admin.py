@@ -12,7 +12,8 @@ from django.template import loader
 from import_export.admin import ImportExportMixin
 from wkhtmltopdf import render_pdf_from_template
 
-from conversions.mixin import TemplateAndFormatMixin, OrderExportMixin
+from conversions.mixin import TemplateAndFormatMixin
+from conversions.admin import OrderExportAdmin
 from conversions.resources import CertificateResource, DiscountResource
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 from yandex_kassa.admin import Payment as YandexPayment, PaymentAdmin
@@ -78,7 +79,7 @@ class CustomerDataInline(admin.StackedInline):
     extra = 0
 
 
-class OrderAdmin(OrderExportMixin, admin.ModelAdmin):
+class OrderAdmin(OrderExportAdmin, admin.ModelAdmin):
     list_display = ('number', 'state', 'get_payment_status', 'date_add', 'get_fio', 'get_city', 'get_count',
                     'get_amount_to_pay', 'get_print_url', 'get_export_url', )
     search_fields = ('number', 'customer_data__lastname', 'customer_data__name', 'customer_data__midname',
