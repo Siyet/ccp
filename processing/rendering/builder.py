@@ -81,7 +81,7 @@ class ShirtBuilder(object):
 
     @lazy
     def buttons_color(self):
-        if self.custom_buttons:
+        if self.custom_buttons and self.custom_buttons_type:
             buttons = CustomButtons.objects.filter(pk=self.custom_buttons).first()
             if buttons:
                 return ImageColor.getrgb(buttons.color) + (255,)
