@@ -1,7 +1,7 @@
 from collections import CollectionsListView, ShirtInfoListView
 from collections import CollectionFabricDesignsList, CollectionFabricsList, CollectionFabricColorsList, \
     CollectionHardnessList, CollectionStaysList, CollectionContrastDetailsList, CollectionStitchesList, \
-    CollectionDickeyList
+    CollectionDickeyList, CollectionThicknessList, CollectionFabricTypeList
 
 from sizes import SizeOptionsList, SizesList
 

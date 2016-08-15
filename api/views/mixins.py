@@ -1,3 +1,11 @@
+# coding: utf-8
+
+from django.shortcuts import get_object_or_404
+from lazy import lazy
+
+from backend.models import Collection
+
+
 class FilterHelpersMixin(object):
     def build_filter(self, title, name, values):
         """
@@ -24,3 +32,16 @@ class FilterHelpersMixin(object):
             'key': key,
             'value': value
         }
+
+
+class CollectionMixin(object):
+    """
+    Миксин для получения коллекции из БД или из кэша
+    """
+
+    @lazy
+    def collection(self):
+        collection = get_object_or_404(
+            Collection.objects.select_related('storehouse'), pk=self.kwargs.get('pk')
+        )
+        return collection
