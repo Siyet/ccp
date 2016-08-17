@@ -302,10 +302,10 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
 
     collar = ShirtCollarSerializer()
     cuff = ShirtCuffSerializer()
-    dickey = ShirtDickeySerializer(required=False)
+    dickey = ShirtDickeySerializer(required=False, allow_null=True)
     contrast_details = ContrastDetailsSerializer(many=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
-    initials = InitialsSerializer(required=False)
+    initials = InitialsSerializer(required=False, allow_null=True)
     fit = serializers.StringRelatedField(source='fit.title')
     sleeve_length = serializers.StringRelatedField(source='sleeve_length.title')
 
@@ -322,12 +322,11 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailsSerializer(serializers.ModelSerializer):
+    shirt = ShirtDetailsSerializer()
 
     class Meta:
         model = checkout.OrderDetails
         fields = ('shirt', 'amount', )
-
-    shirt = ShirtDetailsSerializer()
 
     def create(self, validated_data):
         shirt = validated_data.pop('shirt')

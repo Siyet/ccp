@@ -35,8 +35,8 @@ class CostumecodeMailer(object):
     order_subject = _(u'НОВЫЙ ЗАКАЗ')
     order_customer_subject = _(u'COSTUME CODE - Ваш заказ подтвержден и оплачен')
     order_admin_template_name = 'checkout/payment_completed_admin_email.html'
-    order_pdf_template_name = 'checkout/payment_completed_customer_email.html'
     order_customer_template_name = 'checkout/payment_completed_customer_email.html'
+    order_pdf_template_name = 'checkout/payment_completed_customer_pdf_email.html'
 
     @classmethod
     def send_order_payment_completed(cls, order):
