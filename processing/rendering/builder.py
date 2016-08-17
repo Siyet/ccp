@@ -14,7 +14,7 @@ from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
 from .utils import hex_to_rgb, scale_tuple
 from core.settings.base import RENDER
-from processing.cache import CacheBuilder
+from processing.cache import CacheBuilder, STITCHES
 
 
 class CacheBuilderMock(object):
@@ -260,7 +260,7 @@ class ShirtBuilder(object):
 
         for conf in stitches:
             try:
-                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution)
+                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution, field_types={'image': STITCHES }))
                 cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
                 print(e.message)
