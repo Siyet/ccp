@@ -129,5 +129,7 @@ class ShirtImage(APIView):
             required: true
         """
         data = request.data
+        if 'echo' in request.query_params:
+            return Response(data)
         image_url = ShirtImageCache.get_image_url(data, projection, resolution)
         return Response(request.build_absolute_uri(image_url))
