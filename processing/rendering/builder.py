@@ -260,7 +260,7 @@ class ShirtBuilder(object):
 
         for conf in stitches:
             try:
-                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution, field_types={'image': STITCHES }))
+                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution, field_types={'image': STITCHES })
                 cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
                 print(e.message)
