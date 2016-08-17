@@ -341,8 +341,7 @@ class ShirtBuilder(object):
         return (configuration.sources.filter(projection=self.projection).first(),
                 configuration.stitches.filter(projection=self.projection))
 
-    def append_solid_contrasting_part(self, ao, light_conf, model, part_details, uv):
-        fabric = part_details[0]['fabric']
+    def append_solid_contrasting_part(self, ao, light_conf, model, fabric, uv):
         texture = self.get_fabric_texture(fabric)
         alpha_cache = model.cache.get(source_field='uv_alpha', resolution=self.resolution)
         self.alphas.append(alpha_cache)
@@ -392,7 +391,7 @@ class ShirtBuilder(object):
         ao = model.cache.get(source_field='ao', resolution=self.resolution).file.path
         fabrics = set(map(lambda d: d['fabric'], part_details))
         if sorted(present_part_keys) == sorted(part_keys) and len(fabrics) == 1:
-            self.append_solid_contrasting_part(ao, light_conf, model, part_details, uv)
+            self.append_solid_contrasting_part(ao, light_conf, model, next(fabrics), uv)
         else:
             self.append_model(model)
             detail_masks = []
@@ -406,5 +405,7 @@ class ShirtBuilder(object):
                 self.append_granular_contrasting_part(ao, detail_masks, light_conf, uv)
 
             # for external cuff part there's no mask: we just replace whole manget
-            elif ContrastDetails.CUFF_ELEMENTS.cuff_outer in present_part_keys:
-                self.append_solid_contrasting_part(ao, light_conf, model, part_details, uv)
+            else:
+                cuff_element = first(lambda x: x['element'] == ContrastDetails.CUFF_ELEMENTS.cuff_outer, part_details)
+                if cuff_element:
+                    self.append_solid_contrasting_part(ao, light_conf, model, cuff_element['fabric'], uv)
