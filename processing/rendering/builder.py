@@ -391,7 +391,7 @@ class ShirtBuilder(object):
         ao = model.cache.get(source_field='ao', resolution=self.resolution).file.path
         fabrics = set(map(lambda d: d['fabric'], part_details))
         if sorted(present_part_keys) == sorted(part_keys) and len(fabrics) == 1:
-            self.append_solid_contrasting_part(ao, light_conf, model, next(fabrics), uv)
+            self.append_solid_contrasting_part(ao, light_conf, model, fabrics.pop(), uv)
         else:
             self.append_model(model)
             detail_masks = []
