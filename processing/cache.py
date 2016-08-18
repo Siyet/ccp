@@ -1,17 +1,15 @@
 from io import BytesIO
 from math import floor, ceil
-from copy import copy
 
 from django.core.files.base import ContentFile
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 from django.contrib.contenttypes.models import ContentType
+
 from scipy import ndimage
-from PIL import ImageFilter
-from core.utils import first
+
 from processing.models import BodyConfiguration, SourceCache, CACHE_RESOLUTION
 from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
-
 from core.settings.base import RENDER
 
 EXR_FIELD = 'EXR'
@@ -21,7 +19,6 @@ STITCHES = 'S'
 
 
 class CacheBuilder(object):
-
     SCALE_MAP = {
         'uv': 2.0,
         'light': 1.0,
@@ -38,7 +35,6 @@ class CacheBuilder(object):
         'mask': L_FIELD,
         'side_mask': L_FIELD
     }
-
 
     @staticmethod
     def create_cache(instance, fields, resolution, field_types=None):
@@ -90,7 +86,7 @@ class CacheBuilder(object):
                     raise
 
             if field == 'uv':
-                matrix._source = matrix._source[..., :2].astype('uint16') # cut redundant channels from uv
+                matrix._source = matrix._source[..., :2].astype('uint16')  # cut redundant channels from uv
 
             scale = CacheBuilder.SCALE_MAP.get(field, 1)
             matrices.append((field, matrix, scale))
@@ -116,7 +112,8 @@ class CacheBuilder(object):
             filename = "%s_%s_%s.%s" % (instance._meta.model_name, instance.id, field, extension)
             position = scaled_bbox[:2][::-1]
             ct = ContentType.objects.get_for_model(instance)
-            cache = SourceCache(source_field=field, resolution=resolution, object_id=instance.id, content_type=ct, position=position)
+            cache = SourceCache(source_field=field, resolution=resolution, object_id=instance.id, content_type=ct,
+                                position=position)
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
     @staticmethod
@@ -130,7 +127,7 @@ class CacheBuilder(object):
             array = (array * 255.0).astype('uint8')
             if len(array.shape) > 2:
                 if array.shape[2] > 1:
-                    array = array[..., -1] # only take alpha
+                    array = array[..., -1]  # only take alpha
                 array = array.reshape(array.shape[:2])
             img = Image.fromarray(array, mode='L')
             img.save(buffer, extension)
@@ -152,12 +149,14 @@ class CacheBuilder(object):
         filename = "%s.npy" % texture.texture.name
         ct = ContentType.objects.get_for_model(texture)
         SourceCache.objects.filter(object_id=texture.id, content_type=ct).delete()
+
         def save_to_cache(image, resolution):
             texture_arr = np.asarray(image).transpose(1, 0, 2)
             buffer = BytesIO()
             np.save(buffer, texture_arr)
             buffer.flush()
-            cache = SourceCache(source_field='texture', resolution=resolution, object_id=texture.id, content_type=ct, position=(0, 0))
+            cache = SourceCache(source_field='texture', resolution=resolution, object_id=texture.id, content_type=ct,
+                                position=(0, 0))
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
         img = Image.open(texture.texture.path)

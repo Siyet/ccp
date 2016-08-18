@@ -2,6 +2,6 @@
 
 
 def save_relations(instance, field):
-    if getattr(instance, field) is not None and getattr(instance, field).pk is None:
+    if getattr(instance, field) is not None:
         getattr(instance, field).save()
         setattr(instance, field, getattr(instance, field))

@@ -421,6 +421,9 @@ class Shirt(models.Model):
         verbose_name = _(u'Рубашка')
         verbose_name_plural = _(u'Рубашки')
 
+    def __unicode__(self):
+        return self.code if self.code else self.id
+
 
 class CustomShirt(Shirt):
     objects = managers.CustomShirtManager()

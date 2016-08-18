@@ -121,7 +121,6 @@ def scale_tuple(tpl, scale=1):
     return res
 
 def draw_rotated_text(text, font, rotate):
-    size = font.getsize(text)
     text_image = Image.new('L', font.getsize(text))
     draw = ImageDraw.Draw(text_image)
     draw.text((0, 0), text, font=font, fill=255)
