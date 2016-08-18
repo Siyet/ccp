@@ -321,12 +321,12 @@ class Shirt(models.Model):
 
     showcase_image = models.ImageField(_(u'Изображение для витрины'), blank=False, null=True, upload_to='showcase')
     showcase_image_list = ImageSpecField(source='showcase_image',
-                                         processors=[ResizeToFill(200, 300)],
+                                         processors=[ResizeToFill(settings.SHOWCASE_IMAGE_SIZE)],
                                          format='JPEG',
                                          options={'quality': 80})
 
     showcase_image_detail = ImageSpecField(source='showcase_image',
-                                           processors=[ResizeToFill(400, 600)],
+                                           processors=[ResizeToFill(settings.SHOWCASE_DETAILS_IMAGE_SIZE)],
                                            format='JPEG',
                                            options={'quality': 80})
 

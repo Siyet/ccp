@@ -22,6 +22,10 @@ SITE_INFO_EMAIL = 'contact@costumecode.ru'
 ADMIN_ORDER_EMAIL = 'test.cc@wecreateapps.ru'
 
 
+SHOWCASE_IMAGE_SIZE = (200, 300)
+SHOWCASE_DETAILS_IMAGE_SIZE = (1080, 1440)
+
+
 # Render
 
 RENDER = {
