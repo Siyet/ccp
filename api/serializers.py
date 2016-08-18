@@ -199,13 +199,14 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
     country = serializers.StringRelatedField(source='collection.storehouse.country')
     short_description = serializers.StringRelatedField(source='fabric.short_description')
     long_description = serializers.StringRelatedField(source='fabric.long_description')
+    tailoring_time = serializers.ReadOnlyField(source='collection.tailoring_time')
 
     def get_shirt_images(self, object):
         return [self.context['view'].request.build_absolute_uri(shirt_image.image.url) for shirt_image in object.shirt_images.all()]
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['individualization', 'short_description', 'long_description', 'shirt_images', 'collection_title', 'country']
+        fields = ['individualization', 'short_description', 'long_description', 'shirt_images', 'collection_title', 'country', 'tailoring_time']
 
 
 class TemplateShirtSerializer(TemplateShirtListSerializer):
@@ -308,6 +309,7 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
     initials = InitialsSerializer(required=False, allow_null=True)
     fit = serializers.StringRelatedField(source='fit.title')
     sleeve_length = serializers.StringRelatedField(source='sleeve_length.title')
+    tailoring_time = serializers.ReadOnlyField(source='collection.tailoring_time')
 
     class Meta:
         model = models.Shirt
