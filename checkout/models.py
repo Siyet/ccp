@@ -1,25 +1,24 @@
 # coding: utf-8
 import uuid
-
 import datetime
+
 from django.db import models
 from django.db.transaction import atomic
 from django.dispatch.dispatcher import receiver
 from django.utils.text import ugettext_lazy as _
 from model_utils import Choices
-
 from ordered_model.models import OrderedModel
 from yandex_kassa.models import Payment as YandexPayment
 from yandex_kassa.signals import payment_completed
 
-from core.mail import CostumecodeMailer
+from checkout.mail import CheckoutMailer
 from core.utils import first
 
 
 class Payment(YandexPayment):
     class Meta:
         proxy = True
-        ordering = ('-created', )
+        ordering = ('-created',)
         verbose_name = _(u'Платеж')
         verbose_name_plural = _(u'Платежи')
 
@@ -99,6 +98,7 @@ class Order(models.Model):
         for detail in self.order_details.all():
             result += float(detail.price) * detail.amount
         return result
+
     get_full_amount.allow_tags = True
     get_full_amount.short_description = _(u'Общая стоимость заказа')
 
@@ -107,6 +107,7 @@ class Order(models.Model):
             return self.payment.order_amount
         except AttributeError:
             return None
+
     get_amount_to_pay.allow_tags = True
     get_amount_to_pay.short_description = _(u'Сумма заказа')
 
@@ -115,6 +116,7 @@ class Order(models.Model):
             return self.payment.shop_amount
         except AttributeError:
             return None
+
     get_amount_paid.allow_tags = True
     get_amount_paid.short_description = _(u'Оплаченная сумма')
 
@@ -123,6 +125,7 @@ class Order(models.Model):
             return self.payment.performed_datetime
         except AttributeError:
             return None
+
     get_performed_datetime.allow_tags = True
     get_performed_datetime.short_description = _(u'Дата обработки заказа')
 
@@ -131,6 +134,7 @@ class Order(models.Model):
             return self.payment.get_status_display()
         except AttributeError:
             return None
+
     get_payment_status.allow_tags = True
     get_payment_status.short_description = _(u'Статус оплаты')
 
@@ -139,6 +143,7 @@ class Order(models.Model):
             return self.get_customer_address().get_fio()
         except AttributeError:
             return None
+
     get_fio.allow_tags = True
     get_fio.short_description = _(u'ФИО')
 
@@ -147,11 +152,13 @@ class Order(models.Model):
             return self.checkout_shop.city
         address = self.get_other_address() or self.get_customer_address()
         return address.city if address else ''
+
     get_city.allow_tags = True
     get_city.short_description = _(u'Город')
 
     def get_count(self):
         return sum([x.amount for x in self.order_details.all()])
+
     get_count.allow_tags = True
     get_count.short_description = _(u'Количество рубашек в заказе')
 
@@ -180,7 +187,7 @@ class Order(models.Model):
                                          payment_type=Payment.PAYMENT_TYPE.AC)
         self.payment = payment
         self.save(update_fields=['payment'])
-        CostumecodeMailer.send_to_customer_order_payment_completed(self)
+        CheckoutMailer.send_to_customer_order_payment_completed(self)
         if payment.order_amount <= 0:
             self.save_certificate()
             payment.set_success()
@@ -287,5 +294,5 @@ class Discount(models.Model):
 
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
-    CostumecodeMailer.send_order_payment_completed(sender.order)
-    CostumecodeMailer.send_to_customer_order_payment_completed(sender.order)
+    CheckoutMailer.send_order_payment_completed(sender.order)
+    CheckoutMailer.send_to_customer_order_payment_completed(sender.order)

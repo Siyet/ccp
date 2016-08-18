@@ -5,7 +5,6 @@ from rest_framework import pagination
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from django.conf import settings
 from django.utils.text import ugettext_lazy as _
 
@@ -14,7 +13,7 @@ from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
 from api.filters import TemplateShirtsFilter
-from api.cache import ShirtImageCache
+from processing.rendering.image_cache import ShirtImageCache
 
 
 class TemplateShirtsList(ListAPIView):
@@ -87,7 +86,7 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
 
-        collections_list =  list(collections.values('id', 'filter_title').distinct())
+        collections_list = list(collections.values('id', 'filter_title').distinct())
         for collection in collections_list:
             collection['title'] = collection.pop('filter_title')
 
@@ -128,8 +127,10 @@ class ShirtImage(APIView):
             paramType: path
             required: true
         """
-        data = request.data
         if 'echo' in request.query_params:
-            return Response(data)
+            return Response(request.data)
+        serializer = serializers.ShirtDetailsSerializer(data=request.data)
+        serializer.is_valid()
+        data = serializer.validated_data
         image_url = ShirtImageCache.get_image_url(data, projection, resolution)
         return Response(request.build_absolute_uri(image_url))

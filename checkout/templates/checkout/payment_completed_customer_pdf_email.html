@@ -1,4 +1,5 @@
 {% load staticfiles i18n %}
+{% load checkout_tags %}
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -101,9 +102,7 @@
     {% for order_detail in order.order_details.all %}
         <tr class="text-black">
             <td>
-                {% if order_detail.shirt.showcase_image %}
-                    <img src="{{ order_detail.shirt.showcase_image_list.url }}" alt="">
-                {% endif %}
+                <img src="{% shirt_image order_detail.shirt %}" height="120" width="120" alt="">
             </td>
             <td>
                 <p><b>{% trans 'Сорочка' %}</b></p>
