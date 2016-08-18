@@ -344,8 +344,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
             models.Dickey.objects.create(shirt=shirt, **dickey)
 
         if initials:
-            shirt.initials = models.Initials.objects.create(**initials)
-            shirt.save()
+            models.Initials.objects.create(shirt=shirt, **initials)
 
         for contrast_detail in contrast_details:
             models.ContrastDetails.objects.create(shirt=shirt, **contrast_detail)

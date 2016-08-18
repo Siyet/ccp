@@ -1,6 +1,6 @@
 from time import time
 
-from PIL import Image, ImageChops, ImageColor
+from PIL import Image, ImageChops, ImageColor, ImageFont, ImageOps
 import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
@@ -12,7 +12,7 @@ from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
-from .utils import hex_to_rgb, scale_tuple
+from .utils import hex_to_rgb, scale_tuple, draw_rotated_text
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder, STITCHES
 
@@ -53,6 +53,7 @@ class ShirtBuilder(object):
         self.yoke = self.extract(shirt_data, 'yoke')
         self.contrast_details = shirt_data.get('contrast_details', [])
         self.contrast_stitches = shirt_data.get('contrast_stitches', [])
+        self.initials = shirt_data.get('initials', None)
         self.reset()
 
     def extract(self, data, param):
@@ -220,6 +221,8 @@ class ShirtBuilder(object):
             extra_details=self.extra_details,
             base_layer=self.base_layer
         )
+        if self.initials:
+            ShirtBuilder.add_initials(res, self.initials, self.resolution, self.pocket)
 
         print("compose", time() - start)
         print("total", time() - total)
@@ -409,3 +412,29 @@ class ShirtBuilder(object):
                 cuff_element = first(lambda x: x['element'] == ContrastDetails.CUFF_ELEMENTS.cuff_outer, part_details)
                 if cuff_element:
                     self.append_solid_contrasting_part(ao, light_conf, model, cuff_element['fabric'], uv)
+
+    @staticmethod
+    def add_initials(image, initials, projection, pocket):
+        if not initials:
+            return
+
+        configurations = compose.InitialsConfiguration.objects.filter(
+            font_id=initials['font'], location=initials['location'], pocket=pocket
+        ).select_related('font')
+        initials_configuration = configurations.first()
+        if not initials_configuration:
+            return
+        position = initials_configuration.positions.filter(projection=projection).first()
+        if not position:
+            return
+        color = dictionaries.Color.objects.get(pk=initials['color'])
+        color = hex_to_rgb(color.color)
+        image_scale = float(image.size[0]) / RENDER['default_size'][0]
+        font_size = int(round(image_scale * initials_configuration.font_size))
+        font = ImageFont.truetype(initials_configuration.font.font.path, font_size, encoding='utf-8')
+        text = draw_rotated_text(unicode(initials['text']), font, position.rotate)
+        text.save('/tmp/al_text.png')
+        initials_position = (int(position.left * image.size[0]), int(position.top * image.size[1]))
+        colorized_text = ImageOps.colorize(text, (0,0,0), color)
+        colorized_text.save('/tmp/text.png')
+        image.paste(colorized_text, initials_position, text)

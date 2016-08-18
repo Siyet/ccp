@@ -1,5 +1,5 @@
 from .cache import SourceCache, CACHE_RESOLUTION
-from .sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask, StitchesSource, PROJECTION
+from .sources import ComposeSource, ButtonsSource, CollarMask, Texture, CuffMask, StitchesSource, PROJECTION, InitialsPosition
 from .configuration import (
     BodyConfiguration,
     BackConfiguration,
@@ -12,5 +12,6 @@ from .configuration import (
     BodyButtonsConfiguration,
     CollarButtonsConfiguration,
     CuffButtonsConfiguration,
-    StitchColor
+    StitchColor,
+    InitialsConfiguration
 )

@@ -1,6 +1,7 @@
 # coding: utf-8
 from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
 from django.utils.encoding import smart_text
+from django.utils.translation import ugettext_lazy as _
 
 from backend.models import SEX
 
@@ -81,8 +82,8 @@ class ChoicesWidget(Widget):
 
 class TemplateShirtCollectionWidget(ForeignKeyWidget):
     SEX_DICT = {
-        u'МУЖ': SEX.male,
-        u'ЖЕН': SEX.female
+        _(u'МУЖ'): SEX.male,
+        _(u'ЖЕН'): SEX.female
     }
 
     def get_object(self, key):

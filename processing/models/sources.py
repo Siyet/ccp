@@ -8,7 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 from model_utils.models import TimeStampedModel
-from .configuration import CachedSource
+from .configuration import CachedSource, InitialsConfiguration
 
 from backend.models import ContrastDetails
 from processing.upload_path import UploadComposingSource
@@ -118,3 +118,14 @@ class Texture(ModelDiffMixin, TimeStampedModel, CachedSource):
 
     def __unicode__(self):
         return self.texture.name
+
+
+class InitialsPosition(ProjectionModel):
+    left = models.FloatField(_(u'Координата X'))
+    top = models.FloatField(_(u'Координата Y'))
+    rotate = models.IntegerField(_(u'Поворот'), default=0)
+    configuration = models.ForeignKey(InitialsConfiguration, related_name='positions')
+
+    class Meta:
+        verbose_name = _(u'Позиция инициалов')
+        verbose_name_plural = _(u'Позиции инициалов')

@@ -111,6 +111,7 @@ class OrderExportMixin(object):
                 (_(u'Пуговицы'), achain(shirt, 'N/A', 'custom_buttons', 'title')),
             ]]
         )
+
         if shirt.initials:
             data.append(
                 [_(u'ИНИЦИАЛЫ'), [
@@ -126,8 +127,8 @@ class OrderExportMixin(object):
         for element in ElementStitch.objects.filter(collections=shirt.collection):
             detail_rows.append((element.title, contrast_stitches.get(element.title, '-')))
         detail_rows += [
-            (_(u'Платок'), achain(shirt, u'Нет', 'shawl', 'title')),
-            (_(u'Цельная кокетка'), achain(shirt, u'Нет', 'yoke', 'title')),
+            (_(u'Платок'), achain(shirt, _(u'Нет'), 'shawl', 'title')),
+            (_(u'Цельная кокетка'), achain(shirt, _(u'Нет'), 'yoke', 'title')),
             (_(u'Застежка под штифты'), shirt.get_clasp_display()),
             (_(u'Отстрочка (воротник и манжеты)'), shirt.get_stitch_display()),
         ]

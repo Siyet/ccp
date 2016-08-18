@@ -121,15 +121,6 @@ try:
 except:
     raise Exception("Database specification not found, please create 'database.py' file in 'core/settings' folder")
 
-
-# Render
-
-RENDER = {
-    'source_size': (4096, 4096),
-    'default_size': (2048, 2048),
-    'preview_scale': 0.25
-}
-
 # Misc
 
 from .appconfig import *

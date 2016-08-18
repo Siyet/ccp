@@ -13,35 +13,36 @@ from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionW
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
     Initials, ContrastStitch, ElementStitch, ContrastDetails, ShawlOptions
 from dictionaries import models as dictionaries
+from django.utils.translation import ugettext as _
 
 
 class TemplateShirtResource(resources.ModelResource):
     BUTTONS_DEFAULT_DICT = {
-        True: u'Пожалуйста, используйте стандартные пуговицы',
+        True: _(u'Пожалуйста, используйте стандартные пуговицы'),
         False: u''
     }
     CONTRAST_STITCHES_USE_DICT = {
-        True: u'Я хочу использовать отстрочку контрастного цвета',
-        False: u'Я не хочу использовать отстрочку контрастного цвета'
+        True: _(u'Я хочу использовать отстрочку контрастного цвета'),
+        False: _(u'Я не хочу использовать отстрочку контрастного цвета')
     }
     CLASP_USE_DICT = {
-        True: u'Я хочу использовать застежку под штифты',
-        False: u'Я не хочу использовать застежку под штифты',
+        True: _(u'Я хочу использовать застежку под штифты'),
+        False: _(u'Я не хочу использовать застежку под штифты'),
     }
     DICKEY_USE_DICT = {
-        True: u'Я хочу использовать манишку',
-        False: u'Я не хочу использовать манишку',
+        True: _(u'Я хочу использовать манишку'),
+        False: _(u'Я не хочу использовать манишку'),
     }
     CONTRAST_DETAILS_USE_DICT = {
-        True: u'Я хочу использовать контрастные ткани',
-        False: u'Я не хочу использовать контрастные ткани',
+        True: _(u'Я хочу использовать контрастные ткани'),
+        False: _(u'Я не хочу использовать контрастные ткани'),
     }
     INITIALS_USE_DICT = {
-        True: u'Я хочу использовать инициалы',
-        False: u'Я не хочу использовать инициалы'
+        True: _(u'Я хочу использовать инициалы'),
+        False: _(u'Я не хочу использовать инициалы')
     }
 
-    TUCK_NOT_USE_CONSTANT = u'Без вытачки'
+    TUCK_NOT_USE_CONSTANT = _(u'Без вытачки')
 
     COLLECTION_ATTRIBUTE_MAP = {'collection'}
     TUCK_ATTRIBUTE_MAP = {'tuck'}
@@ -51,51 +52,51 @@ class TemplateShirtResource(resources.ModelResource):
     INITIALS_ATTRIBUTE_MAP = {'initials__font', 'initials__color', 'initials__location'}
     INITIALS_CHOICES_ATTRIBUTE_MAP = {'initials__location'}
 
-    SEX_COLUMN_NAME = u'Пол'
-    TUCK_COLUMN_NAME = u'Вытачки'
-    CLASP_COLUMN_NAME = u'Застежка под штифты'
-    DICKEY_COLUMN_NAME = u'Манишка'
-    CUFF_COLUMN_NAME = u'Манжеты'
-    INITIALS_COLUMN_NAME = u'Инициалы'
+    SEX_COLUMN_NAME = _(u'Пол')
+    TUCK_COLUMN_NAME = _(u'Вытачки')
+    CLASP_COLUMN_NAME = _(u'Застежка под штифты')
+    DICKEY_COLUMN_NAME = _(u'Манишка')
+    CUFF_COLUMN_NAME = _(u'Манжеты')
+    INITIALS_COLUMN_NAME = _(u'Инициалы')
 
     code = fields.Field(attribute='code', column_name='Shirt Code')
-    fabric = fields.Field(attribute='fabric', column_name=u'Код ткани',
+    fabric = fields.Field(attribute='fabric', column_name=_(u'Код ткани'),
                           widget=CustomForeignKeyWidget(Fabric, field='code'))
-    size_option = fields.Field(attribute='size_option', column_name=u'Размер',
+    size_option = fields.Field(attribute='size_option', column_name=_(u'Размер'),
                                widget=CustomForeignKeyWidget(model=dictionaries.SizeOptions, field='title'))
-    size = fields.Field(attribute='size', column_name=u'№ размера',
+    size = fields.Field(attribute='size', column_name=_(u'№ размера'),
                         widget=CustomForeignKeyWidget(model=dictionaries.Size, field='size'))
-    hem = fields.Field(attribute='hem', column_name=u'Низ',
+    hem = fields.Field(attribute='hem', column_name=_(u'Низ'),
                        widget=CustomForeignKeyWidget(model=dictionaries.HemType, field='title', create_missing=False))
-    placket = fields.Field(attribute='placket', column_name=u'Полочка',
+    placket = fields.Field(attribute='placket', column_name=_(u'Полочка'),
                            widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title',
                                                          create_missing=False))
-    pocket = fields.Field(attribute='pocket', column_name=u'Карман',
+    pocket = fields.Field(attribute='pocket', column_name=_(u'Карман'),
                           widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title',
                                                         create_missing=False))
     tuck = fields.Field(attribute='tuck', column_name=TUCK_COLUMN_NAME,
                         widget=ChoicesWidget(choices=TemplateShirt.TUCK_OPTIONS))
-    back = fields.Field(attribute='back', column_name=u'Спинка',
+    back = fields.Field(attribute='back', column_name=_(u'Спинка'),
                         widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title', create_missing=False))
-    collection = TemplateShirtCollectionField(attribute='collection', column_name=u'Коллекция',
+    collection = TemplateShirtCollectionField(attribute='collection', column_name=_(u'Коллекция'),
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
-    stitch = fields.Field(attribute='stitch', column_name=u'Отстрочка (мм)',
+    stitch = fields.Field(attribute='stitch', column_name=_(u'Отстрочка (мм)'),
                           widget=ChoicesWidget(choices=TemplateShirt.STITCH))
-    yoke = fields.Field(attribute='yoke', column_name=u'Цельная кокетка',
+    yoke = fields.Field(attribute='yoke', column_name=_(u'Цельная кокетка'),
                         widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title', create_missing=False))
     clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME, widget=ChoicesWidget(choices=CLASP_USE_DICT))
-    sleeve = fields.Field(attribute='sleeve', column_name=u'Рукав',
+    sleeve = fields.Field(attribute='sleeve', column_name=_(u'Рукав'),
                           widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title',
                                                         create_missing=False))
     # Импорт воротника
-    collar__type = fields.Field(attribute='collar__type', column_name=u'Тип воротника',
+    collar__type = fields.Field(attribute='collar__type', column_name=_(u'Тип воротника'),
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title',
                                                               create_missing=False))
-    collar__hardness = fields.Field(attribute='collar__hardness', column_name=u'Жесткость воротника',
+    collar__hardness = fields.Field(attribute='collar__hardness', column_name=_(u'Жесткость воротника'),
                                     widget=CustomForeignKeyWidget(model=Hardness, field='title', create_missing=False))
-    collar__stays = fields.Field(attribute='collar__stays', column_name=u'Косточки',
+    collar__stays = fields.Field(attribute='collar__stays', column_name=_(u'Косточки'),
                                  widget=CustomForeignKeyWidget(model=Stays, field='title', create_missing=False))
-    collar__size = fields.Field(attribute='collar__size', column_name=u'Размер воротника',
+    collar__size = fields.Field(attribute='collar__size', column_name=_(u'Размер воротника'),
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title',
                                                               create_missing=False))
 
@@ -103,61 +104,61 @@ class TemplateShirtResource(resources.ModelResource):
     cuff__type = fields.Field(attribute='cuff__type', column_name=CUFF_COLUMN_NAME,
                               widget=CustomForeignKeyWidget(model=dictionaries.CuffType, field='title',
                                                             create_missing=False))
-    cuff__rounding = fields.Field(attribute='cuff__rounding', column_name=u'Вид манжеты',
+    cuff__rounding = fields.Field(attribute='cuff__rounding', column_name=_(u'Вид манжеты'),
                                   widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title',
                                                                 create_missing=False))
-    cuff__hardness = fields.Field(attribute='cuff__hardness', column_name=u'Жесткость манжеты',
+    cuff__hardness = fields.Field(attribute='cuff__hardness', column_name=_(u'Жесткость манжеты'),
                                   widget=CustomForeignKeyWidget(model=Hardness, field='title', create_missing=False))
     # Импорт пуговиц
-    custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=u'Пуговицы',
+    custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=_(u'Пуговицы'),
                                        widget=CustomForeignKeyWidget(model=dictionaries.CustomButtonsType,
                                                                      field='title',
                                                                      create_missing=False))
-    custom_buttons = fields.Field(attribute='custom_buttons', column_name=u'Код цвета пуговицы',
+    custom_buttons = fields.Field(attribute='custom_buttons', column_name=_(u'Код цвета пуговицы'),
                                   widget=CustomForeignKeyWidget(model=CustomButtons, field='title',
                                                                 create_missing=False))
     # импорт манишки
-    dickey__type = fields.Field(attribute='dickey__type', column_name=u'МА Тип',
+    dickey__type = fields.Field(attribute='dickey__type', column_name=_(u'МА Тип'),
                                 widget=CustomForeignKeyWidget(dictionaries.DickeyType, field='title',
                                                               create_missing=False))
-    dickey__fabric = fields.Field(attribute='dickey__fabric', column_name=u'МА Ткань',
+    dickey__fabric = fields.Field(attribute='dickey__fabric', column_name=_(u'МА Ткань'),
                                   widget=CustomForeignKeyWidget(Fabric, field='code', create_missing=False))
     # импорт инициалов
-    initials__font = fields.Field(attribute='initials__font', column_name=u'ИН Шрифт',
+    initials__font = fields.Field(attribute='initials__font', column_name=_(u'ИН Шрифт'),
                                   widget=ForeignKeyWidget(dictionaries.Font, field='title'))
-    initials__color = fields.Field(attribute='initials__color', column_name=u'ИН Цвет',
+    initials__color = fields.Field(attribute='initials__color', column_name=_(u'ИН Цвет'),
                                    widget=ForeignKeyWidget(dictionaries.Color, field='title'))
-    initials__location = fields.Field(attribute='initials__location', column_name=u'ИН Позиция')
+    initials__location = fields.Field(attribute='initials__location', column_name=_(u'ИН Позиция'))
     # контрастные отстрочки
-    contrast_stitch_shirt = fields.Field(attribute='contrast_stitch_shirt', column_name=u'ОТЦ Сорочка')
-    contrast_stitch_cuff = fields.Field(attribute='contrast_stitch_cuff', column_name=u'ОТЦ Манжеты')
-    contrast_stitch_collar = fields.Field(attribute='contrast_stitch_collar', column_name=u'ОТЦ Воротник')
-    contrast_stitch_loops = fields.Field(attribute='contrast_stitch_loops', column_name=u'ОТЦ Петель/ниток')
+    contrast_stitch_shirt = fields.Field(attribute='contrast_stitch_shirt', column_name=_(u'ОТЦ Сорочка'))
+    contrast_stitch_cuff = fields.Field(attribute='contrast_stitch_cuff', column_name=_(u'ОТЦ Манжеты'))
+    contrast_stitch_collar = fields.Field(attribute='contrast_stitch_collar', column_name=_(u'ОТЦ Воротник'))
+    contrast_stitch_loops = fields.Field(attribute='contrast_stitch_loops', column_name=_(u'ОТЦ Петель/ниток'))
     # контрастные детали
-    contrast_detail_collar = fields.Field(attribute='contrast_detail_collar', column_name=u'КТ Воротник')
+    contrast_detail_collar = fields.Field(attribute='contrast_detail_collar', column_name=_(u'КТ Воротник'))
     contrast_detail_collar_face = fields.Field(attribute='contrast_detail_collar_face',
-                                               column_name=u'КТ Воротник лицевая сторона')
+                                               column_name=_(u'КТ Воротник лицевая сторона'))
     contrast_detail_collar_bottom = fields.Field(attribute='contrast_detail_collar_bottom',
-                                                 column_name=u'КТ Воротник низ')
+                                                 column_name=_(u'КТ Воротник низ'))
     contrast_detail_collar_outer = fields.Field(attribute='contrast_detail_collar_outer',
-                                                column_name=u'КТ Воротник внешняя стойка')
+                                                column_name=_(u'КТ Воротник внешняя стойка'))
     contrast_detail_collar_inner = fields.Field(attribute='contrast_detail_collar_inner',
-                                                column_name=u'КТ Воротник внутренняя стойка')
-    contrast_detail_cuuff = fields.Field(attribute='contrast_detail_cuff', column_name=u'КТ Манжета')
+                                                column_name=_(u'КТ Воротник внутренняя стойка'))
+    contrast_detail_cuuff = fields.Field(attribute='contrast_detail_cuff', column_name=_(u'КТ Манжета'))
     contrast_detail_cuff_outer = fields.Field(attribute='contrast_detail_cuff_outer',
-                                              column_name=u'КТ Манжета внешняя')
+                                              column_name=_(u'КТ Манжета внешняя'))
     contrast_detail_cuff_inner = fields.Field(attribute='contrast_detail_cuff_inner',
-                                              column_name=u'КТ Манжета внутренняя')
+                                              column_name=_(u'КТ Манжета внутренняя'))
 
-    export_headers = [u'Shirt Code', u'Код ткани', u'Коллекция', u'Пол', u'Размер', u'№ размера', u'Тип воротника',
-                      u'Размер воротника', u'Жесткость воротника', u'Косточки', u'Манжеты', u'Вид манжеты', u'Рукав',
-                      u'Жесткость манжеты', u'Низ', u'Полочка', u'Карман', u'Вытачки', u'Спинка', u'Вариант пуговиц',
-                      u'Пуговицы', u'Код цвета пуговицы', u'Отстрочка (цвет)', u'ОТЦ Сорочка', u'ОТЦ Манжеты',
-                      u'ОТЦ Воротник', u'ОТЦ Петель/ниток', u'Отстрочка (мм)', u'Цельная кокетка',
-                      u'Застежка под штифты', u'Манишка', u'МА Ткань', u'МА Тип', u'Контрастные ткани', u'КТ Воротник',
-                      u'КТ Воротник лицевая сторона', u'КТ Воротник низ', u'КТ Воротник внешняя стойка',
-                      u'КТ Воротник внутренняя стойка', u'КТ Манжета', u'КТ Манжета внешняя', u'КТ Манжета внутренняя',
-                      u'Инициалы', u'ИН Шрифт', u'ИН Цвет', u'ИН Позиция', ]
+    export_headers = [_(u'Shirt Code'), _(u'Код ткани'), _(_(u'Коллекция')), _(_(u'Пол')), _(_(u'Размер')), _(_(u'№ размера')), _(u'Тип воротника'),
+                      _(u'Размер воротника'), _(u'Жесткость воротника'), _(u'Косточки'), _(u'Манжеты'), _(u'Вид манжеты'), _(u'Рукав'),
+                      _(u'Жесткость манжеты'), _(u'Низ'), _(u'Полочка'), _(u'Карман'), _(u'Вытачки'), _(u'Спинка'), _(u'Вариант пуговиц'),
+                      _(u'Пуговицы'), _(u'Код цвета пуговицы'), _(u'Отстрочка (цвет)'), _(u'ОТЦ Сорочка'), _(u'ОТЦ Манжеты'),
+                      _(u'ОТЦ Воротник'), _(u'ОТЦ Петель/ниток'), _(u'Отстрочка (мм)'), _(u'Цельная кокетка'),
+                      _(u'Застежка под штифты'), _(u'Манишка'), _(u'МА Ткань'), _(u'МА Тип'), _(u'Контрастные ткани'), _(u'КТ Воротник'),
+                      _(u'КТ Воротник лицевая сторона'), _(u'КТ Воротник низ'), _(u'КТ Воротник внешняя стойка'),
+                      _(u'КТ Воротник внутренняя стойка'), _(u'КТ Манжета'), _(u'КТ Манжета внешняя'), _(u'КТ Манжета внутренняя'),
+                      _(u'Инициалы'), _(u'ИН Шрифт'), _(u'ИН Цвет'), _(u'ИН Позиция')]
 
     class Meta:
         model = TemplateShirt
@@ -244,10 +245,10 @@ class TemplateShirtResource(resources.ModelResource):
             # Контрастные отстрочки
             row.append(self.CONTRAST_STITCHES_USE_DICT[len(obj.contrast_stitches.all()) > 0])
             row += [
-                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Сорочка'), ''),
-                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Манжета'), ''),
-                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Воротник'), ''),
-                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == u'Петели/нитки'), ''),
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == _(u'Сорочка')), ''),
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == _(u'Манжета')), ''),
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == _(u'Воротник')), ''),
+                next((x.color.title for x in obj.contrast_stitches.all() if x.element.title == _(u'Петели/нитки')), ''),
             ]
 
             row += [
@@ -280,8 +281,9 @@ class TemplateShirtResource(resources.ModelResource):
             ]
 
             # Инициалы
-            row.append(self.INITIALS_USE_DICT[obj.initials is not None])
-            if obj.initials:
+            has_initials = hasattr(obj, 'initials')
+            row.append(self.INITIALS_USE_DICT[has_initials])
+            if has_initials:
                 if obj.initials.font:
                     row.append(obj.initials.font.title)
                 else:
@@ -371,8 +373,7 @@ class TemplateShirtResource(resources.ModelResource):
                 save_relations(instance.dickey, 'type')
                 save_relations(instance.dickey, 'fabric')
 
-            if instance.initials is not None:
-                save_relations(instance, 'initials')
+            if hasattr(instance, 'initials'):
                 save_relations(instance.initials, 'font')
                 save_relations(instance.initials, 'color')
 
@@ -380,7 +381,7 @@ class TemplateShirtResource(resources.ModelResource):
                 instance.size.save()
                 instance.size = instance.size
 
-            if instance.initials is not None:
+            if hasattr(instance, 'initials'):
                 try:
                     instance.initials.location = \
                         next(x for x in instance.initials.LOCATION if x[1] == instance.initials.location)[0]
@@ -399,12 +400,13 @@ class TemplateShirtResource(resources.ModelResource):
             self.save_related(instance, 'collar')
             self.save_related(instance, 'cuff')
             self.save_related(instance, 'dickey')
+            self.save_related(instance, 'initials')
 
             # контрастные отстрочки
-            self.import_contrast_stitch(instance, u'Сорочка', instance.contrast_stitch_shirt)
-            self.import_contrast_stitch(instance, u'Манжета', instance.contrast_stitch_cuff)
-            self.import_contrast_stitch(instance, u'Воротник', instance.contrast_stitch_collar)
-            self.import_contrast_stitch(instance, u'Петели/нитки', instance.contrast_stitch_loops)
+            self.import_contrast_stitch(instance, _(u'Сорочка'), instance.contrast_stitch_shirt)
+            self.import_contrast_stitch(instance, _(u'Манжета'), instance.contrast_stitch_cuff)
+            self.import_contrast_stitch(instance, _(u'Воротник'), instance.contrast_stitch_collar)
+            self.import_contrast_stitch(instance, _(u'Петели/нитки'), instance.contrast_stitch_loops)
             # контрастные детали
             if instance.contrast_detail_collar:
                 self.import_contrast_detail(instance, 'collar_face', instance.contrast_detail_collar)
@@ -429,13 +431,11 @@ class TemplateShirtResource(resources.ModelResource):
         if data[self.CUFF_COLUMN_NAME] and not hasattr(obj, 'cuff'):
             obj.cuff = Cuff()
 
-        if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False] and obj.initials is None:
+        if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False] and not hasattr(obj, 'initials'):
             obj.initials = Initials()
         use_dickey = self.DICKEY_USE_DICT[True] in data[self.DICKEY_COLUMN_NAME]
         if use_dickey:
             obj.dickey = Dickey()
-        if data[self.INITIALS_COLUMN_NAME] == self.INITIALS_USE_DICT[True] and obj.initials is None:
-            obj.initials = Initials()
         for field in self.get_fields():
             if isinstance(field.widget, ManyToManyWidget):
                 continue

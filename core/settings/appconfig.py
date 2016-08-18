@@ -20,3 +20,16 @@ SITE_DOMAIN = 'costumecode.ru'
 SITE_INFO_EMAIL = 'contact@costumecode.ru'
 
 ADMIN_ORDER_EMAIL = 'test.cc@wecreateapps.ru'
+
+
+SHOWCASE_IMAGE_SIZE = (200, 300)
+SHOWCASE_DETAILS_IMAGE_SIZE = (1080, 1440)
+
+
+# Render
+
+RENDER = {
+    'source_size': (4096, 4096),
+    'default_size': (2048, 2048),
+    'preview_scale': 0.25
+}
