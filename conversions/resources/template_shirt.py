@@ -13,7 +13,7 @@ from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionW
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
     Initials, ContrastStitch, ElementStitch, ContrastDetails, ShawlOptions
 from dictionaries import models as dictionaries
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 
 class TemplateShirtResource(resources.ModelResource):
@@ -150,15 +150,15 @@ class TemplateShirtResource(resources.ModelResource):
     contrast_detail_cuff_inner = fields.Field(attribute='contrast_detail_cuff_inner',
                                               column_name=_(u'КТ Манжета внутренняя'))
 
-    export_headers = [_(u'Shirt Code', u'Код ткани', u'Коллекция', u'Пол', u'Размер', u'№ размера', u'Тип воротника'),
-                      _(u'Размер воротника', u'Жесткость воротника', u'Косточки', u'Манжеты', u'Вид манжеты', u'Рукав'),
-                      _(u'Жесткость манжеты', u'Низ', u'Полочка', u'Карман', u'Вытачки', u'Спинка', u'Вариант пуговиц'),
-                      _(u'Пуговицы', u'Код цвета пуговицы', u'Отстрочка (цвет)', u'ОТЦ Сорочка', u'ОТЦ Манжеты'),
-                      _(u'ОТЦ Воротник', u'ОТЦ Петель/ниток', u'Отстрочка (мм)', u'Цельная кокетка'),
-                      _(u'Застежка под штифты', u'Манишка', u'МА Ткань', u'МА Тип', u'Контрастные ткани', u'КТ Воротник'),
-                      _(u'КТ Воротник лицевая сторона', u'КТ Воротник низ', u'КТ Воротник внешняя стойка'),
-                      _(u'КТ Воротник внутренняя стойка', u'КТ Манжета', u'КТ Манжета внешняя', u'КТ Манжета внутренняя'),
-                      _(u'Инициалы', u'ИН Шрифт', u'ИН Цвет', u'ИН Позиция'), ]
+    export_headers = [_(u'Shirt Code'), _(u'Код ткани'), _(_(u'Коллекция')), _(_(u'Пол')), _(_(u'Размер')), _(_(u'№ размера')), _(u'Тип воротника'),
+                      _(u'Размер воротника'), _(u'Жесткость воротника'), _(u'Косточки'), _(u'Манжеты'), _(u'Вид манжеты'), _(u'Рукав'),
+                      _(u'Жесткость манжеты'), _(u'Низ'), _(u'Полочка'), _(u'Карман'), _(u'Вытачки'), _(u'Спинка'), _(u'Вариант пуговиц'),
+                      _(u'Пуговицы'), _(u'Код цвета пуговицы'), _(u'Отстрочка (цвет)'), _(u'ОТЦ Сорочка'), _(u'ОТЦ Манжеты'),
+                      _(u'ОТЦ Воротник'), _(u'ОТЦ Петель/ниток'), _(u'Отстрочка (мм)'), _(u'Цельная кокетка'),
+                      _(u'Застежка под штифты'), _(u'Манишка'), _(u'МА Ткань'), _(u'МА Тип'), _(u'Контрастные ткани'), _(u'КТ Воротник'),
+                      _(u'КТ Воротник лицевая сторона'), _(u'КТ Воротник низ'), _(u'КТ Воротник внешняя стойка'),
+                      _(u'КТ Воротник внутренняя стойка'), _(u'КТ Манжета'), _(u'КТ Манжета внешняя'), _(u'КТ Манжета внутренняя'),
+                      _(u'Инициалы'), _(u'ИН Шрифт'), _(u'ИН Цвет'), _(u'ИН Позиция')]
 
     class Meta:
         model = TemplateShirt
