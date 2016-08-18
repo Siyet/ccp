@@ -1,20 +1,16 @@
 # coding: utf-8
-from StringIO import StringIO
-from zipfile import ZipFile
-
-from django.http.response import Http404
-from openpyxl import Workbook
-
 from django.conf.urls import url
-from django.http import HttpResponse
-from django.utils.text import ugettext_lazy as _
+from django.http.response import HttpResponse, Http404
 from import_export.formats.base_formats import XLSX
 
-from .mixin import OrderExportMixin
+from .report import OrderDetailReportGenerator
+from .archive import ArchiveGenerator
 
 
-class OrderExportAdmin(OrderExportMixin):
+class OrderExportAdmin(object):
     CONTENT_TYPE_ZIP = 'application/zip'
+    report_generator_class = OrderDetailReportGenerator
+    archive_generator_class = ArchiveGenerator
 
     def get_urls(self):
         urls = super(OrderExportAdmin, self).get_urls()
@@ -34,66 +30,6 @@ class OrderExportAdmin(OrderExportMixin):
     def get_export_shirt_filename(self):
         return 'Orderform_single_shirt'
 
-    def get_shirt_xlsx(self, order, order_detail, number):
-        """
-        Get OrderDetail XLSX
-
-        Args:
-            order: Order object
-            order_detail: OrderDetail object
-            number: OrderDetail number in Order
-        Returns:
-            string
-        """
-        wb = Workbook()
-        ws = wb.active
-
-        ws.append([u'%s' % _(u'Номер заказа'), order.number])
-        ws.append([u'%s' % _(u'Позиция в заказе'), '#%i' % number])
-
-        ws.append([u'%s' % _(u'ДАННЫЕ'), order.number])
-        for line in self.get_address_data(order.get_customer_address()):
-            ws.append(map(unicode, line))
-
-        for cat in self.get_shirt_data(order_detail.shirt):
-            ws.append([unicode(cat[0])])
-            for line in cat[1]:
-                ws.append(map(unicode, line))
-
-        ws.append([u'%s' % _(u'ДОСТАВКА')])
-        for line in self.get_delivery(order):
-            ws.append(map(unicode, line))
-
-        export_data = StringIO()
-        wb.save(export_data)
-        return export_data.getvalue()
-
-    def get_order_xlsx(self, order):
-        """
-        Get Order XLSX
-
-        Args:
-            order: Order object
-        Returns:
-            string
-        """
-        wb = Workbook()
-        ws = wb.active
-        ws.append([u'%s' % _(u'Заказ')])
-        for line in self.get_order_data(order):
-            ws.append(map(unicode, line))
-
-        ws.append([u'%s' % _(u'ДАННЫЕ КЛИЕНТА'), order.number])
-        for line in self.get_address_data(order.get_customer_address()):
-            ws.append(map(unicode, line))
-
-        ws.append([u'%s' % _(u'АДРЕС ДОСТАВКИ')])
-        for line in self.get_delivery(order):
-            ws.append(map(unicode, line))
-        export_data = StringIO()
-        wb.save(export_data)
-        return export_data.getvalue()
-
     def export_shirt_action(self, request, *args, **kwargs):
         order = self.get_object(request, kwargs.get('pk'))
         if not order:
@@ -106,20 +42,27 @@ class OrderExportAdmin(OrderExportMixin):
             if x.pk == shirt.pk:
                 number = ind + 1
                 break
-        xlsx = self.get_shirt_xlsx(order, shirt, number)
+        report_generator = self.report_generator_class()
+        xlsx = report_generator.get_shirt_xlsx(order, shirt, number)
         response = HttpResponse(xlsx, content_type=XLSX.CONTENT_TYPE)
         response['Content-Disposition'] = 'attachment; filename=%s.xlsx' % self.get_export_shirt_filename()
         return response
 
     def export_action(self, request, *args, **kwargs):
         order = self.get_object(request, kwargs.get('pk'))
-        fz = StringIO()
-        with ZipFile(fz, 'w') as response_zip:
-            for ind, shirt in enumerate(order.order_details.all()):
-                xlsx = self.get_shirt_xlsx(order, shirt, ind + 1)
-                response_zip.writestr('%i_%i_%s.xlsx' % (order.pk, ind + 1, self.get_export_shirt_filename()), xlsx)
-            xlsx = self.get_order_xlsx(order)
-            response_zip.writestr('%i_%s.xlsx' % (order.pk, self.get_export_filename()), xlsx)
-        response = HttpResponse(fz.getvalue(), content_type=self.CONTENT_TYPE_ZIP)
+        report_generator = self.report_generator_class()
+        archive_generator = self.archive_generator_class()
+        for ind, shirt in enumerate(order.order_details.all()):
+            xlsx = report_generator.get_shirt_xlsx(order, shirt, ind + 1)
+            archive_generator.add(
+                '%i_%i_%s.xlsx' % (order.pk, ind + 1, self.get_export_shirt_filename()),
+                xlsx
+            )
+        xlsx = report_generator.get_order_xlsx(order)
+        archive_generator.add(
+            '%i_%s.xlsx' % (order.pk, self.get_export_filename()),
+            xlsx
+        )
+        response = HttpResponse(archive_generator.archive(), content_type=self.CONTENT_TYPE_ZIP)
         response['Content-Disposition'] = 'attachment; filename=%s.zip' % self.get_export_filename()
         return response

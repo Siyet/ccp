@@ -98,7 +98,7 @@ class OrderExportMixin(object):
             ]]
         )
 
-        if shirt.initials:
+        try:
             data.append(
                 [_(u'ИНИЦИАЛЫ'), [
                     (_(u'Текст'), shirt.initials.text),
@@ -107,6 +107,8 @@ class OrderExportMixin(object):
                     (_(u'Расположение'), shirt.initials.get_location_display()),
                 ]]
             )
+        except ObjectDoesNotExist:
+            pass
 
         contrast_stitches = {x.element.title: x.color.title for x in shirt.contrast_stitches.all()}
         detail_rows = []
