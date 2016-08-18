@@ -57,7 +57,6 @@ admin.site.register(DefaultElement, DefaultElementAdmin)
 admin.site.register([
     Color,
     Font,
-    FabricColor,
     FabricCategory,
     CuffRounding,
     CustomButtonsType,
@@ -76,5 +75,5 @@ admin.site.register([
 
 admin.site.register(Size, SizeAdmin)
 
-admin.site.register([SizeOptions, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
+admin.site.register([SizeOptions, FabricColor, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
                     GrappelliOrderableAdmin)
