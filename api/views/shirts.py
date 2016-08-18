@@ -129,8 +129,6 @@ class ShirtImage(APIView):
         """
         if 'echo' in request.query_params:
             return Response(request.data)
-        serializer = serializers.ShirtDetailsSerializer(data=request.data)
-        serializer.is_valid()
-        data = serializer.validated_data
+        data = dict(request.data)
         image_url = ShirtImageCache.get_image_url(data, projection, resolution)
         return Response(request.build_absolute_uri(image_url))

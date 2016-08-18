@@ -12,6 +12,10 @@ from api.serializers import ShirtDetailsSerializer
 
 
 class ShirtImageCache(object):
+    compose_parts = ['collar', 'cuff', 'pocket', 'custom_buttons_type', 'custom_buttons',
+                     'sleeve', 'hem', 'placket', 'tuck', 'back', 'dickey', 'fabric', 'yoke', 'contrast_details',
+                     'contrast_stitches', 'initials']
+
     @staticmethod
     def get_image_url_for_model(shirt, projection, resolution):
         data = ShirtDetailsSerializer(instance=shirt).data
@@ -29,9 +33,14 @@ class ShirtImageCache(object):
             return os.path.join(settings.RENDER_CACHE_PATH, filename), filename
 
         resolution = resolution or CACHE_RESOLUTION.preview
-        base_key = sha1(json.dumps(data, sort_keys=True)).hexdigest()
+        # filter out irrelevant keys
+        data_keys = data.keys()
+        data = { key: data[key] for key in ShirtImageCache.compose_parts if key in data_keys }
+
+        base_key = sha1(json.dumps(data)).hexdigest()
+
         initials = data.pop('initials')
-        key = sha1(json.dumps(data, sort_keys=True)).hexdigest()
+        key = sha1(json.dumps(data)).hexdigest()
         (full_path, filename) = path_for_key(key)
         image = None
         if not os.path.isfile(full_path):
