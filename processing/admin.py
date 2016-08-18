@@ -118,6 +118,18 @@ class StitchColorAdmin(admin.ModelAdmin):
     list_select_related = ('content_type', 'element')
 
 
+class InitialsPositionInline(admin.TabularInline):
+    model = models.InitialsPosition
+    extra = 1
+    max_num = 3
+
+
+class InitialsConfigurationAdmin(admin.ModelAdmin):
+    model = models.InitialsConfiguration
+    list_display = ('font', 'font_size', 'location')
+
+    inlines = [InitialsPositionInline]
+
 admin.site.register(models.BodyConfiguration, SourceAdmin)
 admin.site.register(models.CollarConfiguration, CollarSourceAdmin)
 admin.site.register(models.CuffConfiguration, CuffSourceAdmin)
@@ -131,3 +143,4 @@ admin.site.register(models.CollarButtonsConfiguration, ButtonsSourceAdmin)
 admin.site.register(models.CuffButtonsConfiguration, CuffButtonsAdmin)
 admin.site.register(models.Texture, TextureAdmin)
 admin.site.register(models.StitchColor, StitchColorAdmin)
+admin.site.register(models.InitialsConfiguration, InitialsConfigurationAdmin)

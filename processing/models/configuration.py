@@ -11,6 +11,13 @@ from processing.upload_path import UploadComposingSource
 from processing.storage import overwrite_storage
 
 
+class CachedSource(models.Model):
+    cache = GenericRelation('processing.SourceCache')
+
+    class Meta:
+        abstract = True
+
+
 class ConfigurationModel(models.Model):
     def __unicode__(self):
         return "#%s" % self.id
@@ -29,13 +36,6 @@ class PartConfigurationModel(ConfigurationModel):
 class ButtonsConfigurationModel(ConfigurationModel):
     sources = GenericRelation('processing.ButtonsSource')
     stitches = GenericRelation('processing.StitchesSource')
-
-    class Meta:
-        abstract = True
-
-
-class CachedSource(models.Model):
-    cache = GenericRelation('processing.SourceCache')
 
     class Meta:
         abstract = True
@@ -162,3 +162,14 @@ class StitchColor(models.Model):
     class Meta:
         verbose_name = _(u'Конфигурация отстрочки')
         verbose_name_plural = _(u'Конфигурации отстрочек')
+
+
+class InitialsConfiguration(ConfigurationModel):
+    font = models.ForeignKey(dictionaries.Font, verbose_name=_(u'Шрифт'))
+    font_size = models.IntegerField(_(u'Размер шрифта'), default=18)
+    pocket = models.ManyToManyField(dictionaries.PocketType, verbose_name=_(u'Видно с карманом'))
+    location = models.CharField(_(u'Местоположение'), choices=backend.Initials.LOCATION, max_length=10)
+
+    class Meta:
+        verbose_name = _(u'Конфигурация инициалов')
+        verbose_name_plural = _(u'Конфигурации инициалов')

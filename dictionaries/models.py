@@ -30,8 +30,8 @@ class Color(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = u'Цвет (для инициалов)'
-        verbose_name_plural = u'Цвета (для инициалов)'
+        verbose_name = _(u'Цвет (для инициалов)')
+        verbose_name_plural = _(u'Цвета (для инициалов)')
 
 
 class Font(models.Model):
@@ -42,8 +42,8 @@ class Font(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = u'Шрифт (для инициалов)'
-        verbose_name_plural = u'Шрифты (для инициалов)'
+        verbose_name = _(u'Шрифт (для инициалов)')
+        verbose_name_plural = _(u'Шрифты (для инициалов)')
 
 
 class FabricColor(models.Model):

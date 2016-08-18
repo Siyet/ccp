@@ -281,6 +281,7 @@ class Dickey(models.Model):
 
 class Initials(models.Model):
     font = models.ForeignKey('dictionaries.Font', verbose_name=_(u'Шрифт'), null=True)
+    shirt = models.OneToOneField('backend.Shirt', related_name='initials')
 
     LOCATION = Choices(
         ('button2', _(u'2 пуговица')),
@@ -305,7 +306,7 @@ class Initials(models.Model):
 
 class Shirt(models.Model):
     related_fields = ["collection", "fabric", "size_option", "size", "hem", "placket", "pocket", "back",
-                      "custom_buttons_type", "custom_buttons", "shawl", "yoke", "initials"]
+                      "custom_buttons_type", "custom_buttons", "shawl", "yoke"]
 
     TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
@@ -358,7 +359,6 @@ class Shirt(models.Model):
                      ('5mm', _(u'5 мм')))
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
 
-    initials = models.OneToOneField(Initials, verbose_name=_(u'Инициалы'), blank=True, null=True)
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
     def calculate_price(self):
@@ -560,7 +560,7 @@ class AccessoriesPrice(models.Model):
                                          blank=True)
 
     def __unicode__(self):
-        return u'Цена: %s' % self.content_type
+        return _(u'Цена: %s') % self.content_type
 
     def content_type_title(self):
         return content_type_names.get(self.content_type.name, self.content_type.name)

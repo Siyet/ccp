@@ -63,11 +63,6 @@ class BaseShirtAdmin(GrappelliOrderableAdmin):
         return HttpResponse(json.dumps(show_cuffs))
 
 
-class CustomShirtAdmin(admin.ModelAdmin):
-    inlines = [CollarInline, CuffInline, ContrastDetailsInline, ContrastStitchInline]
-    exclude = ['is_template', 'code', 'showcase_image', 'individualization']
-
-
 class DickeyInline(admin.StackedInline):
     model = Dickey
     inline_classes = ('grp-open',)
@@ -75,10 +70,22 @@ class DickeyInline(admin.StackedInline):
     max_num = 1
 
 
+class InitialsInline(admin.StackedInline):
+    model = Initials
+    inline_classes = ('grp-open',)
+    extra = 0
+    max_num = 1
+
+
+class CustomShirtAdmin(admin.ModelAdmin):
+    inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, InitialsInline]
+    exclude = ['is_template', 'code', 'showcase_image', 'individualization']
+
+
 class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, BaseShirtAdmin):
     resource_class = TemplateShirtResource
     exclude = ['is_template']
-    inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, ShirtImageInline]
+    inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, InitialsInline, ShirtImageInline]
     list_select_related = ('hem', 'placket', 'pocket', 'cuff__type', 'collar__type', 'dickey__type', 'collar__hardness')
     list_display = ('code', 'cuff', 'collar', 'hem', 'placket', 'pocket', 'dickey')
 
@@ -196,7 +203,6 @@ class CustomButtonsAdmin(GrappelliOrderableAdmin):
 
 admin.site.register([
     Storehouse,
-    Initials,
     ElementStitch
 ])
 
