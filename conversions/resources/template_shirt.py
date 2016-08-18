@@ -434,7 +434,7 @@ class TemplateShirtResource(resources.ModelResource):
         if data[self.INITIALS_COLUMN_NAME] != self.INITIALS_USE_DICT[False] and not hasattr(obj, 'initials'):
             obj.initials = Initials()
         use_dickey = self.DICKEY_USE_DICT[True] in data[self.DICKEY_COLUMN_NAME]
-        if use_dickey:
+        if use_dickey and not hasattr(obj, 'dickey'):
             obj.dickey = Dickey()
         for field in self.get_fields():
             if isinstance(field.widget, ManyToManyWidget):
