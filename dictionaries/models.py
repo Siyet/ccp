@@ -53,7 +53,7 @@ class FabricColor(OrderedModel):
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Цвет ткани')
         verbose_name_plural = _(u'Цвета тканей')
 
