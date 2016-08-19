@@ -46,7 +46,7 @@ class Font(models.Model):
         verbose_name_plural = _(u'Шрифты (для инициалов)')
 
 
-class FabricColor(models.Model):
+class FabricColor(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
     value = RGBColorField(_(u'Значение'))
 
