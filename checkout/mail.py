@@ -1,7 +1,6 @@
 # coding: utf-8
 
 from core.mail import EmailSender
-from django.template import loader
 from django.utils.safestring import mark_safe
 from django.utils.text import ugettext_lazy as _
 from django.template.loader import render_to_string
@@ -15,7 +14,6 @@ class CheckoutMailer(object):
     order_customer_subject = _(u'COSTUME CODE - Ваш заказ подтвержден и оплачен')
     order_admin_template_name = 'checkout/payment_completed_admin_email.html'
     order_customer_template_name = 'checkout/payment_completed_customer_email.html'
-    order_pdf_template_name = 'checkout/payment_completed_customer_pdf_email.html'
 
     @classmethod
     def send_order_payment_completed(cls, order):
@@ -28,13 +26,7 @@ class CheckoutMailer(object):
         cls.sender_class(subject, html_content, [settings.ADMIN_ORDER_EMAIL]).start()
 
     @classmethod
-    def render_pdf(cls, order):
-        t = loader.get_template(cls.order_pdf_template_name)
-        return render_pdf_from_template(t, None, None, {'order': order})
-
-    @classmethod
-    def send_to_customer_order_payment_completed(cls, order):
-        pdf = CheckoutMailer.render_pdf(order)
+    def send_to_customer_order_payment_completed(cls, order, pdf):
         subject = cls.order_customer_subject
         data = {
             'SITE_INFO_EMAIL': settings.SITE_INFO_EMAIL

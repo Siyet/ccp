@@ -1,14 +1,9 @@
 # coding: utf-8
 from django.core.exceptions import ObjectDoesNotExist
-from django.http.response import Http404
-from openpyxl import Workbook
-from StringIO import StringIO
 
 from django.conf import settings
-from django.conf.urls import url
 from django.http import HttpResponse
 from django.utils.text import ugettext_lazy as _
-from import_export.formats.base_formats import XLSX
 
 from backend.models import ElementStitch, ContrastDetails
 from core.utils import achain
@@ -21,15 +16,6 @@ class TemplateAndFormatMixin(object):
 
 
 class OrderExportMixin(object):
-    def get_urls(self):
-        urls = super(OrderExportMixin, self).get_urls()
-        my_urls = [
-            url(r'^(?P<pk>\d+)/export/(?P<shirt>\d+)/$', self.admin_site.admin_view(self.export_shirt_action)),
-        ]
-        return my_urls + urls
-
-    def get_export_shirt_filename(self):
-        return 'Orderform_single_shirt'
 
     def get_address_data(self, address):
         return [
@@ -112,7 +98,7 @@ class OrderExportMixin(object):
             ]]
         )
 
-        if shirt.initials:
+        try:
             data.append(
                 [_(u'ИНИЦИАЛЫ'), [
                     (_(u'Текст'), shirt.initials.text),
@@ -121,6 +107,8 @@ class OrderExportMixin(object):
                     (_(u'Расположение'), shirt.initials.get_location_display()),
                 ]]
             )
+        except ObjectDoesNotExist:
+            pass
 
         contrast_stitches = {x.element.title: x.color.title for x in shirt.contrast_stitches.all()}
         detail_rows = []
@@ -144,39 +132,84 @@ class OrderExportMixin(object):
         data.append([_(u'КОНТРАСТНЫЕ ДЕТАЛИ'), contrast_detail_rows])
         return data
 
-    def export_shirt_action(self, request, *args, **kwargs):
-        order = self.get_object(request, kwargs.get('pk'))
-        if not order:
-            raise Http404
-        shirt = order.get_shirt(kwargs.get('shirt'))
-        if not shirt:
-            raise Http404
-        wb = Workbook()
-        ws = wb.active
+    def get_order_data(self, order):
+        data = [
+            (_(u'Номер заказа'), order.number),
+            (_(u'Общая стоимость заказа'), order.get_amount_to_pay()),
+            (_(u'Дата оплаты заказа'), order.get_performed_datetime()),
+        ]
+        if order.certificate:
+            data += [
+                (_(u'Использование сертификата'), _(u'Да')),
+                (_(u'Номер сертификата'), order.certificate.number),
+                (_(u'Номинал сертификата'), u'%s рублей' % order.certificate_value),
+            ]
+        else:
+            data += [
+                (_(u'Использование сертификата'), _(u'Нет')),
+            ]
+        if order.discount_value is not None and order.customer and order.discount_value > 0:
+            data += [
+                (_(u'Использование скидки'), _(u'Да')),
+                (_(u'Номинал скидки'), '%s %%' % (order.customer.get_discount_value() * 100.0)),
+                (_(u'Размер скидки'), u'%s рублей' % order.discount_value),
+                (_(u'Номер скидочной карты'), order.customer.number),
+            ]
+        else:
+            data += [
+                (_(u'Использование скидки'), _(u'Нет')),
+            ]
+        return data
 
-        ws.append([u'%s' % _(u'Номер заказа'), order.number])
-        number = 1
-        for ind, x in enumerate(order.order_details.all()):
-            if x.pk == shirt.pk:
-                number = ind + 1
-                break
-        ws.append([u'%s' % _(u'Позиция в заказе'), '#%i' % number])
+    def get_shirt_lines(self, order, order_detail, number):
+        """
+        Get order_detail info to list of string
 
-        ws.append([u'%s' % _(u'ДАННЫЕ'), order.number])
+        Args:
+            order: Order model
+            order_detail: OrderDetail model
+            number: number order_detail in order
+        Returns:
+            list of string
+        """
+        lines = [
+            [u'%s' % _(u'Номер заказа'), order.number],
+            [u'%s' % _(u'Позиция в заказе'), '#%i' % number],
+            [u'%s' % _(u'ДАННЫЕ'), order.number]
+        ]
         for line in self.get_address_data(order.get_customer_address()):
-            ws.append(map(unicode, line))
+            lines.append(map(unicode, line))
 
-        for cat in self.get_shirt_data(shirt.shirt):
-            ws.append([unicode(cat[0])])
+        for cat in self.get_shirt_data(order_detail.shirt):
+            lines.append([unicode(cat[0])])
             for line in cat[1]:
-                ws.append(map(unicode, line))
+                lines.append(map(unicode, line))
 
-        ws.append([u'%s' % _(u'ДОСТАВКА')])
+        lines.append([u'%s' % _(u'ДОСТАВКА')])
         for line in self.get_delivery(order):
-            ws.append(map(unicode, line))
+            lines.append(map(unicode, line))
+        return lines
 
-        export_data = StringIO()
-        wb.save(export_data)
-        response = HttpResponse(export_data.getvalue(), content_type=XLSX.CONTENT_TYPE)
-        response['Content-Disposition'] = 'attachment; filename=%s.xlsx' % self.get_export_shirt_filename()
-        return response
+    def get_order_lines(self, order):
+        """
+        Get order info to list of string
+        
+        Args:
+            order: Order model
+        Returns:
+            list of string
+        """
+        lines = [
+            [u'%s' % _(u'Заказ')]
+        ]
+        for line in self.get_order_data(order):
+            lines.append(map(unicode, line))
+
+        lines.append([u'%s' % _(u'ДАННЫЕ КЛИЕНТА'), order.number])
+        for line in self.get_address_data(order.get_customer_address()):
+            lines.append(map(unicode, line))
+
+        lines.append([u'%s' % _(u'АДРЕС ДОСТАВКИ')])
+        for line in self.get_delivery(order):
+            lines.append(map(unicode, line))
+        return lines
