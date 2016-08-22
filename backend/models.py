@@ -51,7 +51,7 @@ class Collection(OrderedModel):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.active.select_related('category', 'fabric_type', 'thickness')\
+        return Fabric.objects.active.select_related('category', 'type', 'thickness')\
             .prefetch_related('residuals__storehouse', 'category__prices').filter(filter_predicate)
 
 
@@ -112,7 +112,7 @@ class Fabric(TimeStampedModel):
     code = models.CharField(_(u'Артикул'), max_length=20, unique=True)
     category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics',
                                  blank=True, null=True)
-    fabric_type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics',
+    type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics',
                                     null=True)
     thickness = models.ForeignKey('dictionaries.Thickness', verbose_name=_(u'Толщина'), related_name='fabrics',
                                   null=True)

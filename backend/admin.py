@@ -131,7 +131,7 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
     list_filter = ('category',)
     readonly_fields = ['category']
     inlines = [FabricResidualAdminInline, ]
-    list_select_related = ('category', 'fabric_type', 'thickness', 'texture')
+    list_select_related = ('category', 'type', 'thickness', 'texture')
 
     def __init__(self, *args, **kwargs):
         super(FabricAdmin, self).__init__(*args, **kwargs)
@@ -159,7 +159,7 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
 
     def get_list_display(self, request):
         residual_fields = map(lambda storehouse: self.RESIDUAL_KEY % storehouse.id, self.storehouses)
-        list_display = ['code', 'category'] + residual_fields + ['material', 'has_description', 'fabric_type',
+        list_display = ['code', 'category'] + residual_fields + ['material', 'has_description', 'type',
                                                                  'thickness', 'get_colors', 'get_designs', 'thumbnail']
         return list_display
 

@@ -22,7 +22,7 @@ class FabricResource(resources.ModelResource):
                           widget=CachedManyToManyWidget(dictionaries.FabricDesign, field='title'))
     short_description = fields.Field(column_name='Short fabric description', attribute='short_description')
     long_description = fields.Field(column_name='Long fabric description', attribute='long_description')
-    fabric_type = fields.Field(column_name='Type', attribute='fabric_type',
+    type = fields.Field(column_name='Type', attribute='type',
                                widget=CustomForeignKeyWidget(dictionaries.FabricType, field='title'))
     thickness = fields.Field(column_name='Thickness', attribute='thickness',
                              widget=CustomForeignKeyWidget(dictionaries.Thickness, field='title'))
@@ -34,7 +34,7 @@ class FabricResource(resources.ModelResource):
         import_id_fields = ('code',)
         fields = ('code',)
         skip_unchanged = False
-        select_related = ['thickness', 'fabric_type', 'category']
+        select_related = ['thickness', 'type', 'category']
         prefetch_related = ['designs', 'colors']
         instance_loader_class = CachedWithPrefetchedInstanceLoader.prepare(select_related, prefetch_related)
 
@@ -56,7 +56,7 @@ class FabricResource(resources.ModelResource):
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
             save_relations(instance, 'category')
-            save_relations(instance, 'fabric_type')
+            save_relations(instance, 'type')
             save_relations(instance, 'thickness')
 
     @atomic()
