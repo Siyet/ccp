@@ -1,13 +1,15 @@
 # coding: utf-8
 from django.conf.urls import url
+from django.contrib import admin
 from django.http.response import HttpResponse, Http404
 from import_export.formats.base_formats import XLSX
 
 from .report import OrderDetailReportGenerator
 from .archive import ArchiveGenerator
+from .mixin import OrderExportMixin
 
 
-class OrderExportAdmin(object):
+class OrderExportAdmin(OrderExportMixin, admin.ModelAdmin):
     CONTENT_TYPE_ZIP = 'application/zip'
     report_generator_class = OrderDetailReportGenerator
     archive_generator_class = ArchiveGenerator
@@ -43,7 +45,7 @@ class OrderExportAdmin(object):
                 number = ind + 1
                 break
         report_generator = self.report_generator_class()
-        xlsx = report_generator.get_shirt_xlsx(order, shirt, number)
+        xlsx = report_generator.get_xlsx(self.get_shirt_lines(order, shirt, number))
         response = HttpResponse(xlsx, content_type=XLSX.CONTENT_TYPE)
         response['Content-Disposition'] = 'attachment; filename=%s.xlsx' % self.get_export_shirt_filename()
         return response
@@ -53,12 +55,12 @@ class OrderExportAdmin(object):
         report_generator = self.report_generator_class()
         archive_generator = self.archive_generator_class()
         for ind, shirt in enumerate(order.order_details.all()):
-            xlsx = report_generator.get_shirt_xlsx(order, shirt, ind + 1)
+            xlsx = report_generator.get_xlsx(self.get_shirt_lines(order, shirt, ind + 1))
             archive_generator.add(
                 '%i_%i_%s.xlsx' % (order.pk, ind + 1, self.get_export_shirt_filename()),
                 xlsx
             )
-        xlsx = report_generator.get_order_xlsx(order)
+        xlsx = report_generator.get_xlsx(self.get_order_lines(order))
         archive_generator.add(
             '%i_%s.xlsx' % (order.pk, self.get_export_filename()),
             xlsx

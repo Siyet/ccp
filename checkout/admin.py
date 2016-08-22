@@ -79,7 +79,7 @@ class CustomerDataInline(admin.StackedInline):
     extra = 0
 
 
-class OrderAdmin(OrderExportAdmin, admin.ModelAdmin):
+class OrderAdmin(OrderExportAdmin):
     list_display = ('number', 'state', 'get_payment_status', 'date_add', 'get_fio', 'get_city', 'get_count',
                     'get_amount_to_pay', 'get_print_url', 'get_export_url', )
     search_fields = ('number', 'customer_data__lastname', 'customer_data__name', 'customer_data__midname',

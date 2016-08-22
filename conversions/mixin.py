@@ -160,3 +160,56 @@ class OrderExportMixin(object):
                 (_(u'Использование скидки'), _(u'Нет')),
             ]
         return data
+
+    def get_shirt_lines(self, order, order_detail, number):
+        """
+        Get order_detail info to list of string
+
+        Args:
+            order: Order model
+            order_detail: OrderDetail model
+            number: number order_detail in order
+        Returns:
+            list of string
+        """
+        lines = [
+            [u'%s' % _(u'Номер заказа'), order.number],
+            [u'%s' % _(u'Позиция в заказе'), '#%i' % number],
+            [u'%s' % _(u'ДАННЫЕ'), order.number]
+        ]
+        for line in self.get_address_data(order.get_customer_address()):
+            lines.append(map(unicode, line))
+
+        for cat in self.get_shirt_data(order_detail.shirt):
+            lines.append([unicode(cat[0])])
+            for line in cat[1]:
+                lines.append(map(unicode, line))
+
+        lines.append([u'%s' % _(u'ДОСТАВКА')])
+        for line in self.get_delivery(order):
+            lines.append(map(unicode, line))
+        return lines
+
+    def get_order_lines(self, order):
+        """
+        Get order info to list of string
+        
+        Args:
+            order: Order model
+        Returns:
+            list of string
+        """
+        lines = [
+            [u'%s' % _(u'Заказ')]
+        ]
+        for line in self.get_order_data(order):
+            lines.append(map(unicode, line))
+
+        lines.append([u'%s' % _(u'ДАННЫЕ КЛИЕНТА'), order.number])
+        for line in self.get_address_data(order.get_customer_address()):
+            lines.append(map(unicode, line))
+
+        lines.append([u'%s' % _(u'АДРЕС ДОСТАВКИ')])
+        for line in self.get_delivery(order):
+            lines.append(map(unicode, line))
+        return lines
