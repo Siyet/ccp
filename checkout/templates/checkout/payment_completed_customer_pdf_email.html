@@ -102,7 +102,7 @@
     {% for order_detail in order.order_details.all %}
         <tr class="text-black">
             <td>
-                
+                <img src="{% shirt_image order_detail.shirt %}" height="120" width="120" alt="">
             </td>
             <td>
                 <p><b>{% trans 'Сорочка' %}</b></p>

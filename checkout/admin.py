@@ -89,7 +89,6 @@ class OrderAdmin(OrderExportAdmin):
                        'get_performed_datetime', )
     inlines = [CustomerDataInline, OrderDetailsInline]
 
-    order_pdf_template_name = 'checkout/payment_completed_customer_pdf_email.html'
     CONTENT_TYPE_PDF = 'application/pdf'
 
     def get_queryset(self, request):
