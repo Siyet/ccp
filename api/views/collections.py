@@ -2,20 +2,21 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import pagination
 from rest_framework import filters
 from django.shortcuts import get_object_or_404
 from django.utils.text import ugettext_lazy as _
-from rest_framework_extensions.cache.mixins import ListCacheResponseMixin
+from rest_framework_extensions.cache.decorators import cache_response
 from last_modified.decorators import last_modified
 from lazy import lazy
+from django.db.models import Q
 
 from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey
 from dictionaries import models as dictionaries
 from api import serializers
 from .mixins import CollectionMixin
-from api.cache import fabric_last_modified
+from api.cache import fabric_last_modified, ListKeyConstructor
 from api.filters import CollectionFabricsFilter
-from django.db.models import Q
 
 
 class CollectionsListView(ListAPIView):
@@ -34,14 +35,14 @@ class ShirtInfoListView(ListAPIView):
     serializer_class = serializers.ShirtInfoSerializer
 
 
-class CollectionFabricsList(CollectionMixin, ListCacheResponseMixin, ListAPIView):
+class CollectionFabricsList(CollectionMixin, ListAPIView):
     """
     Список доступных тканей для выбранной коллекции.
-    Может быть отфильтрован по полям "цвет" и "дизайн"
     """
     serializer_class = serializers.FabricSerializer
     filter_class = CollectionFabricsFilter
     filter_backends = (filters.DjangoFilterBackend,)
+    pagination_class = pagination.LimitOffsetPagination
 
     @lazy
     def collection(self):
@@ -54,8 +55,25 @@ class CollectionFabricsList(CollectionMixin, ListCacheResponseMixin, ListAPIView
             Q(short_description='') & Q(long_description='')
         )
 
+    @cache_response(key_func=ListKeyConstructor())
+    def list(self, request, *args, **kwargs):
+        return super(CollectionFabricsList, self).list(request, *args, **kwargs)
+
     @last_modified(last_modified_func=fabric_last_modified)
     def get(self, request, *args, **kwargs):
+        """
+        ---
+        parameters_strategy: merge
+        parameters:
+            - name: limit
+              type: integer
+              paramType: query
+              description: количество записей
+            - name: offset
+              type: integer
+              paramType: query
+              description: отступ
+        """
         return super(CollectionFabricsList, self).get(request, *args, **kwargs)
 
     def get_serializer(self, queryset, **kwargs):
