@@ -61,6 +61,16 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             desings
         )
 
+    def get_ordering_options(self):
+        ordering_fields = TemplateShirtsList.ordering_fields
+        ordering_options = []
+        for field_key in ordering_fields:
+            field = models.Shirt._meta.get_field(field_key)
+            ordering_options.append({'id': field_key, 'title': _(u'%s - по возрастанию' % field.verbose_name)})
+            ordering_options.append({'id': '-' + field_key, 'title': _(u'%s - по убыванию' % field.verbose_name)})
+
+        return ordering_options
+
     def get(self, request, *args, **kwargs):
         """
         Фильтры для списка рубашек
@@ -96,6 +106,7 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             self.build_filter(_(u'Дизайн'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
             self.build_filter(_(u'Тип ткани'), 'fabric_type', list(fabric_types.values('id', 'title').distinct())),
             self.build_filter(_(u'Толщина ткани'), 'thickness', list(thickness.values('id', 'title').distinct())),
+            self.build_filter(_(u'Сортировка'), 'ordering', self.get_ordering_options())
         ])
 
 
