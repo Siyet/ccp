@@ -6,10 +6,12 @@ from django.db import models
 from django.db.transaction import atomic
 from django.dispatch.dispatcher import receiver
 from django.utils.text import ugettext_lazy as _
+from django.template import loader
 from model_utils import Choices
 from ordered_model.models import OrderedModel
 from yandex_kassa.models import Payment as YandexPayment
 from yandex_kassa.signals import payment_completed
+from wkhtmltopdf import render_pdf_from_template
 
 from checkout.mail import CheckoutMailer
 from core.utils import first
@@ -70,6 +72,7 @@ class Order(models.Model):
         ('new', _(u'Ожидает обработки', )),
         ('completed', _(u'Обработан', )),
     )
+    ORDER_PDF_TEMPLATE_NAME = 'checkout/payment_completed_customer_pdf_email.html'
 
     number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True, default=uuid.uuid4)
     state = models.CharField(_(u'Статус'), max_length=20, choices=STATES, default=STATES.new)
@@ -187,7 +190,7 @@ class Order(models.Model):
                                          payment_type=Payment.PAYMENT_TYPE.AC)
         self.payment = payment
         self.save(update_fields=['payment'])
-        CheckoutMailer.send_to_customer_order_payment_completed(self)
+        CheckoutMailer.send_to_customer_order_payment_completed(self, self.get_pdf())
         if payment.order_amount <= 0:
             self.save_certificate()
             payment.set_success()
@@ -209,6 +212,10 @@ class Order(models.Model):
 
     def get_other_address(self):
         return first(lambda x: x.type == CustomerData.ADDRESS_TYPE.other_address, self.customer_data.all())
+
+    def get_pdf(self):
+        t = loader.get_template(self.ORDER_PDF_TEMPLATE_NAME)
+        return render_pdf_from_template(t, None, None, {'order': self})
 
 
 class CustomerData(models.Model):
@@ -295,4 +302,4 @@ class Discount(models.Model):
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
     CheckoutMailer.send_order_payment_completed(sender.order)
-    CheckoutMailer.send_to_customer_order_payment_completed(sender.order)
+    CheckoutMailer.send_to_customer_order_payment_completed(sender.order, sender.order.get_pdf())

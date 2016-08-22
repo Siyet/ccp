@@ -8,9 +8,7 @@ from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.http import HttpResponse
 from django.utils.text import ugettext_lazy as _
-from django.template import loader
 from import_export.admin import ImportExportMixin
-from wkhtmltopdf import render_pdf_from_template
 
 from conversions.mixin import TemplateAndFormatMixin
 from conversions.admin import OrderExportAdmin
@@ -111,9 +109,7 @@ class OrderAdmin(OrderExportAdmin):
 
     def pdf_action(self, request, *args, **kwargs):
         order = self.get_object(request, kwargs.get('pk'))
-        t = loader.get_template(self.order_pdf_template_name)
-        pdf = render_pdf_from_template(t, None, None, {'order': order})
-        response = HttpResponse(pdf, content_type=self.CONTENT_TYPE_PDF)
+        response = HttpResponse(order.get_pdf(), content_type=self.CONTENT_TYPE_PDF)
         response['Content-Disposition'] = 'inline; filename=%s.pdf' % self.get_export_filename()
         return response
 
