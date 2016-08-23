@@ -53,7 +53,7 @@ class BaseFabricSerializer(serializers.ModelSerializer):
 
 
 class FabricSerializer(BaseFabricSerializer):
-    fabric_type = serializers.StringRelatedField(source='fabric_type.title')
+    type = serializers.StringRelatedField()
     thickness = serializers.StringRelatedField(source='thickness.title')
     price = serializers.SerializerMethodField()
     tailoring_time = serializers.SerializerMethodField()
@@ -65,7 +65,7 @@ class FabricSerializer(BaseFabricSerializer):
         return obj.cached_collection.tailoring_time
 
     class Meta(BaseFabricSerializer.Meta):
-        fields = ['id', 'fabric_type', 'thickness', 'code', 'short_description', 'long_description', 'texture', 'price',
+        fields = ['id', 'type', 'thickness', 'code', 'short_description', 'long_description', 'texture', 'price',
                   'tailoring_time']
 
 
@@ -166,7 +166,7 @@ class ShawlOptionsSerializer(serializers.ModelSerializer):
 
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
-    fabric_type = serializers.StringRelatedField(source='fabric.fabric_type.title')
+    fabric_type = serializers.StringRelatedField(source='fabric.type')
     thickness = serializers.StringRelatedField(source='fabric.thickness.title')
     showcase_image = serializers.ImageField(source='showcase_image_list')
     sex = serializers.SerializerMethodField()

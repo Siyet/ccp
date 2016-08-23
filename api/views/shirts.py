@@ -16,9 +16,9 @@ from api.filters import TemplateShirtsFilter
 from processing.rendering.image_cache import ShirtImageCache
 
 
-class TemplateShirtsList(ListAPIView):
+class ShowcaseShirtsListView(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
-    queryset = models.TemplateShirt.objects.available().select_related('fabric__fabric_type', 'fabric__thickness')
+    queryset = models.TemplateShirt.objects.available().select_related('fabric__type', 'fabric__thickness')
     pagination_class = pagination.LimitOffsetPagination
     filter_class = TemplateShirtsFilter
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend,)
@@ -27,6 +27,8 @@ class TemplateShirtsList(ListAPIView):
     def get(self, request, *args, **kwargs):
         """
         Список рубашек для отображения в разделе "витрина".
+        Для фильтрации всех полей возможно использование нескольких значений через запятую:
+        ?fabric__type=1,2&fabric__colors=1,2&collection__sex=female,unisex
         ---
         parameters:
             - name: ordering
@@ -45,7 +47,7 @@ class TemplateShirtsList(ListAPIView):
               paramType: query
               description: отступ
         """
-        return super(TemplateShirtsList, self).get(request, *args, **kwargs)
+        return super(ShowcaseShirtsListView, self).get(request, *args, **kwargs)
 
 
 class TemplateShirtDetails(RetrieveAPIView):
@@ -104,8 +106,8 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             self.build_filter(_(u'Коллекция'), 'collection', collections_list),
             self.build_filter(_(u'Цвет'), 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
             self.build_filter(_(u'Дизайн'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
-            self.build_filter(_(u'Тип ткани'), 'fabric_type', list(fabric_types.values('id', 'title').distinct())),
-            self.build_filter(_(u'Толщина ткани'), 'thickness', list(thickness.values('id', 'title').distinct())),
+            self.build_filter(_(u'Тип ткани'), 'fabric__type', list(fabric_types.values('id', 'title').distinct())),
+            self.build_filter(_(u'Толщина ткани'), 'fabric__thickness', list(thickness.values('id', 'title').distinct())),
             self.build_filter(_(u'Сортировка'), 'ordering', self.get_ordering_options())
         ])
 

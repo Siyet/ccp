@@ -1,25 +1,46 @@
+# coding: utf-8
+
 from rest_framework import filters
 import django_filters
 
 from backend import models
-from dictionaries import models as dictionaries
+from django.utils.translation import ugettext as _
+
+from django_filters.fields import Lookup
+from django_filters.filters import BaseInFilter, MultipleChoiceFilter
+from django import forms
+from django.utils.encoding import smart_text
+
+
+class CSVChoiceField(forms.MultipleChoiceField):
+    def to_python(self, value):
+        value = super(CSVChoiceField, self).to_python(value)
+        if not value:
+            return []
+        values = ','.join(value).split(',')
+        print(values)
+        return [smart_text(val) for val in values]
+
+
+class CSVMultipleChoiceFilter(MultipleChoiceFilter):
+    field_class = CSVChoiceField
 
 
 class TemplateShirtsFilter(filters.FilterSet):
-    fabric = django_filters.ModelMultipleChoiceFilter(queryset=models.Fabric.objects.all())
-    fabric_type = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.FabricType.objects.all(),
-                                                           name='fabric__fabric_type')
-    thickness = django_filters.ModelMultipleChoiceFilter(queryset=dictionaries.Thickness.objects.all(),
-                                                         name='fabric__thickness')
-    collection = django_filters.ModelMultipleChoiceFilter(queryset=models.Collection.objects.all())
-    collection__sex = django_filters.MultipleChoiceFilter(choices=models.SEX)
+    fabric = BaseInFilter(label=_(u'Ткань'))
+    fabric__type = BaseInFilter(label=_(u'Тип ткани'))
+    fabric__colors = BaseInFilter(label=_(u'Цвет ткани'))
+    fabric__designs = BaseInFilter(label=_(u'Паттерн ткани'))
+    fabric__thickness = BaseInFilter(label=_(u'Толщина ткани'))
+    collection = BaseInFilter(label=_(u'Коллекция'))
+    collection__sex = CSVMultipleChoiceFilter(choices=models.SEX, label=_(u'Пол коллекции'), lookup_expr='in')
 
     class Meta:
         model = models.Shirt
-        fields = ['fabric', 'fabric_type', 'thickness', 'fabric__colors', 'fabric__designs', 'collection__sex']
+        fields = [] # include only explicitly specified fields
 
 
 class CollectionFabricsFilter(filters.FilterSet):
     class Meta:
         model = models.Fabric
-        fields = ('colors', 'designs', 'fabric_type', 'thickness',)
+        fields = ('colors', 'designs', 'type', 'thickness',)
