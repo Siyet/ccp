@@ -190,7 +190,6 @@ class Order(models.Model):
                                          payment_type=Payment.PAYMENT_TYPE.AC)
         self.payment = payment
         self.save(update_fields=['payment'])
-        CheckoutMailer.send_to_customer_order_payment_completed(self, self.get_pdf())
         if payment.order_amount <= 0:
             self.save_certificate()
             payment.set_success()
