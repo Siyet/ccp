@@ -64,7 +64,7 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
         )
 
     def get_ordering_options(self):
-        ordering_fields = TemplateShirtsList.ordering_fields
+        ordering_fields = ShowcaseShirtsListView.ordering_fields
         ordering_options = []
         for field_key in ordering_fields:
             field = models.Shirt._meta.get_field(field_key)
