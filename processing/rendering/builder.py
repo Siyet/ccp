@@ -46,7 +46,7 @@ class ShirtBuilder(object):
         self.placket = self.extract(shirt_data, 'placket')
         if self.placket:
             self.placket = dictionaries.PlacketType.objects.get(pk=self.placket)
-        self.tuck = shirt_data.get('tuck', False)
+        self.tuck = self.extract(shirt_data, 'tuck')
         self.back = self.extract(shirt_data, 'back')
         self.dickey = self.extract(shirt_data, 'dickey')
         self.fabric = shirt_data.get('fabric')
@@ -263,7 +263,8 @@ class ShirtBuilder(object):
 
         for conf in stitches:
             try:
-                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution, field_types={'image': STITCHES })
+                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution,
+                                           field_types={'image': STITCHES})
                 cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
                 print(e.message)
@@ -329,7 +330,7 @@ class ShirtBuilder(object):
     def get_back(self):
         if not self.back:
             return None
-        back_conf = compose.BackConfiguration.objects.get(back_id=self.back, tuck=self.tuck, hem_id=self.hem)
+        back_conf = compose.BackConfiguration.objects.get(back_id=self.back, tuck_id=self.tuck, hem_id=self.hem)
         return back_conf.sources.filter(projection=self.projection).first()
 
     def get_buttons_conf(self, model, filters):
@@ -435,6 +436,6 @@ class ShirtBuilder(object):
         text = draw_rotated_text(unicode(initials['text']), font, position.rotate)
         text.save('/tmp/al_text.png')
         initials_position = (int(position.left * image.size[0]), int(position.top * image.size[1]))
-        colorized_text = ImageOps.colorize(text, (0,0,0), color)
+        colorized_text = ImageOps.colorize(text, (0, 0, 0), color)
         colorized_text.save('/tmp/text.png')
         image.paste(colorized_text, initials_position, text)

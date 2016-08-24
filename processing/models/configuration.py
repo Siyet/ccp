@@ -53,7 +53,7 @@ class BodyConfiguration(PartConfigurationModel):
 
 class BackConfiguration(PartConfigurationModel):
     back = models.ForeignKey(dictionaries.BackType, verbose_name=_(u'Спинка'))
-    tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=backend.Shirt.TUCK_OPTIONS, default=False)
+    tuck = models.ForeignKey(dictionaries.TuckType, verbose_name=_(u'Вытачки'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
 
     class Meta:

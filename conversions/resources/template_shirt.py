@@ -42,10 +42,7 @@ class TemplateShirtResource(resources.ModelResource):
         False: _(u'Я не хочу использовать инициалы')
     }
 
-    TUCK_NOT_USE_CONSTANT = _(u'Без вытачки')
-
     COLLECTION_ATTRIBUTE_MAP = {'collection'}
-    TUCK_ATTRIBUTE_MAP = {'tuck'}
     CLASP_ATTRIBUTE_MAP = {'clasp'}
     CUFF_ATTRIBUTE_LIST = ('cuff__type', 'cuff__rounding', 'cuff__hardness')
     DICKEY_ATTRIBUTE_MAP = {'dickey__type', 'dickey__fabric'}
@@ -75,7 +72,7 @@ class TemplateShirtResource(resources.ModelResource):
                           widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title',
                                                         create_missing=False))
     tuck = fields.Field(attribute='tuck', column_name=TUCK_COLUMN_NAME,
-                        widget=ChoicesWidget(choices=TemplateShirt.TUCK_OPTIONS))
+                        widget=CustomForeignKeyWidget(model=dictionaries.TuckType, field='title', create_missing=False))
     back = fields.Field(attribute='back', column_name=_(u'Спинка'),
                         widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title', create_missing=False))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=_(u'Коллекция'),
@@ -228,7 +225,7 @@ class TemplateShirtResource(resources.ModelResource):
                 obj.hem.title,
                 obj.placket.title,
                 obj.pocket.title,
-                obj.get_tuck_display(),
+                obj.tuck.title,
                 obj.back.title,
             ]
 
@@ -445,8 +442,6 @@ class TemplateShirtResource(resources.ModelResource):
         if field.attribute and field.column_name in data:
             if field.attribute in self.COLLECTION_ATTRIBUTE_MAP:
                 field.save(obj, data, sex=data[self.SEX_COLUMN_NAME])
-            elif field.attribute in self.TUCK_ATTRIBUTE_MAP:
-                obj.tuck = data[self.TUCK_COLUMN_NAME] != self.TUCK_NOT_USE_CONSTANT
             elif field.attribute in self.CLASP_ATTRIBUTE_MAP:
                 obj.clasp = data[self.CLASP_COLUMN_NAME] == self.CLASP_USE_DICT[True]
             elif field.attribute in self.DICKEY_ATTRIBUTE_MAP:
