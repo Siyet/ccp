@@ -31,6 +31,7 @@ collection_urls = [
     url(r'^dickey/$', views.CollectionDickeyList.as_view()),
     url(r'^tuck/$', views.CollectionTuckList.as_view()),
     url(r'^stitches/$', views.CollectionStitchesList.as_view()),
+    url(r'^fit/$', views.CollectionFitList.as_view()),
 ]
 
 components = [

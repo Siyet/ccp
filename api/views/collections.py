@@ -21,7 +21,8 @@ from api.filters import CollectionFabricsFilter
 __all__ = [
     'CollectionsListView', 'CollectionFabricDesignsList', 'CollectionFabricsList', 'CollectionFabricColorsList',
     'CollectionHardnessList', 'CollectionStaysList', 'CollectionContrastDetailsList', 'CollectionStitchesList',
-    'CollectionDickeyList', 'CollectionThicknessList', 'CollectionFabricTypeList', 'CollectionTuckList'
+    'CollectionDickeyList', 'CollectionThicknessList', 'CollectionFabricTypeList', 'CollectionTuckList',
+    'CollectionFitList',
 ]
 
 
@@ -184,3 +185,10 @@ class CollectionStitchesList(APIView):
             'colors': [{'id': x.pk, 'title': x.title, 'color': x.color} for x in
                        dictionaries.StitchColor.objects.all()],
         })
+
+
+class CollectionFitList(CollectionMixin, ListAPIView):
+    serializer_class = serializers.FitSerializer
+
+    def get_queryset(self):
+        return self.collection.fits.prefetch_related('sizes')

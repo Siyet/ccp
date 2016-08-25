@@ -424,3 +424,11 @@ class FabricTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.FabricType
         fields = '__all__'
+
+
+class FitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Fit
+        fields = ('id', 'picture', 'title', 'sizes',)
+
+    sizes = SizeSerializer(many=True)
