@@ -59,11 +59,12 @@ class CacheBuilder(object):
                 alpha = alpha.resize(scale_tuple(alpha.size, alpha_scale), Image.LANCZOS)
                 alpha_array = np.asarray(alpha).astype('float32') / 255.0
                 matrices.append(('uv_alpha', Submatrix(alpha_array), CacheBuilder.SCALE_MAP['uv'] / 2.0))
-                if is_preview:
-                    array = ndimage.zoom(array, [preview_scale, preview_scale, 1], order=0)
                 size = array.shape[:2]
                 array[..., 0] *= size[0]
                 array[..., 1] *= size[1]
+                if is_preview:
+                    array = ndimage.zoom(array, [preview_scale, preview_scale, 1], order=0)
+
 
             else:
                 img = image_from_array(array)
@@ -163,9 +164,6 @@ class CacheBuilder(object):
 
         save_to_cache(img, CACHE_RESOLUTION.full)
 
-        img = img.resize(scale_tuple(img.size, RENDER['preview_scale']), Image.LANCZOS)
+        img = img.filter(ImageFilter.GaussianBlur(radius=3.5))
 
-        if texture.moire_filter:
-            img = img.filter(ImageFilter.GaussianBlur(radius=1.5))
-            img = img.filter(ImageFilter.UnsharpMask(radius=1, percent=120))
         save_to_cache(img, CACHE_RESOLUTION.preview)
