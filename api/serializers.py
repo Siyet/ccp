@@ -303,7 +303,7 @@ class InitialsSerializer(serializers.ModelSerializer):
         fields = ('font', 'location', 'text', 'color', )
 
 
-class ShirtDetailsSerializer(serializers.ModelSerializer):
+class ShirtSerializer(serializers.ModelSerializer):
     required_fields = {'collection', 'sleeve', 'fabric'}
 
     collar = ShirtCollarSerializer()
@@ -312,9 +312,6 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
     contrast_details = ContrastDetailsSerializer(many=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
     initials = InitialsSerializer(required=False, allow_null=True)
-    fit = serializers.StringRelatedField(source='fit.title')
-    sleeve_length = serializers.StringRelatedField(source='sleeve_length.title')
-    tailoring_time = serializers.ReadOnlyField(source='collection.tailoring_time')
 
     class Meta:
         model = models.Shirt
@@ -322,14 +319,20 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
         exclude = ["is_template", "is_standard", "code", "individualization", "showcase_image"]
 
     def __init__(self, *args, **kwargs):
-        super(ShirtDetailsSerializer, self).__init__(*args, **kwargs)
+        super(ShirtSerializer, self).__init__(*args, **kwargs)
         for field_name in self.required_fields:
             self.fields[field_name].allow_null = False
             self.fields[field_name].required = True
 
 
+class ShirtDetailsSerializer(ShirtSerializer):
+    fit = serializers.StringRelatedField(source='fit.title')
+    sleeve_length = serializers.StringRelatedField(source='sleeve_length.title')
+    tailoring_time = serializers.ReadOnlyField(source='collection.tailoring_time')
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
-    shirt = ShirtDetailsSerializer()
+    shirt = ShirtSerializer()
 
     class Meta:
         model = checkout.OrderItem
