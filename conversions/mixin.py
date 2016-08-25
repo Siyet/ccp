@@ -92,7 +92,7 @@ class OrderExportMixin(object):
                 (_(u'Низ'), achain(shirt, 'N/A', 'hem', 'title')),
                 (_(u'Полочка'), achain(shirt, 'N/A', 'placket', 'title')),
                 (_(u'Карман'), achain(shirt, 'N/A', 'pocket', 'title')),
-                (_(u'Вытачки'), shirt.get_tuck_display()),
+                (_(u'Вытачки'), achain(shirt, 'N/A', 'tuck', 'title')),
                 (_(u'Спинка'), achain(shirt, 'N/A', 'back', 'title')),
                 (_(u'Пуговицы'), achain(shirt, 'N/A', 'custom_buttons', 'title')),
             ]]

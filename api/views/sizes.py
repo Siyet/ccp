@@ -9,6 +9,9 @@ from dictionaries.models import Size, SizeOptions, SleeveLength
 from api import serializers
 
 
+__all__ = ['SizeOptionsList', 'SizesList']
+
+
 class SizeOptionsList(ListAPIView):
     """
     Список опций для выбора размера на экране "Размеры"

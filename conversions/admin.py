@@ -40,7 +40,7 @@ class OrderExportAdmin(OrderExportMixin, admin.ModelAdmin):
         if not shirt:
             raise Http404
         number = 1
-        for ind, x in enumerate(order.order_details.all()):
+        for ind, x in enumerate(order.items.all()):
             if x.pk == shirt.pk:
                 number = ind + 1
                 break
@@ -54,7 +54,7 @@ class OrderExportAdmin(OrderExportMixin, admin.ModelAdmin):
         order = self.get_object(request, kwargs.get('pk'))
         report_generator = self.report_generator_class()
         archive_generator = self.archive_generator_class()
-        for ind, shirt in enumerate(order.order_details.all()):
+        for ind, shirt in enumerate(order.items.all()):
             xlsx = report_generator.get_xlsx(self.get_shirt_lines(order, shirt, ind + 1))
             archive_generator.add(
                 '%i_%i_%s.xlsx' % (order.pk, ind + 1, self.get_export_shirt_filename()),

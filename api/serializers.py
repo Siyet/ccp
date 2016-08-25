@@ -228,9 +228,14 @@ class HardnessSerializer(serializers.ModelSerializer):
 
 
 class StaysSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Stays
+        fields = ['id', 'title']
+
+
+class TuckSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = dictionaries.TuckType
         fields = ['id', 'title']
 
 
@@ -323,11 +328,11 @@ class ShirtDetailsSerializer(serializers.ModelSerializer):
             self.fields[field_name].required = True
 
 
-class OrderDetailsSerializer(serializers.ModelSerializer):
+class OrderItemSerializer(serializers.ModelSerializer):
     shirt = ShirtDetailsSerializer()
 
     class Meta:
-        model = checkout.OrderDetails
+        model = checkout.OrderItem
         fields = ('shirt', 'amount', )
 
     def create(self, validated_data):
@@ -353,7 +358,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
 
-        return checkout.OrderDetails.objects.create(shirt=shirt, price=shirt.price, **validated_data)
+        return checkout.OrderItem.objects.create(shirt=shirt, price=shirt.price, **validated_data)
 
 
 class CustomerDataSerializer(serializers.ModelSerializer):
@@ -364,13 +369,13 @@ class CustomerDataSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_details = OrderDetailsSerializer(many=True, required=True, read_only=False)
+    items = OrderItemSerializer(many=True, required=True, read_only=False)
     customer_data = CustomerDataSerializer(many=True, required=True, read_only=False)
     amount = serializers.StringRelatedField(source='payment.order_amount')
 
     class Meta:
         model = checkout.Order
-        fields = ('number', 'customer', 'checkout_shop', 'certificate', 'amount', 'order_details', 'customer_data', )
+        fields = ('number', 'customer', 'checkout_shop', 'certificate', 'amount', 'items', 'customer_data', )
 
     def validate(self, attrs):
         customer_data = attrs.get('customer_data', [])
@@ -384,20 +389,20 @@ class OrderSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        order_details = validated_data.pop('order_details')
+        order_items = validated_data.pop('items')
         customer_data = validated_data.pop('customer_data')
         order = checkout.Order.objects.create(**validated_data)
-        order_details_serializer = OrderDetailsSerializer()
-        for detail in order_details:
-            detail['order'] = order
-            order_details_serializer.create(detail)
+        order_item_serializer = OrderItemSerializer()
+        for item in order_items:
+            item['order'] = order
+            order_item_serializer.create(item)
         for data in customer_data:
             checkout.CustomerData.objects.create(order=order, **data)
         order.create_payment()
         return order
 
 
-class OrderDetailSerializer(OrderSerializer):
+class OrderDetailsSerializer(OrderSerializer):
     class Meta:
         model = checkout.Order
         fields = OrderSerializer.Meta.fields + ('state', 'payment_status', 'full_amount', 'discount_value',

@@ -5,6 +5,9 @@ from api import serializers
 from dictionaries.models import FAQ
 
 
+__all__ = ['FAQListView']
+
+
 class FAQListView(ListAPIView):
     """
     Список вопросов и ответов

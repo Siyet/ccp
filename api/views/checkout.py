@@ -11,6 +11,12 @@ from checkout import models as checkout
 from checkout.models import Order
 
 
+__all__ = [
+    'ShopListView', 'CertificateDetailView', 'DiscountDetailView', 'OrderCreateView',
+    'OrderPaymentData', 'OrderDetailView'
+]
+
+
 class ShopListView(ListAPIView):
     """
     Список магазинов для самовывоза
@@ -39,7 +45,7 @@ class OrderCreateView(CreateAPIView):
     """
     Создание заказа
     """
-    queryset = Order.objects.prefetch_related('order_details').all()
+    queryset = Order.objects.prefetch_related('items').all()
     serializer_class = serializers.OrderSerializer
 
 
@@ -49,8 +55,8 @@ class OrderDetailView(RetrieveAPIView):
     """
     lookup_field = 'number'
     queryset = checkout.Order.objects.select_related('checkout_shop', 'certificate', 'payment')\
-        .prefetch_related('order_details__shirt', 'customer_data')
-    serializer_class = serializers.OrderDetailSerializer
+        .prefetch_related('items__shirt', 'customer_data')
+    serializer_class = serializers.OrderDetailsSerializer
 
 
 class OrderPaymentData(APIView):

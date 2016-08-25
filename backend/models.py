@@ -38,6 +38,7 @@ class Collection(OrderedModel):
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
+    tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'))
     sex = models.CharField(_(u'Пол коллекции'), choices=SEX, max_length=6, default=SEX.male, blank=False)
     tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
 
@@ -51,7 +52,7 @@ class Collection(OrderedModel):
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)
-        return Fabric.objects.active.select_related('category', 'type', 'thickness')\
+        return Fabric.objects.active.select_related('category', 'type', 'thickness') \
             .prefetch_related('residuals__storehouse', 'category__prices').filter(filter_predicate)
 
 
@@ -127,7 +128,7 @@ class Fabric(TimeStampedModel):
     category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics',
                                  blank=True, null=True)
     type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics',
-                                    null=True)
+                             null=True)
     thickness = models.ForeignKey('dictionaries.Thickness', verbose_name=_(u'Толщина'), related_name='fabrics',
                                   null=True)
     short_description = models.TextField(_(u'Краткое описание'), blank=True, default="")
@@ -136,7 +137,8 @@ class Fabric(TimeStampedModel):
     colors = models.ManyToManyField('dictionaries.FabricColor', verbose_name=_(u'Цвета'), related_name='color_fabrics')
     designs = models.ManyToManyField('dictionaries.FabricDesign', verbose_name=_(u'Дизайн'),
                                      related_name='design_fabrics')
-    texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True, on_delete=models.SET_NULL)
+    texture = models.OneToOneField('processing.Texture', verbose_name=_(u'Текстура'), related_name='fabric', null=True,
+                                   on_delete=models.SET_NULL)
     dickey = models.BooleanField(_(u'Используется в манишке'), default=False)
     active = models.BooleanField(_(u'Активна'), default=True)
 
@@ -322,7 +324,6 @@ class Shirt(models.Model):
     related_fields = ["collection", "fabric", "size_option", "size", "hem", "placket", "pocket", "back",
                       "custom_buttons_type", "custom_buttons", "shawl", "yoke"]
 
-    TUCK_OPTIONS = Choices((False, _(u'Без вытачки')), (True, _(u'С вытачками')))
     CLASP_OPTIONS = Choices((False, _(u'Не использовать застежку')), (True, _(u'Использовать застежку')))
 
     is_template = models.BooleanField(_(u'Используется как шаблон'), default=False)
@@ -355,7 +356,8 @@ class Shirt(models.Model):
     fit = models.ForeignKey(Fit, verbose_name=_(u'Талия'), blank=True, null=True)
     sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True, null=True)
 
-    tuck = models.BooleanField(verbose_name=_(u'Вытачки'), choices=TUCK_OPTIONS, default=False)
+    tuck = ChainedForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), chained_field='collection',
+                             chained_model_field='collections', show_all=True)
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
 
@@ -428,7 +430,6 @@ class Shirt(models.Model):
 
         self.price = self.calculate_price()
         super(Shirt, self).save(*args, **kwargs)
-
 
     class Meta:
         ordering = ('code',)

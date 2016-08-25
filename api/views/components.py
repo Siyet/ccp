@@ -10,6 +10,14 @@ from backend import models
 from dictionaries import models as dictionaries
 from api import serializers
 
+
+__all__ = [
+    'CollarTypeList', 'CuffTypeList', 'HemTypeList', 'BackTypeList', 'PocketTypeList',
+    'PlacketTypeList', 'SleeveTypeList', 'YokeTypeList', 'CustomButtonsTypeList', 'ShawlOptionsList',
+    'ClaspOptionsList', 'StitchOptionsList', 'TemplateInitialsList', 'DickeyList'
+]
+
+
 class CollarTypeList(ListAPIView):
     """
     Список типов воротников
@@ -88,15 +96,6 @@ class ShawlOptionsList(ListAPIView):
     """
     serializer_class = serializers.ShawlOptionsSerializer
     queryset = models.ShawlOptions.objects.all()
-
-
-class TuckOptionsList(APIView):
-    """
-    Список вариантов вытачек
-    """
-
-    def get(self, request, *args, **kwargs):
-        return Response([{'key': x[0], 'value': unicode(x[1])} for x in models.Shirt.TUCK_OPTIONS])
 
 
 class ClaspOptionsList(APIView):
