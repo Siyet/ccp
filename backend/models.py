@@ -94,7 +94,7 @@ class Stays(OrderedModel):
 class Fit(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='fits')
-    sizes = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размеры'))
+    sizes = models.ManyToManyField('dictionaries.Size', verbose_name=_(u'Размеры'), related_name='fits')
     picture = models.ImageField(_(u'Изображение'), upload_to='fit')
 
     class Meta(OrderedModel.Meta):
@@ -354,6 +354,7 @@ class Shirt(models.Model):
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
                                default=ResolveDefault(SleeveType))
     fit = models.ForeignKey(Fit, verbose_name=_(u'Талия'), blank=True, null=True)
+    # fit = models.ForeignKey('dictionaries.Fit', verbose_name=_(u'Талия'), blank=True, null=True)
     sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True, null=True)
 
     tuck = ChainedForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), chained_field='collection',

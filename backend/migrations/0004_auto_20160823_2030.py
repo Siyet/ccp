@@ -35,8 +35,4 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.RunPython(populate_tuck),
-        migrations.RemoveField(
-            model_name='shirt',
-            name='tuck',
-        ),
     ]

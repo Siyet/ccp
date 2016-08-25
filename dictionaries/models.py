@@ -315,6 +315,17 @@ class SleeveLength(OrderedModel):
         return self.title
 
 
+class Fit(OrderedModel):
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = _(u'Тип талии')
+        verbose_name_plural = _(u'Типы талии')
+
+    def __unicode__(self):
+        return self.title
+
+
 class DefaultElement(models.Model):
     LIMIT_CHOICES = {'model__in': ['shawloptions', 'sleevetype']}
 
