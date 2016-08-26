@@ -210,6 +210,7 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
 
 
 class TemplateShirtSerializer(TemplateShirtListSerializer):
+    showcase_image_hd = serializers.ImageField(source='showcase_image_detail_hd')
     showcase_image = serializers.ImageField(source='showcase_image_detail')
     details = serializers.SerializerMethodField()
 
@@ -217,7 +218,7 @@ class TemplateShirtSerializer(TemplateShirtListSerializer):
         return TemplateShirtDetailsSerializer(instance=object, context=self.context).data
 
     class Meta(TemplateShirtListSerializer.Meta):
-        fields = TemplateShirtListSerializer.Meta.fields + ['details']
+        fields = TemplateShirtListSerializer.Meta.fields + ['showcase_image_hd', 'details']
 
 
 class HardnessSerializer(serializers.ModelSerializer):
