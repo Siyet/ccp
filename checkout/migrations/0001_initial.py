@@ -8,7 +8,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('yandex_kassa', '0006_auto_20160630_1628'),
+        ('yandex_kassa', '0001_initial'),
         ('backend', '0001_initial'),
     ]
 

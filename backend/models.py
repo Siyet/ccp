@@ -91,6 +91,20 @@ class Stays(OrderedModel):
         verbose_name_plural = _(u'Косточки')
 
 
+class Fit(OrderedModel):
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='fits')
+    sizes = models.ManyToManyField('dictionaries.Size', verbose_name=_(u'Размеры'), related_name='fits')
+    picture = models.ImageField(_(u'Изображение'), upload_to='fit')
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = _(u'Тип талии')
+        verbose_name_plural = _(u'Типы талии')
+
+    def __unicode__(self):
+        return self.title
+
+
 class FabricPrice(TimeStampedModel):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='prices')
     fabric_category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория тканей'),
@@ -339,9 +353,9 @@ class Shirt(models.Model):
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
                                default=ResolveDefault(SleeveType))
-    fit = models.ForeignKey('dictionaries.Fit', verbose_name=_(u'Талия'), blank=True, null=True)
-    sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True,
-                                      null=True)
+    fit = models.ForeignKey(Fit, verbose_name=_(u'Талия'), blank=True, null=True)
+    # fit = models.ForeignKey('dictionaries.Fit', verbose_name=_(u'Талия'), blank=True, null=True)
+    sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True, null=True)
 
     tuck = ChainedForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), chained_field='collection',
                              chained_model_field='collections', show_all=True)

@@ -50,8 +50,7 @@ class OrderExportMixin(object):
         data = [[
             _(u'СОРОЧКА'), [
                 (_(u'Размер'), shirt.size.size if shirt.size else ''),
-                (_(u'Талия'), shirt.get_fit_display() if shirt.fit else ''),
-                (_(u'Длина рукава'), shirt.get_sleeve_length_display() if shirt.sleeve_length else ''),
+                (_(u'Талия'), shirt.fit.title if shirt.fit else ''),
             ]
         ]]
         try:

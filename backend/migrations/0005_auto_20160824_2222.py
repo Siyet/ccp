@@ -13,6 +13,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name='shirt',
+            name='tuck',
+        ),
          migrations.RenameField(
             model_name='shirt',
             old_name='tucks',
