@@ -2,6 +2,7 @@
 from django.db.transaction import atomic
 from rest_framework import serializers
 from django.utils.text import ugettext_lazy as _
+
 from backend import models
 from core.utils import first
 from dictionaries import models as dictionaries
@@ -10,9 +11,10 @@ from checkout import models as checkout
 
 class CollectionSerializer(serializers.ModelSerializer):
     title = serializers.ReadOnlyField(source='__unicode__')
+
     class Meta:
         model = models.Collection
-        fields = ('id', 'title', 'text', 'image', 'tailoring_time', )
+        fields = ('id', 'title', 'text', 'image', 'tailoring_time',)
 
 
 class ShirtInfoImageSerializer(serializers.ModelSerializer):
@@ -79,7 +81,6 @@ class FabricDesignSerializer(serializers.ModelSerializer):
         model = dictionaries.FabricDesign
 
 
-
 class CollarButtonsSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.CollarButtons
@@ -144,7 +145,6 @@ class DickeyTypeSerializer(serializers.ModelSerializer):
 
 
 class CustomButtonsSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.CustomButtons
         fields = ['id', 'title', 'picture', ]
@@ -159,7 +159,6 @@ class CustomButtonsTypeSerializer(serializers.ModelSerializer):
 
 
 class ShawlOptionsSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.ShawlOptions
 
@@ -182,7 +181,8 @@ class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'short_description', 'thickness', 'price', 'sex', 'collection']
+        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'short_description',
+                  'thickness', 'price', 'sex', 'collection']
 
 
 class ShirtImageSerializer(serializers.ModelSerializer):
@@ -202,14 +202,17 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
     tailoring_time = serializers.ReadOnlyField(source='collection.tailoring_time')
 
     def get_shirt_images(self, object):
-        return [self.context['view'].request.build_absolute_uri(shirt_image.image.url) for shirt_image in object.shirt_images.all()]
+        return [self.context['view'].request.build_absolute_uri(shirt_image.image.url) for shirt_image in
+                object.shirt_images.all()]
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['individualization', 'short_description', 'long_description', 'shirt_images', 'collection_title', 'country', 'tailoring_time']
+        fields = ['individualization', 'short_description', 'long_description', 'shirt_images', 'collection_title',
+                  'country', 'tailoring_time']
 
 
 class TemplateShirtSerializer(TemplateShirtListSerializer):
+    showcase_image_hd = serializers.ImageField(source='showcase_image')
     showcase_image = serializers.ImageField(source='showcase_image_detail')
     details = serializers.SerializerMethodField()
 
@@ -217,11 +220,10 @@ class TemplateShirtSerializer(TemplateShirtListSerializer):
         return TemplateShirtDetailsSerializer(instance=object, context=self.context).data
 
     class Meta(TemplateShirtListSerializer.Meta):
-        fields = TemplateShirtListSerializer.Meta.fields + ['details']
+        fields = TemplateShirtListSerializer.Meta.fields + ['showcase_image_hd', 'details']
 
 
 class HardnessSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Hardness
         fields = ['id', 'title']
@@ -240,31 +242,27 @@ class TuckSerializer(serializers.ModelSerializer):
 
 
 class ShopSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = checkout.Shop
         fields = '__all__'
 
 
 class CertificateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = checkout.Certificate
         fields = '__all__'
 
 
 class DiscountSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = checkout.Discount
         fields = '__all__'
 
 
 class FAQSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = dictionaries.FAQ
-        fields = ('question', 'answer', )
+        fields = ('question', 'answer',)
 
 
 class ShirtCollarSerializer(serializers.ModelSerializer):
@@ -300,7 +298,7 @@ class ContrastStitchesSerializer(serializers.ModelSerializer):
 class InitialsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Initials
-        fields = ('font', 'location', 'text', 'color', )
+        fields = ('font', 'location', 'text', 'color',)
 
 
 class ShirtSerializer(serializers.ModelSerializer):
@@ -336,7 +334,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = checkout.OrderItem
-        fields = ('shirt', 'amount', )
+        fields = ('shirt', 'amount',)
 
     def create(self, validated_data):
         shirt = validated_data.pop('shirt')
@@ -365,10 +363,9 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class CustomerDataSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = checkout.CustomerData
-        fields = ('name', 'lastname', 'midname', 'phone', 'email', 'type', 'city', 'address', 'index', )
+        fields = ('name', 'lastname', 'midname', 'phone', 'email', 'type', 'city', 'address', 'index',)
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -378,7 +375,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = checkout.Order
-        fields = ('number', 'customer', 'checkout_shop', 'certificate', 'amount', 'items', 'customer_data', )
+        fields = ('number', 'customer', 'checkout_shop', 'certificate', 'amount', 'items', 'customer_data',)
 
     def validate(self, attrs):
         customer_data = attrs.get('customer_data', [])
