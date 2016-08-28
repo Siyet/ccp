@@ -50,8 +50,7 @@ class OrderExportMixin(object):
         data = [[
             _(u'СОРОЧКА'), [
                 (_(u'Размер'), shirt.size.size if shirt.size else ''),
-                (_(u'Талия'), shirt.get_fit_display() if shirt.fit else ''),
-                (_(u'Длина рукава'), shirt.get_sleeve_length_display() if shirt.sleeve_length else ''),
+                (_(u'Талия'), shirt.fit.title if shirt.fit else ''),
             ]
         ]]
         try:
@@ -92,7 +91,7 @@ class OrderExportMixin(object):
                 (_(u'Низ'), achain(shirt, 'N/A', 'hem', 'title')),
                 (_(u'Полочка'), achain(shirt, 'N/A', 'placket', 'title')),
                 (_(u'Карман'), achain(shirt, 'N/A', 'pocket', 'title')),
-                (_(u'Вытачки'), shirt.get_tuck_display()),
+                (_(u'Вытачки'), achain(shirt, 'N/A', 'tuck', 'title')),
                 (_(u'Спинка'), achain(shirt, 'N/A', 'back', 'title')),
                 (_(u'Пуговицы'), achain(shirt, 'N/A', 'custom_buttons', 'title')),
             ]]

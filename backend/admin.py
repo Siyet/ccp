@@ -206,7 +206,7 @@ admin.site.register([
     ElementStitch
 ])
 
-admin.site.register([Hardness, ShawlOptions, Stays], GrappelliOrderableAdmin)
+admin.site.register([Hardness, ShawlOptions, Stays, Fit], GrappelliOrderableAdmin)
 
 admin.site.register(CustomButtons, CustomButtonsAdmin)
 

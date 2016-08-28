@@ -19,7 +19,7 @@ from .models import (
     Shop,
     Certificate,
     Order,
-    OrderDetails,
+    OrderItem,
     Discount,
     CustomerData,
     Payment
@@ -54,7 +54,7 @@ class ShopAdmin(GrappelliOrderableAdmin):
 
 
 class OrderDetailsInline(admin.TabularInline):
-    model = OrderDetails
+    model = OrderItem
     extra = 0
     exclude = ('shirt', )
     readonly_fields = ('get_shirt_url', 'amount', 'price', 'get_export_url', )
@@ -84,7 +84,7 @@ class OrderAdmin(OrderExportAdmin):
                      'customer_data__city', 'checkout_shop__city', )
     list_filter = ('state', 'date_add', 'payment__status',)
     list_select_related = ('checkout_shop', 'payment', )
-    list_prefetch_related = ('customer_data', 'order_details', )
+    list_prefetch_related = ('customer_data', 'items', )
     readonly_fields = ('get_payment_status', 'date_add', 'get_full_amount', 'get_amount_to_pay', 'get_amount_paid',
                        'get_performed_datetime', )
     inlines = [CustomerDataInline, OrderDetailsInline]

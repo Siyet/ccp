@@ -98,7 +98,7 @@ class Order(models.Model):
 
     def get_full_amount(self):
         result = 0
-        for detail in self.order_details.all():
+        for detail in self.items.all():
             result += float(detail.price) * detail.amount
         return result
 
@@ -160,7 +160,7 @@ class Order(models.Model):
     get_city.short_description = _(u'Город')
 
     def get_count(self):
-        return sum([x.amount for x in self.order_details.all()])
+        return sum([x.amount for x in self.items.all()])
 
     get_count.allow_tags = True
     get_count.short_description = _(u'Количество рубашек в заказе')
@@ -204,7 +204,7 @@ class Order(models.Model):
             self.certificate.save(update_fields=['value'])
 
     def get_shirt(self, shirt):
-        return self.order_details.filter(pk=shirt).first()
+        return self.items.filter(pk=shirt).first()
 
     def get_customer_address(self):
         return first((lambda x: x.type == CustomerData.ADDRESS_TYPE.customer_address), self.customer_data.all())
@@ -250,13 +250,14 @@ class CustomerData(models.Model):
         return u'%s %s.%s.' % (self.lastname, self.name[0], self.midname[0])
 
 
-class OrderDetails(models.Model):
-    order = models.ForeignKey(Order, verbose_name=_(u'Заказ'), related_name='order_details')
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, verbose_name=_(u'Заказ'), related_name='items')
     shirt = models.ForeignKey('backend.Shirt', verbose_name=_(u'Рубашка'))
     amount = models.IntegerField(_(u'Количество'))
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
     class Meta:
+        db_table = 'checkout_orderdetails'
         verbose_name = _(u'Детали заказа')
         verbose_name_plural = _(u'Детали заказа')
 

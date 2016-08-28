@@ -268,6 +268,17 @@ class BackType(ComponentModel):
         verbose_name_plural = _(u'Типы спинок')
 
 
+class TuckType(OrderedModel):
+    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = _(u'Тип вытачек')
+        verbose_name_plural = _(u'Типы вытачек')
+
+    def __unicode__(self):
+        return self.title
+
+
 class Thickness(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
 
@@ -291,17 +302,6 @@ class FAQ(models.Model):
 
     def __unicode__(self):
         return self.question
-
-
-class Fit(OrderedModel):
-    title = models.CharField(_(u'Название'), max_length=255, unique=True)
-
-    class Meta(OrderedModel.Meta):
-        verbose_name = _(u'Тип талии')
-        verbose_name_plural = _(u'Типы талии')
-
-    def __unicode__(self):
-        return self.title
 
 
 class SleeveLength(OrderedModel):

@@ -99,21 +99,21 @@
     </tr>
     </thead>
     <tbody>
-    {% for order_detail in order.order_details.all %}
+    {% for order_item in order.items.all %}
         <tr class="text-black">
             <td>
-                <img src="{% shirt_image order_detail.shirt %}" height="120" width="120" alt="">
+                <img src="{% shirt_image order_item.shirt %}" height="120" width="120" alt="">
             </td>
             <td>
                 <p><b>{% trans 'Сорочка' %}</b></p>
 
-                <p>{{ order_detail.shirt.size }}</p>
+                <p>{{ order_item.shirt.size }}</p>
 
-                <p>{{ order_detail.shirt.collection.tailoring_time }}</p>
+                <p>{{ order_item.shirt.collection.tailoring_time }}</p>
             </td>
-            <td class="text-right">{{ order_detail.amount }}</td>
-            <td class="text-right">{{ order_detail.amount }} x {{ order_detail.price }} {% trans 'руб.' %}</td>
-            <td class="text-right">{{ order_detail.get_total|floatformat:2 }} {% trans 'руб.' %}</td>
+            <td class="text-right">{{ order_item.amount }}</td>
+            <td class="text-right">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб.' %}</td>
+            <td class="text-right">{{ order_item.get_total|floatformat:2 }} {% trans 'руб.' %}</td>
         </tr>
     {% endfor %}
     </tbody>

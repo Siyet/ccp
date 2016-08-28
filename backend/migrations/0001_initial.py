@@ -2,22 +2,33 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import colorful.fields
+import django.utils.timezone
+import model_utils.fields
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dictionaries', '0003_auto_20160115_1816'),
     ]
 
     operations = [
         migrations.CreateModel(
+            name='AccessoriesPrice',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('object_pk', models.IntegerField(null=True, verbose_name='object ID', blank=True)),
+                ('price', models.DecimalField(verbose_name='\u0426\u0435\u043d\u0430', max_digits=10, decimal_places=2)),
+            ],
+            options={
+                'verbose_name': '\u0426\u0435\u043d\u0430 \u043d\u0430\u0434\u0431\u0430\u0432\u043a\u0438',
+                'verbose_name_plural': '\u0426\u0435\u043d\u044b \u043d\u0430\u0434\u0431\u0430\u0432\u043e\u043a',
+            },
+        ),
+        migrations.CreateModel(
             name='Collar',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('stays', models.CharField(max_length=10, verbose_name='\u041a\u043e\u0441\u0442\u043e\u0447\u043a\u0438', choices=[(b'yes', '\u0414\u0430'), (b'no', '\u041d\u0435\u0442'), (b'removable', '\u0414\u0430, \u0441\u044a\u0435\u043c\u043d\u044b\u0435')])),
-                ('hardness', models.CharField(max_length=15, verbose_name='\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c', choices=[(b'very_soft', '\u041e\u0447\u0435\u043d\u044c \u043c\u044f\u0433\u043a\u0438\u0439'), (b'soft', '\u041c\u044f\u0433\u043a\u0438\u0439'), (b'hard', '\u0416\u0435\u0441\u0442\u043a\u0438\u0439'), (b'very_hard', '\u041e\u0447\u0435\u043d\u044c \u0436\u0435\u0441\u0442\u043a\u0438\u0439'), (b'no_hardener', '\u0411\u0435\u0437 \u0443\u043f\u043b\u043e\u0442\u043d\u0438\u0442\u0435\u043b\u044f')])),
-                ('type', models.ForeignKey(verbose_name='\u0422\u0438\u043f', to='dictionaries.CollarType')),
             ],
             options={
                 'verbose_name': '\u0412\u043e\u0440\u043e\u0442\u043d\u0438\u043a',
@@ -28,13 +39,21 @@ class Migration(migrations.Migration):
             name='Collection',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('order', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
+                ('filter_title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043b\u044f \u0444\u0438\u043b\u044c\u0442\u0440\u0430')),
+                ('text', models.TextField(verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435')),
+                ('image', models.ImageField(upload_to=b'collection', verbose_name='\u0418\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435')),
                 ('dickey', models.BooleanField(verbose_name='\u041c\u0430\u043d\u0438\u0448\u043a\u0430')),
                 ('clasp', models.BooleanField(verbose_name='\u0417\u0430\u0441\u0442\u0435\u0436\u043a\u0430 \u043f\u043e\u0434 \u0448\u0442\u0438\u0444\u0442\u044b')),
                 ('solid_yoke', models.BooleanField(verbose_name='\u0426\u0435\u043b\u044c\u043d\u0430\u044f \u043a\u043e\u043a\u0435\u0442\u043a\u0430')),
                 ('shawl', models.BooleanField(verbose_name='\u041f\u043b\u0430\u0442\u043e\u043a')),
+                ('sex', models.CharField(default=b'male', max_length=6, verbose_name='\u041f\u043e\u043b \u043a\u043e\u043b\u043b\u0435\u043a\u0446\u0438\u0438', choices=[(b'male', '\u041c\u0443\u0436\u0441\u043a\u0430\u044f'), (b'female', '\u0416\u0435\u043d\u0441\u043a\u0430\u044f'), (b'unisex', '\u0423\u043d\u0438\u0441\u0435\u043a\u0441')])),
+                ('tailoring_time', models.CharField(max_length=255, null=True, verbose_name='\u0412\u0440\u0435\u043c\u044f \u043f\u043e\u0448\u0438\u0432\u0430 \u0438 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0438')),
             ],
             options={
+                'ordering': ('order',),
+                'abstract': False,
                 'verbose_name': '\u041a\u043e\u043b\u043b\u0435\u043a\u0446\u0438\u044f',
                 'verbose_name_plural': '\u041a\u043e\u043b\u043b\u0435\u043a\u0446\u0438\u0438',
             },
@@ -54,8 +73,6 @@ class Migration(migrations.Migration):
             name='ContrastStitch',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('element', models.CharField(max_length=10, verbose_name='\u042d\u043b\u0435\u043c\u0435\u043d\u0442', choices=[(b'shirt', '\u0421\u043e\u0440\u043e\u0447\u043a\u0430'), (b'cuffs', '\u041c\u0430\u043d\u0436\u0435\u0442\u044b'), (b'collar', '\u0412\u043e\u0440\u043e\u0442\u043d\u0438\u043a'), (b'thread', '\u041f\u0435\u0442\u0435\u043b\u044c/\u043d\u0438\u0442\u043e\u043a')])),
-                ('color', models.ForeignKey(verbose_name='\u0426\u0432\u0435\u0442 \u043e\u0442\u0441\u0442\u0440\u043e\u0447\u043a\u0438', to='dictionaries.StitchColor')),
             ],
             options={
                 'verbose_name': '\u041a\u043e\u043d\u0442\u0440\u0430\u0441\u0442\u043d\u0430\u044f \u043e\u0442\u0441\u0442\u0440\u043e\u0447\u043a\u0430',
@@ -66,9 +83,6 @@ class Migration(migrations.Migration):
             name='Cuff',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('hardness', models.CharField(max_length=15, verbose_name='\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c', choices=[(b'very_soft', '\u041e\u0447\u0435\u043d\u044c \u043c\u044f\u0433\u043a\u0438\u0439'), (b'soft', '\u041c\u044f\u0433\u043a\u0438\u0439'), (b'hard', '\u0416\u0435\u0441\u0442\u043a\u0438\u0439'), (b'very_hard', '\u041e\u0447\u0435\u043d\u044c \u0436\u0435\u0441\u0442\u043a\u0438\u0439'), (b'no_hardener', '\u0411\u0435\u0437 \u0443\u043f\u043b\u043e\u0442\u043d\u0438\u0442\u0435\u043b\u044f')])),
-                ('sleeve', models.BooleanField(verbose_name='\u0420\u0443\u043a\u0430\u0432')),
-                ('type', models.ForeignKey(verbose_name='\u0422\u0438\u043f', to='dictionaries.CuffType')),
             ],
             options={
                 'verbose_name': '\u041c\u0430\u043d\u0436\u0435\u0442\u0430',
@@ -79,11 +93,14 @@ class Migration(migrations.Migration):
             name='CustomButtons',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('order', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
-                ('picture', models.ImageField(upload_to=b'', verbose_name='\u0418\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435')),
-                ('type', models.ForeignKey(verbose_name='\u0422\u0438\u043f', to='dictionaries.CustomButtonsType')),
+                ('picture', models.ImageField(upload_to=b'custombuttons', verbose_name='\u0418\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435')),
+                ('color', colorful.fields.RGBColorField(default=b'#FFFFFF', verbose_name='\u0426\u0432\u0435\u0442')),
             ],
             options={
+                'ordering': ('order',),
+                'abstract': False,
                 'verbose_name': '\u041a\u0430\u0441\u0442\u043e\u043c\u043d\u044b\u0435 \u043f\u0443\u0433\u043e\u0432\u0438\u0446\u044b',
                 'verbose_name_plural': '\u041a\u0430\u0441\u0442\u043e\u043c\u043d\u044b\u0435 \u043f\u0443\u0433\u043e\u0432\u0438\u0446\u044b',
             },
@@ -99,16 +116,32 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='ElementStitch',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
+            ],
+            options={
+                'verbose_name': '\u041e\u0442\u0441\u0442\u0440\u043e\u0447\u043a\u0430',
+                'verbose_name_plural': '\u041e\u0442\u0441\u0442\u0440\u043e\u0447\u043a\u0438',
+            },
+        ),
+        migrations.CreateModel(
             name='Fabric',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('code', models.CharField(max_length=20, verbose_name='\u0410\u0440\u0442\u0438\u043a\u0443\u043b')),
-                ('description', models.TextField(verbose_name='\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435')),
-                ('texture', models.ImageField(upload_to=b'', verbose_name='\u0422\u0435\u043a\u0441\u0442\u0443\u0440\u0430')),
-                ('colors', models.ManyToManyField(related_name='color_fabrics', verbose_name='\u0426\u0432\u0435\u0442\u0430', to='dictionaries.FabricColor')),
-                ('designs', models.ManyToManyField(related_name='design_fabrics', verbose_name='\u0414\u0438\u0437\u0430\u0439\u043d', to='dictionaries.FabricColor')),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
+                ('code', models.CharField(unique=True, max_length=20, verbose_name='\u0410\u0440\u0442\u0438\u043a\u0443\u043b')),
+                ('short_description', models.TextField(default=b'', verbose_name='\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435', blank=True)),
+                ('long_description', models.TextField(default=b'', verbose_name='\u041f\u043e\u043b\u043d\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435', blank=True)),
+                ('material', models.CharField(default=b'', max_length=255, verbose_name='\u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b', blank=True)),
+                ('dickey', models.BooleanField(default=False, verbose_name='\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u0432 \u043c\u0430\u043d\u0438\u0448\u043a\u0435')),
+                ('active', models.BooleanField(default=True, verbose_name='\u0410\u043a\u0442\u0438\u0432\u043d\u0430')),
             ],
             options={
+                'ordering': ('code',),
+                'abstract': False,
                 'verbose_name': '\u0422\u043a\u0430\u043d\u044c',
                 'verbose_name_plural': '\u0422\u043a\u0430\u043d\u0438',
             },
@@ -117,8 +150,9 @@ class Migration(migrations.Migration):
             name='FabricPrice',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('price', models.DecimalField(verbose_name='\u0426\u0435\u043d\u0430', max_digits=10, decimal_places=2)),
-                ('fabric', models.ForeignKey(related_name='prices', verbose_name='\u0422\u043a\u0430\u043d\u044c', to='backend.Fabric')),
             ],
             options={
                 'verbose_name': '\u0426\u0435\u043d\u0430 \u0442\u043a\u0430\u043d\u0438',
@@ -129,8 +163,7 @@ class Migration(migrations.Migration):
             name='FabricResidual',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('amount', models.DecimalField(verbose_name='\u041e\u0441\u0442\u0430\u0442\u043e\u043a', max_digits=10, decimal_places=2)),
-                ('fabric', models.ForeignKey(related_name='residuals', verbose_name='\u0422\u043a\u0430\u043d\u044c', to='backend.Fabric')),
+                ('amount', models.DecimalField(default=0, verbose_name='\u041e\u0441\u0442\u0430\u0442\u043e\u043a', max_digits=10, decimal_places=2)),
             ],
             options={
                 'verbose_name': '\u041e\u0441\u0442\u0430\u0442\u043e\u043a \u0442\u043a\u0430\u043d\u0438',
@@ -138,13 +171,25 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='Hardness',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('order', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
+            ],
+            options={
+                'ordering': ('order',),
+                'abstract': False,
+                'verbose_name': '\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c',
+                'verbose_name_plural': '\u0416\u0435\u0441\u0442\u043a\u043e\u0441\u0442\u044c',
+            },
+        ),
+        migrations.CreateModel(
             name='Initials',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('font', models.CharField(max_length=10, verbose_name='\u0428\u0440\u0438\u0444\u0442', choices=[(b'script', b'Script'), (b'arial', b'Arial'), (b'free', b'Free')])),
                 ('location', models.CharField(max_length=10, verbose_name='\u041c\u0435\u0441\u0442\u043e\u043f\u043e\u043b\u043e\u0436\u0435\u043d\u0438\u0435', choices=[(b'button2', '2 \u043f\u0443\u0433\u043e\u0432\u0438\u0446\u0430'), (b'button3', '3 \u043f\u0443\u0433\u043e\u0432\u0438\u0446\u0430'), (b'button4', '4 \u043f\u0443\u0433\u043e\u0432\u0438\u0446\u0430'), (b'button5', '5 \u043f\u0443\u0433\u043e\u0432\u0438\u0446\u0430'), (b'hem', '\u041d\u0438\u0437 (\u043b)'), (b'pocket', '\u041a\u0430\u0440\u043c\u0430\u043d (\u043b)'), (b'cuff', '\u041c\u0430\u043d\u0436\u0435\u0442\u0430 (\u043b)')])),
                 ('text', models.CharField(max_length=255, verbose_name='\u0422\u0435\u043a\u0441\u0442')),
-                ('color', models.ForeignKey(verbose_name='\u0426\u0432\u0435\u0442', to='dictionaries.Color')),
             ],
             options={
                 'verbose_name': '\u0418\u043d\u0438\u0446\u0438\u0430\u043b\u044b',
@@ -155,10 +200,13 @@ class Migration(migrations.Migration):
             name='ShawlOptions',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('order', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
                 ('extra_price', models.DecimalField(verbose_name='\u0414\u043e\u0431\u0430\u0432\u043e\u0447\u043d\u0430\u044f \u0441\u0442\u043e\u0438\u043c\u043e\u0441\u0442\u044c', max_digits=10, decimal_places=2)),
             ],
             options={
+                'ordering': ('order',),
+                'abstract': False,
                 'verbose_name': '\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u043f\u043b\u0430\u0442\u043a\u0430',
                 'verbose_name_plural': '\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u043f\u043b\u0430\u0442\u043a\u0430',
             },
@@ -167,74 +215,58 @@ class Migration(migrations.Migration):
             name='Shirt',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('is_template', models.BooleanField(verbose_name='\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u043a\u0430\u043a \u0448\u0430\u0431\u043b\u043e\u043d')),
-                ('size', models.IntegerField(verbose_name='\u0420\u0430\u0437\u043c\u0435\u0440', choices=[(35, 35), (36, 36), (37, 37), (38, 38), (39, 39), (40, 40), (41, 41), (42, 42)])),
-                ('hem', models.CharField(max_length=10, verbose_name='\u041d\u0438\u0437', choices=[(b'straight', '\u041f\u0440\u044f\u043c\u043e\u0439'), (b'figured', '\u0424\u0438\u0433\u0443\u0440\u043d\u044b\u0439')])),
-                ('placket', models.CharField(max_length=10, verbose_name='\u041f\u043e\u043b\u043e\u0447\u043a\u0430', choices=[(b'plank', '\u0421 \u043f\u043b\u0430\u043d\u043a\u043e\u0439'), (b'hidden', '\u0421\u043a\u0440\u044b\u0442\u0430\u044f \u0437\u0430\u0441\u0442\u0435\u0436\u043a\u0430'), (b'no_plank', '\u0411\u0435\u0437 \u043f\u043b\u0430\u043d\u043a\u0438')])),
-                ('pocket', models.CharField(max_length=10, verbose_name='\u041a\u0430\u0440\u043c\u0430\u043d', choices=[(b'none', '\u0411\u0435\u0437 \u043a\u0430\u0440\u043c\u0430\u043d\u0430'), (b'rounded', '\u0417\u0430\u043a\u0440\u0443\u0433\u043b\u0435\u043d\u043d\u044b\u0435 \u0443\u0433\u043b\u044b'), (b'straight', '\u041f\u0440\u044f\u043c\u044b\u0435 \u0443\u0433\u043b\u044b')])),
-                ('tuck', models.BooleanField(verbose_name='\u0412\u044b\u0442\u0430\u0447\u043a\u0438')),
-                ('back', models.CharField(max_length=10, verbose_name='\u0421\u043f\u0438\u043d\u043a\u0430', choices=[(b'no_folds', '\u0411\u0435\u0437 \u0441\u043a\u043b\u0430\u0434\u043e\u043a'), (b'one_fold', '\u041e\u0434\u043d\u0430 \u0441\u043a\u043b\u0430\u0434\u043a\u0430'), (b'two_folds', '\u0414\u0432\u0435 \u0441\u043a\u043b\u0430\u0434\u043a\u0438')])),
-                ('clasp', models.BooleanField(verbose_name='\u0417\u0430\u0441\u0442\u0435\u0436\u043a\u0430 \u043f\u043e\u0434 \u0448\u0442\u0438\u0444\u0442\u044b')),
+                ('is_template', models.BooleanField(default=False, verbose_name='\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u043a\u0430\u043a \u0448\u0430\u0431\u043b\u043e\u043d')),
+                ('is_standard', models.BooleanField(default=False, verbose_name='\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u043a\u0430\u043a \u0441\u0442\u0430\u043d\u0434\u0430\u0440\u0442\u043d\u044b\u0439 \u0432\u0430\u0440\u0438\u0430\u043d\u0442', editable=False)),
+                ('code', models.CharField(max_length=255, null=True, verbose_name='\u0410\u0440\u0442\u0438\u043a\u0443\u043b')),
+                ('individualization', models.TextField(null=True, verbose_name='\u0418\u043d\u0434\u0438\u0432\u0438\u0434\u0443\u0430\u043b\u0438\u0437\u0430\u0446\u0438\u044f', blank=True)),
+                ('showcase_image', models.ImageField(upload_to=b'showcase', null=True, verbose_name='\u0418\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435 \u0434\u043b\u044f \u0432\u0438\u0442\u0440\u0438\u043d\u044b')),
+                ('tuck', models.BooleanField(default=False, verbose_name='\u0412\u044b\u0442\u0430\u0447\u043a\u0438', choices=[(False, '\u0411\u0435\u0437 \u0432\u044b\u0442\u0430\u0447\u043a\u0438'), (True, '\u0421 \u0432\u044b\u0442\u0430\u0447\u043a\u0430\u043c\u0438')])),
+                ('clasp', models.BooleanField(default=False, verbose_name='\u0417\u0430\u0441\u0442\u0435\u0436\u043a\u0430 \u043f\u043e\u0434 \u0448\u0442\u0438\u0444\u0442\u044b', choices=[(False, '\u041d\u0435 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u044c \u0437\u0430\u0441\u0442\u0435\u0436\u043a\u0443'), (True, '\u0418\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u044c \u0437\u0430\u0441\u0442\u0435\u0436\u043a\u0443')])),
                 ('stitch', models.CharField(max_length=10, verbose_name='\u0428\u0438\u0440\u0438\u043d\u0430 \u043e\u0442\u0441\u0442\u0440\u043e\u0447\u043a\u0438', choices=[(b'none', '0 \u043c\u043c (\u0431\u0435\u0437 \u043e\u0442\u0441\u0442\u0440\u043e\u0447\u043a\u0438)'), (b'1mm', '1 \u043c\u043c (\u0442\u043e\u043b\u044c\u043a\u043e \u0441\u044a\u0435\u043c\u043d\u044b\u0435 \u043a\u043e\u0441\u0442\u043e\u0447\u043a\u0438)'), (b'5mm', '5 \u043c\u043c')])),
-                ('collar', models.OneToOneField(verbose_name='\u0412\u043e\u0440\u043e\u0442\u043d\u0438\u043a', to='backend.Collar')),
-                ('cuffs', models.OneToOneField(verbose_name='\u041c\u0430\u043d\u0436\u0435\u0442\u044b', to='backend.Cuff')),
-                ('custom_buttons', models.ForeignKey(verbose_name='\u041a\u0430\u0441\u0442\u043e\u043c\u043d\u044b\u0435 \u043f\u0443\u0433\u043e\u0432\u0438\u0446\u044b', blank=True, to='backend.CustomButtons', null=True)),
-                ('dickey', models.OneToOneField(null=True, blank=True, to='backend.Dickey', verbose_name='\u041c\u0430\u043d\u0438\u0448\u043a\u0430')),
-                ('fabric', models.ForeignKey(verbose_name='\u0422\u043a\u0430\u043d\u044c', to='backend.Fabric')),
-                ('initials', models.OneToOneField(null=True, blank=True, to='backend.Initials', verbose_name='\u0418\u043d\u0438\u0446\u0438\u0430\u043b\u044b')),
-                ('shawl', models.ForeignKey(verbose_name='\u041f\u043b\u0430\u0442\u043e\u043a', to='backend.ShawlOptions')),
-                ('yoke', models.ForeignKey(verbose_name='\u041a\u043e\u043a\u0435\u0442\u043a\u0430', to='dictionaries.YokeType')),
+                ('price', models.DecimalField(verbose_name='\u0426\u0435\u043d\u0430', null=True, editable=False, max_digits=10, decimal_places=2)),
             ],
             options={
+                'ordering': ('code',),
                 'verbose_name': '\u0420\u0443\u0431\u0430\u0448\u043a\u0430',
                 'verbose_name_plural': '\u0420\u0443\u0431\u0430\u0448\u043a\u0438',
+            },
+        ),
+        migrations.CreateModel(
+            name='ShirtImage',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('image', models.ImageField(upload_to=b'showcase', verbose_name='\u0418\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435')),
+                ('shirt', models.ForeignKey(related_name='shirt_images', to='backend.Shirt')),
+            ],
+            options={
+                'verbose_name': '\u0418\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435',
+                'verbose_name_plural': '\u0418\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f',
+            },
+        ),
+        migrations.CreateModel(
+            name='Stays',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('order', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
+                ('collections', models.ManyToManyField(related_name='stays', verbose_name='\u041a\u043e\u043b\u043b\u0435\u043a\u0446\u0438\u0438', to='backend.Collection')),
+            ],
+            options={
+                'ordering': ('order',),
+                'abstract': False,
+                'verbose_name': '\u041a\u043e\u0441\u0442\u043e\u0447\u043a\u0438',
+                'verbose_name_plural': '\u041a\u043e\u0441\u0442\u043e\u0447\u043a\u0438',
             },
         ),
         migrations.CreateModel(
             name='Storehouse',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('title', models.CharField(max_length=255, verbose_name='\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435')),
-                ('collection', models.ForeignKey(verbose_name='\u041a\u043e\u043b\u043b\u0435\u043a\u0446\u0438\u044f', to='backend.Collection')),
+                ('country', models.CharField(unique=True, max_length=255, verbose_name='\u0421\u0442\u0440\u0430\u043d\u0430')),
             ],
             options={
                 'verbose_name': '\u0421\u043a\u043b\u0430\u0434',
                 'verbose_name_plural': '\u0421\u043a\u043b\u0430\u0434\u044b',
             },
-        ),
-        migrations.AddField(
-            model_name='fabricresidual',
-            name='storehouse',
-            field=models.ForeignKey(related_name='residuals', verbose_name='\u0421\u043a\u043b\u0430\u0434', to='backend.Storehouse'),
-        ),
-        migrations.AddField(
-            model_name='fabricprice',
-            name='storehouse',
-            field=models.ForeignKey(related_name='prices', verbose_name='\u0421\u043a\u043b\u0430\u0434', to='backend.Storehouse'),
-        ),
-        migrations.AddField(
-            model_name='dickey',
-            name='fabric',
-            field=models.ForeignKey(to='backend.Fabric'),
-        ),
-        migrations.AddField(
-            model_name='dickey',
-            name='type',
-            field=models.ForeignKey(to='dictionaries.DickeyType'),
-        ),
-        migrations.AddField(
-            model_name='contraststitch',
-            name='shirt',
-            field=models.ForeignKey(to='backend.Shirt'),
-        ),
-        migrations.AddField(
-            model_name='contrastdetails',
-            name='fabric',
-            field=models.ForeignKey(verbose_name='\u0422\u043a\u0430\u043d\u044c', to='backend.Fabric'),
-        ),
-        migrations.AddField(
-            model_name='contrastdetails',
-            name='shirt',
-            field=models.ForeignKey(verbose_name='\u0420\u0443\u0431\u0430\u0448\u043a\u0430', to='backend.Shirt'),
         ),
     ]

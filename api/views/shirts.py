@@ -15,6 +15,19 @@ from api import serializers
 from api.filters import TemplateShirtsFilter
 from processing.rendering.image_cache import ShirtImageCache
 
+__all__ = [
+    'ShirtInfoListView', 'ShowcaseShirtsListView', 'TemplateShirtDetails', 'TemplateShirtsFiltersList', 'ShirtDetails',
+    'ShirtImage'
+]
+
+
+class ShirtInfoListView(ListAPIView):
+    """
+    Информация о рубашках для отображения на экране выборе коллекций
+    """
+    queryset = dictionaries.ShirtInfo.objects.all()
+    serializer_class = serializers.ShirtInfoSerializer
+
 
 class ShowcaseShirtsListView(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
@@ -107,7 +120,8 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             self.build_filter(_(u'Цвет'), 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
             self.build_filter(_(u'Дизайн'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
             self.build_filter(_(u'Тип ткани'), 'fabric__type', list(fabric_types.values('id', 'title').distinct())),
-            self.build_filter(_(u'Толщина ткани'), 'fabric__thickness', list(thickness.values('id', 'title').distinct())),
+            self.build_filter(_(u'Толщина ткани'), 'fabric__thickness',
+                              list(thickness.values('id', 'title').distinct())),
             self.build_filter(_(u'Сортировка'), 'ordering', self.get_ordering_options())
         ])
 
