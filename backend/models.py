@@ -340,15 +340,10 @@ class Shirt(models.Model):
                                          format='JPEG',
                                          options={'quality': 80})
 
-    showcase_image_detail_hd = ImageSpecField(source='showcase_image',
-                                           processors=[ResizeToFill(*settings.SHOWCASE_DETAILS_IMAGE_SIZE_HD)],
-                                           format='JPEG',
-                                           options={'quality': 80})
-
     showcase_image_detail = ImageSpecField(source='showcase_image',
                                            processors=[ResizeToFill(*settings.SHOWCASE_DETAILS_IMAGE_SIZE)],
                                            format='JPEG',
-                                           options={'quality': 70})
+                                           options={'quality': 80})
 
     size_option = models.ForeignKey('dictionaries.SizeOptions', verbose_name=_(u'Выбранный вариант размера'))
     size = models.ForeignKey('dictionaries.Size', verbose_name=_(u'Размер'), blank=True, null=True)
