@@ -130,17 +130,6 @@ class InitialsConfigurationAdmin(admin.ModelAdmin):
 
     inlines = [InitialsPositionInline]
 
-admin.site.register(models.BodyConfiguration, SourceAdmin)
-admin.site.register(models.CollarConfiguration, CollarSourceAdmin)
-admin.site.register(models.CuffConfiguration, CuffSourceAdmin)
-admin.site.register(models.BackConfiguration, SourceAdmin)
-admin.site.register(models.PocketConfiguration, SourceAdmin)
-admin.site.register(models.PlacketConfiguration, PlacketAdmin)
-admin.site.register(models.DickeyConfiguration, SourceAdmin)
-admin.site.register(models.YokeConfiguration, SourceAdmin)
-admin.site.register(models.BodyButtonsConfiguration, ButtonsSourceAdmin)
-admin.site.register(models.CollarButtonsConfiguration, ButtonsSourceAdmin)
-admin.site.register(models.CuffButtonsConfiguration, CuffButtonsAdmin)
+
 admin.site.register(models.Texture, TextureAdmin)
 admin.site.register(models.StitchColor, StitchColorAdmin)
-admin.site.register(models.InitialsConfiguration, InitialsConfigurationAdmin)

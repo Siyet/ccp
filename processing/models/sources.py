@@ -14,8 +14,7 @@ from backend.models import ContrastDetails
 from processing.upload_path import UploadComposingSource
 from processing.specs import TextureSample, TextureSampleThumbnail, Generators
 from processing.storage import overwrite_storage
-from .configuration import CollarConfiguration, CuffConfiguration
-
+from .configuration import CuffConfiguration
 from .mixins import ModelDiffMixin
 
 PROJECTION = Choices(("front", _(u'Передняя')), ("side", _(u"Боковая")), ("back", _(u'Задняя')))
@@ -60,13 +59,16 @@ class ButtonsSource(CachedSource, ProjectionModel):
 
 
 class CollarMask(CachedSource, ProjectionModel):
-    collar = models.ForeignKey(CollarConfiguration, related_name='masks')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
     mask = models.FileField(verbose_name=_(u'Файл маски'), storage=overwrite_storage,
                             upload_to=UploadComposingSource('composesource/%s/%s'))
     element = models.CharField(_(u'Элемент'), choices=ContrastDetails.COLLAR_ELEMENTS, max_length=20)
 
     class Meta:
-        unique_together = ('collar', 'element', 'projection')
+        unique_together = ('object_id', 'content_type', 'element', 'projection')
         verbose_name = _(u'Маска воротника')
         verbose_name_plural = _(u'Маски воротника')
 
