@@ -10,6 +10,8 @@ from backend import models as backend
 from processing.upload_path import UploadComposingSource
 from processing.storage import overwrite_storage
 
+from core.constants import SEX
+
 
 class CachedSource(models.Model):
     cache = GenericRelation('processing.SourceCache')
@@ -27,7 +29,7 @@ class ConfigurationModel(models.Model):
 
 
 class UnisexModel(models.Model):
-    sex = models.CharField(max_length=10, choices=backend.SEX, default=backend.SEX.male)
+    sex = models.CharField(max_length=10, choices=SEX, default=SEX.male)
 
     class Meta:
         abstract = True

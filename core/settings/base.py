@@ -42,6 +42,8 @@ INSTALLED_APPS = (
     'backend',
     'checkout',
     'processing',
+    'processing.male_configs',
+    'processing.female_configs',
 
     # should be the last
     'django_cleanup'

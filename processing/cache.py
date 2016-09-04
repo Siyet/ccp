@@ -9,8 +9,8 @@ from django.contrib.contenttypes.models import ContentType
 from scipy import ndimage
 
 from processing.models import SourceCache, CACHE_RESOLUTION
-from processing.men.models import ManBodyConfiguration
-from processing.women.models import WomanBodyConfiguration
+from processing.male_configs.models import MaleBodyConfiguration
+from processing.female_configs.models import FemaleBodyConfiguration
 from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
 from core.settings.base import RENDER
 
@@ -79,7 +79,7 @@ class CacheBuilder(object):
                     img = img.resize(scale_tuple(img.size, resize_factor), Image.LANCZOS)
                 array = np.asarray(img).astype('float32') / 255.0
             content_object = getattr(instance, 'content_object', None)
-            if isinstance(content_object, WomanBodyConfiguration) or isinstance(content_object, ManBodyConfiguration):
+            if isinstance(content_object, FemaleBodyConfiguration) or isinstance(content_object, MaleBodyConfiguration):
                 matrix = Matrix(array)
             else:
                 try:

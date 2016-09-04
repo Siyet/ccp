@@ -7,7 +7,7 @@ from django.conf import settings
 from PIL import Image
 
 from processing.models import CACHE_RESOLUTION
-from processing.rendering.builder import ShirtBuilder
+from processing.rendering.builders.factory import ShirtBuilderFactory
 from api.serializers import ShirtDetailsSerializer
 
 
@@ -43,14 +43,14 @@ class ShirtImageCache(object):
         key = sha1(json.dumps(data)).hexdigest()
         (full_path, filename) = path_for_key(key)
         image = None
+        builder = ShirtBuilderFactory.get_builder_for_shirt(data, projection, resolution)
         if not os.path.isfile(full_path):
-            builder = ShirtBuilder(data, projection, resolution)
             image = builder.build_shirt()
             image.save(full_path)
         # only append initials
         if initials:
             image = image or Image.open(full_path)
-            ShirtBuilder.add_initials(image, initials, projection, data['pocket'])
+            builder.add_initials(image, initials, projection, data['pocket'])
             (full_path, filename) = path_for_key(base_key)
             image.save(full_path)
 

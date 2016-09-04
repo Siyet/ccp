@@ -1,6 +1,6 @@
 from django.http.response import HttpResponse
 
-from processing.rendering.builder import ShirtBuilder
+from processing.rendering.builders.factory import ShirtBuilderFactory
 from models import PROJECTION, CACHE_RESOLUTION
 from api.serializers import ShirtDetailsSerializer
 from backend.models import Shirt
@@ -11,10 +11,10 @@ def shirt(request, pk, *args, **kwargs):
     initials = data.get('initials', None)
     projection = request.GET.get("projection") or PROJECTION.front
     resolution = request.GET.get("resolution") or CACHE_RESOLUTION.preview
-    bldr = ShirtBuilder(data, projection, resolution=resolution)
+    bldr = ShirtBuilderFactory.get_builder_for_shirt(data, projection, resolution=resolution)
     response = HttpResponse(content_type="image/png")
     image = bldr.build_shirt()
     if initials:
-        ShirtBuilder.add_initials(image, initials, projection, data['pocket'])
+        bldr.add_initials(image, initials, projection, data['pocket'])
     image.save(response, "PNG")
     return response

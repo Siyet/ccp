@@ -12,7 +12,7 @@ from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
-from .utils import hex_to_rgb, scale_tuple, draw_rotated_text
+from processing.rendering.utils import hex_to_rgb, scale_tuple, draw_rotated_text
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder, STITCHES
 
@@ -27,14 +27,19 @@ class CacheBuilderMock(object):
         pass
 
 
-cache_builder = CacheBuilderMock
-# cache_builder = CacheBuilder
+class BaseShirtBuilder(object):
+    cache_builder = CacheBuilderMock
+    # cache_builder = CacheBuilder
 
-
-class ShirtBuilder(object):
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
+        self.is_ready = False
+        self.shirt_data = shirt_data
         self.resolution = resolution
         self.projection = projection
+
+
+    def _setup(self):
+        shirt_data = self.shirt_data
         self.collar = self.extract(shirt_data, 'collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
         self.pocket = self.extract(shirt_data, 'pocket')
@@ -77,7 +82,7 @@ class ShirtBuilder(object):
 
     def get_fabric_texture(self, fabric_id):
         fabric = Fabric.objects.select_related('texture').get(pk=fabric_id)
-        cache_builder.cache_texture(fabric.texture)
+        self.cache_builder.cache_texture(fabric.texture)
         return fabric.texture
 
     @lazy
@@ -91,13 +96,7 @@ class ShirtBuilder(object):
 
     @lazy
     def collar_conf(self):
-        try:
-            collar_conf = compose.CollarConfiguration.objects.prefetch_related('masks').get(
-                collar_id=self.collar['type'],
-                buttons=self.collar_buttons)
-            return collar_conf
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist("Collar configuration not found for given parameters: %s" % self.collar)
+        raise NotImplementedError()
 
     @lazy
     def collar_model(self):
@@ -105,129 +104,11 @@ class ShirtBuilder(object):
 
     @lazy
     def cuff_conf(self):
-        try:
-            cuff_conf = compose.CuffConfiguration.objects.get(cuff_types__id=self.cuff['type'] if self.cuff else None,
-                                                              rounding_id=self.cuff['rounding'] if self.cuff else None)
-            return cuff_conf
-        except ObjectDoesNotExist:
-            raise ObjectDoesNotExist("Collar configuration not found for given parameters: %s" % self.collar)
+        raise NotImplementedError()
 
     @lazy
     def cuff_model(self):
         return self.cuff_conf.sources.filter(projection=self.projection).first()
-
-    def append_dickey(self):
-        if self.projection == compose.PROJECTION.back or not self.dickey:
-            return None
-        start = time()
-        conf = self.get_compose_configuration(compose.DickeyConfiguration, {
-            'dickey_id': self.dickey['type'],
-            'hem_id': self.hem
-        })
-        cache_builder.create_cache(conf, ('light', 'uv'), resolution=self.resolution)
-        cache_builder.create_cache(self.cuff_conf, ('side_mask',), resolution=self.resolution)
-        light = conf.cache.get(source_field='light', resolution=self.resolution)
-        alpha = conf.cache.get(source_field='uv_alpha', resolution=self.resolution)
-        alpha_img = Image.open(alpha.file.path)
-        dickey_alphas = []
-        for alpha_cache in self.alphas:
-            if isinstance(alpha_cache.content_object.content_object, compose.CollarConfiguration) or \
-                    isinstance(alpha_cache.content_object.content_object, compose.CuffConfiguration):
-                dickey_alphas.append(alpha_cache)
-        if self.projection == compose.PROJECTION.side and self.sleeve.cuffs:
-            dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask', resolution=self.resolution))
-        for alpha_cache in dickey_alphas:
-            part_alpha = Image.open(alpha_cache.file.path)
-            part_position = alpha_cache.position
-            part_layer = Image.new(alpha_img.mode, alpha_img.size)
-            part_layer.paste(part_alpha, (
-                part_position[0] - alpha.position[0],
-                part_position[1] - alpha.position[1]
-            ))
-            alpha_img = ImageChops.subtract(alpha_img, part_layer)
-
-        texture = self.get_fabric_texture(self.dickey['fabric'])
-        dickey = Composer.create_dickey(
-            texture=texture.cache.get(resolution=self.resolution).file.path,
-            uv=np.load(conf.cache.get(source_field='uv', resolution=self.resolution).file.path),
-            alpha=alpha_img
-        )
-        print("dickey", time() - start)
-        return ImageConf(dickey, light.position)
-
-    def build_shirt(self):
-        total = time()
-        start = time()
-        texture = self.get_fabric_texture(self.fabric)
-        cache_builder.cache_texture(texture)
-        self.append_model(self.get_compose_configuration(compose.BodyConfiguration, {
-            'sleeve_id': self.sleeve.id,
-            'hem_id': self.hem,
-            'cuff_types__id': self.cuff['type'] if self.cuff else None
-        }))
-        self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
-        if self.sleeve.cuffs:
-            self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
-        self.append_model(self.get_compose_configuration(compose.PocketConfiguration, {
-            'pocket_id': self.pocket
-        }))
-        self.append_model(self.get_back())
-        self.append_model(self.get_compose_configuration(compose.PlacketConfiguration, {
-            'plackets': self.placket.id,
-            'hem_id': self.hem
-        }), post_shadow=True)
-        if self.projection == compose.PROJECTION.back and self.yoke:
-            self.append_model(self.get_compose_configuration(compose.YokeConfiguration, {
-                'yoke_id': self.yoke
-            }))
-
-        if self.projection != compose.PROJECTION.back and self.placket.show_buttons:
-            buttons_conf = self.get_buttons_conf(compose.BodyButtonsConfiguration, {})
-            self.append_buttons_stitches(buttons_conf)
-
-        if self.cuff and self.sleeve.cuffs:
-            self.append_buttons_stitches(self.get_buttons_conf(compose.CuffButtonsConfiguration, {
-                'cuff_id': self.cuff['type'],
-                'rounding_types__id': self.cuff['rounding']
-            }))
-
-        self.append_buttons_stitches(self.get_buttons_conf(compose.CollarButtonsConfiguration, {
-            'collar_id': self.collar['type'],
-            'buttons': self.collar_buttons
-        }))
-
-        uv = Composer.compose_uv(self.uv)
-        light = Composer.compose_light(self.lights)
-        if texture.needs_shadow:
-            shadow = Composer.compose_light(self.shadows)
-        else:
-            shadow = None
-        alpha = Composer.compose_alpha(self.alphas)
-        dickey = self.append_dickey()
-        print("preparation", time() - start)
-        start = time()
-
-        res = Composer.create(
-            texture=texture.cache.get(resolution=self.resolution).file.path,
-            uv=uv,
-            light=light,
-            shadow=shadow,
-            post_shadows=self.post_shadows,
-            alpha=alpha,
-            buttons=self.buttons,
-            lower_stitches=self.lower_stitches,
-            upper_stitches=self.upper_stitches,
-            dickey=dickey,
-            extra_details=self.extra_details,
-            base_layer=self.base_layer
-        )
-        if self.initials:
-            ShirtBuilder.add_initials(res, self.initials, self.resolution, self.pocket)
-
-        print("compose", time() - start)
-        print("total", time() - total)
-
-        return res
 
     def append_buttons_stitches(self, conf):
         if conf is None:
@@ -238,10 +119,9 @@ class ShirtBuilder(object):
         self.append_stitches(stitches)
 
     def append_model(self, model, post_shadow=False):
-
         if model is None:
             return
-        cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
+        self.cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
         self.uv.append(model.cache.get(source_field='uv', resolution=self.resolution))
         try:
             self.lights.append(model.cache.get(source_field='light', resolution=self.resolution))
@@ -263,7 +143,7 @@ class ShirtBuilder(object):
 
         for conf in stitches:
             try:
-                cache_builder.create_cache(stitches, ('image',), resolution=self.resolution,
+                self.cache_builder.create_cache(stitches, ('image',), resolution=self.resolution,
                                            field_types={'image': STITCHES})
                 cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
@@ -293,7 +173,7 @@ class ShirtBuilder(object):
         if conf is None:
             return
         try:
-            cache_builder.create_cache(conf, ('image', 'ao'), resolution=self.resolution)
+            self.cache_builder.create_cache(conf, ('image', 'ao'), resolution=self.resolution)
             buttons_cache = conf.cache.get(source_field='image', resolution=self.resolution)
         except Exception as e:
             print(e.message)
@@ -320,18 +200,16 @@ class ShirtBuilder(object):
                 self.post_shadows.append(ImageConf.for_cache(ao))
 
     def get_compose_configuration(self, model, filters):
+        configurations = self.get_compose_configurations(model, filters)
+        return configurations.first() if configurations else None
+
+    def get_compose_configurations(self, model, filters):
         filters = map(lambda (k, v): Q(**{k: v}) | Q(**{"%s__isnull" % k: True}), filters.iteritems())
         try:
             configuration = model.objects.get(*filters)
-            return configuration.sources.filter(projection=self.projection).first()
+            return configuration.sources.filter(projection=self.projection)
         except ObjectDoesNotExist:
             return None
-
-    def get_back(self):
-        if not self.back:
-            return None
-        back_conf = compose.BackConfiguration.objects.get(back_id=self.back, tuck_id=self.tuck, hem_id=self.hem)
-        return back_conf.sources.filter(projection=self.projection).first()
 
     def get_buttons_conf(self, model, filters):
         filters = map(lambda (k, v): Q(**{k: v}) | Q(**{"%s__isnull" % k: True}), filters.iteritems())
@@ -389,7 +267,7 @@ class ShirtBuilder(object):
             return self.append_model(model)
         present_part_keys = filter(lambda k: k in part_keys, all_detail_keys)
         part_details = filter(lambda k: k['element'] in part_keys, self.contrast_details)
-        cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
+        self.cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
         uv = np.load(model.cache.get(source_field='uv', resolution=self.resolution).file.path)
         light_conf = model.cache.get(source_field='light', resolution=self.resolution)
         ao = model.cache.get(source_field='ao', resolution=self.resolution).file.path
@@ -402,7 +280,7 @@ class ShirtBuilder(object):
             for detail in part_details:
                 mask = conf.masks.filter(element=detail['element'], projection=self.projection).first()
                 if mask:
-                    cache_builder.create_cache(mask, ('mask',), resolution=self.resolution)
+                    self.cache_builder.create_cache(mask, ('mask',), resolution=self.resolution)
                     detail_masks.append((detail, mask))
 
             if detail_masks:
@@ -414,15 +292,16 @@ class ShirtBuilder(object):
                 if cuff_element:
                     self.append_solid_contrasting_part(ao, light_conf, model, cuff_element['fabric'], uv)
 
-    @staticmethod
-    def add_initials(image, initials, projection, pocket):
+    @classmethod
+    def get_initials_configuration(cls, initials, pocket):
+        raise NotImplementedError()
+
+    @classmethod
+    def add_initials(cls, image, initials, projection, pocket):
         if not initials:
             return
 
-        configurations = compose.InitialsConfiguration.objects.filter(
-            font_id=initials['font'], location=initials['location'], pocket=pocket
-        ).select_related('font')
-        initials_configuration = configurations.first()
+        initials_configuration = cls.get_initials_configuration(initials, pocket)
         if not initials_configuration:
             return
         position = initials_configuration.positions.filter(projection=projection).first()
@@ -434,8 +313,6 @@ class ShirtBuilder(object):
         font_size = int(round(image_scale * initials_configuration.font_size))
         font = ImageFont.truetype(initials_configuration.font.font.path, font_size, encoding='utf-8')
         text = draw_rotated_text(unicode(initials['text']), font, position.rotate)
-        text.save('/tmp/al_text.png')
         initials_position = (int(position.left * image.size[0]), int(position.top * image.size[1]))
         colorized_text = ImageOps.colorize(text, (0, 0, 0), color)
-        colorized_text.save('/tmp/text.png')
         image.paste(colorized_text, initials_position, text)

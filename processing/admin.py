@@ -43,7 +43,7 @@ class ManyToManyMixin(object):
         return super(ManyToManyMixin, self).get_queryset(request).prefetch_related(*prefetch_fields)
 
 
-class CollarMaskInline(admin.TabularInline):
+class CollarMaskInline(GenericTabularInline):
     model = models.CollarMask
     max_num = 12
     fields = ('projection', 'mask', 'element')
