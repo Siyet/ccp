@@ -5,12 +5,14 @@ import sys
 from django.core.management import BaseCommand
 
 from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration, CACHE_RESOLUTION, Texture
+from processing.female_configs.models import FemaleBodySource
 from processing.cache import CacheBuilder, STITCHES
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         self.cache_sources(ComposeSource, ['uv', 'light', 'ao'])
+        self.cache_sources(FemaleBodySource, ['uv', 'light', 'ao'])
         self.cache_sources(ButtonsSource, ['image', 'ao'])
         self.cache_sources(StitchesSource, ['image'], {'image': STITCHES})
         self.cache_sources(CuffMask, ['mask'])

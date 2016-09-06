@@ -10,3 +10,13 @@ class ProcessingConfig(AppConfig):
     def ready(self):
         # noinspection PyUnresolvedReferences
         from processing import signals
+
+
+class ManProcessingConfig(AppConfig):
+    name = 'processing.male_configs'
+    verbose_name = _(u'Рендеринг (мужчины)')
+
+
+class WomanProcessingConfig(AppConfig):
+    name = 'processing.female_configs'
+    verbose_name = _(u'Рендеринг (женщины)')

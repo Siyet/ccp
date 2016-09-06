@@ -111,7 +111,6 @@ def paste(source, image_conf):
 
 
 class Composer(object):
-    from .utils import uv_to_image
     @staticmethod
     def compose_uv(sources):
         base = np.load(sources[0].file.path)

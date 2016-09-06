@@ -19,12 +19,7 @@ from colorful.fields import RGBColorField
 from core.utils import first
 from dictionaries.models import FabricCategory, SleeveType, ResolveDefault
 from backend import managers
-
-SEX = Choices(
-    ('male', _(u'Мужская')),
-    ('female', _(u'Женская')),
-    ('unisex', _(u'Унисекс')),
-)
+from core import constants
 
 
 class Collection(OrderedModel):
@@ -39,7 +34,7 @@ class Collection(OrderedModel):
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
     tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'))
-    sex = models.CharField(_(u'Пол коллекции'), choices=SEX, max_length=6, default=SEX.male, blank=False)
+    sex = models.CharField(_(u'Пол коллекции'), choices=constants.SEX, max_length=6, default=constants.SEX.male, blank=False)
     tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
 
     def __unicode__(self):
