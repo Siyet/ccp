@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from scipy import ndimage
 
-from processing.models import SourceCache, CACHE_RESOLUTION
+from processing.models import SourceCache, CACHE_RESOLUTION, PROJECTION, CuffConfiguration
 from processing.male_configs.models import MaleBodyConfiguration
 from processing.female_configs.models import FemaleBodyConfiguration
 from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
@@ -18,6 +18,14 @@ EXR_FIELD = 'EXR'
 RGBA_FIELD = 'RGBA'
 L_FIELD = 'L'
 STITCHES = 'S'
+
+
+def is_base_layer(model):
+    content_object = getattr(model, 'content_object', None)
+    is_body = isinstance(content_object, FemaleBodyConfiguration) or isinstance(content_object, MaleBodyConfiguration)
+    is_cuffs = isinstance(content_object, CuffConfiguration)
+    is_back_cuffs = is_cuffs and model.projection == PROJECTION.back
+    return is_body or is_back_cuffs
 
 
 class CacheBuilder(object):
@@ -35,7 +43,8 @@ class CacheBuilder(object):
         'ao': RGBA_FIELD,
         'uv_alpha': L_FIELD,
         'mask': L_FIELD,
-        'side_mask': L_FIELD
+        'side_mask': L_FIELD,
+        'shadow': RGBA_FIELD
     }
 
     @staticmethod
@@ -67,7 +76,6 @@ class CacheBuilder(object):
                 if is_preview:
                     array = ndimage.zoom(array, [preview_scale, preview_scale, 1], order=0)
 
-
             else:
                 img = image_from_array(array)
                 field_type = field_types.get(field) or CacheBuilder.DEFAULT_FIELD_TYPES.get(field)
@@ -78,8 +86,8 @@ class CacheBuilder(object):
                         resize_factor /= 2.0
                     img = img.resize(scale_tuple(img.size, resize_factor), Image.LANCZOS)
                 array = np.asarray(img).astype('float32') / 255.0
-            content_object = getattr(instance, 'content_object', None)
-            if isinstance(content_object, FemaleBodyConfiguration) or isinstance(content_object, MaleBodyConfiguration):
+
+            if is_base_layer(instance):
                 matrix = Matrix(array)
             else:
                 try:

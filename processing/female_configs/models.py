@@ -6,8 +6,17 @@ from dictionaries import models as dictionaries
 
 from django.utils.translation import ugettext_lazy as _
 from processing.models.configuration import UnisexModel
-from processing.models.sources import ComposeSource
+from processing.models.sources import AbstractComposeSource
 from core.constants import SEX
+
+
+class FemaleBodySource(AbstractComposeSource):
+    back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), null=True, blank=True)
+
+    class Meta(AbstractComposeSource.Meta):
+        unique_together = ('content_type', 'object_id', 'projection', 'back')
+        verbose_name = _(u'Модель сборки основы')
+        verbose_name_plural = _(u'Модели сборки основы')
 
 
 class FemaleConfigurationManager(models.Manager):
@@ -27,11 +36,12 @@ class FemaleConfigurationModel(models.Model):
         abstract = True
 
 
-class FemaleBodyConfiguration(PartConfigurationModel):
+class FemaleBodyConfiguration(ConfigurationModel):
     sleeve = models.ForeignKey(dictionaries.SleeveType, verbose_name=_(u'Рукав'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
     cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
     tuck = models.ForeignKey(dictionaries.TuckType, verbose_name=_(u'Вытачки'))
+    sources = GenericRelation(FemaleBodySource)
 
     class Meta:
         verbose_name = _(u'Конфигурация сборки для основы')
@@ -47,7 +57,7 @@ class FemaleCollarConfiguration(PartConfigurationModel):
         verbose_name_plural = _(u'Конфигурации сборки для воротника')
 
 
-class FemaleCuffConfiguration(CuffConfiguration):
+class FemaleCuffConfiguration(FemaleConfigurationModel, CuffConfiguration):
     class Meta:
         proxy = True
         verbose_name = CuffConfiguration._meta.verbose_name
@@ -107,13 +117,9 @@ class FemaleInitialsConfiguration(FemaleConfigurationModel, InitialsConfiguratio
         verbose_name_plural = InitialsConfiguration._meta.verbose_name_plural
 
 
-class FemaleBodySource(ComposeSource):
-    back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), null=True, blank=True)
-
-
 class FemaleBackShadow(CachedSource):
     back = models.OneToOneField('dictionaries.BackType', verbose_name=_(u'Спинка'))
-    models.FileField(verbose_name=_(u'Файл тени'), storage=overwrite_storage,
+    shadow = models.FileField(verbose_name=_(u'Файл тени'), storage=overwrite_storage,
                              upload_to=UploadComposingSource('composesource/%s/%s'))
 
     def __unicode__(self):

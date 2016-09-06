@@ -26,7 +26,7 @@ class ProjectionModel(models.Model):
         abstract = True
 
 
-class ComposeSource(CachedSource, ProjectionModel):
+class AbstractComposeSource(CachedSource, ProjectionModel):
     uv = models.FileField(_(u'UV'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/uv/%s'))
     ao = models.FileField(_(u'Тени'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/ao/%s'), blank=True)
     light = models.FileField(_(u'Свет'), storage=overwrite_storage, upload_to=UploadComposingSource('%s/light/%s'), blank=True)
@@ -36,9 +36,14 @@ class ComposeSource(CachedSource, ProjectionModel):
     content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
+        abstract = True
         unique_together = ('content_type', 'object_id', 'projection')
         verbose_name = _(u'Модель сборки')
         verbose_name_plural = _(u'Модели сборки')
+
+
+class ComposeSource(AbstractComposeSource):
+    pass
 
 
 class ButtonsSource(CachedSource, ProjectionModel):

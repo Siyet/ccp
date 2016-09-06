@@ -8,10 +8,9 @@ from lazy import lazy
 
 from .base import BaseShirtBuilder
 from processing.female_configs import models
-from processing.rendering.compose import Composer
+from processing.rendering.compose import Composer, ImageConf
 from processing.models import PROJECTION
 from backend.models import ContrastDetails
-
 
 class FemaleShirtBuilder(BaseShirtBuilder):
     @lazy
@@ -50,14 +49,15 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             'tuck_id': self.tuck,
         })
         if self.projection == PROJECTION.back:
-            self.append_model(body_models.first())
+            if self.sleeve.cuffs:
+                self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
+            self.append_model(body_models.get(back_id=self.back))
         else:
-            model = body_models.filter(back_id=self.back)
-            self.append_model(model)
+            self.append_model(body_models.first())
+            if self.sleeve.cuffs:
+                self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
 
         self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
-        if self.sleeve.cuffs:
-            self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
         self.append_model(self.get_compose_configuration(models.FemalePocketConfiguration, {
             'pocket_id': self.pocket
         }))
@@ -71,6 +71,13 @@ class FemaleShirtBuilder(BaseShirtBuilder):
                 'yoke_id': self.yoke
             }))
 
+        if self.projection == PROJECTION.back:
+            back_shadow = models.FemaleBackShadow.objects.get(back_id=self.back)
+            self.cache_builder.create_cache(back_shadow, ['shadow'], resolution=self.resolution)
+            shadow_cache = back_shadow.cache.get(source_field='shadow', resolution=self.resolution)
+            shadow_conf = ImageConf.for_cache(shadow_cache)
+            self.post_shadows.append(shadow_conf)
+
         if self.projection != PROJECTION.back and self.placket.show_buttons:
             buttons_conf = self.get_buttons_conf(models.FemaleBodyButtonsConfiguration, {})
             self.append_buttons_stitches(buttons_conf)
@@ -82,8 +89,7 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             }))
 
         self.append_buttons_stitches(self.get_buttons_conf(models.FemaleCollarButtonsConfiguration, {
-            'collar_id': self.collar['type'],
-            'buttons': self.collar_buttons
+            'collar_id': self.collar['type']
         }))
 
         uv = Composer.compose_uv(self.uv)

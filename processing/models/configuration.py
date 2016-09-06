@@ -54,7 +54,7 @@ class CuffConfiguration(UnisexModel, CachedSource, PartConfigurationModel):
     cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
     rounding = models.ForeignKey(dictionaries.CuffRounding, verbose_name=_(u'Тип закругления'), blank=True, null=True)
     side_mask = models.FileField(verbose_name=_(u'Маска рукава (сбоку)'), storage=overwrite_storage,
-                                 upload_to=UploadComposingSource('composesource/%s/%s'), null=True)
+                                 upload_to=UploadComposingSource('composesource/%s/%s'), null=True, blank=True)
 
     class Meta:
         verbose_name = _(u'Конфигурация сборки для манжет')
