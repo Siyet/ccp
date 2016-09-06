@@ -196,7 +196,7 @@ class Order(models.Model):
         return payment
 
     def check_certificate(self):
-        return self.certificate.get_value() > self.certificate_value
+        return self.certificate.get_value() >= self.certificate_value
 
     def save_certificate(self):
         if self.certificate:
@@ -301,5 +301,6 @@ class Discount(models.Model):
 
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
-    CheckoutMailer.send_order_payment_completed(sender.order)
-    CheckoutMailer.send_to_customer_order_payment_completed(sender.order, sender.order.get_pdf())
+    order = Order.objects.get(payment=sender)
+    CheckoutMailer.send_order_payment_completed(order)
+    CheckoutMailer.send_to_customer_order_payment_completed(order, order.get_pdf())
