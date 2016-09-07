@@ -58,7 +58,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware'
+    'django.middleware.security.SecurityMiddleware',
+    'core.middleware.LoggingMiddleware',
 )
 
 ROOT_URLCONF = 'core.urls'
@@ -147,6 +148,11 @@ LOGGING = {
         },
     },
     'loggers': {
+        'request': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'checkout': {
             'handlers': ['file'],
             'level': 'DEBUG',
