@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 import uuid
 import datetime
 
@@ -15,6 +16,8 @@ from wkhtmltopdf import render_pdf_from_template
 
 from checkout.mail import CheckoutMailer
 from core.utils import first
+
+logger = logging.getLogger('checkout')
 
 
 class Payment(YandexPayment):
@@ -301,6 +304,10 @@ class Discount(models.Model):
 
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
+    logger.info('payment_completed %s' % sender.pk)
     order = Order.objects.get(payment=sender)
+    order.save_certificate()
+    logger.info('save certificate %s' % order.pk)
     CheckoutMailer.send_order_payment_completed(order)
     CheckoutMailer.send_to_customer_order_payment_completed(order, order.get_pdf())
+    logger.info('send emails %s' % order.pk)
