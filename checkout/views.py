@@ -16,8 +16,8 @@ class CheckOrderView(YandexCheckOrderView):
         order = Order.objects.get(payment=payment)
         logger.info('Order: %s' % order.pk)
         if not order.check_certificate():
-            logging.error('certificate error %s' % order.pk)
+            logger.error('certificate error %s' % order.pk)
             content = self.get_xml(dict(code=100, message=order.CERTIFICATE_ERROR))
             return self.get_response(content)
-        logging.info('good %s' % order.pk)
+        logger.info('good %s' % order.pk)
         return response

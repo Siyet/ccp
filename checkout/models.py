@@ -199,6 +199,8 @@ class Order(models.Model):
         return payment
 
     def check_certificate(self):
+        if not self.certificate:
+            return True
         return self.certificate.get_value() >= self.certificate_value
 
     def save_certificate(self):
@@ -304,7 +306,7 @@ class Discount(models.Model):
 
 @receiver(payment_completed)
 def payment_completed_receiver(sender, *args, **kwargs):
-    logger.info('payment_completed %s' % sender.pk)
+    logger.info('payment completed %s' % sender.pk)
     order = Order.objects.get(payment=sender)
     order.save_certificate()
     logger.info('save certificate %s' % order.pk)
