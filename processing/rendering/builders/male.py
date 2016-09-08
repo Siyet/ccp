@@ -13,8 +13,14 @@ from processing.models import PROJECTION
 from processing.rendering.compose import ImageConf
 from backend.models import ContrastDetails
 
+from dictionaries import models as dictionaries
+
 
 class MaleShirtBuilder(BaseShirtBuilder):
+    def _setup(self):
+        super(MaleShirtBuilder, self)._setup()
+        self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
+
     @lazy
     def collar_conf(self):
         try:
