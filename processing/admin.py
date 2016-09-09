@@ -91,6 +91,7 @@ class ButtonsSourceAdmin(admin.ModelAdmin):
 
 
 class CuffButtonsAdmin(ManyToManyMixin, ButtonsSourceAdmin):
+    exclude = ['sex']
     m2m_fields = ['rounding_types']
 
 
@@ -127,7 +128,7 @@ class InitialsPositionInline(admin.TabularInline):
 class InitialsConfigurationAdmin(admin.ModelAdmin):
     model = models.InitialsConfiguration
     list_display = ('font', 'font_size', 'location')
-
+    exclude = ['sex']
     inlines = [InitialsPositionInline]
 
 

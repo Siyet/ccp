@@ -62,9 +62,10 @@ class CuffConfiguration(UnisexModel, CachedSource, PartConfigurationModel):
 
 
 class PocketConfiguration(UnisexModel, PartConfigurationModel):
-    pocket = models.OneToOneField(dictionaries.PocketType, verbose_name=_(u'Тип кармана'))
+    pocket = models.ForeignKey(dictionaries.PocketType, verbose_name=_(u'Тип кармана'))
 
     class Meta:
+        unique_together = ('pocket', 'sex')
         verbose_name = _(u'Конфигурация сборки для кармана')
         verbose_name_plural = _(u'Конфигурации сборки для кармана')
 

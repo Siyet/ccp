@@ -20,14 +20,21 @@ class CuffsAdmin(SourceAdmin):
     exclude = ['side_mask', 'sex']
 
 
+class FemaleSourceAdmin(SourceAdmin):
+    exclude = ['sex']
+
+
+class FemaleButtonsAdmin(ButtonsSourceAdmin):
+    exclude = ['sex']
+
 admin.site.register(models.FemaleBodyConfiguration, BodyAdmin)
 admin.site.register(models.FemaleCollarConfiguration, CollarSourceAdmin)
 admin.site.register(models.FemaleCuffConfiguration, CuffsAdmin)
-admin.site.register(models.FemalePocketConfiguration, SourceAdmin)
+admin.site.register(models.FemalePocketConfiguration, FemaleSourceAdmin)
 admin.site.register(models.FemalePlacketConfiguration, PlacketAdmin)
-admin.site.register(models.FemaleYokeConfiguration, SourceAdmin)
-admin.site.register(models.FemaleBodyButtonsConfiguration, ButtonsSourceAdmin)
+admin.site.register(models.FemaleYokeConfiguration, FemaleSourceAdmin)
+admin.site.register(models.FemaleBodyButtonsConfiguration, FemaleButtonsAdmin)
 admin.site.register(models.FemaleCuffButtonsConfiguration, CuffButtonsAdmin)
 admin.site.register(models.FemaleInitialsConfiguration, InitialsConfigurationAdmin)
-admin.site.register(models.FemaleCollarButtonsConfiguration, ButtonsSourceAdmin)
+admin.site.register(models.FemaleCollarButtonsConfiguration, FemaleButtonsAdmin)
 admin.site.register(models.FemaleBackShadow)
