@@ -155,7 +155,7 @@ class BaseShirtBuilder(object):
                 ct = ContentType.objects.get_for_model(conf.content_object)
                 relation = compose.StitchColor.objects.get(content_type_id=ct.id)
             except ObjectDoesNotExist:
-                ct = ContentType.objects.get_for_model(conf.content_object.__base__)
+                ct = ContentType.objects.get_for_model(conf.content_object.__class__.__base__)
                 relation = compose.StitchColor.objects.get(content_type_id=ct.id)
 
             element = relation.element_id
