@@ -29,12 +29,16 @@ class Command(BaseCommand):
             texture_name, extension = path.splitext(texture_file)
             if not texture_name or not extension:
                 continue
+            texture_path = path.join('textures', texture_file)
+            # skip existing textures
+            texture = Texture.objects.filter(texture=texture_path).first()
+            if not texture:
+                texture = Texture(
+                    needs_shadow=False,
+                    texture=texture_path
+                )
+                texture.save()
 
-            texture = Texture(
-                needs_shadow=False,
-                texture=path.join('textures', texture_file)
-            )
-            texture.save()
             fabric = Fabric.objects.filter(code=texture_name).first()
             if fabric:
                 fabric.texture = texture
