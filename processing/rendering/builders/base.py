@@ -151,12 +151,8 @@ class BaseShirtBuilder(object):
 
             stitches_conf = ImageConf.for_cache(cache)
 
-            try:
-                ct = ContentType.objects.get_for_model(conf.content_object)
-                relation = compose.StitchColor.objects.get(content_type_id=ct.id)
-            except ObjectDoesNotExist:
-                ct = ContentType.objects.get_for_model(conf.content_object.__class__.__base__)
-                relation = compose.StitchColor.objects.get(content_type_id=ct.id)
+            ct = ContentType.objects.get_for_model(conf.content_object)
+            relation = compose.StitchColor.objects.get(content_type_id=ct.id)
 
             element = relation.element_id
             element_info = first(lambda s: s['element'] == element, self.contrast_stitches)

@@ -99,8 +99,8 @@ class CuffButtonsConfiguration(UnisexModel, ButtonsConfigurationModel):
 
 class StitchColor(models.Model):
     content_type = models.OneToOneField(ContentType, verbose_name=_(u'Тип конфигурации'), limit_choices_to={
-        'app_label': 'processing',
-        'model__in': ('bodybuttonsconfiguration', 'collarbuttonsconfiguration', 'cuffbuttonsconfiguration')
+        'app_label__in': ('male_configs', 'female_configs'),
+        'model__contains': 'buttonsconfiguration'
     })
     element = models.ForeignKey(backend.ElementStitch, verbose_name=_(u'Отстрочка'))
 

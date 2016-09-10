@@ -4,7 +4,7 @@ from django.db import models
 from processing.models.configuration import *
 from dictionaries import models as dictionaries
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from processing.models.configuration import UnisexModel
 from processing.models.sources import AbstractComposeSource
 from core.constants import SEX
@@ -91,7 +91,7 @@ class FemaleYokeConfiguration(FemaleConfigurationModel, YokeConfiguration):
 class FemaleBodyButtonsConfiguration(FemaleConfigurationModel, BodyButtonsConfiguration):
     class Meta:
         proxy = True
-        verbose_name = BodyButtonsConfiguration._meta.verbose_name
+        verbose_name = BodyButtonsConfiguration._meta.verbose_name + _(u'(Ж)')
         verbose_name_plural = BodyButtonsConfiguration._meta.verbose_name_plural
 
 
@@ -102,14 +102,14 @@ class FemaleCollarButtonsConfiguration(ButtonsConfigurationModel):
 
     class Meta:
         unique_together = ('collar', 'buttons')
-        verbose_name = _(u'Конфигурация сборки для пуговиц воротника')
+        verbose_name = _(u'Конфигурация сборки для пуговиц воротника') + _(u'(Ж)')
         verbose_name_plural = _(u'Конфигурации сборки для пуговиц воротника')
 
 
 class FemaleCuffButtonsConfiguration(FemaleConfigurationModel, CuffButtonsConfiguration):
     class Meta:
         proxy = True
-        verbose_name = CuffButtonsConfiguration._meta.verbose_name
+        verbose_name = CuffButtonsConfiguration._meta.verbose_name + _(u'(Ж)')
         verbose_name_plural = CuffButtonsConfiguration._meta.verbose_name_plural
 
 
