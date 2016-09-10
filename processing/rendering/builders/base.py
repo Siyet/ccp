@@ -151,9 +151,13 @@ class BaseShirtBuilder(object):
 
             stitches_conf = ImageConf.for_cache(cache)
 
-            ct = ContentType.objects.get_for_model(conf.content_object)
+            try:
+                ct = ContentType.objects.get_for_model(conf.content_object)
+                relation = compose.StitchColor.objects.get(content_type_id=ct.id)
+            except ObjectDoesNotExist:
+                ct = ContentType.objects.get_for_model(conf.content_object.__base__)
+                relation = compose.StitchColor.objects.get(content_type_id=ct.id)
 
-            relation = compose.StitchColor.objects.get(content_type_id=ct.id)
             element = relation.element_id
             element_info = first(lambda s: s['element'] == element, self.contrast_stitches)
             image = Image.open(cache.file.path)
