@@ -8,7 +8,7 @@ import models
 class BodySourceInline(GenericTabularInline):
     model = models.FemaleBodySource
     max_num = 12
-    fields = ('projection', 'back', 'uv', 'ao', 'light')
+    fields = ('projection', 'back', 'uv', 'ao', 'light', 'shadow')
 
 
 class BodyAdmin(ManyToManyMixin, admin.ModelAdmin):
