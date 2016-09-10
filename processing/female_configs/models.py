@@ -39,7 +39,7 @@ class FemaleConfigurationModel(models.Model):
 class FemaleBodyConfiguration(ConfigurationModel):
     sleeve = models.ForeignKey(dictionaries.SleeveType, verbose_name=_(u'Рукав'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
-    cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
+    cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'), blank=True)
     tuck = models.ForeignKey(dictionaries.TuckType, verbose_name=_(u'Вытачки'))
     sources = GenericRelation(FemaleBodySource)
 

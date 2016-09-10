@@ -28,7 +28,7 @@ class MaleConfigurationModel(models.Model):
 class MaleBodyConfiguration(PartConfigurationModel):
     sleeve = models.ForeignKey(dictionaries.SleeveType, verbose_name=_(u'Рукав'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
-    cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'))
+    cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'), blank=True)
 
     class Meta:
         verbose_name = _(u'Конфигурация сборки для основы')
