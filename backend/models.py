@@ -33,7 +33,7 @@ class Collection(OrderedModel):
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
-    tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'))
+    tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'), related_name='collections')
     sex = models.CharField(_(u'Пол коллекции'), choices=constants.SEX, max_length=6, default=constants.SEX.male, blank=False)
     tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
 

@@ -31,6 +31,7 @@ from .models import (
     FAQ,
     SleeveLength,
     DefaultElement,
+    TuckType
 )
 
 
@@ -69,6 +70,7 @@ admin.site.register([
     SleeveType,
     FAQ,
     SleeveLength,
+    TuckType
 ])
 
 admin.site.register(Size, SizeAdmin)

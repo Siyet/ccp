@@ -71,8 +71,8 @@ class CacheBuilder(object):
                 alpha_array = np.asarray(alpha).astype('float32') / 255.0
                 matrices.append(('uv_alpha', Submatrix(alpha_array), CacheBuilder.SCALE_MAP['uv'] / 2.0))
                 size = array.shape[:2]
-                array[..., 0] *= size[0]
-                array[..., 1] *= size[1]
+                array[..., 0] *= size[0] - 1
+                array[..., 1] *= size[1] - 1
                 if is_preview:
                     array = ndimage.zoom(array, [preview_scale, preview_scale, 1], order=0)
 
