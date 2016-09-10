@@ -89,7 +89,8 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             }))
 
         self.append_buttons_stitches(self.get_buttons_conf(models.FemaleCollarButtonsConfiguration, {
-            'collar_id': self.collar['type']
+            'collar_id': self.collar['type'],
+            'buttons': self.collar_buttons
         }))
 
         uv = Composer.compose_uv(self.uv)

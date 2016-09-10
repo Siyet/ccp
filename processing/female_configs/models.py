@@ -97,8 +97,11 @@ class FemaleBodyButtonsConfiguration(FemaleConfigurationModel, BodyButtonsConfig
 
 class FemaleCollarButtonsConfiguration(ButtonsConfigurationModel):
     collar = models.OneToOneField(dictionaries.CollarType, verbose_name=_(u'Воротник'))
+    buttons = models.IntegerField(_(u'Количество пуговиц'), choices=dictionaries.CollarButtons.BUTTONS_CHOICES,
+                                  default=1)
 
     class Meta:
+        unique_together = ('collar', 'buttons')
         verbose_name = _(u'Конфигурация сборки для пуговиц воротника')
         verbose_name_plural = _(u'Конфигурации сборки для пуговиц воротника')
 

@@ -163,14 +163,22 @@ class ShawlOptionsSerializer(serializers.ModelSerializer):
         model = models.ShawlOptions
 
 
+class ShirtCollectionSerializer(serializers.ModelSerializer):
+    title = serializers.ReadOnlyField(source='__unicode__')
+
+    class Meta:
+        model = models.Collection
+        fields = ('id', 'title')
+
+
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
     fabric_type = serializers.StringRelatedField(source='fabric.type')
+    collection = ShirtCollectionSerializer()
     thickness = serializers.StringRelatedField(source='fabric.thickness.title')
     showcase_image = serializers.ImageField(source='showcase_image_list')
     sex = serializers.SerializerMethodField()
     material = serializers.StringRelatedField(source='fabric.material')
-    collection = serializers.StringRelatedField(source='collection.title')
     short_description = serializers.StringRelatedField(source='fabric.short_description')
 
     def get_sex(self, object):
@@ -195,7 +203,6 @@ class ShirtImageSerializer(serializers.ModelSerializer):
 
 class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
     shirt_images = serializers.SerializerMethodField()
-    collection_title = serializers.StringRelatedField(source='collection')
     country = serializers.StringRelatedField(source='collection.storehouse.country')
     short_description = serializers.StringRelatedField(source='fabric.short_description')
     long_description = serializers.StringRelatedField(source='fabric.long_description')
@@ -207,7 +214,7 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['individualization', 'short_description', 'long_description', 'shirt_images', 'collection_title',
+        fields = ['individualization', 'short_description', 'long_description', 'shirt_images',
                   'country', 'tailoring_time']
 
 

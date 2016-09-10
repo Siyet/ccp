@@ -1,7 +1,9 @@
 # coding: utf-8
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
-from processing.admin import CollarSourceAdmin, PlacketAdmin, ButtonsSourceAdmin, SourceAdmin, InitialsConfigurationAdmin, CuffButtonsAdmin, ManyToManyMixin
+
+from processing.admin import CollarSourceAdmin, PlacketAdmin, ButtonsSourceAdmin, SourceAdmin, \
+    InitialsConfigurationAdmin, CuffButtonsAdmin, ManyToManyMixin, CuffSourceAdmin
 import models
 
 
@@ -16,7 +18,7 @@ class BodyAdmin(ManyToManyMixin, admin.ModelAdmin):
     m2m_fields = ['cuff_types']
 
 
-class CuffsAdmin(SourceAdmin):
+class CuffsAdmin(CuffSourceAdmin):
     exclude = ['side_mask', 'sex']
 
 
@@ -26,6 +28,7 @@ class FemaleSourceAdmin(SourceAdmin):
 
 class FemaleButtonsAdmin(ButtonsSourceAdmin):
     exclude = ['sex']
+
 
 admin.site.register(models.FemaleBodyConfiguration, BodyAdmin)
 admin.site.register(models.FemaleCollarConfiguration, CollarSourceAdmin)

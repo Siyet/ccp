@@ -51,7 +51,7 @@ class CollarMaskInline(GenericTabularInline):
 
 class ComposingSourceInline(GenericTabularInline):
     model = models.ComposeSource
-    fields = ('projection', 'uv', 'ao', 'light')
+    fields = ('projection', 'uv', 'ao', 'light', 'shadow')
     max_num = 3
 
 

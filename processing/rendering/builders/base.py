@@ -40,6 +40,7 @@ class BaseShirtBuilder(object):
     def _setup(self):
         shirt_data = self.shirt_data
         self.collar = self.extract(shirt_data, 'collar')
+        self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
         self.pocket = self.extract(shirt_data, 'pocket')
         self.cuff = self.extract(shirt_data, 'cuff')
         self.custom_buttons_type = self.extract(shirt_data, 'custom_buttons_type')
