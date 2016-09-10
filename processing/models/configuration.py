@@ -108,6 +108,9 @@ class StitchColor(models.Model):
         verbose_name = _(u'Конфигурация отстрочки')
         verbose_name_plural = _(u'Конфигурации отстрочек')
 
+    def __unicode__(self):
+        return unicode(self.content_type)
+
 
 class InitialsConfiguration(UnisexModel, ConfigurationModel):
     font = models.ForeignKey(dictionaries.Font, verbose_name=_(u'Шрифт'))
