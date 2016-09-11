@@ -29,7 +29,7 @@ class CacheBuilderMock(object):
 
 class BaseShirtBuilder(object):
     cache_builder = CacheBuilderMock
-    cache_builder = CacheBuilder
+    # cache_builder = CacheBuilder
 
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
         self.is_ready = False
@@ -151,7 +151,6 @@ class BaseShirtBuilder(object):
 
             stitches_conf = ImageConf.for_cache(cache)
             ct = ContentType.objects.get_for_model(conf.content_object)
-            print(ct.id)
             relation = compose.StitchColor.objects.get(content_type_id=ct.id)
 
             element = relation.element_id
