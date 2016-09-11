@@ -9,7 +9,6 @@ from dictionaries import models as dictionaries
 from backend import models as backend
 from processing.upload_path import UploadComposingSource
 from processing.storage import overwrite_storage
-
 from core.constants import SEX
 
 
@@ -99,8 +98,8 @@ class CuffButtonsConfiguration(UnisexModel, ButtonsConfigurationModel):
 
 class StitchColor(models.Model):
     content_type = models.OneToOneField(ContentType, verbose_name=_(u'Тип конфигурации'), limit_choices_to={
-        'app_label__in': ('male_configs', 'female_configs'),
-        'model__contains': 'buttonsconfiguration'
+        'model__in': ('bodybuttonsconfiguration', 'cuffbuttonsconfiguration', 'malecollarbuttonsconfiguration',
+                    'femalecollarbuttonsconfiguration')
     })
     element = models.ForeignKey(backend.ElementStitch, verbose_name=_(u'Отстрочка'))
 

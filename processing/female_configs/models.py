@@ -96,7 +96,7 @@ class FemaleBodyButtonsConfiguration(FemaleConfigurationModel, BodyButtonsConfig
 
 
 class FemaleCollarButtonsConfiguration(ButtonsConfigurationModel):
-    collar = models.OneToOneField(dictionaries.CollarType, verbose_name=_(u'Воротник'))
+    collar = models.ForeignKey(dictionaries.CollarType, verbose_name=_(u'Воротник'))
     buttons = models.IntegerField(_(u'Количество пуговиц'), choices=dictionaries.CollarButtons.BUTTONS_CHOICES,
                                   default=1)
 

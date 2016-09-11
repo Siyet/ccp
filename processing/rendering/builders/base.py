@@ -29,7 +29,7 @@ class CacheBuilderMock(object):
 
 class BaseShirtBuilder(object):
     cache_builder = CacheBuilderMock
-    # cache_builder = CacheBuilder
+    cache_builder = CacheBuilder
 
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
         self.is_ready = False
@@ -142,7 +142,7 @@ class BaseShirtBuilder(object):
 
         for conf in stitches:
             try:
-                self.cache_builder.create_cache(stitches, ('image',), resolution=self.resolution,
+                self.cache_builder.create_cache(conf, ('image',), resolution=self.resolution,
                                            field_types={'image': STITCHES})
                 cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
@@ -150,8 +150,8 @@ class BaseShirtBuilder(object):
                 continue
 
             stitches_conf = ImageConf.for_cache(cache)
-
             ct = ContentType.objects.get_for_model(conf.content_object)
+            print(ct.id)
             relation = compose.StitchColor.objects.get(content_type_id=ct.id)
 
             element = relation.element_id
