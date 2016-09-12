@@ -74,10 +74,6 @@ class Migration(migrations.Migration):
             model_name='placketconfiguration',
             name='plackets',
         ),
-        migrations.RemoveField(
-            model_name='collarmask',
-            name='collar',
-        ),
         migrations.DeleteModel(
             name='BackConfiguration',
         ),
@@ -86,9 +82,6 @@ class Migration(migrations.Migration):
         ),
         migrations.DeleteModel(
             name='CollarButtonsConfiguration',
-        ),
-        migrations.DeleteModel(
-            name='CollarConfiguration',
         ),
         migrations.DeleteModel(
             name='DickeyConfiguration',
