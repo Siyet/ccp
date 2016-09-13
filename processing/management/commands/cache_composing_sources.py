@@ -32,8 +32,6 @@ class Command(BaseCommand):
                     CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.full, field_types)
                     CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.preview, field_types)
                 except Exception as e:
-                    print("ERROR: %s" % e.message)
-                    print("failed to create cache for %s" % src.object_id)
                     raise
             i += 1
             sys.stdout.write("\rprocessed (%s/%s)" % (i, count))

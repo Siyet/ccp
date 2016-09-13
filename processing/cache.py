@@ -103,7 +103,8 @@ class CacheBuilder(object):
             matrices.append((field, matrix, scale))
 
         if not matrices:
-            raise Exception("Failed to cache source: fields %s are not found; source id: %s" % (fields, instance.id))
+            print("Failed to cache source: fields %s are not found; source id: %s" % (fields, instance.id))
+            return 
 
         size_array = []
         for _, matrix, scale in matrices:
