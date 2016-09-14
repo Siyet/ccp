@@ -12,7 +12,7 @@ from api.serializers import ShirtDetailsSerializer
 
 
 class ShirtImageCache(object):
-    compose_parts = ['collar', 'cuff', 'pocket', 'custom_buttons_type', 'custom_buttons',
+    compose_parts = ['collar', 'collection', 'cuff', 'pocket', 'custom_buttons_type', 'custom_buttons',
                      'sleeve', 'hem', 'placket', 'tuck', 'back', 'dickey', 'fabric', 'yoke', 'contrast_details',
                      'contrast_stitches', 'initials']
 
