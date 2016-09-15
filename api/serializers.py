@@ -245,7 +245,7 @@ class StaysSerializer(serializers.ModelSerializer):
 class TuckSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.TuckType
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'picture']
 
 
 class ShopSerializer(serializers.ModelSerializer):
