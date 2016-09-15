@@ -175,6 +175,6 @@ class CacheBuilder(object):
 
         save_to_cache(img, CACHE_RESOLUTION.full)
 
-        img = img.filter(ImageFilter.GaussianBlur(radius=3.5))
+        # img = img.filter(ImageFilter.GaussianBlur(radius=3.5))
 
         save_to_cache(img, CACHE_RESOLUTION.preview)
