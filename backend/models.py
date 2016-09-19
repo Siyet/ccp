@@ -16,7 +16,6 @@ from model_utils.models import TimeStampedModel
 from ordered_model.models import OrderedModel
 from colorful.fields import RGBColorField
 
-from core.utils import first
 from dictionaries.models import FabricCategory, SleeveType, ResolveDefault
 from backend import managers
 from core import constants
@@ -33,6 +32,8 @@ class Collection(OrderedModel):
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
+    contrast_details = models.BooleanField(_(u'Контрастные детали'))
+    white_fabric = models.ForeignKey('backend.Fabric', verbose_name=_(u'Ткань для опции "Воротник и манжеты полностью белые"'), null=True, blank=True)
     tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'), related_name='collections')
     sex = models.CharField(_(u'Пол коллекции'), choices=constants.SEX, max_length=6, default=constants.SEX.male, blank=False)
     tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
@@ -200,15 +201,6 @@ class Collar(models.Model):
         verbose_name = _(u'Воротник')
         verbose_name_plural = _(u'Воротники')
 
-    @staticmethod
-    def get_related_shirts(pk=None, exclude=None):
-        qs = Shirt.objects.filter(collar__isnull=False)
-        if pk:
-            qs = qs.filter(collar__id=pk)
-        if exclude:
-            qs = qs.exclude(collar__id__in=exclude)
-        return qs.values('id').distinct()
-
 
 class Cuff(models.Model):
     hardness = models.ForeignKey(Hardness, verbose_name=_(u'Жесткость'), null=True)
@@ -234,15 +226,6 @@ class Cuff(models.Model):
     class Meta:
         verbose_name = _(u'Манжета')
         verbose_name_plural = _(u'Манжеты')
-
-    @staticmethod
-    def get_related_shirts(pk=None, exclude=None):
-        qs = Shirt.objects.filter(cuff__isnull=False)
-        if pk:
-            qs = qs.filter(cuff__id=pk)
-        if exclude:
-            qs = qs.exclude(cuff__id__in=exclude)
-        return qs.values('id').distinct()
 
 
 class CustomButtons(OrderedModel):
@@ -288,6 +271,9 @@ class Dickey(models.Model):
     class Meta:
         verbose_name = _(u'Манишка')
         verbose_name_plural = _(u'Манишки')
+
+    def get_shirts(self):
+        return [self.shirt]
 
 
 class Initials(models.Model):
@@ -373,50 +359,6 @@ class Shirt(models.Model):
 
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
 
-    def calculate_price(self):
-        price = 0
-
-        # Платок
-        try:
-            shawl_price = self.shawl.extra_price
-        except AttributeError:
-            shawl_price = 0
-        price += shawl_price
-
-        # Кастомные пуговицы
-        try:
-            custom_buttons_price = self.custom_buttons.type.extra_price
-        except AttributeError:
-            custom_buttons_price = 0
-        price += custom_buttons_price
-
-        # Манишка
-        if hasattr(self, 'dickey'):
-            dickey_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
-                                                           content_type__model='dickey').filter(
-                Q(object_pk__isnull=True) | Q(object_pk=self.shawl_id)).order_by('-object_pk').first()
-            if dickey_price:
-                price += dickey_price.price
-
-        # Контрастные детали
-        contrast_detail_price = AccessoriesPrice.objects.filter(content_type__app_label='backend',
-                                                                content_type__model='contrastdetails').first()
-        # Независимо от количества
-        if contrast_detail_price and self.contrast_details.count() > 0:
-            price += contrast_detail_price.price
-
-        # Воротник или манжета. Наличие хотя бы одного прибавляем цену
-        if hasattr(self, 'cuff') or hasattr(self, 'collar'):
-            cuff_price = AccessoriesPrice.objects.filter(Q(content_type__app_label='backend') & (
-                Q(content_type__model='cuff') | Q(content_type__model='collar'))).order_by('-object_pk').first()
-            if cuff_price:
-                price += cuff_price.price
-
-        fabric_price_filter = lambda x: x.fabric_category_id == self.fabric.category_id
-        fabric_price = first(fabric_price_filter, self.collection.storehouse.prices.all())
-        if fabric_price is not None:
-            price += fabric_price.price
-        return price
 
     def save(self, *args, **kwargs):
         cuff = getattr(self, 'cuff', None)
@@ -424,7 +366,6 @@ class Shirt(models.Model):
             if cuff.id:
                 cuff.delete()
 
-        self.price = self.calculate_price()
         super(Shirt, self).save(*args, **kwargs)
 
     class Meta:
@@ -527,8 +468,7 @@ class ContrastDetails(models.Model):
         verbose_name_plural = _(u'Контрастные детали')
         unique_together = ['shirt', 'element']
 
-    @staticmethod
-    def get_related_shirts(pk=None, exclude=None):
+    def get_shirts(pk=None, exclude=None):
         qs = Shirt.objects.filter(contrast_details__isnull=False)
         return qs.values('id').distinct()
 
@@ -558,26 +498,20 @@ class ContrastStitch(models.Model):
         verbose_name_plural = _(u'Контрастные отстрочки')
 
 
-content_type_names = {
-    _(u'Контрастная деталь'): _(u'Контрастные ткани'),
-    _(u'Воротник'): _(u' Воротник полностью белый'),
-    _(u'Манжета'): _(u' Манжета полностью белая'),
-}
-
-
 class AccessoriesPrice(models.Model):
-    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), related_name='accessories_price')
-    object_pk = models.IntegerField(_('object ID'), blank=True, null=True)
-    content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    content_type_names = {
+        _(u'Контрастная деталь'): _(u'Контрастные ткани'),
+    }
+
+    content_type = models.OneToOneField(ContentType, verbose_name=_('content type'), related_name='accessories_price',
+                                        limit_choices_to={'model__in': ('dickey', 'contrastdetails')})
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2)
-    collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='accessories_prices',
-                                         blank=True)
 
     def __unicode__(self):
         return _(u'Цена: %s') % self.content_type
 
     def content_type_title(self):
-        return content_type_names.get(self.content_type.name, self.content_type.name)
+        return self.content_type_names.get(self.content_type.name, self.content_type.name)
 
     content_type_title.allow_tags = True
     content_type_title.short_description = _(u'Тип')
@@ -585,18 +519,3 @@ class AccessoriesPrice(models.Model):
     class Meta:
         verbose_name = _(u'Цена надбавки')
         verbose_name_plural = _(u'Цены надбавок')
-        unique_together = [('content_type', 'object_pk',)]
-
-    def get_content_object(self):
-        try:
-            return self.content_object
-        except ValueError:
-            return None
-
-    def get_shirts(self):
-        if self.object_pk:
-            return self.content_type.model_class().get_related_shirts(pk=self.object_pk)
-        else:
-            return self.content_type.model_class().get_related_shirts(
-                exclude=AccessoriesPrice.objects.filter(content_type=self.content_type, object_pk__isnull=False).values(
-                    'object_pk'))

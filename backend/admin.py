@@ -86,6 +86,7 @@ class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, BaseShirtAdm
     resource_class = TemplateShirtResource
     exclude = ['is_template']
     inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, InitialsInline, ShirtImageInline]
+    readonly_fields = ('price',)
     list_select_related = ('hem', 'placket', 'pocket', 'cuff__type', 'collar__type', 'dickey__type', 'collar__hardness')
     list_display = ('code', 'cuff', 'collar', 'hem', 'placket', 'pocket', 'dickey')
 
@@ -188,8 +189,8 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
 
 
 class AccessoriesPriceAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'content_type_title', 'content_object', 'price',)
-    list_display_links = ('pk', 'content_type_title', 'content_object', 'price',)
+    list_display = ('content_type_title', 'price',)
+    list_display_links = ('content_type_title', 'price',)
     form = AccessoriesPriceAdminForm
 
 

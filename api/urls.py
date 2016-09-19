@@ -16,6 +16,7 @@ shirt_urls = [
     url(r'^showcase/filter/$', views.TemplateShirtsFiltersList.as_view()),
     url(r'^image/(?P<projection>front|side|back)/(?P<resolution>full|preview)/$', views.ShirtImage.as_view()),
     url(r'^image/(?P<projection>front|side|back)/$', views.ShirtImage.as_view()),
+    url(r'^price/$', views.ShirtPrice.as_view()),
     url(r'^(?P<pk>[0-9]+)/$', views.ShirtDetails.as_view()),
 ]
 

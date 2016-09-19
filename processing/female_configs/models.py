@@ -118,16 +118,3 @@ class FemaleInitialsConfiguration(FemaleConfigurationModel, InitialsConfiguratio
         proxy = True
         verbose_name = InitialsConfiguration._meta.verbose_name
         verbose_name_plural = InitialsConfiguration._meta.verbose_name_plural
-
-
-class FemaleBackShadow(CachedSource):
-    back = models.OneToOneField('dictionaries.BackType', verbose_name=_(u'Спинка'))
-    shadow = models.FileField(verbose_name=_(u'Файл тени'), storage=overwrite_storage,
-                             upload_to=UploadComposingSource('composesource/%s/%s'))
-
-    def __unicode__(self):
-        return _(u'Тень для спинки: %s') % self.back.title
-
-    class Meta:
-        verbose_name = _(u'Тень спинки')
-        verbose_name_plural = _(u'Тени спинки')
