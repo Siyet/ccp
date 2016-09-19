@@ -45,10 +45,9 @@ class ShirtPriceCalculator(object):
         collection = backend.Collection.objects.get(pk=shirt_data.pop('collection'))
         contrast_details = shirt_data.pop('contrast_details')
         # контрастные детали в эксклюзивной коллекции
-        exclusive_details = collection.contrast_details and len(contrast_details)
+        exclusive_details = collection.contrast_details and contrast_details
         # "воротник и манжеты полностью белые" в бизнес коллекции
         business_details = contrast_details is not None and not collection.contrast_details
-        print('business', business_details)
         if business_details or exclusive_details:
             price += ShirtPriceCalculator._extra_price_for_model(backend.ContrastDetails)
 
