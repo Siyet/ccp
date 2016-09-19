@@ -353,7 +353,7 @@ class Shirt(models.Model):
     sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True, null=True)
 
     tuck = ChainedForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), chained_field='collection',
-                             chained_model_field='collections', show_all=True)
+                             chained_model_field='collections', show_all=False)
 
     back = models.ForeignKey('dictionaries.BackType', verbose_name=_(u'Спинка'), related_name='back_shirts')
 
