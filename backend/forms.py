@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 
 from backend.widgets import ContentTypeSelect
-from backend.models import AccessoriesPrice, content_type_names
+from backend.models import AccessoriesPrice
 
 
 class RelatedContentTypeForm(forms.ModelForm):
@@ -38,22 +38,14 @@ class RelatedContentTypeForm(forms.ModelForm):
         return content_type
 
 
-class AccessoriesPriceAdminForm(RelatedContentTypeForm):
+class AccessoriesPriceAdminForm(forms.ModelForm):
     class Meta:
         model = AccessoriesPrice
         fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
-        super(AccessoriesPriceAdminForm, self).__init__(*args, **kwargs)
-        content_type_pk = \
-            [x.pk for x in self.fields['content_type'].queryset if hasattr(x.model_class(), 'get_related_shirts')]
-        self.fields['content_type'].queryset = self.fields['content_type'].queryset.filter(pk__in=content_type_pk)
-        self.fields['content_type'].choices = \
-            [(pk, content_type_names.get(title, title)) for pk, title in self.fields['content_type'].choices]
-
     def clean_content_type(self):
         content_type = super(AccessoriesPriceAdminForm, self).clean_content_type()
-        if not hasattr(content_type.model_class(), 'get_related_shirts'):
+        if not hasattr(content_type.model_class(), 'get_shirts'):
             raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
 
         return content_type

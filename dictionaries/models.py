@@ -178,16 +178,6 @@ class DickeyType(ComponentModel):
         verbose_name = _(u'Тип манишки')
         verbose_name_plural = _(u'Типы манишки')
 
-    def get_related_shirts(self, exclude=None):
-        return []
-        # self.dickey_set.all().
-        # qs = Shirt.objects.filter(dickey__isnull=False)
-        # if pk:
-        #     qs = qs.filter(dickey__id=pk)
-        # if exclude:
-        #     qs = qs.exclude(dickey__id__in=exclude)
-        # return qs.values('id').distinct()
-
 
 class ShirtInfo(models.Model):
     title = models.CharField(_(u'Заголовок'), max_length=255, unique=True)

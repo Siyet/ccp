@@ -10,6 +10,7 @@ from django.utils.text import ugettext_lazy as _
 
 from api.views.mixins import FilterHelpersMixin
 from backend import models
+from backend.pricing import ShirtPriceCalculator
 from dictionaries import models as dictionaries
 from api import serializers
 from api.filters import TemplateShirtsFilter
@@ -17,7 +18,7 @@ from processing.rendering.image_cache import ShirtImageCache
 
 __all__ = [
     'ShirtInfoListView', 'ShowcaseShirtsListView', 'TemplateShirtDetails', 'TemplateShirtsFiltersList', 'ShirtDetails',
-    'ShirtImage'
+    'ShirtImage', 'ShirtPrice'
 ]
 
 
@@ -159,3 +160,18 @@ class ShirtImage(APIView):
         data = dict(request.data)
         image_url = ShirtImageCache.get_image_url(data, projection, resolution)
         return Response(request.build_absolute_uri(image_url))
+
+
+class ShirtPrice(APIView):
+    def post(self, request, *args, **kwargs):
+        """
+        Получение цены рубашки.
+        ---
+        parameters:
+          - name: body
+            description: json-объект рубашки, см. /api/shirt/{pk}/
+            paramType: body
+            required: true
+        """
+        price = ShirtPriceCalculator.get_price_for_dictionary(request.data)
+        return Response(price)

@@ -58,5 +58,8 @@ class ShirtImageCache(object):
 
     @staticmethod
     def get_image_url(data, projection, resolution):
+        # TODO: revert cache resolution
+        # resolution = CACHE_RESOLUTION.preview
+
         (full_path, filename) = ShirtImageCache.get_image_path(data, projection, resolution)
         return os.path.join(settings.RENDER_CACHE_URL, filename)
