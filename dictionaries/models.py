@@ -156,7 +156,7 @@ class CustomButtonsType(models.Model):
 
 
 class YokeType(ComponentModel):
-    class Meta:
+    class Meta(ComponentModel.Meta):
         verbose_name = _(u'Тип кокетки')
         verbose_name_plural = _(u'Типы кокетки')
 

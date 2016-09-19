@@ -60,7 +60,6 @@ admin.site.register([
     FabricCategory,
     CuffRounding,
     CustomButtonsType,
-    YokeType,
     StitchColor,
     DickeyType,
     HemType,
@@ -75,5 +74,5 @@ admin.site.register([
 
 admin.site.register(Size, SizeAdmin)
 
-admin.site.register([SizeOptions, FabricColor, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
+admin.site.register([SizeOptions, YokeType, FabricColor, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
                     GrappelliOrderableAdmin)
