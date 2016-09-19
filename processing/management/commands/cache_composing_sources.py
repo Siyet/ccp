@@ -11,8 +11,8 @@ from processing.cache import CacheBuilder, STITCHES
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        self.cache_sources(ComposeSource, ['uv', 'light', 'ao'])
-        self.cache_sources(FemaleBodySource, ['uv', 'light', 'ao'])
+        self.cache_sources(ComposeSource, ['uv', 'light', 'ao', 'shadow'])
+        self.cache_sources(FemaleBodySource, ['uv', 'light', 'ao', 'shadow'])
         self.cache_sources(ButtonsSource, ['image', 'ao'])
         self.cache_sources(StitchesSource, ['image'], {'image': STITCHES})
         self.cache_sources(CuffMask, ['mask'])
