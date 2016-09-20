@@ -16,7 +16,9 @@ class ShirtPriceCalculator(object):
         price += ShirtPriceCalculator._extra_price_for_part(shirt.shawl)
 
         # Кастомные пуговицы
-        price += ShirtPriceCalculator._extra_price_for_part(shirt.custom_buttons_type)
+        buttons = shirt.custom_buttons
+        if buttons:
+            price += buttons.type.extra_price
 
         # Манишка
         price += ShirtPriceCalculator._extra_price_for_model(getattr(shirt, 'dickey', None))
@@ -36,8 +38,11 @@ class ShirtPriceCalculator(object):
 
         price += ShirtPriceCalculator._price_for_part_by_id(backend.ShawlOptions, shirt_data.pop("shawl", None))
 
-        price += ShirtPriceCalculator._price_for_part_by_id(dictionaries.CustomButtonsType,
-                                                            shirt_data.pop("custom_buttons_type", None))
+        buttons_id = shirt_data.pop("custom_buttons", None)
+        if buttons_id:
+            buttons = backend.CustomButtons.objects.filter(pk=buttons_id).first()
+            if buttons:
+                price += buttons.type.extra_price
 
         if shirt_data.pop('dickey') is not None:
             price += ShirtPriceCalculator._extra_price_for_model(backend.Dickey)
