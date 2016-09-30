@@ -31,5 +31,6 @@ SHOWCASE_DETAILS_IMAGE_SIZE = (540, 720)
 RENDER = {
     'source_size': (4096, 4096),
     'default_size': (2048, 2048),
-    'preview_scale': 0.75
+    'preview_scale': 0.75,
+    'crop_scale': (0.1875, 0.0625, 0.8125, 0.96875)
 }

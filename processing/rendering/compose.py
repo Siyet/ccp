@@ -160,7 +160,9 @@ class Composer(object):
                upper_stitches=[], dickey=None, extra_details=[], base_layer=[], AA=True):
 
         texture_arr = load_texture(texture)
-
+        print('uv size', uv.shape)
+        if alpha is not None:
+            print('alpha size', alpha.size)
         result = STMap(uv, texture_arr, AA)
 
         paste(result, dickey)
