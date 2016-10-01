@@ -290,10 +290,17 @@ class ShirtDickeySerializer(serializers.ModelSerializer):
         fields = ('type', 'fabric')
 
 
+class NullableListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        res = super(NullableListSerializer, self).to_representation(data)
+        return res if res else None
+
+
 class ContrastDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ContrastDetails
         fields = ('element', 'fabric')
+        list_serializer_class = NullableListSerializer
 
 
 class ContrastStitchesSerializer(serializers.ModelSerializer):
@@ -361,8 +368,15 @@ class OrderItemSerializer(serializers.ModelSerializer):
         if initials:
             models.Initials.objects.create(shirt=shirt, **initials)
 
-        for contrast_detail in contrast_details:
-            models.ContrastDetails.objects.create(shirt=shirt, **contrast_detail)
+        if contrast_details is not None:
+            collection = validated_data.get('collection')
+            if collection.contrast_details:
+                for contrast_detail in contrast_details:
+                    models.ContrastDetails.objects.create(shirt=shirt, **contrast_detail)
+            else:
+                for element in models.ContrastDetails.ELEMENTS:
+                    models.ContrastDetails.objects.create(shirt=shirt, element=element, fabric=collection.white_fabric)
+
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
 

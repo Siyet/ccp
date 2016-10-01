@@ -66,22 +66,22 @@ class CacheBuilder(object):
 
 
             if field == 'uv':
+                size = array.shape[:2]
+                array[..., 0] *= size[0] - 1
+                array[..., 1] *= size[1] - 1
+
+                w = (crop[0] * size[1], crop[1] * size[0],
+                     crop[2] * size[1], crop[3] * size[0])
+                array = array[w[1]:w[3], w[0]:w[2]]
+
                 alpha = image_from_array(array[..., 3])
                 alpha_scale = preview_scale / 2.0 if is_preview else 0.5
                 alpha = alpha.resize(scale_tuple(alpha.size, alpha_scale), Image.LANCZOS)
                 alpha_array = np.asarray(alpha).astype('float32') / 255.0
                 matrices.append(('uv_alpha', Submatrix(alpha_array), CacheBuilder.SCALE_MAP['uv'] / 2.0))
-                size = array.shape[:2]
-                array[..., 0] *= size[0] - 1
-                array[..., 1] *= size[1] - 1
 
                 if is_preview:
                     array = ndimage.zoom(array, [preview_scale, preview_scale, 1], order=0)
-
-                w = (crop[0] * array.shape[1], crop[1] * array.shape[0],
-                     crop[2] * array.shape[1], crop[3] * array.shape[0])
-                array = array[w[1]:w[3], w[0]:w[2]]
-                print('array', array.shape)
 
             else:
                 img = image_from_array(array)
@@ -97,7 +97,6 @@ class CacheBuilder(object):
                         resize_factor /= 2.0
                     img = img.resize(scale_tuple(img.size, resize_factor), Image.LANCZOS)
 
-                print('img', img.size)
                 array = np.asarray(img).astype('float32') / 255.0
 
             if is_base_layer(instance):

@@ -198,6 +198,9 @@ class AccessoriesPriceAdmin(admin.ModelAdmin):
 class CollectionAdmin(GrappelliOrderableAdmin):
     list_display = ('title', 'sex')
 
+    class Media:
+        js = ('backend/admin/collection/scripts.js',)
+
 
 class CustomButtonsAdmin(GrappelliOrderableAdmin):
     list_display = ('title', 'type')
