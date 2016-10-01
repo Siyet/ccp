@@ -160,7 +160,6 @@ class Composer(object):
                upper_stitches=[], dickey=None, extra_details=[], base_layer=[], AA=True):
 
         texture_arr = load_texture(texture)
-
         result = STMap(uv, texture_arr, AA)
 
         paste(result, dickey)

@@ -119,13 +119,12 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
         return Response([
             self.build_filter(_(u'Коллекция'), 'collection', collections_list),
             self.build_filter(_(u'Цвет'), 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
-            self.build_filter(_(u'Дизайн'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
-            self.build_filter(_(u'Тип ткани'), 'fabric__type', list(fabric_types.values('id', 'title').distinct())),
-            self.build_filter(_(u'Толщина ткани'), 'fabric__thickness',
+            self.build_filter(_(u'Узор'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
+            self.build_filter(_(u'Плетение'), 'fabric__type', list(fabric_types.values('id', 'title').distinct())),
+            self.build_filter(_(u'Плотность'), 'fabric__thickness',
                               list(thickness.values('id', 'title').distinct())),
             self.build_filter(_(u'Сортировка'), 'ordering', self.get_ordering_options())
         ])
-
 
 class ShirtDetails(RetrieveAPIView):
     """

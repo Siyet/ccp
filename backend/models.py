@@ -45,6 +45,11 @@ class Collection(OrderedModel):
         verbose_name = _(u'Коллекция')
         verbose_name_plural = _(u'Коллекции')
 
+    def save(self, *args, **kwargs):
+        if self.contrast_details:
+            self.white_fabric = None
+        return super(Collection, self).save(*args, **kwargs)
+
     def fabrics(self):
         filter_predicate = Q(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL)
         filter_predicate &= Q(residuals__storehouse=self.storehouse.pk)

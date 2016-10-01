@@ -66,6 +66,16 @@ ROOT_URLCONF = 'core.urls'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ALLOW_HEADERS = (
+    'x-requested-with',
+    'content-type',
+    'accept',
+    'origin',
+    'authorization',
+    'x-csrftoken',
+    'Cache-Control'
+)
+
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.DjangoFilterBackend',
@@ -113,7 +123,6 @@ TIME_ZONE = 'Europe/Moscow'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
@@ -129,6 +138,7 @@ except:
 from .appconfig import *
 # noinspection PyUnresolvedReferences
 from .email import *
+
 try:
     from htmltopdf import *
 except:

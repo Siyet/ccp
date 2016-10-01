@@ -5,9 +5,8 @@ import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
-from lazy import lazy
 
-from backend.models import ContrastDetails, Fabric, CustomButtons
+from backend.models import ContrastDetails, Fabric, CustomButtons, Collection
 from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
@@ -16,6 +15,7 @@ from processing.rendering.utils import hex_to_rgb, scale_tuple, draw_rotated_tex
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder, STITCHES
 
+from django.utils.functional import cached_property
 
 class CacheBuilderMock(object):
     @staticmethod
@@ -39,6 +39,7 @@ class BaseShirtBuilder(object):
 
     def _setup(self):
         shirt_data = self.shirt_data
+        self.collection_id = shirt_data['collection']
         self.collar = self.extract(shirt_data, 'collar')
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
         self.pocket = self.extract(shirt_data, 'pocket')
@@ -79,12 +80,13 @@ class BaseShirtBuilder(object):
         self.base_layer = []
         self.extra_details = []
 
-    def get_fabric_texture(self, fabric_id):
-        fabric = Fabric.objects.select_related('texture').get(pk=fabric_id)
+    def get_fabric_texture(self, fabric):
+        if not isinstance(fabric, Fabric):
+            fabric = Fabric.objects.select_related('texture').get(pk=fabric)
         self.cache_builder.cache_texture(fabric.texture)
         return fabric.texture
 
-    @lazy
+    @cached_property
     def buttons_color(self):
         if self.custom_buttons and self.custom_buttons_type:
             buttons = CustomButtons.objects.filter(pk=self.custom_buttons).first()
@@ -93,19 +95,23 @@ class BaseShirtBuilder(object):
 
         return None
 
-    @lazy
+    @cached_property
+    def collection(self):
+        return Collection.objects.get(pk=self.collection_id)
+
+    @cached_property
     def collar_conf(self):
         raise NotImplementedError()
 
-    @lazy
+    @cached_property
     def collar_model(self):
         return self.collar_conf.sources.filter(projection=self.projection).first()
 
-    @lazy
+    @cached_property
     def cuff_conf(self):
         raise NotImplementedError()
 
-    @lazy
+    @cached_property
     def cuff_model(self):
         return self.cuff_conf.sources.filter(projection=self.projection).first()
 
@@ -260,8 +266,21 @@ class BaseShirtBuilder(object):
             self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
     def append_contrasting_part(self, conf, model, elements):
-        if not self.contrast_details:
+        if self.contrast_details is None:
             return self.append_model(model)
+
+        self.cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
+
+        def sources_for(model):
+            uv = np.load(model.cache.get(source_field='uv', resolution=self.resolution).file.path)
+            light_conf = model.cache.get(source_field='light', resolution=self.resolution)
+            ao = model.cache.get(source_field='ao', resolution=self.resolution).file.path
+            return uv, light_conf, ao
+
+        if not self.collection.contrast_details:
+            (uv, light_conf, ao) = sources_for(model)
+            self.append_solid_contrasting_part(ao, light_conf, model, self.collection.white_fabric, uv)
+            return
 
         part_keys = set([x[0] for x in elements])
         all_detail_keys = set([x['element'] for x in self.contrast_details])
@@ -269,10 +288,7 @@ class BaseShirtBuilder(object):
             return self.append_model(model)
         present_part_keys = filter(lambda k: k in part_keys, all_detail_keys)
         part_details = filter(lambda k: k['element'] in part_keys, self.contrast_details)
-        self.cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
-        uv = np.load(model.cache.get(source_field='uv', resolution=self.resolution).file.path)
-        light_conf = model.cache.get(source_field='light', resolution=self.resolution)
-        ao = model.cache.get(source_field='ao', resolution=self.resolution).file.path
+        (uv, light_conf, ao) = sources_for(model)
         fabrics = set(map(lambda d: d['fabric'], part_details))
         if sorted(present_part_keys) == sorted(part_keys) and len(fabrics) == 1:
             self.append_solid_contrasting_part(ao, light_conf, model, fabrics.pop(), uv)

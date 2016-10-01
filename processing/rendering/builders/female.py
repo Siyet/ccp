@@ -71,13 +71,6 @@ class FemaleShirtBuilder(BaseShirtBuilder):
                 'yoke_id': self.yoke
             }))
 
-        if self.projection == PROJECTION.back:
-            back_shadow = models.FemaleBackShadow.objects.get(back_id=self.back)
-            self.cache_builder.create_cache(back_shadow, ['shadow'], resolution=self.resolution)
-            shadow_cache = back_shadow.cache.get(source_field='shadow', resolution=self.resolution)
-            shadow_conf = ImageConf.for_cache(shadow_cache)
-            self.post_shadows.append(shadow_conf)
-
         if self.projection != PROJECTION.back and self.placket.show_buttons:
             buttons_conf = self.get_buttons_conf(models.FemaleBodyButtonsConfiguration, {})
             self.append_buttons_stitches(buttons_conf)

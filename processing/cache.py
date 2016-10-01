@@ -53,7 +53,7 @@ class CacheBuilder(object):
         field_types = field_types or CacheBuilder.DEFAULT_FIELD_TYPES
         preview_scale = RENDER["preview_scale"]
         is_preview = resolution == CACHE_RESOLUTION.preview
-
+        crop = RENDER['crop_scale']
         for field in fields:
             image = getattr(instance, field, None)
             if not image or not image.path:
@@ -64,27 +64,39 @@ class CacheBuilder(object):
             except IOError:
                 array = np.asarray(Image.open(image.path)).astype('float32') / 255.0
 
+
             if field == 'uv':
+                size = array.shape[:2]
+                array[..., 0] *= size[0] - 1
+                array[..., 1] *= size[1] - 1
+
+                w = (crop[0] * size[1], crop[1] * size[0],
+                     crop[2] * size[1], crop[3] * size[0])
+                array = array[w[1]:w[3], w[0]:w[2]]
+
                 alpha = image_from_array(array[..., 3])
                 alpha_scale = preview_scale / 2.0 if is_preview else 0.5
                 alpha = alpha.resize(scale_tuple(alpha.size, alpha_scale), Image.LANCZOS)
                 alpha_array = np.asarray(alpha).astype('float32') / 255.0
                 matrices.append(('uv_alpha', Submatrix(alpha_array), CacheBuilder.SCALE_MAP['uv'] / 2.0))
-                size = array.shape[:2]
-                array[..., 0] *= size[0] - 1
-                array[..., 1] *= size[1] - 1
+
                 if is_preview:
                     array = ndimage.zoom(array, [preview_scale, preview_scale, 1], order=0)
 
             else:
                 img = image_from_array(array)
                 field_type = field_types.get(field) or CacheBuilder.DEFAULT_FIELD_TYPES.get(field)
-
+                w = (
+                    img.size[0] * crop[0], img.size[1] * crop[1],
+                    img.size[0] * crop[2], img.size[1] * crop[3],
+                )
+                img = img.crop(w)
                 if field_type == L_FIELD or is_preview:
                     resize_factor = preview_scale if is_preview else 1
                     if field_type == L_FIELD:
                         resize_factor /= 2.0
                     img = img.resize(scale_tuple(img.size, resize_factor), Image.LANCZOS)
+
                 array = np.asarray(img).astype('float32') / 255.0
 
             if is_base_layer(instance):
