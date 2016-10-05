@@ -49,6 +49,10 @@ class Font(models.Model):
 class FabricColor(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
     value = RGBColorField(_(u'Значение'))
+    image_filter = models.ImageField(_(u'Изображение для фильтра на витрине'),
+        upload_to='fabriccolor', blank=True)
+    image_fabric = models.ImageField(_(u'Изображение для фильтра внутри конфигуратора'),
+        upload_to='fabriccolor', blank=True)
 
     def __unicode__(self):
         return self.title
