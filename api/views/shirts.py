@@ -87,6 +87,9 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
 
         return ordering_options
 
+    def get_colors_serializer(self, colors):
+        return serializers.FabricColorSerializer(colors, many=True, context={'request': self.request})
+
     def get(self, request, *args, **kwargs):
         """
         Фильтры для списка рубашек
@@ -103,6 +106,7 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             color_fabrics__shirt__is_template=True,
             color_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
+        colors_serializer = self.get_colors_serializer(colors.distinct())
         designs = dictionaries.FabricDesign.objects.filter(
             design_fabrics__shirt__is_template=True,
             design_fabrics__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
@@ -118,7 +122,7 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
 
         return Response([
             self.build_filter(_(u'Коллекция'), 'collection', collections_list),
-            self.build_filter(_(u'Цвет'), 'fabric__colors', list(colors.values('id', 'title', 'value').distinct())),
+            self.build_filter(_(u'Цвет'), 'fabric__colors', colors_serializer.data),
             self.build_filter(_(u'Узор'), 'fabric__designs', self.build_design_list(designs.distinct(), request)),
             self.build_filter(_(u'Плетение'), 'fabric__type', list(fabric_types.values('id', 'title').distinct())),
             self.build_filter(_(u'Плотность'), 'fabric__thickness',
