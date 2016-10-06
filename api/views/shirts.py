@@ -5,6 +5,7 @@ from rest_framework import pagination
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import F
 from django.conf import settings
 from django.utils.text import ugettext_lazy as _
 
@@ -116,9 +117,8 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
 
-        collections_list = list(collections.values('id', 'filter_title').distinct())
-        for collection in collections_list:
-            collection['title'] = collection.pop('filter_title')
+        collections = collections.values('id', 'filter_title').annotate(title=F('filter_title'))
+        collections_list = list(collections.values('id', 'title').distinct())
 
         return Response([
             self.build_filter(_(u'Коллекция'), 'collection', collections_list),
@@ -129,6 +129,7 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
                               list(thickness.values('id', 'title').distinct())),
             self.build_filter(_(u'Сортировка'), 'ordering', self.get_ordering_options())
         ])
+
 
 class ShirtDetails(RetrieveAPIView):
     """
