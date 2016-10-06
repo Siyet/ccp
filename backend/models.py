@@ -26,6 +26,7 @@ class Collection(OrderedModel):
                                    blank=False, null=True)
     title = models.CharField(_(u'Название'), max_length=255)
     filter_title = models.CharField(_(u'Наименование для фильтра'), max_length=255)
+    about_shirt_title = models.CharField(_(u'Наименование для экрана "О сорочке"'), max_length=255)
     text = models.TextField(_(u'Описание'))
     image = models.ImageField(_(u'Изображение'), upload_to='collection')
     dickey = models.BooleanField(_(u'Манишка'))

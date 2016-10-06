@@ -165,10 +165,11 @@ class ShawlOptionsSerializer(serializers.ModelSerializer):
 
 class ShirtCollectionSerializer(serializers.ModelSerializer):
     title = serializers.ReadOnlyField(source='__unicode__')
+    production = serializers.CharField(source='about_shirt_title')
 
     class Meta:
         model = models.Collection
-        fields = ('id', 'title')
+        fields = ('id', 'title', 'production',)
 
 
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
