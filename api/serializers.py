@@ -74,6 +74,7 @@ class FabricSerializer(BaseFabricSerializer):
 class FabricColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = dictionaries.FabricColor
+        exclude = ('order',)
 
 
 class FabricDesignSerializer(serializers.ModelSerializer):

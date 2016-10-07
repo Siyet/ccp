@@ -49,6 +49,7 @@ class Font(models.Model):
 class FabricColor(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, unique=True)
     value = RGBColorField(_(u'Значение'))
+    image = models.ImageField(_(u'Изображение'), upload_to='fabriccolor', blank=True)
 
     def __unicode__(self):
         return self.title
