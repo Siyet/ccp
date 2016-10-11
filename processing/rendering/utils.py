@@ -1,19 +1,21 @@
 import OpenEXR
+import os
 
 import numpy
 import Imath
-import os
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw
 
 FLOAT = Imath.PixelType(Imath.PixelType.FLOAT)
 
 CHANNELS = ('R', 'G', 'B', 'A')
+
 
 class Repickable(object):
     def repick(self, bbox):
         self.bbox = bbox
         (x, y, x1, y1) = bbox
         self.values = self._source[x: x1, y: y1]
+
 
 class Matrix(Repickable):
     def __init__(self, arr):
@@ -39,7 +41,6 @@ class Submatrix(Repickable):
         self.values = arr[x[0]:x[1], y[0]:y[1]]
         self.bbox = (x[0], y[0], x[1], y[1])
         self._source = arr
-
 
 
 def load_image(filename):
@@ -95,7 +96,6 @@ def exr_to_array(exrfile, channels=None):
     return res
 
 
-
 def uv_to_image(arr):
     result = extend_uv_with_blue(arr) * 255.0
     return Image.fromarray(result.astype('uint8'), "RGB")
@@ -114,15 +114,24 @@ def hex_to_rgb(value):
     return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 
-def scale_tuple(tpl, scale=1):
+def scale_tuple(tpl, scale=1.0):
     if abs(scale - 1.0) < 0.001:
         return tuple(int(x) for x in tpl)
     res = tuple(int(round(float(x) * scale)) for x in tpl)
     return res
+
+
+def cropped_box(size, crop, scale=1.0):
+    return scale_tuple(
+        (
+            size[0] * crop[0], size[1] * crop[1],
+            size[0] * crop[2], size[1] * crop[3]
+        ), scale)
+
 
 def draw_rotated_text(text, font, rotate):
     text_image = Image.new('L', font.getsize(text))
     draw = ImageDraw.Draw(text_image)
     draw.text((0, 0), text, font=font, fill=255)
 
-    return text_image.rotate(rotate,  expand=1)
+    return text_image.rotate(rotate, expand=1)

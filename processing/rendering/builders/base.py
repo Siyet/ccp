@@ -11,7 +11,7 @@ from dictionaries import models as dictionaries
 import processing.models as compose
 from processing.rendering.compose import Composer, ImageConf
 from core.utils import first
-from processing.rendering.utils import hex_to_rgb, scale_tuple, draw_rotated_text
+from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_text
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder, STITCHES
 
@@ -195,7 +195,8 @@ class BaseShirtBuilder(object):
         if conf.projection == compose.PROJECTION.side and isinstance(conf.content_object,
                                                                      compose.BodyButtonsConfiguration):
             scale = 1.0 if self.resolution == compose.CACHE_RESOLUTION.full else RENDER['preview_scale']
-            size = scale_tuple(RENDER['default_size'], scale)
+            box = cropped_box(RENDER['default_size'], RENDER['crop_scale'], scale)
+            size = (box[2]-box[0], box[3]-box[1])
             buttons_base = Image.new("RGBA", size, 0)
             buttons_base.paste(buttons_image, buttons_cache.position, mask=buttons_image)
             if ao:
