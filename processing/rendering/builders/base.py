@@ -1,5 +1,3 @@
-from time import time
-
 from PIL import Image, ImageChops, ImageColor, ImageFont, ImageOps
 import numpy as np
 from django.db.models import ObjectDoesNotExist

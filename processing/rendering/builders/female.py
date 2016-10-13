@@ -1,14 +1,12 @@
 from time import time
 
 from django.core.exceptions import ObjectDoesNotExist
-from PIL import Image, ImageChops
-import numpy as np
 
 from lazy import lazy
 
 from .base import BaseShirtBuilder
 from processing.female_configs import models
-from processing.rendering.compose import Composer, ImageConf
+from processing.rendering.compose import Composer
 from processing.models import PROJECTION
 from backend.models import ContrastDetails
 
@@ -37,10 +35,6 @@ class FemaleShirtBuilder(BaseShirtBuilder):
 
     def build_shirt(self):
         self._setup()
-        total = time()
-        start = time()
-        texture = self.get_fabric_texture(self.fabric)
-        self.cache_builder.cache_texture(texture)
 
         body_models= self.get_compose_configurations(models.FemaleBodyConfiguration, {
             'sleeve_id': self.sleeve.id,
@@ -48,14 +42,23 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             'cuff_types__id': self.cuff['type'] if self.cuff else None,
             'tuck_id': self.tuck,
         })
+        cuff_buttons = self.get_buttons_conf(models.FemaleCuffButtonsConfiguration, {
+                'cuff_id': self.cuff['type'],
+                'rounding_types__id': self.cuff['rounding']
+            })
         if self.projection == PROJECTION.back:
             if self.sleeve.cuffs:
                 self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
+                self.append_buttons_stitches(cuff_buttons)
+                cuffs = self.perform_compose()
+                self.base_layer.append(cuffs)
+
             self.append_model(body_models.get(back_id=self.back))
         else:
             self.append_model(body_models.first())
             if self.sleeve.cuffs:
                 self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
+                self.append_buttons_stitches(cuff_buttons)
 
         self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
         self.append_model(self.get_compose_configuration(models.FemalePocketConfiguration, {
@@ -75,28 +78,30 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             buttons_conf = self.get_buttons_conf(models.FemaleBodyButtonsConfiguration, {})
             self.append_buttons_stitches(buttons_conf)
 
-        if self.cuff and self.sleeve.cuffs:
-            self.append_buttons_stitches(self.get_buttons_conf(models.FemaleCuffButtonsConfiguration, {
-                'cuff_id': self.cuff['type'],
-                'rounding_types__id': self.cuff['rounding']
-            }))
-
         self.append_buttons_stitches(self.get_buttons_conf(models.FemaleCollarButtonsConfiguration, {
             'collar_id': self.collar['type'],
             'buttons': self.collar_buttons
         }))
 
+        res = self.perform_compose()
+
+        if self.initials:
+            self.add_initials(res, self.initials, self.resolution, self.pocket)
+
+        return res
+
+    def perform_compose(self):
         uv = Composer.compose_uv(self.uv)
         light = Composer.compose_light(self.lights)
+        texture = self.get_fabric_texture(self.fabric)
+        self.cache_builder.cache_texture(texture)
         if texture.needs_shadow:
             shadow = Composer.compose_light(self.shadows)
         else:
             shadow = None
         alpha = Composer.compose_alpha(self.alphas)
-        print("preparation", time() - start)
-        start = time()
 
-        res = Composer.create(
+        result = Composer.create(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
             light=light,
@@ -110,14 +115,8 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             extra_details=self.extra_details,
             base_layer=self.base_layer
         )
-        if self.initials:
-            self.add_initials(res, self.initials, self.resolution, self.pocket)
-
-        print("compose", time() - start)
-        print("total", time() - total)
-
-        return res
-
+        self.reset()
+        return result
 
     @classmethod
     def get_initials_configuration(cls, initials, pocket):
