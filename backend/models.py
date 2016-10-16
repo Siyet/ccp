@@ -1,7 +1,6 @@
 # coding: UTF-8
 import re
 
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
@@ -34,9 +33,13 @@ class Collection(OrderedModel):
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
     shawl = models.BooleanField(_(u'Платок'))
     contrast_details = models.BooleanField(_(u'Контрастные детали'))
-    white_fabric = models.ForeignKey('backend.Fabric', verbose_name=_(u'Ткань для опции "Воротник и манжеты полностью белые"'), null=True, blank=True)
-    tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'), related_name='collections')
-    sex = models.CharField(_(u'Пол коллекции'), choices=constants.SEX, max_length=6, default=constants.SEX.male, blank=False)
+    white_fabric = models.ForeignKey('backend.Fabric',
+                                     verbose_name=_(u'Ткань для опции "Воротник и манжеты полностью белые"'), null=True,
+                                     blank=True)
+    tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'),
+                                  related_name='collections')
+    sex = models.CharField(_(u'Пол коллекции'), choices=constants.SEX, max_length=6, default=constants.SEX.male,
+                           blank=False)
     tailoring_time = models.CharField(_(u'Время пошива и доставки'), max_length=255, null=True)
 
     def __unicode__(self):
@@ -94,7 +97,7 @@ class Stays(OrderedModel):
 
 
 class Fit(OrderedModel):
-    title = models.CharField(_(u'Название'), max_length=255, unique=True)
+    title = models.CharField(_(u'Название'), max_length=255)
     collections = models.ManyToManyField(Collection, verbose_name=_(u'Коллекции'), related_name='fits')
     sizes = models.ManyToManyField('dictionaries.Size', verbose_name=_(u'Размеры'), related_name='fits')
     picture = models.ImageField(_(u'Изображение'), upload_to='fit')
@@ -340,9 +343,11 @@ class Shirt(models.Model):
     pocket = models.ForeignKey('dictionaries.PocketType', verbose_name=_(u'Карман'), related_name='pocket_shirts')
     sleeve = models.ForeignKey('dictionaries.SleeveType', verbose_name=_(u'Рукав'), related_name='sleeve_shirts',
                                default=ResolveDefault(SleeveType))
-    fit = models.ForeignKey(Fit, verbose_name=_(u'Талия'), blank=True, null=True)
-    # fit = models.ForeignKey('dictionaries.Fit', verbose_name=_(u'Талия'), blank=True, null=True)
-    sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True, null=True)
+    fit = ChainedForeignKey(Fit, verbose_name=_(u'Талия'), chained_field='collection',
+                            chained_model_field='collections', show_all=False, blank=True, null=True)
+
+    sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True,
+                                      null=True)
 
     tuck = ChainedForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), chained_field='collection',
                              chained_model_field='collections', show_all=False)
@@ -364,7 +369,6 @@ class Shirt(models.Model):
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
 
     price = models.DecimalField(_(u'Цена'), max_digits=10, decimal_places=2, editable=False, null=True)
-
 
     def save(self, *args, **kwargs):
         cuff = getattr(self, 'cuff', None)
