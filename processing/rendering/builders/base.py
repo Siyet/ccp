@@ -139,7 +139,8 @@ class BaseShirtBuilder(object):
         except ObjectDoesNotExist:
             pass
         try:
-            self.post_shadows.append(model.cache.get(source_field='shadow', resolution=self.resolution))
+            shadow = model.cache.get(source_field='shadow', resolution=self.resolution)
+            self.post_shadows.append(ImageConf.for_cache(shadow))
         except ObjectDoesNotExist:
             pass
         self.alphas.append(model.cache.get(source_field='uv_alpha', resolution=self.resolution))
