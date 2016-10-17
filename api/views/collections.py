@@ -52,7 +52,7 @@ class CollectionFabricsList(CollectionMixin, ListAPIView):
     def get_queryset(self):
         return self.collection.fabrics().select_related('texture').exclude(texture=None).exclude(
             Q(short_description='') & Q(long_description='')
-        )
+        ).exclude(dickey=True)
 
     @cache_response(key_func=ListKeyConstructor())
     def list(self, request, *args, **kwargs):

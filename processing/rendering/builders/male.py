@@ -97,7 +97,7 @@ class MaleShirtBuilder(BaseShirtBuilder):
         self.append_model(self.get_compose_configuration(models.MalePlacketConfiguration, {
             'plackets': self.placket.id,
             'hem_id': self.hem
-        }), post_shadow=True)
+        }))
         if self.projection == PROJECTION.back and self.yoke:
             self.append_model(self.get_compose_configuration(models.MaleYokeConfiguration, {
                 'yoke_id': self.yoke

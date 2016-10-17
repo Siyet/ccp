@@ -68,7 +68,7 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             'plackets': self.placket.id,
             'hem_id': self.hem,
             'tuck_id': self.tuck
-        }), post_shadow=True)
+        }))
         if self.projection == PROJECTION.back and self.yoke:
             self.append_model(self.get_compose_configuration(models.FemaleYokeConfiguration, {
                 'yoke_id': self.yoke
