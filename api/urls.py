@@ -28,8 +28,6 @@ collection_urls = [
     url(r'^fabric/fabric_type/$', views.CollectionFabricTypeList.as_view()),
     url(r'^hardness/$', views.CollectionHardnessList.as_view()),
     url(r'^stays/$', views.CollectionStaysList.as_view()),
-    url(r'^contrasting_fabrics/$', views.CollectionContrastDetailsList.as_view()),
-    url(r'^dickey/$', views.CollectionDickeyList.as_view()),
     url(r'^tuck/$', views.CollectionTuckList.as_view()),
     url(r'^stitches/$', views.CollectionStitchesList.as_view()),
     url(r'^fit/$', views.CollectionFitList.as_view()),

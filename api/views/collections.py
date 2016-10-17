@@ -20,8 +20,8 @@ from api.filters import CollectionFabricsFilter
 
 __all__ = [
     'CollectionsListView', 'CollectionFabricDesignsList', 'CollectionFabricsList', 'CollectionFabricColorsList',
-    'CollectionHardnessList', 'CollectionStaysList', 'CollectionContrastDetailsList', 'CollectionStitchesList',
-    'CollectionDickeyList', 'CollectionThicknessList', 'CollectionFabricTypeList', 'CollectionTuckList',
+    'CollectionHardnessList', 'CollectionStaysList', 'CollectionStitchesList',
+    'CollectionThicknessList', 'CollectionFabricTypeList', 'CollectionTuckList',
     'CollectionFitList',
 ]
 
@@ -121,32 +121,6 @@ class CollectionStaysList(CollectionMixin, ListAPIView):
 
     def get_queryset(self):
         return self.collection.stays.all()
-
-
-class CollectionAccessoriesPriceList(CollectionMixin, APIView):
-    model = None
-
-    def get(self, request, *args, **kwargs):
-        prices = AccessoriesPrice.objects.filter(collections=self.collection, content_type__app_label='backend',
-                                                 content_type__model=self.model.__name__.lower()).distinct().first()
-        result = [{'key': False, 'value': _(u'Не использовать'), 'extra_price': None}]
-        if prices:
-            result.append({'key': True, 'value': _(u'Использовать'), 'extra_price': prices.price})
-        return Response(result)
-
-
-class CollectionContrastDetailsList(CollectionAccessoriesPriceList):
-    """
-    Доступные варианты для контрастных тканей
-    """
-    model = ContrastDetails
-
-
-class CollectionDickeyList(CollectionAccessoriesPriceList):
-    """
-    Доступные варианты для манишки
-    """
-    model = Dickey
 
 
 class CollectionTuckList(CollectionMixin, ListAPIView):
