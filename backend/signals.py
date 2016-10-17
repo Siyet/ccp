@@ -28,7 +28,8 @@ def calculate_shirts_price(sender, instance, created, **kwargs):
 
 
 def calculate_shirt_price(sender, instance, **kwargs):
-    instance.price = ShirtPriceCalculator.get_price_for_object(instance)
+    if isinstance(instance, models.Shirt):
+        instance.price = ShirtPriceCalculator.get_price_for_object(instance)
 
 
 # TODO: добавить 2 события для всех связанных моделей с ценой рубашки
@@ -47,4 +48,4 @@ post_save.connect(calculate_shirts_price, sender=CustomButtonsType)
 pre_save.connect(get_old_shirts, sender=models.ContrastDetails)
 post_save.connect(calculate_shirts_price, sender=models.ContrastDetails)
 
-pre_save.connect(calculate_shirt_price, sender=models.Shirt)
+pre_save.connect(calculate_shirt_price)

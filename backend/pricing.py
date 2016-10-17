@@ -4,7 +4,6 @@ from django.contrib.contenttypes.models import ContentType
 
 from core.utils import first
 from backend import models as backend
-from dictionaries import models as dictionaries
 
 
 class ShirtPriceCalculator(object):
