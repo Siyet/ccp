@@ -323,7 +323,7 @@ class ShirtSerializer(serializers.ModelSerializer):
     collar = ShirtCollarSerializer()
     cuff = ShirtCuffSerializer()
     dickey = ShirtDickeySerializer(required=False, allow_null=True)
-    contrast_details = ContrastDetailsSerializer(many=True)
+    contrast_details = ContrastDetailsSerializer(many=True, allow_null=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
     initials = InitialsSerializer(required=False, allow_null=True)
 
@@ -358,7 +358,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         cuff = shirt.pop('cuff')
         dickey = shirt.pop('dickey', None)
         initials = shirt.pop('initials', None)
-        contrast_details = shirt.pop('contrast_details')
+        contrast_details = shirt.pop('contrast_details', None)
         contrast_stitches = shirt.pop('contrast_stitches')
         shirt = models.Shirt.objects.create(**shirt)
         models.Collar.objects.create(shirt=shirt, **collar)
