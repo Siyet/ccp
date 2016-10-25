@@ -21,11 +21,14 @@ class ListKeyConstructor(DefaultListKeyConstructor):
 
 
 def get_latest_date(model):
-    latest = model.objects.values_list('modified').latest('modified')
-    return latest[0] if latest else None
+    try:
+        latest = model.objects.values_list('modified').latest('modified')
+        return latest[0] if latest else None
+    except:
+        return None
 
 
 def fabric_last_modified(*args, **kwargs):
-    print(args, kwargs)
     dates = map(lambda model: get_latest_date(model), [Fabric, FabricPrice, Texture])
+    dates = filter(None, dates)
     return max(dates)
