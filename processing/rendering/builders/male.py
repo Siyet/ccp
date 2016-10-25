@@ -154,7 +154,7 @@ class MaleShirtBuilder(BaseShirtBuilder):
     def get_back(self):
         if not self.back:
             return None
-        back_conf = models.MaleBackConfiguration.objects.get(back_id=self.back, tuck_id=self.tuck)
+        back_conf = models.MaleBackConfiguration.objects.get(back_id=self.back, tuck_id=self.tuck, hem_id=self.hem)
         return back_conf.sources.filter(projection=self.projection).first()
 
     @classmethod

@@ -38,9 +38,10 @@ class MaleBodyConfiguration(PartConfigurationModel):
 class MaleBackConfiguration(PartConfigurationModel):
     back = models.ForeignKey(dictionaries.BackType, verbose_name=_(u'Спинка'))
     tuck = models.ForeignKey(dictionaries.TuckType, verbose_name=_(u'Вытачки'))
+    hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
 
     class Meta:
-        unique_together = ('back', 'tuck')
+        unique_together = ('back', 'hem', 'tuck')
         verbose_name = _(u'Конфигурация сборки для спинки')
         verbose_name_plural = _(u'Конфигурации сборки для спинки')
 
