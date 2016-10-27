@@ -30,7 +30,7 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             )
             return cuff_conf
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist("Collar configuration not found for given parameters: %s" % self.collar)
+            raise ObjectDoesNotExist("Cuff configuration not found for given parameters: %s" % self.collar)
 
 
     def build_shirt(self):
