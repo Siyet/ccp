@@ -9,12 +9,12 @@ from pricing import ShirtPriceCalculator
 
 
 def get_old_shirts(sender, instance, **kwargs):
-    if instance.pk is not None and not hasattr(instance, '__import__'):
+    if instance.pk is not None and not hasattr(instance, 'ignore_signals'):
         instance.old_shirts = sender.objects.get(pk=instance.pk).get_shirts()
 
 
 def calculate_shirts_price(sender, instance, created, **kwargs):
-    if hasattr(instance, '__import__'):
+    if hasattr(instance, 'ignore_signals'):
         return
     with transaction.atomic():
         # обязательный метод get_shirts для связанных с ценой рубашки моделей
@@ -30,7 +30,7 @@ def calculate_shirts_price(sender, instance, created, **kwargs):
 
 
 def calculate_shirt_price(sender, instance, **kwargs):
-    if isinstance(instance, models.Shirt) and not hasattr(instance, '__import__'):
+    if isinstance(instance, models.Shirt):
         instance.price = ShirtPriceCalculator.get_price_for_object(instance)
 
 

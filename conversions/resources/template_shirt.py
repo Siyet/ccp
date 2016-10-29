@@ -319,7 +319,6 @@ class TemplateShirtResource(resources.ModelResource):
             data.append(row)
         return data
 
-
     def import_contrast_stitch(self, instance, element, color):
         if instance.marked_new:
             stitch = None
@@ -344,7 +343,8 @@ class TemplateShirtResource(resources.ModelResource):
             if detail is None:
                 detail = ContrastDetails(shirt=instance, element=element)
             detail.fabric = fabric
-            detail.__import__ = True
+            # ignore pricing for now
+            detail.ignore_signals = True
             detail.save()
         elif detail is not None:
             detail.delete()
@@ -352,7 +352,6 @@ class TemplateShirtResource(resources.ModelResource):
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
             instance.marked_new = instance.pk is None
-            instance.__import__ = True
 
             if instance.size is not None and instance.size._state.adding:
                 instance.size.save()
