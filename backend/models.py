@@ -172,6 +172,10 @@ class Fabric(TimeStampedModel):
     def is_valid_code(code):
         return re.match(r'[A-Z]\d+$', code) if isinstance(code, basestring) else False
 
+    @staticmethod
+    def autocomplete_search_fields():
+        return ("code__icontains",)
+
     class Meta(OrderedModel.Meta):
         ordering = ('code',)
         verbose_name = _(u'Ткань')

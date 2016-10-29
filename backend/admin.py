@@ -38,6 +38,10 @@ class CollarInline(admin.StackedInline):
 class ContrastDetailsInline(admin.TabularInline):
     model = ContrastDetails
     extra = 1
+    raw_id_fields = ['fabric']
+    autocomplete_lookup_fields = {
+        'fk': ['fabric']
+    }
 
 
 class ContrastStitchInline(admin.TabularInline):
@@ -62,6 +66,12 @@ class BaseShirtAdmin(GrappelliOrderableAdmin):
         except:
             show_cuffs = True
         return HttpResponse(json.dumps(show_cuffs))
+
+    raw_id_fields = ['fabric']
+    autocomplete_lookup_fields = {
+        'fk': ['fabric']
+    }
+
 
 
 class DickeyInline(admin.StackedInline):

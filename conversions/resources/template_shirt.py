@@ -5,6 +5,8 @@ import tablib
 from import_export import fields
 from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 from import_export import resources
+from django.utils.translation import ugettext as _
+from django.utils.functional import cached_property
 
 from conversions.fields import TemplateShirtCollectionField
 from conversions.utils import save_relations
@@ -13,7 +15,7 @@ from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionW
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
     Initials, ContrastStitch, ElementStitch, ContrastDetails, ShawlOptions
 from dictionaries import models as dictionaries
-from django.utils.translation import ugettext as _
+from core.utils import first
 
 
 class TemplateShirtResource(resources.ModelResource):
@@ -147,14 +149,20 @@ class TemplateShirtResource(resources.ModelResource):
     contrast_detail_cuff_inner = fields.Field(attribute='contrast_detail_cuff_inner',
                                               column_name=_(u'КТ Манжета внутренняя'))
 
-    export_headers = [_(u'Shirt Code'), _(u'Код ткани'), _(_(u'Коллекция')), _(_(u'Пол')), _(_(u'Размер')), _(_(u'№ размера')), _(u'Тип воротника'),
-                      _(u'Размер воротника'), _(u'Жесткость воротника'), _(u'Косточки'), _(u'Манжеты'), _(u'Вид манжеты'), _(u'Рукав'),
-                      _(u'Жесткость манжеты'), _(u'Низ'), _(u'Полочка'), _(u'Карман'), _(u'Вытачки'), _(u'Спинка'), _(u'Вариант пуговиц'),
-                      _(u'Пуговицы'), _(u'Код цвета пуговицы'), _(u'Отстрочка (цвет)'), _(u'ОТЦ Сорочка'), _(u'ОТЦ Манжеты'),
+    export_headers = [_(u'Shirt Code'), _(u'Код ткани'), _(_(u'Коллекция')), _(_(u'Пол')), _(_(u'Размер')),
+                      _(_(u'№ размера')), _(u'Тип воротника'),
+                      _(u'Размер воротника'), _(u'Жесткость воротника'), _(u'Косточки'), _(u'Манжеты'),
+                      _(u'Вид манжеты'), _(u'Рукав'),
+                      _(u'Жесткость манжеты'), _(u'Низ'), _(u'Полочка'), _(u'Карман'), _(u'Вытачки'), _(u'Спинка'),
+                      _(u'Вариант пуговиц'),
+                      _(u'Пуговицы'), _(u'Код цвета пуговицы'), _(u'Отстрочка (цвет)'), _(u'ОТЦ Сорочка'),
+                      _(u'ОТЦ Манжеты'),
                       _(u'ОТЦ Воротник'), _(u'ОТЦ Петель/ниток'), _(u'Отстрочка (мм)'), _(u'Цельная кокетка'),
-                      _(u'Застежка под штифты'), _(u'Манишка'), _(u'МА Ткань'), _(u'МА Тип'), _(u'Контрастные ткани'), _(u'КТ Воротник'),
+                      _(u'Застежка под штифты'), _(u'Манишка'), _(u'МА Ткань'), _(u'МА Тип'), _(u'Контрастные ткани'),
+                      _(u'КТ Воротник'),
                       _(u'КТ Воротник лицевая сторона'), _(u'КТ Воротник низ'), _(u'КТ Воротник внешняя стойка'),
-                      _(u'КТ Воротник внутренняя стойка'), _(u'КТ Манжета'), _(u'КТ Манжета внешняя'), _(u'КТ Манжета внутренняя'),
+                      _(u'КТ Воротник внутренняя стойка'), _(u'КТ Манжета'), _(u'КТ Манжета внешняя'),
+                      _(u'КТ Манжета внутренняя'),
                       _(u'Инициалы'), _(u'ИН Шрифт'), _(u'ИН Цвет'), _(u'ИН Позиция')]
 
     class Meta:
@@ -165,16 +173,32 @@ class TemplateShirtResource(resources.ModelResource):
         select_related = ['fabric', 'collection', 'collar__type', 'collar__hardness', 'collar__stays', 'collar__size',
                           'cuff__type', 'cuff__rounding', 'cuff__hardness', 'hem',
                           'placket', 'pocket', 'back', 'custom_buttons_type', 'custom_buttons', 'yoke',
-                          'dickey__fabric',
+                          'dickey__fabric', 'tuck', 'sleeve', 'size_option', 'size',
                           'dickey__type', 'initials__font', 'initials__color']
-        prefetch_related = ['contrast_stitches', 'contrast_details']
+        prefetch_related = ['contrast_stitches', 'contrast_details', 'dickey']
+        defaults = {
+            'sleeve': dictionaries.resolve_default_object(dictionaries.SleeveType),
+            'shawl': dictionaries.resolve_default_object(ShawlOptions)
+        }
         instance_loader_class = CachedWithPrefetchedInstanceLoader.prepare(select_related, prefetch_related)
+
+    @cached_property
+    def stitch_elements(self):
+        return ElementStitch.objects.values('id', 'title')
+
+    @cached_property
+    def stitch_colors(self):
+        return dictionaries.StitchColor.objects.values('id', 'title')
+
+    @cached_property
+    def fabrics(self):
+        return list(Fabric.objects.all())
 
     def get_queryset(self):
         qs = super(TemplateShirtResource, self).get_queryset()
         return qs.select_related(*self._meta.select_related).prefetch_related(*self._meta.prefetch_related)
 
-    def export(self, queryset=None):
+    def export(self, queryset=None, *args, **kwargs):
         queryset = self.get_queryset().iterator()
         data = tablib.Dataset(headers=self.export_headers)
         for obj in queryset:
@@ -295,84 +319,40 @@ class TemplateShirtResource(resources.ModelResource):
             data.append(row)
         return data
 
+
     def import_contrast_stitch(self, instance, element, color):
+        if instance.marked_new:
+            stitch = None
+        else:
+            stitch = first(lambda cs: cs.element.title == element, instance.contrast_stitches.all())
         if color:
-            try:
-                detail = ContrastStitch.objects.get(
-                    element=ElementStitch.objects.get_or_create(title=element)[0],
-                    shirt=instance
-                )
-                detail.color = dictionaries.StitchColor.objects.get_or_create(title=color)[0]
-                detail.save()
-            except ContrastStitch.DoesNotExist:
-                ContrastStitch.objects.create(
-                    element=ElementStitch.objects.get_or_create(title=element)[0],
-                    color=dictionaries.StitchColor.objects.get_or_create(title=color)[0],
-                    shirt=instance
-                )
+            element = first(lambda e: e['title'] == element, self.stitch_elements)
+            color = first(lambda c: c['title'] == color, self.stitch_colors)
+            if stitch is None:
+                stitch = ContrastStitch(shirt=instance, element_id=element['id'], color_id=color['id'])
+            stitch.save()
+        elif stitch is not None:
+            stitch.delete()
+
+    def import_contrast_detail(self, instance, element, fabric_code):
+        if instance.marked_new:
+            detail = None
         else:
-            self.remove_contrast_stich(instance, element)
-
-    def remove_contrast_stich(self, instance, element):
-        try:
-            detail = ContrastStitch.objects.filter(element=ElementStitch.objects.get_or_create(title=element)[0],
-                                                   shirt=instance)
+            detail = first(lambda cd: cd.element == element, instance.contrast_details.all())
+        if fabric_code:
+            fabric = first(lambda f: f.code == fabric_code, self.fabrics)
+            if detail is None:
+                detail = ContrastDetails(shirt=instance, element=element)
+            detail.fabric = fabric
+            detail.__import__ = True
+            detail.save()
+        elif detail is not None:
             detail.delete()
-        except ContrastStitch.DoesNotExist:
-            pass
-
-    def import_contrast_detail(self, instance, element, fabric):
-        if fabric:
-            try:
-                detail = ContrastDetails.objects.get(
-                    element=element,
-                    shirt=instance
-                )
-                detail.fabric = Fabric.objects.get_or_create(code=fabric)[0]
-                detail.save()
-            except ContrastDetails.DoesNotExist:
-                ContrastDetails.objects.create(
-                    element=element,
-                    fabric=Fabric.objects.get_or_create(code=fabric)[0],
-                    shirt=instance
-                )
-        else:
-            self.remove_contrast_stich(instance, element)
-
-    def remove_contrast_detail(self, instance, element):
-        try:
-            detail = ContrastDetails.objects.filter(element=element, shirt=instance)
-            detail.delete()
-        except ContrastDetails.DoesNotExist:
-            pass
 
     def before_save_instance(self, instance, dry_run):
         if not dry_run:
-            save_relations(instance, 'fabric')
-            save_relations(instance, 'collection')
-            save_relations(instance, 'hem')
-            save_relations(instance, 'placket')
-            save_relations(instance, 'size_option')
-            save_relations(instance, 'pocket')
-            save_relations(instance, 'back')
-            save_relations(instance, 'yoke')
-            save_relations(instance, 'sleeve')
-            save_relations(instance.collar, 'type')
-            save_relations(instance.collar, 'hardness')
-            save_relations(instance.collar, 'stays')
-            save_relations(instance.collar, 'size')
-            if hasattr(instance, 'cuff'):
-                save_relations(instance.cuff, 'type')
-                save_relations(instance.cuff, 'rounding')
-                save_relations(instance.cuff, 'hardness')
-
-            if hasattr(instance, 'dickey'):
-                save_relations(instance.dickey, 'type')
-                save_relations(instance.dickey, 'fabric')
-
-            if hasattr(instance, 'initials'):
-                save_relations(instance.initials, 'font')
-                save_relations(instance.initials, 'color')
+            instance.marked_new = instance.pk is None
+            instance.__import__ = True
 
             if instance.size is not None and instance.size._state.adding:
                 instance.size.save()
@@ -458,3 +438,6 @@ class TemplateShirtResource(resources.ModelResource):
                 field.save(obj, data)
         else:
             return None
+
+    def init_instance(self, row=None):
+        return self._meta.model(**TemplateShirtResource.Meta.defaults)

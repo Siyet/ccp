@@ -328,3 +328,13 @@ class ResolveDefault(object):
             return default.object_pk
         except DefaultElement.DoesNotExist:
             return None
+
+
+def resolve_default_object(model):
+    model_ct = ContentType.objects.get_for_model(model)
+    try:
+        default = DefaultElement.objects.get(content_type=model_ct)
+        return model.objects.get(pk=default.object_pk)
+    except DefaultElement.DoesNotExist:
+        return None
+
