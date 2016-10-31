@@ -43,4 +43,4 @@ def deploy():
             run("python manage.py migrate")
             run("python manage.py collectstatic --noinput")
 
-        run("supervisorctl restart costumecode")
+        run("touch ../uwsgi/ccback.ini")
