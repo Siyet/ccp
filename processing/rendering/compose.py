@@ -18,7 +18,10 @@ class ImageConf(object):
 
 def STMap(source, texture_arr, AA):
 
-    result = texture_arr[source[..., 0], source[..., 1]]
+    result_size = source.shape[:2] + (texture_arr.shape[2], )
+    source = source[..., 0] * texture_arr.shape[0] + source[..., 1]
+    texture_arr = texture_arr.reshape(texture_arr.shape[0]*texture_arr.shape[1], texture_arr.shape[2])
+    result = texture_arr.take(source.ravel(), axis=0).reshape(result_size)
 
     result = Image.fromarray(result, "RGB")
     if AA:
@@ -197,4 +200,5 @@ class Composer(object):
             for layer in base_layer:
                 result.paste(layer, (0, 0), mask=mask)
 
-        return result
+        background = Image.new("RGBA", result.size, "white")
+        return Image.alpha_composite(background, result)
