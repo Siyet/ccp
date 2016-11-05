@@ -197,4 +197,5 @@ class Composer(object):
             for layer in base_layer:
                 result.paste(layer, (0, 0), mask=mask)
 
-        return result
+        background = Image.new("RGBA", result.size, "white")
+        return Image.alpha_composite(background, result)
