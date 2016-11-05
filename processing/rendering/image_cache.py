@@ -29,7 +29,7 @@ class ShirtImageCache(object):
     @staticmethod
     def get_image_path(data, projection, resolution):
         def path_for_key(key):
-            filename = "%s_%s_%s.png" % (key, projection, resolution)
+            filename = "%s_%s_%s.jpg" % (key, projection, resolution)
             return os.path.join(settings.RENDER_CACHE_PATH, filename), filename
 
         resolution = resolution or CACHE_RESOLUTION.preview
@@ -46,13 +46,13 @@ class ShirtImageCache(object):
         builder = ShirtBuilderFactory.get_builder_for_shirt(data, projection, resolution)
         if not os.path.isfile(full_path):
             image = builder.build_shirt()
-            image.save(full_path)
+            image.save(full_path, "JPEG")
         # only append initials
         if initials:
             image = image or Image.open(full_path)
             builder.add_initials(image, initials, projection, data['pocket'])
             (full_path, filename) = path_for_key(base_key)
-            image.save(full_path)
+            image.save(full_path, "JPEG")
 
         return (full_path, filename)
 
