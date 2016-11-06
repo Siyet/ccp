@@ -12,9 +12,9 @@ def shirt(request, pk, *args, **kwargs):
     projection = request.GET.get("projection") or PROJECTION.front
     resolution = request.GET.get("resolution") or CACHE_RESOLUTION.preview
     bldr = ShirtBuilderFactory.get_builder_for_shirt(data, projection, resolution=resolution)
-    response = HttpResponse(content_type="image/png")
+    response = HttpResponse(content_type="image/jpeg")
     image = bldr.build_shirt()
     if initials:
         bldr.add_initials(image, initials, projection, data['pocket'])
-    image.save(response, "PNG")
+    image.save(response, "JPEG")
     return response

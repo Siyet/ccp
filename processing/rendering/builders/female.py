@@ -9,6 +9,7 @@ from processing.female_configs import models
 from processing.rendering.compose import Composer
 from processing.models import PROJECTION
 from backend.models import ContrastDetails
+from PIL import Image
 
 class FemaleShirtBuilder(BaseShirtBuilder):
     @lazy
@@ -88,7 +89,8 @@ class FemaleShirtBuilder(BaseShirtBuilder):
         if self.initials:
             self.add_initials(res, self.initials, self.resolution, self.pocket)
 
-        return res
+        background = Image.new("RGBA", res.size, "white")
+        return Image.alpha_composite(background, res)
 
     def perform_compose(self):
         uv = Composer.compose_uv(self.uv)

@@ -149,7 +149,8 @@ class MaleShirtBuilder(BaseShirtBuilder):
         print("compose", time() - start)
         print("total", time() - total)
 
-        return res
+        background = Image.new("RGBA", res.size, "white")
+        return Image.alpha_composite(background, res)
 
     def get_back(self):
         if not self.back:
