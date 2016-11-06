@@ -12,7 +12,7 @@ from core.utils import first
 from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_text
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder, STITCHES
-
+from time import time
 from django.utils.functional import cached_property
 
 class CacheBuilderMock(object):
@@ -77,6 +77,46 @@ class BaseShirtBuilder(object):
         self.upper_stitches = []
         self.base_layer = []
         self.extra_details = []
+
+    def compose_dickey(self):
+        """
+        Must be overriden in case dickey is necessary for model
+        """
+        return None
+
+    def perform_compose(self):
+        uv = Composer.compose_uv(self.uv)
+        light = Composer.compose_light(self.lights)
+        texture = self.get_fabric_texture(self.fabric)
+        if texture.needs_shadow:
+            shadow = Composer.compose_light(self.shadows)
+        else:
+            shadow = None
+        alpha = Composer.compose_alpha(self.alphas)
+
+        dickey = self.compose_dickey()
+
+        res = Composer.create(
+            texture=texture.cache.get(resolution=self.resolution).file.path,
+            uv=uv,
+            light=light,
+            shadow=shadow,
+            post_shadows=self.post_shadows,
+            alpha=alpha,
+            buttons=self.buttons,
+            lower_stitches=self.lower_stitches,
+            upper_stitches=self.upper_stitches,
+            dickey=dickey,
+            extra_details=self.extra_details,
+            base_layer=self.base_layer
+        )
+
+        if self.initials:
+            self.add_initials(res, self.initials, self.resolution, self.pocket)
+
+        self.reset()
+        background = Image.new("RGBA", res.size, "white")
+        return Image.alpha_composite(background, res)
 
     def get_fabric_texture(self, fabric):
         if not isinstance(fabric, Fabric):
@@ -235,6 +275,7 @@ class BaseShirtBuilder(object):
         texture = self.get_fabric_texture(fabric)
         alpha_cache = model.cache.get(source_field='uv_alpha', resolution=self.resolution)
         self.alphas.append(alpha_cache)
+
         composed_detail = Composer.create(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
@@ -242,6 +283,7 @@ class BaseShirtBuilder(object):
             shadow=Image.open(ao) if texture.needs_shadow else None,
             alpha=Image.open(alpha_cache.file.path)
         )
+
         self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
     def append_granular_contrasting_part(self, ao, detail_masks, light_conf, uv):
