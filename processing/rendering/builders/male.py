@@ -34,7 +34,7 @@ class MaleShirtBuilder(BaseShirtBuilder):
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist("Collar configuration not found for given parameters: %s" % self.collar)
 
-    def append_dickey(self):
+    def compose_dickey(self):
         if self.projection == PROJECTION.back or not self.dickey:
             return None
         start = time()
