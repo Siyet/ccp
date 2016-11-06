@@ -48,10 +48,12 @@ class MaleShirtBuilder(BaseShirtBuilder):
         alpha = conf.cache.get(source_field='uv_alpha', resolution=self.resolution)
         alpha_img = Image.open(alpha.file.path)
         dickey_alphas = []
-        for alpha_cache in self.alphas:
-            if isinstance(alpha_cache.content_object.content_object, models.MaleCollarConfiguration) or \
-                    isinstance(alpha_cache.content_object.content_object, models.MaleCuffConfiguration):
-                dickey_alphas.append(alpha_cache)
+        if self.projection == PROJECTION.front:
+            for alpha_cache in self.alphas:
+                part_class = alpha_cache.content_object.content_object
+                overlapping_parts = [models.MaleCollarConfiguration, models.CuffConfiguration]
+                if any(isinstance(part_class, overlapping_part) for overlapping_part in overlapping_parts):
+                    dickey_alphas.append(alpha_cache)
         if self.projection == PROJECTION.side and self.sleeve.cuffs:
             dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask', resolution=self.resolution))
         for alpha_cache in dickey_alphas:

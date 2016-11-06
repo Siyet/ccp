@@ -3,6 +3,7 @@ import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.utils.functional import cached_property
 
 from backend.models import ContrastDetails, Fabric, CustomButtons, Collection
 from dictionaries import models as dictionaries
@@ -12,8 +13,7 @@ from core.utils import first
 from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_text
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder, STITCHES
-from time import time
-from django.utils.functional import cached_property
+
 
 class CacheBuilderMock(object):
     @staticmethod
@@ -192,7 +192,7 @@ class BaseShirtBuilder(object):
         for conf in stitches:
             try:
                 self.cache_builder.create_cache(conf, ('image',), resolution=self.resolution,
-                                           field_types={'image': STITCHES})
+                                                field_types={'image': STITCHES})
                 cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
                 print(e.message)
@@ -235,7 +235,7 @@ class BaseShirtBuilder(object):
                                                                      compose.BodyButtonsConfiguration):
             scale = 1.0 if self.resolution == compose.CACHE_RESOLUTION.full else RENDER['preview_scale']
             box = cropped_box(RENDER['default_size'], RENDER['crop_scale'], scale)
-            size = (box[2]-box[0], box[3]-box[1])
+            size = (box[2] - box[0], box[3] - box[1])
             buttons_base = Image.new("RGBA", size, 0)
             buttons_base.paste(buttons_image, buttons_cache.position, mask=buttons_image)
             if ao:
