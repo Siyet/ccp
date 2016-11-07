@@ -326,6 +326,7 @@ class ShirtSerializer(serializers.ModelSerializer):
     contrast_details = ContrastDetailsSerializer(many=True, allow_null=True)
     contrast_stitches = ContrastStitchesSerializer(many=True)
     initials = InitialsSerializer(required=False, allow_null=True)
+    fabric_code = serializers.ReadOnlyField(source='fabric.code')
 
     class Meta:
         model = models.Shirt
