@@ -55,12 +55,10 @@ class DefaultElementAdmin(admin.ModelAdmin):
 admin.site.register(ShirtInfo, ShirtInfoAdmin)
 admin.site.register(DefaultElement, DefaultElementAdmin)
 admin.site.register([
-    Color,
     Font,
     FabricCategory,
     CuffRounding,
     CustomButtonsType,
-    StitchColor,
     DickeyType,
     HemType,
     BackType,
@@ -74,5 +72,5 @@ admin.site.register([
 
 admin.site.register(Size, SizeAdmin)
 
-admin.site.register([SizeOptions, YokeType, FabricColor, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
+admin.site.register([SizeOptions, Color, YokeType, StitchColor, FabricColor, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
                     GrappelliOrderableAdmin)
