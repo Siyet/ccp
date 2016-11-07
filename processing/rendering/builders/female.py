@@ -1,14 +1,11 @@
-from time import time
-
 from django.core.exceptions import ObjectDoesNotExist
-
 from lazy import lazy
 
 from .base import BaseShirtBuilder
 from processing.female_configs import models
-from processing.rendering.compose import Composer
 from processing.models import PROJECTION
 from backend.models import ContrastDetails
+
 
 class FemaleShirtBuilder(BaseShirtBuilder):
     @lazy
@@ -32,20 +29,19 @@ class FemaleShirtBuilder(BaseShirtBuilder):
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist("Cuff configuration not found for given parameters: %s" % self.collar)
 
-
     def build_shirt(self):
         self._setup()
 
-        body_models= self.get_compose_configurations(models.FemaleBodyConfiguration, {
+        body_models = self.get_compose_configurations(models.FemaleBodyConfiguration, {
             'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,
             'cuff_types__id': self.cuff['type'] if self.cuff else None,
             'tuck_id': self.tuck,
         })
         cuff_buttons = self.get_buttons_conf(models.FemaleCuffButtonsConfiguration, {
-                'cuff_id': self.cuff['type'],
-                'rounding_types__id': self.cuff['rounding']
-            })
+            'cuff_id': self.cuff['type'],
+            'rounding_types__id': self.cuff['rounding']
+        })
         if self.projection == PROJECTION.back:
             if self.sleeve.cuffs:
                 self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
@@ -83,40 +79,7 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             'buttons': self.collar_buttons
         }))
 
-        res = self.perform_compose()
-
-        if self.initials:
-            self.add_initials(res, self.initials, self.resolution, self.pocket)
-
-        return res
-
-    def perform_compose(self):
-        uv = Composer.compose_uv(self.uv)
-        light = Composer.compose_light(self.lights)
-        texture = self.get_fabric_texture(self.fabric)
-        self.cache_builder.cache_texture(texture)
-        if texture.needs_shadow:
-            shadow = Composer.compose_light(self.shadows)
-        else:
-            shadow = None
-        alpha = Composer.compose_alpha(self.alphas)
-
-        result = Composer.create(
-            texture=texture.cache.get(resolution=self.resolution).file.path,
-            uv=uv,
-            light=light,
-            shadow=shadow,
-            post_shadows=self.post_shadows,
-            alpha=alpha,
-            buttons=self.buttons,
-            lower_stitches=self.lower_stitches,
-            upper_stitches=self.upper_stitches,
-            dickey=None,
-            extra_details=self.extra_details,
-            base_layer=self.base_layer
-        )
-        self.reset()
-        return result
+        return self.perform_compose()
 
     @classmethod
     def get_initials_configuration(cls, initials, pocket):

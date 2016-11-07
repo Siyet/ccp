@@ -137,7 +137,7 @@ class ShirtDetails(RetrieveAPIView):
     """
     serializer_class = serializers.ShirtDetailsSerializer
 
-    queryset = models.Shirt.objects.all()
+    queryset = models.Shirt.objects.select_related("fabric")
 
 
 class ShirtImage(APIView):

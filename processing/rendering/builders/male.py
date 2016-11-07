@@ -3,7 +3,6 @@ from time import time
 from django.core.exceptions import ObjectDoesNotExist
 from PIL import Image, ImageChops
 import numpy as np
-
 from lazy import lazy
 
 from .base import BaseShirtBuilder
@@ -12,8 +11,6 @@ from processing.rendering.compose import Composer
 from processing.models import PROJECTION
 from processing.rendering.compose import ImageConf
 from backend.models import ContrastDetails
-
-from dictionaries import models as dictionaries
 
 
 class MaleShirtBuilder(BaseShirtBuilder):
@@ -30,14 +27,14 @@ class MaleShirtBuilder(BaseShirtBuilder):
     @lazy
     def cuff_conf(self):
         try:
-            cuff_conf = models.MaleCuffConfiguration.objects.get(cuff_types__id=self.cuff['type'] if self.cuff else None,
-                                                              rounding_id=self.cuff['rounding'] if self.cuff else None)
+            cuff_conf = models.MaleCuffConfiguration.objects.get(
+                cuff_types__id=self.cuff['type'] if self.cuff else None,
+                rounding_id=self.cuff['rounding'] if self.cuff else None)
             return cuff_conf
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist("Collar configuration not found for given parameters: %s" % self.collar)
 
-
-    def append_dickey(self):
+    def compose_dickey(self):
         if self.projection == PROJECTION.back or not self.dickey:
             return None
         start = time()
@@ -51,10 +48,12 @@ class MaleShirtBuilder(BaseShirtBuilder):
         alpha = conf.cache.get(source_field='uv_alpha', resolution=self.resolution)
         alpha_img = Image.open(alpha.file.path)
         dickey_alphas = []
-        for alpha_cache in self.alphas:
-            if isinstance(alpha_cache.content_object.content_object, models.MaleCollarConfiguration) or \
-                    isinstance(alpha_cache.content_object.content_object, models.MaleCuffConfiguration):
-                dickey_alphas.append(alpha_cache)
+        if self.projection == PROJECTION.front:
+            for alpha_cache in self.alphas:
+                part_class = alpha_cache.content_object.content_object
+                overlapping_parts = [models.MaleCollarConfiguration, models.CuffConfiguration]
+                if any(isinstance(part_class, overlapping_part) for overlapping_part in overlapping_parts):
+                    dickey_alphas.append(alpha_cache)
         if self.projection == PROJECTION.side and self.sleeve.cuffs:
             dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask', resolution=self.resolution))
         for alpha_cache in dickey_alphas:
@@ -79,17 +78,17 @@ class MaleShirtBuilder(BaseShirtBuilder):
     def build_shirt(self):
         self._setup()
         total = time()
-        start = time()
-        texture = self.get_fabric_texture(self.fabric)
-        self.cache_builder.cache_texture(texture)
+
         self.append_model(self.get_compose_configuration(models.MaleBodyConfiguration, {
             'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,
             'cuff_types__id': self.cuff['type'] if self.cuff else None
         }))
+
         self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
         if self.sleeve.cuffs:
             self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
+
         self.append_model(self.get_compose_configuration(models.MalePocketConfiguration, {
             'pocket_id': self.pocket
         }))
@@ -118,37 +117,9 @@ class MaleShirtBuilder(BaseShirtBuilder):
             'buttons': self.collar_buttons
         }))
 
-        uv = Composer.compose_uv(self.uv)
-        light = Composer.compose_light(self.lights)
-        if texture.needs_shadow:
-            shadow = Composer.compose_light(self.shadows)
-        else:
-            shadow = None
-        alpha = Composer.compose_alpha(self.alphas)
-        dickey = self.append_dickey()
-        print("preparation", time() - start)
-        start = time()
+        res = self.perform_compose()
 
-        res = Composer.create(
-            texture=texture.cache.get(resolution=self.resolution).file.path,
-            uv=uv,
-            light=light,
-            shadow=shadow,
-            post_shadows=self.post_shadows,
-            alpha=alpha,
-            buttons=self.buttons,
-            lower_stitches=self.lower_stitches,
-            upper_stitches=self.upper_stitches,
-            dickey=dickey,
-            extra_details=self.extra_details,
-            base_layer=self.base_layer
-        )
-        if self.initials:
-            self.add_initials(res, self.initials, self.resolution, self.pocket)
-
-        print("compose", time() - start)
         print("total", time() - total)
-
         return res
 
     def get_back(self):

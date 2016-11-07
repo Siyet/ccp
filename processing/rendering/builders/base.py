@@ -3,6 +3,7 @@ import numpy as np
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.utils.functional import cached_property
 
 from backend.models import ContrastDetails, Fabric, CustomButtons, Collection
 from dictionaries import models as dictionaries
@@ -13,7 +14,6 @@ from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_tex
 from core.settings.base import RENDER
 from processing.cache import CacheBuilder, STITCHES
 
-from django.utils.functional import cached_property
 
 class CacheBuilderMock(object):
     @staticmethod
@@ -77,6 +77,46 @@ class BaseShirtBuilder(object):
         self.upper_stitches = []
         self.base_layer = []
         self.extra_details = []
+
+    def compose_dickey(self):
+        """
+        Must be overriden in case dickey is necessary for model
+        """
+        return None
+
+    def perform_compose(self):
+        uv = Composer.compose_uv(self.uv)
+        light = Composer.compose_light(self.lights)
+        texture = self.get_fabric_texture(self.fabric)
+        if texture.needs_shadow:
+            shadow = Composer.compose_light(self.shadows)
+        else:
+            shadow = None
+        alpha = Composer.compose_alpha(self.alphas)
+
+        dickey = self.compose_dickey()
+
+        res = Composer.create(
+            texture=texture.cache.get(resolution=self.resolution).file.path,
+            uv=uv,
+            light=light,
+            shadow=shadow,
+            post_shadows=self.post_shadows,
+            alpha=alpha,
+            buttons=self.buttons,
+            lower_stitches=self.lower_stitches,
+            upper_stitches=self.upper_stitches,
+            dickey=dickey,
+            extra_details=self.extra_details,
+            base_layer=self.base_layer
+        )
+
+        if self.initials:
+            self.add_initials(res, self.initials, self.resolution, self.pocket)
+
+        self.reset()
+        background = Image.new("RGBA", res.size, "white")
+        return Image.alpha_composite(background, res)
 
     def get_fabric_texture(self, fabric):
         if not isinstance(fabric, Fabric):
@@ -152,7 +192,7 @@ class BaseShirtBuilder(object):
         for conf in stitches:
             try:
                 self.cache_builder.create_cache(conf, ('image',), resolution=self.resolution,
-                                           field_types={'image': STITCHES})
+                                                field_types={'image': STITCHES})
                 cache = conf.cache.get(source_field='image', resolution=self.resolution)
             except Exception as e:
                 print(e.message)
@@ -195,7 +235,7 @@ class BaseShirtBuilder(object):
                                                                      compose.BodyButtonsConfiguration):
             scale = 1.0 if self.resolution == compose.CACHE_RESOLUTION.full else RENDER['preview_scale']
             box = cropped_box(RENDER['default_size'], RENDER['crop_scale'], scale)
-            size = (box[2]-box[0], box[3]-box[1])
+            size = (box[2] - box[0], box[3] - box[1])
             buttons_base = Image.new("RGBA", size, 0)
             buttons_base.paste(buttons_image, buttons_cache.position, mask=buttons_image)
             if ao:
@@ -235,6 +275,7 @@ class BaseShirtBuilder(object):
         texture = self.get_fabric_texture(fabric)
         alpha_cache = model.cache.get(source_field='uv_alpha', resolution=self.resolution)
         self.alphas.append(alpha_cache)
+
         composed_detail = Composer.create(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
@@ -242,6 +283,7 @@ class BaseShirtBuilder(object):
             shadow=Image.open(ao) if texture.needs_shadow else None,
             alpha=Image.open(alpha_cache.file.path)
         )
+
         self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
     def append_granular_contrasting_part(self, ao, detail_masks, light_conf, uv):

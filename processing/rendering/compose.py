@@ -1,4 +1,3 @@
-from time import time
 import os
 
 from PIL import Image, ImageChops, ImageOps
@@ -17,8 +16,13 @@ class ImageConf(object):
 
 
 def STMap(source, texture_arr, AA):
+    result_size = source.shape[:2] + (texture_arr.shape[2],)
 
-    result = texture_arr[source[..., 0], source[..., 1]]
+    source = source.astype(np.uint32)
+    source = (source[..., 0] * texture_arr.shape[0] + source[..., 1])
+
+    texture_arr = texture_arr.reshape(texture_arr.shape[0] * texture_arr.shape[1], texture_arr.shape[2])
+    result = texture_arr.take(source, axis=0).reshape(result_size)
 
     result = Image.fromarray(result, "RGB")
     if AA:
@@ -153,7 +157,6 @@ class Composer(object):
             result.putalpha(alpha)
 
         return result
-
 
     @staticmethod
     def create(texture, uv, light=None, shadow=None, post_shadows=[], alpha=None, buttons=[], lower_stitches=[],
