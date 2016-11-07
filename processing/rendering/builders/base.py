@@ -69,8 +69,8 @@ class BaseShirtBuilder(object):
     def reset(self):
         self.uv = []
         self.lights = []
+        self.ao = []
         self.shadows = []
-        self.post_shadows = []
         self.alphas = []
         self.buttons = []
         self.lower_stitches = []
@@ -86,12 +86,12 @@ class BaseShirtBuilder(object):
 
     def perform_compose(self):
         uv = Composer.compose_uv(self.uv)
-        light = Composer.compose_light(self.lights)
+        light = Composer.compose_ambience(self.lights)
         texture = self.get_fabric_texture(self.fabric)
         if texture.needs_shadow:
-            shadow = Composer.compose_light(self.shadows)
+            ao = Composer.compose_ambience(self.ao)
         else:
-            shadow = None
+            ao = None
         alpha = Composer.compose_alpha(self.alphas)
 
         dickey = self.compose_dickey()
@@ -100,8 +100,8 @@ class BaseShirtBuilder(object):
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
             light=light,
-            shadow=shadow,
-            post_shadows=self.post_shadows,
+            ao=ao,
+            shadows=self.shadows,
             alpha=alpha,
             buttons=self.buttons,
             lower_stitches=self.lower_stitches,
@@ -173,14 +173,14 @@ class BaseShirtBuilder(object):
         try:
             shadow = model.cache.get(source_field='ao', resolution=self.resolution)
             if post_shadow:
-                self.post_shadows.append(ImageConf.for_cache(shadow))
+                self.shadows.append(ImageConf.for_cache(shadow))
             else:
-                self.shadows.append(shadow)
+                self.ao.append(shadow)
         except ObjectDoesNotExist:
             pass
         try:
             shadow = model.cache.get(source_field='shadow', resolution=self.resolution)
-            self.post_shadows.append(ImageConf.for_cache(shadow))
+            self.shadows.append(ImageConf.for_cache(shadow))
         except ObjectDoesNotExist:
             pass
         self.alphas.append(model.cache.get(source_field='uv_alpha', resolution=self.resolution))
@@ -245,7 +245,7 @@ class BaseShirtBuilder(object):
         else:
             self.buttons.append(ImageConf(image=buttons_image, position=buttons_cache.position))
             if ao:
-                self.post_shadows.append(ImageConf.for_cache(ao))
+                self.shadows.append(ImageConf.for_cache(ao))
 
     def get_compose_configuration(self, model, filters):
         configurations = self.get_compose_configurations(model, filters)
@@ -280,7 +280,7 @@ class BaseShirtBuilder(object):
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
             light=Image.open(light_conf.file.path),
-            shadow=Image.open(ao) if texture.needs_shadow else None,
+            ao=Image.open(ao) if texture.needs_shadow else None,
             alpha=Image.open(alpha_cache.file.path)
         )
 

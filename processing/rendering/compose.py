@@ -127,7 +127,7 @@ class Composer(object):
         return base
 
     @staticmethod
-    def compose_light(sources):
+    def compose_ambience(sources):
         base = Image.open(sources[0].file.path)
         for source in sources[1:]:
             source_img = Image.open(source.file.path)
@@ -148,7 +148,7 @@ class Composer(object):
         return base
 
     @staticmethod
-    def create_dickey(texture, uv, alpha, AA=True):
+    def create_dickey(texture, uv, alpha=None, AA=True):
         texture_arr = load_texture(texture)
 
         result = STMap(uv, texture_arr, AA)
@@ -159,20 +159,22 @@ class Composer(object):
         return result
 
     @staticmethod
-    def create(texture, uv, light=None, shadow=None, post_shadows=[], alpha=None, buttons=[], lower_stitches=[],
+    def create(texture, uv, light=None, ao=None, shadows=[], alpha=None, buttons=[], lower_stitches=[],
                upper_stitches=[], dickey=None, extra_details=[], base_layer=[], AA=True):
 
         texture_arr = load_texture(texture)
         result = STMap(uv, texture_arr, AA)
 
-        paste(result, dickey)
+        if ao is not None:
+            result = ImageChops.multiply(result, load_image(ao))
 
-        if shadow is not None:
-            result = ImageChops.multiply(result, load_image(shadow))
+        paste(result, dickey)
 
         if light is not None:
             light = load_image(light)
             result = overlay(light, result)
+
+
 
         result = apply_srgb(result)
 
@@ -191,7 +193,7 @@ class Composer(object):
         for stitches in upper_stitches:
             paste(result, stitches)
 
-        for shadow in post_shadows:
+        for shadow in shadows:
             paste(result, shadow)
 
         if base_layer:
