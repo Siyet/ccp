@@ -22,14 +22,14 @@ class ComponentModel(OrderedModel):
         abstract = True
 
 
-class Color(models.Model):
+class Color(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255, default=u'')
     color = RGBColorField(_(u'Значение'))
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Цвет (для инициалов)')
         verbose_name_plural = _(u'Цвета (для инициалов)')
 
@@ -162,14 +162,14 @@ class YokeType(ComponentModel):
         verbose_name_plural = _(u'Типы кокетки')
 
 
-class StitchColor(models.Model):
+class StitchColor(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     color = RGBColorField(_(u'Цвет'))
 
     def __unicode__(self):
         return self.title
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _(u'Цвет отстрочки')
         verbose_name_plural = _(u'Цвета отстрочки')
 
