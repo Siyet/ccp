@@ -17,6 +17,10 @@ class ShirtImageCache(object):
                      'contrast_stitches', 'initials']
 
     @staticmethod
+    def _save(image, path):
+        image.save(path, "JPEG", quality=100, optimize=True, progressive=True)
+
+    @staticmethod
     def get_image_url_for_model(shirt, projection, resolution):
         data = ShirtDetailsSerializer(instance=shirt).data
         return ShirtImageCache.get_image_url(data, projection, resolution)
@@ -46,13 +50,13 @@ class ShirtImageCache(object):
         builder = ShirtBuilderFactory.get_builder_for_shirt(data, projection, resolution)
         if not os.path.isfile(full_path):
             image = builder.build_shirt()
-            image.save(full_path, "JPEG")
+            ShirtImageCache._save(image, full_path)
         # only append initials
         if initials:
             image = image or Image.open(full_path)
             builder.add_initials(image, initials, projection, data['pocket'])
             (full_path, filename) = path_for_key(base_key)
-            image.save(full_path, "JPEG")
+            ShirtImageCache._save(image, full_path)
 
         return (full_path, filename)
 

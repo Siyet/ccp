@@ -42,10 +42,12 @@ class MaleShirtBuilder(BaseShirtBuilder):
             'dickey_id': self.dickey['type'],
             'hem_id': self.hem
         })
-        self.cache_builder.create_cache(conf, ('light', 'uv'), resolution=self.resolution)
+        self.cache_builder.create_cache(conf, ('uv', 'shadow'), resolution=self.resolution)
         self.cache_builder.create_cache(self.cuff_conf, ('side_mask',), resolution=self.resolution)
-        light = conf.cache.get(source_field='light', resolution=self.resolution)
+        uv = conf.cache.get(source_field='uv', resolution=self.resolution)
+        shadow = ImageConf.for_cache(conf.cache.get(source_field='shadow', resolution=self.resolution))
         alpha = conf.cache.get(source_field='uv_alpha', resolution=self.resolution)
+
         alpha_img = Image.open(alpha.file.path)
         dickey_alphas = []
         if self.projection == PROJECTION.front:
@@ -56,6 +58,10 @@ class MaleShirtBuilder(BaseShirtBuilder):
                     dickey_alphas.append(alpha_cache)
         if self.projection == PROJECTION.side and self.sleeve.cuffs:
             dickey_alphas.append(self.cuff_conf.cache.get(source_field='side_mask', resolution=self.resolution))
+
+        shadow.image = Image.open(shadow.image)
+        shadow_alpha = shadow.image.split()[-1]
+
         for alpha_cache in dickey_alphas:
             part_alpha = Image.open(alpha_cache.file.path)
             part_position = alpha_cache.position
@@ -64,16 +70,19 @@ class MaleShirtBuilder(BaseShirtBuilder):
                 part_position[0] - alpha.position[0],
                 part_position[1] - alpha.position[1]
             ))
+
+            shadow_alpha = ImageChops.subtract(shadow_alpha, part_layer)
             alpha_img = ImageChops.subtract(alpha_img, part_layer)
 
+        shadow.image.putalpha(shadow_alpha)
+        self.shadows.append(shadow)
         texture = self.get_fabric_texture(self.dickey['fabric'])
         dickey = Composer.create_dickey(
             texture=texture.cache.get(resolution=self.resolution).file.path,
-            uv=np.load(conf.cache.get(source_field='uv', resolution=self.resolution).file.path),
+            uv=np.load(uv.file.path),
             alpha=alpha_img
         )
-        print("dickey", time() - start)
-        return ImageConf(dickey, light.position)
+        return ImageConf(dickey, shadow.position)
 
     def build_shirt(self):
         self._setup()

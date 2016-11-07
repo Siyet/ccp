@@ -16,5 +16,5 @@ def shirt(request, pk, *args, **kwargs):
     image = bldr.build_shirt()
     if initials:
         bldr.add_initials(image, initials, projection, data['pocket'])
-    image.save(response, "JPEG")
+    image.save(response, "JPEG", quality=100, optimize=True, progressive=True)
     return response
