@@ -174,8 +174,6 @@ class Composer(object):
             light = load_image(light)
             result = overlay(light, result)
 
-
-
         result = apply_srgb(result)
 
         for detail in extra_details:

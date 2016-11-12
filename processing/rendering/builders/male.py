@@ -111,7 +111,7 @@ class MaleShirtBuilder(BaseShirtBuilder):
                 'yoke_id': self.yoke
             }))
 
-        if self.projection != PROJECTION.back and self.placket.show_buttons:
+        if self.projection != PROJECTION.back and self.placket.show_buttons and not self.clasp:
             buttons_conf = self.get_buttons_conf(models.MaleBodyButtonsConfiguration, {})
             self.append_buttons_stitches(buttons_conf)
 

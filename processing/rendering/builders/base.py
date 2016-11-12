@@ -42,6 +42,7 @@ class BaseShirtBuilder(object):
         self.collar_buttons = dictionaries.CollarButtons.objects.get(pk=self.collar['size']).buttons
         self.pocket = self.extract(shirt_data, 'pocket')
         self.cuff = self.extract(shirt_data, 'cuff')
+        self.clasp = self.extract(shirt_data, 'clasp', False)
         self.custom_buttons_type = self.extract(shirt_data, 'custom_buttons_type')
         self.custom_buttons = self.extract(shirt_data, 'custom_buttons')
         self.sleeve = dictionaries.SleeveType.objects.get(pk=shirt_data.get('sleeve'))
@@ -59,12 +60,12 @@ class BaseShirtBuilder(object):
         self.initials = shirt_data.get('initials', None)
         self.reset()
 
-    def extract(self, data, param):
+    def extract(self, data, param, default=None):
         value = data.get(param, None)
         if isinstance(value, dict):
             for k in value.keys():
                 value[k] = self.extract(value, k)
-        return value or None  # skip empty strings
+        return value or default  # skip empty strings
 
     def reset(self):
         self.uv = []
