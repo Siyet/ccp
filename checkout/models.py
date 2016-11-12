@@ -231,7 +231,7 @@ class CustomerData(models.Model):
 
     name = models.CharField(_(u'Имя'), max_length=255)
     lastname = models.CharField(_(u'Фамилия'), max_length=255)
-    midname = models.CharField(_(u'Отчество'), max_length=255)
+    midname = models.CharField(_(u'Отчество'), max_length=255, blank=True)
     phone = models.CharField(_(u'Телефон'), max_length=255)
     email = models.EmailField(_(u'Телефон'), max_length=255, null=True)
 
@@ -239,7 +239,7 @@ class CustomerData(models.Model):
                             default=ADDRESS_TYPE.customer_address)
     city = models.CharField(_(u'Город'), max_length=255)
     address = models.CharField(_(u'Адрес'), max_length=255)
-    index = models.CharField(_(u'Индекс'), max_length=6)
+    index = models.CharField(_(u'Индекс'), max_length=6, blank=True)
 
     class Meta:
         verbose_name = _(u'Данные клиента')
