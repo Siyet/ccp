@@ -3,20 +3,20 @@ from __future__ import absolute_import
 
 import json
 
-from django.contrib import admin
-from django.utils.text import ugettext_lazy as _
-from import_export.admin import ImportExportMixin
-from imagekit.admin import AdminThumbnail
 from django.conf.urls import url
-
+from django.contrib import admin
 from django.http.response import HttpResponse
+from django.utils.text import ugettext_lazy as _
+from imagekit.admin import AdminThumbnail
+from import_export.admin import ImportExportMixin
 
-from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
 from conversions.mixin import TemplateAndFormatMixin
+from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
+from core.admin import ManyToManyMixin
 from core.utils import first
 from grappelli_orderable.admin import GrappelliOrderableAdmin
-from .models import *
 from .forms import AccessoriesPriceAdminForm, CuffInlineForm
+from .models import *
 
 
 class ShirtImageInline(admin.TabularInline):
@@ -71,7 +71,6 @@ class BaseShirtAdmin(GrappelliOrderableAdmin):
     autocomplete_lookup_fields = {
         'fk': ['fabric']
     }
-
 
 
 class DickeyInline(admin.StackedInline):
@@ -216,12 +215,19 @@ class CustomButtonsAdmin(GrappelliOrderableAdmin):
     list_display = ('title', 'type')
 
 
+class FitAdmin(ManyToManyMixin, GrappelliOrderableAdmin):
+    m2m_fields = ['collections']
+    exclude = ['sizes', 'picture']
+
+
 admin.site.register([
     Storehouse,
     ElementStitch
 ])
 
-admin.site.register([Hardness, ShawlOptions, Stays, Fit], GrappelliOrderableAdmin)
+admin.site.register(Fit, FitAdmin)
+
+admin.site.register([Hardness, ShawlOptions, Stays], GrappelliOrderableAdmin)
 
 admin.site.register(CustomButtons, CustomButtonsAdmin)
 
