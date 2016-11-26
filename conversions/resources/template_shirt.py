@@ -1,21 +1,20 @@
 # coding: utf-8
-from __future__ import absolute_import
 
 import tablib
-from import_export import fields
-from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
-from import_export import resources
-from django.utils.translation import ugettext as _
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext as _
+from import_export import fields
+from import_export import resources
+from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 
-from conversions.fields import TemplateShirtCollectionField
-from conversions.utils import save_relations
-from conversions.instance_loaders import CachedWithPrefetchedInstanceLoader
-from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionWidget, ChoicesWidget
 from backend.models import Fabric, TemplateShirt, Collection, Collar, Hardness, Stays, Cuff, CustomButtons, Dickey, \
     Initials, ContrastStitch, ElementStitch, ContrastDetails, ShawlOptions
-from dictionaries import models as dictionaries
+from conversions.fields import TemplateShirtCollectionField
+from conversions.instance_loaders import CachedWithPrefetchedInstanceLoader
+from conversions.utils import save_relations
+from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionWidget, ChoicesWidget
 from core.utils import first
+from dictionaries import models as dictionaries
 
 
 class TemplateShirtResource(resources.ModelResource):
@@ -143,7 +142,7 @@ class TemplateShirtResource(resources.ModelResource):
                                                 column_name=_(u'КТ Воротник внешняя стойка'))
     contrast_detail_collar_inner = fields.Field(attribute='contrast_detail_collar_inner',
                                                 column_name=_(u'КТ Воротник внутренняя стойка'))
-    contrast_detail_cuuff = fields.Field(attribute='contrast_detail_cuff', column_name=_(u'КТ Манжета'))
+    contrast_detail_cuff = fields.Field(attribute='contrast_detail_cuff', column_name=_(u'КТ Манжета'))
     contrast_detail_cuff_outer = fields.Field(attribute='contrast_detail_cuff_outer',
                                               column_name=_(u'КТ Манжета внешняя'))
     contrast_detail_cuff_inner = fields.Field(attribute='contrast_detail_cuff_inner',

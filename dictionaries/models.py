@@ -153,7 +153,7 @@ class CustomButtonsType(models.Model):
         verbose_name_plural = _(u'Типы пуговиц')
 
     def get_shirts(self):
-        return self.back_shirts.filter(custom_buttons__isnull=False).values('id')
+        return self.back_shirts.filter(custom_buttons__isnull=False).values_list('id', flat=True).distinct()
 
 
 class YokeType(ComponentModel):

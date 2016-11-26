@@ -177,5 +177,5 @@ class ShirtPrice(APIView):
             paramType: body
             required: true
         """
-        price = ShirtPriceCalculator.get_price_for_dictionary(request.data)
+        price = ShirtPriceCalculator().get_price_for_dictionary(request.data)
         return Response(price)

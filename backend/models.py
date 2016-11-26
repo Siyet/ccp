@@ -125,7 +125,7 @@ class FabricPrice(TimeStampedModel):
 
     def get_shirts(self):
         return Shirt.objects.filter(fabric__category=self.fabric_category,
-                                    collection__storehouse=self.storehouse).values('id')
+                                    collection__storehouse=self.storehouse).values_list('id', flat=True).distinct()
 
 
 class Fabric(TimeStampedModel):
@@ -267,7 +267,7 @@ class ShawlOptions(OrderedModel):
         verbose_name_plural = _(u'Настройки платка')
 
     def get_shirts(self):
-        return Shirt.objects.filter(shawl=self).values('id')
+        return self.shirts.values_list('id', flat=True).distinct()
 
 
 class Dickey(models.Model):
@@ -286,7 +286,7 @@ class Dickey(models.Model):
         verbose_name_plural = _(u'Манишки')
 
     def get_shirts(self):
-        return [self.shirt]
+        return [self.shirt.id]
 
 
 class Initials(models.Model):
@@ -484,7 +484,7 @@ class ContrastDetails(models.Model):
 
     def get_shirts(pk=None, exclude=None):
         qs = Shirt.objects.filter(contrast_details__isnull=False)
-        return qs.values('id').distinct()
+        return qs.values_list('id', flat=True).distinct()
 
 
 class ElementStitch(models.Model):

@@ -2,17 +2,34 @@
 
 from django.contrib.contenttypes.models import ContentType
 
-from core.utils import first
 from backend import models as backend
+from core.utils import first
+
+
+def cached_price(key_func, cache_dict):
+    def dec(fn):
+        def wrapped(*args, **kwargs):
+            key = key_func(*args, **kwargs)
+            if not key:
+                return 0
+            if not key in cache_dict:
+                cache_dict[key] = fn(*args, **kwargs)
+            return cache_dict[key]
+
+        return wrapped
+
+    return dec
 
 
 class ShirtPriceCalculator(object):
-    @staticmethod
-    def get_price_for_object(shirt):
+    cached_prices = {}
+
+
+    def get_price_for_object(self, shirt):
         price = 0
 
         # Платок
-        price += ShirtPriceCalculator._extra_price_for_part(shirt.shawl)
+        price += self._extra_price_for_part(shirt.shawl)
 
         # Кастомные пуговицы
         buttons = shirt.custom_buttons
@@ -20,22 +37,21 @@ class ShirtPriceCalculator(object):
             price += buttons.type.extra_price
 
         # Манишка
-        price += ShirtPriceCalculator._extra_price_for_model(getattr(shirt, 'dickey', None))
+        price += self._extra_price_for_model(getattr(shirt, 'dickey', None))
 
         # Контрастные детали
         if shirt.contrast_details.count() > 0:
-            price += ShirtPriceCalculator._extra_price_for_model(backend.ContrastDetails)
+            price += self._extra_price_for_model(backend.ContrastDetails)
 
         # Ткань
-        price += ShirtPriceCalculator._fabric_price(shirt.fabric, shirt.collection)
+        price += self._fabric_price(shirt.fabric, shirt.collection)
 
         return price
 
-    @staticmethod
-    def get_price_for_dictionary(shirt_data):
+    def get_price_for_dictionary(self, shirt_data):
         price = 0
 
-        price += ShirtPriceCalculator._price_for_part_by_id(backend.ShawlOptions, shirt_data.pop("shawl", None))
+        price += self._price_for_part_by_id(backend.ShawlOptions, shirt_data.pop("shawl", None))
 
         buttons_id = shirt_data.pop("custom_buttons", None)
         if buttons_id:
@@ -44,7 +60,7 @@ class ShirtPriceCalculator(object):
                 price += buttons.type.extra_price
 
         if shirt_data.pop('dickey') is not None:
-            price += ShirtPriceCalculator._extra_price_for_model(backend.Dickey)
+            price += self._extra_price_for_model(backend.Dickey)
 
         collection = backend.Collection.objects.get(pk=shirt_data.pop('collection'))
         contrast_details = shirt_data.pop('contrast_details')
@@ -53,39 +69,43 @@ class ShirtPriceCalculator(object):
         # "воротник и манжеты полностью белые" в бизнес коллекции
         business_details = contrast_details is not None and not collection.contrast_details
         if business_details or exclusive_details:
-            price += ShirtPriceCalculator._extra_price_for_model(backend.ContrastDetails)
+            price += self._extra_price_for_model(backend.ContrastDetails)
 
         fabric = backend.Fabric.objects.get(pk=shirt_data.pop('fabric'))
-        price += ShirtPriceCalculator._fabric_price(fabric, collection)
+        price += self._fabric_price(fabric, collection)
         return price
 
-    @staticmethod
-    def _price_for_part_by_id(model, id):
+    @cached_price(
+        key_func=lambda _, model, id: (model.__name__, id),
+        cache_dict=cached_prices
+    )
+    def _price_for_part_by_id(self, model, id):
         if not id:
             return 0
 
         part = model.objects.get(pk=id)
-        return ShirtPriceCalculator._extra_price_for_part(part)
+        return self._extra_price_for_part(part)
 
-    @staticmethod
-    def _extra_price_for_part(part):
+    def _extra_price_for_part(self, part):
         if part is None:
             return 0
         return part.extra_price
 
-    @staticmethod
-    def _extra_price_for_model(model):
+    @cached_price(key_func=lambda _, m: m._meta.model_name if m else None, cache_dict=cached_prices)
+    def _extra_price_for_model(self, model):
         if model is None:
             return 0
-
         ct = ContentType.objects.get_for_model(model)
         model_price = backend.AccessoriesPrice.objects.filter(content_type=ct).first()
         if model_price:
             return model_price.price
         return 0
 
-    @staticmethod
-    def _fabric_price(fabric, collection):
+    @cached_price(
+        key_func=lambda _, f, c: (f.id, c.id),
+        cache_dict=cached_prices
+    )
+    def _fabric_price(self, fabric, collection):
         fabric_price_filter = lambda x: x.fabric_category_id == fabric.category_id
         fabric_price = first(fabric_price_filter, collection.storehouse.prices.all())
         if fabric_price is not None:
