@@ -3,7 +3,6 @@ from import_export import fields
 
 
 class TemplateShirtCollectionField(fields.Field):
-
     def clean(self, data, sex=None):
         try:
             value = data[self.column_name]
@@ -30,3 +29,19 @@ class TemplateShirtCollectionField(fields.Field):
             for attr in attrs[:-1]:
                 obj = getattr(obj, attr, None)
             setattr(obj, attrs[-1], self.clean(data, sex))
+
+
+class ContrastDetailField(fields.Field):
+    def __init__(self, *args, **kwargs):
+        self.elements = kwargs.pop('elements')
+        super(ContrastDetailField, self).__init__(*args, **kwargs)
+
+    def get_value(self, obj):
+        """
+        Returns the value of the object's attribute.
+        """
+        if self.attribute is None:
+            return None
+
+        details = [detail for detail in obj.contrast_details.all() if detail.element in self.elements]
+        return details
