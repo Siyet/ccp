@@ -6,15 +6,15 @@ from backend import models as backend
 from core.utils import first
 
 
-def cached_price(key_func, cache_dict):
+def _cached_price(key_func):
     def dec(fn):
-        def wrapped(*args, **kwargs):
+        def wrapped(obj, *args, **kwargs):
             key = key_func(*args, **kwargs)
             if not key:
                 return 0
-            if not key in cache_dict:
-                cache_dict[key] = fn(*args, **kwargs)
-            return cache_dict[key]
+            if not key in obj.cached_prices:
+                obj.cached_prices[key] = fn(obj, *args, **kwargs)
+            return obj.cached_prices[key]
 
         return wrapped
 
@@ -23,7 +23,6 @@ def cached_price(key_func, cache_dict):
 
 class ShirtPriceCalculator(object):
     cached_prices = {}
-
 
     def get_price_for_object(self, shirt):
         price = 0
@@ -75,10 +74,7 @@ class ShirtPriceCalculator(object):
         price += self._fabric_price(fabric, collection)
         return price
 
-    @cached_price(
-        key_func=lambda _, model, id: (model.__name__, id),
-        cache_dict=cached_prices
-    )
+    @_cached_price(key_func=lambda model, id: (model.__name__, id))
     def _price_for_part_by_id(self, model, id):
         if not id:
             return 0
@@ -91,7 +87,7 @@ class ShirtPriceCalculator(object):
             return 0
         return part.extra_price
 
-    @cached_price(key_func=lambda _, m: m._meta.model_name if m else None, cache_dict=cached_prices)
+    @_cached_price(key_func=lambda m: m._meta.model_name if m else None)
     def _extra_price_for_model(self, model):
         if model is None:
             return 0
@@ -101,10 +97,7 @@ class ShirtPriceCalculator(object):
             return model_price.price
         return 0
 
-    @cached_price(
-        key_func=lambda _, f, c: (f.id, c.id),
-        cache_dict=cached_prices
-    )
+    @_cached_price(key_func=lambda f, c: (f.id, c.id))
     def _fabric_price(self, fabric, collection):
         fabric_price_filter = lambda x: x.fabric_category_id == fabric.category_id
         fabric_price = first(fabric_price_filter, collection.storehouse.prices.all())
