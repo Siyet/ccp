@@ -14,6 +14,7 @@ SECRET_KEY = 'n_sseuc*u7h+p(t(x*zfg2nbu(bslz_dzmoakp8#+&3-q%d2d+'
 # Application definition
 
 INSTALLED_APPS = (
+    'modeltranslation',
     'grappelli',
     'django.contrib.auth',
     'django.contrib.admin',
@@ -22,6 +23,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'grappelli_orderable',
+
     'smart_selects',
     'imagekit',
     'dictionaries',
@@ -105,26 +107,8 @@ CACHES = {
     }
 }
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
-
-LANGUAGE_CODE = 'ru-RU'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-TIME_ZONE = 'Europe/Moscow'
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = '/static/'
+# noinspection PyUnresolvedReferences
+from translation import *
 
 # Database
 

@@ -24,6 +24,7 @@ from .models import (
     CustomerData,
     Payment
 )
+from modeltranslation.admin import TranslationAdmin
 
 
 class CertificateAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
@@ -49,7 +50,7 @@ class DiscountAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin)
         return filename
 
 
-class ShopAdmin(GrappelliOrderableAdmin):
+class ShopAdmin(GrappelliOrderableAdmin, TranslationAdmin):
     list_display = ('city', 'street', 'home')
 
 

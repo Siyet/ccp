@@ -16,6 +16,7 @@ from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionW
 from core.utils import first
 from dictionaries import models as dictionaries
 
+from lazy import lazy
 
 class TemplateShirtResource(resources.ModelResource):
     BUTTONS_DEFAULT_DICT = {
@@ -175,10 +176,6 @@ class TemplateShirtResource(resources.ModelResource):
                           'dickey__fabric', 'tuck', 'sleeve', 'size_option', 'size',
                           'dickey__type', 'initials__font', 'initials__color']
         prefetch_related = ['contrast_stitches', 'contrast_details', 'dickey']
-        defaults = {
-            'sleeve': dictionaries.resolve_default_object(dictionaries.SleeveType),
-            'shawl': dictionaries.resolve_default_object(ShawlOptions)
-        }
         instance_loader_class = CachedWithPrefetchedInstanceLoader.prepare(select_related, prefetch_related)
 
     @cached_property
@@ -192,6 +189,13 @@ class TemplateShirtResource(resources.ModelResource):
     @cached_property
     def fabrics(self):
         return list(Fabric.objects.all())
+
+    @cached_property
+    def defaults(self):
+        return {
+            'sleeve': dictionaries.resolve_default_object(dictionaries.SleeveType),
+            'shawl': dictionaries.resolve_default_object(ShawlOptions)
+        }
 
     def get_queryset(self):
         qs = super(TemplateShirtResource, self).get_queryset()
@@ -438,4 +442,4 @@ class TemplateShirtResource(resources.ModelResource):
             return None
 
     def init_instance(self, row=None):
-        return self._meta.model(**TemplateShirtResource.Meta.defaults)
+        return self._meta.model(self.defaults)

@@ -9,6 +9,7 @@ from django.http.response import HttpResponse
 from django.utils.text import ugettext_lazy as _
 from imagekit.admin import AdminThumbnail
 from import_export.admin import ImportExportMixin
+from modeltranslation.admin import TranslationAdmin
 
 from conversions.mixin import TemplateAndFormatMixin
 from conversions.resources import FabricResidualResource, FabricResource, TemplateShirtResource
@@ -205,30 +206,32 @@ class AccessoriesPriceAdmin(admin.ModelAdmin):
     form = AccessoriesPriceAdminForm
 
 
-class CollectionAdmin(GrappelliOrderableAdmin):
+class CollectionAdmin(GrappelliOrderableAdmin, TranslationAdmin):
     list_display = ('title', 'sex')
 
     class Media:
         js = ('backend/admin/collection/scripts.js',)
 
 
-class CustomButtonsAdmin(GrappelliOrderableAdmin):
+class CustomButtonsAdmin(GrappelliOrderableAdmin, TranslationAdmin):
     list_display = ('title', 'type')
 
 
-class FitAdmin(ManyToManyMixin, GrappelliOrderableAdmin):
+class FitAdmin(ManyToManyMixin, GrappelliOrderableAdmin, TranslationAdmin):
     m2m_fields = ['collections']
     exclude = ['sizes', 'picture']
 
 
-admin.site.register([
-    Storehouse,
-    ElementStitch
-])
+class OrderedTranslationAdmin(GrappelliOrderableAdmin, TranslationAdmin):
+    pass
+
+
+admin.site.register(Storehouse)
+admin.site.register(ElementStitch, TranslationAdmin)
 
 admin.site.register(Fit, FitAdmin)
 
-admin.site.register([Hardness, ShawlOptions, Stays], GrappelliOrderableAdmin)
+admin.site.register([Hardness, ShawlOptions, Stays], OrderedTranslationAdmin)
 
 admin.site.register(CustomButtons, CustomButtonsAdmin)
 
