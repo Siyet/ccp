@@ -277,11 +277,12 @@ class BaseShirtBuilder(object):
         alpha_cache = model.cache.get(source_field='uv_alpha', resolution=self.resolution)
         self.alphas.append(alpha_cache)
 
+        self.ao.append(ao)
+        self.lights.append(light_conf)
+
         composed_detail = Composer.create(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
-            light=Image.open(light_conf.file.path),
-            ao=Image.open(ao) if texture.needs_shadow else None,
             alpha=Image.open(alpha_cache.file.path)
         )
 
@@ -302,8 +303,6 @@ class BaseShirtBuilder(object):
             composed_detail = Composer.create(
                 texture.cache.get(resolution=self.resolution).file.path,
                 uv,
-                light_image,
-                ao if texture.needs_shadow else None,
                 alpha=alpha
             )
             self.extra_details.append(ImageConf(composed_detail, light_conf.position))

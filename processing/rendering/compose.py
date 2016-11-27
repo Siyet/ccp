@@ -165,6 +165,9 @@ class Composer(object):
         texture_arr = load_texture(texture)
         result = STMap(uv, texture_arr, AA)
 
+        for detail in extra_details:
+            paste(result, detail)
+
         if ao is not None:
             result = ImageChops.multiply(result, load_image(ao))
 
@@ -175,9 +178,6 @@ class Composer(object):
             result = overlay(light, result)
 
         result = apply_srgb(result)
-
-        for detail in extra_details:
-            paste(result, detail)
 
         if alpha:
             result.putalpha(alpha)
