@@ -117,8 +117,8 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             shirts__fabric__residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL
         )
 
-        collections = collections.values('id', 'filter_title').annotate(title=F('filter_title'))
-        collections_list = list(collections.values('id', 'title').distinct())
+        collections = collections.values('id', 'filter_title').distinct()
+        collections_list = [{'id': c['id'], 'title': c['filter_title']} for c in collections]
 
         return Response([
             self.build_filter(_(u'Коллекция'), 'collection', collections_list),

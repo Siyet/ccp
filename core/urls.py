@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.staticfiles.urls import static
 
 from checkout import views as checkout_views
+from api import urls
 
 
 urlpatterns = [
