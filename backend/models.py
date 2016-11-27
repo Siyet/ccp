@@ -191,6 +191,7 @@ class FabricResidual(models.Model):
         return u'%s %s %s' % (self.fabric.code, _(u'на складе'), self.storehouse)
 
     class Meta:
+        ordering = ['fabric']
         verbose_name = _(u'Остаток ткани')
         verbose_name_plural = _(u'Остатки тканей')
         unique_together = ('fabric', 'storehouse')

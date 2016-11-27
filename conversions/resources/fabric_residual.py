@@ -21,6 +21,7 @@ from import_export.results import Result, Error, RowResult
 from import_export import resources
 from backend.models import Fabric, FabricResidual, Storehouse
 from core.utils import first
+from lazy import lazy
 
 
 class FabricResidualResource(resources.ModelResource):
@@ -40,7 +41,7 @@ class FabricResidualResource(resources.ModelResource):
                         amount = float(amount)
                     except (ValueError, TypeError):
                         amount = 0
-                    storehouse = first(lambda x: x.country == country, self.get_storehouses().items())
+                    storehouse = first(lambda s: s.country == country, self.storehouses)
                     residual = first(lambda x: x.storehouse == storehouse, instance.residuals.all())
                     if residual is None:
                         residual = FabricResidual.objects.create(fabric=instance, storehouse=storehouse)
@@ -59,13 +60,13 @@ class FabricResidualResource(resources.ModelResource):
         html = mark_safe(html)
         data.append(html)
 
-        storehouses = self.get_storehouses()
+        storehouses = self.storehouses
         if original:
             residuals = {x.storehouse_id: x.amount for x in original.residuals.all()}
         else:
             residuals = {}
-        for pk, storehouse in storehouses.iteritems():
-            original_value = u'%.2f' % residuals.get(pk, 0)
+        for storehouse in storehouses:
+            original_value = u'%.2f' % residuals.get(storehouse.pk, 0)
             try:
                 current_value = u'%.2f' % float(current.residuals_set.get(storehouse.country, 0))
             except (ValueError, TypeError):
@@ -80,22 +81,17 @@ class FabricResidualResource(resources.ModelResource):
     def get_queryset(self):
         return self._meta.model.objects.all().prefetch_related('residuals__storehouse')
 
-    def get_storehouses(self, storehouses=None):
-        if not hasattr(self, '_storehouses'):
-            if storehouses is not None:
-                for country in storehouses:
-                    Storehouse.objects.get_or_create(country=country)
-            storehouses = Storehouse.objects.all()
-            self._storehouses = OrderedDict((x.pk, x) for x in storehouses)
-        return self._storehouses
+    @lazy
+    def storehouses(self):
+        storehouses = Storehouse.objects.all()
+        return list(storehouses)
 
     @atomic()
     def import_data(self, dataset, dry_run=False, raise_errors=False,
                     use_transactions=None, **kwargs):
         result = Result()
-        storehouses = self.get_storehouses(dataset.headers[1:])
         result.diff_headers = self.get_diff_headers()
-        headers = [storehouse.country for pk, storehouse in storehouses.items()]
+        headers = [storehouse.country for storehouse in self.storehouses]
         headers.insert(0, 'Fabric')
         result.diff_headers = headers
 
@@ -201,16 +197,16 @@ class FabricResidualResource(resources.ModelResource):
 
     def export(self, queryset=None):
         queryset = self.get_queryset()
-        storehouses = self.get_storehouses()
-        headers = [storehouse.country for pk, storehouse in storehouses.items()]
+        storehouses = self.storehouses
+        headers = [storehouse.country for storehouse in storehouses]
         headers.insert(0, 'Fabric')
         data = tablib.Dataset(headers=headers)
         for obj in queryset:
             row = [obj.code]
             residuals = {x.storehouse_id: x.amount for x in obj.residuals.all()}
-            for pk in storehouses.keys():
+            for sh in storehouses:
                 try:
-                    row.append(u'%.2f' % residuals[pk])
+                    row.append(u'%.2f' % residuals[sh.pk])
                 except KeyError:
                     row.append('')
             data.append(row)

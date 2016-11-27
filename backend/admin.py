@@ -118,6 +118,7 @@ class FabricPriceAdmin(admin.ModelAdmin):
 class FabricResidualAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
     resource_class = FabricResidualResource
     list_select_related = ('fabric', 'storehouse',)
+    list_display = ('fabric', 'storehouse', 'amount')
 
     def get_export_queryset(self, request):
         """
