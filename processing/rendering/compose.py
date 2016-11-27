@@ -160,7 +160,7 @@ class Composer(object):
 
     @staticmethod
     def create(texture, uv, light=None, ao=None, shadows=[], alpha=None, buttons=[], lower_stitches=[],
-               upper_stitches=[], dickey=None, extra_details=[], base_layer=[], AA=True):
+               upper_stitches=[], dickey=None, extra_details=[], base_layer=[], AA=True, srgb=True):
 
         texture_arr = load_texture(texture)
         result = STMap(uv, texture_arr, AA)
@@ -177,7 +177,8 @@ class Composer(object):
             light = load_image(light)
             result = overlay(light, result)
 
-        result = apply_srgb(result)
+        if srgb:
+            result = apply_srgb(result)
 
         if alpha:
             result.putalpha(alpha)

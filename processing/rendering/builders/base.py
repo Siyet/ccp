@@ -96,7 +96,6 @@ class BaseShirtBuilder(object):
         alpha = Composer.compose_alpha(self.alphas)
 
         dickey = self.compose_dickey()
-
         res = Composer.create(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
@@ -283,14 +282,14 @@ class BaseShirtBuilder(object):
         composed_detail = Composer.create(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
-            alpha=Image.open(alpha_cache.file.path)
+            alpha=Image.open(alpha_cache.file.path),
+            srgb=False
         )
 
         self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
     def append_granular_contrasting_part(self, ao, detail_masks, light_conf, uv):
         light_image = Image.open(light_conf.file.path)
-        ao = Image.open(ao)
         for detail_mask in detail_masks:
             detail, mask = detail_mask
             fabric = detail['fabric']
@@ -298,12 +297,13 @@ class BaseShirtBuilder(object):
             alpha_cache = mask.cache.get(source_field='mask', resolution=self.resolution)
             alpha = Image.new("L", light_image.size, color=0)
             alpha_image = Image.open(alpha_cache.file.path)
-            position = tuple(alpha_cache.position[x] - light_conf.position[x] for x in [0, 1])
+            position = tuple(ap - lp for ap, lp in zip(alpha_cache.position, light_conf.position))
             alpha.paste(alpha_image, position)
             composed_detail = Composer.create(
                 texture.cache.get(resolution=self.resolution).file.path,
                 uv,
-                alpha=alpha
+                alpha=alpha,
+                srgb=False
             )
             self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
