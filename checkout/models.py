@@ -252,7 +252,8 @@ class CustomerData(models.Model):
         return u'%s, %s (%s)' % (self.city, self.address, self.get_type_display())
 
     def get_fio(self):
-        return u'%s %s.%s.' % (self.lastname, self.name[0], self.midname[0])
+        initials = ".".join(filter(None, [self.name[:1], self.midname[:1]]))
+        return " ".join(filter(None, [self.lastname, initials]))
 
 
 class OrderItem(models.Model):
