@@ -29,6 +29,18 @@ class FemaleShirtBuilder(BaseShirtBuilder):
         except ObjectDoesNotExist:
             raise ObjectDoesNotExist("Cuff configuration not found for given parameters: %s" % self.collar)
 
+
+    @lazy
+    def cuff_buttons(self):
+        if self.cuff and self.sleeve.cuffs:
+            return self.get_buttons_conf(models.FemaleCuffButtonsConfiguration, {
+                'cuff_id': self.cuff['type'],
+                'rounding_types__id': self.cuff['rounding']
+            })
+
+        return None
+
+
     def build_shirt(self):
         self._setup()
 
@@ -38,14 +50,11 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             'cuff_types__id': self.cuff['type'] if self.cuff else None,
             'tuck_id': self.tuck,
         })
-        cuff_buttons = self.get_buttons_conf(models.FemaleCuffButtonsConfiguration, {
-            'cuff_id': self.cuff['type'],
-            'rounding_types__id': self.cuff['rounding']
-        })
+
         if self.projection == PROJECTION.back:
             if self.sleeve.cuffs:
                 self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
-                self.append_buttons_stitches(cuff_buttons)
+                self.append_buttons_stitches(self.cuff_buttons)
                 cuffs = self.perform_compose()
                 self.base_layer.append(cuffs)
 
@@ -54,7 +63,7 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             self.append_model(body_models.first())
             if self.sleeve.cuffs:
                 self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
-                self.append_buttons_stitches(cuff_buttons)
+                self.append_buttons_stitches(self.cuff_buttons)
 
         self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
         self.append_model(self.get_compose_configuration(models.FemalePocketConfiguration, {
