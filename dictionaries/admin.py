@@ -1,42 +1,13 @@
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
 
+from dictionaries import models
 from dictionaries.forms import DefaultElementAdminForm
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 
-from .models import (
-    Color,
-    Font,
-    FabricColor,
-    FabricDesign,
-    FabricCategory,
-    FabricType,
-    CollarButtons,
-    CollarType,
-    CuffRounding,
-    CuffType,
-    CustomButtonsType,
-    YokeType,
-    StitchColor,
-    DickeyType,
-    ShirtInfo,
-    ShirtInfoImage,
-    SizeOptions,
-    Size,
-    HemType,
-    BackType,
-    PlacketType,
-    PocketType,
-    SleeveType,
-    Thickness,
-    FAQ,
-    SleeveLength,
-    DefaultElement,
-    TuckType
-)
-
 
 class ShirtInfoImageInline(admin.TabularInline):
-    model = ShirtInfoImage
+    model = models.ShirtInfoImage
     extra = 0
 
 
@@ -52,25 +23,50 @@ class DefaultElementAdmin(admin.ModelAdmin):
     form = DefaultElementAdminForm
 
 
-admin.site.register(ShirtInfo, ShirtInfoAdmin)
-admin.site.register(DefaultElement, DefaultElementAdmin)
+class OrderableTranslationAdmin(GrappelliOrderableAdmin, TranslationAdmin):
+    pass
+
+# regular models
+
+admin.site.register(models.ShirtInfo, ShirtInfoAdmin)
+admin.site.register(models.DefaultElement, DefaultElementAdmin)
+
 admin.site.register([
-    Font,
-    FabricCategory,
-    CuffRounding,
-    CustomButtonsType,
-    DickeyType,
-    HemType,
-    BackType,
-    PlacketType,
-    PocketType,
-    SleeveType,
-    FAQ,
-    SleeveLength,
-    TuckType
+    models.Font,
+    models.FabricCategory,
+    models.FAQ
 ])
 
-admin.site.register(Size, SizeAdmin)
+admin.site.register(models.Size, SizeAdmin)
 
-admin.site.register([SizeOptions, Color, YokeType, StitchColor, FabricColor, FabricDesign, CollarButtons, CollarType, CuffType, FabricType, Thickness],
-                    GrappelliOrderableAdmin)
+admin.site.register([
+    models.Color,
+    models.StitchColor,
+    models.FabricColor,
+    models.CollarType
+], GrappelliOrderableAdmin)
+
+# translated models
+
+admin.site.register([
+    models.TuckType,
+    models.SleeveLength,
+    models.CuffRounding,
+    models.PocketType,
+    models.DickeyType,
+    models.HemType,
+    models.PlacketType,
+    models.CustomButtonsType,
+    models.SleeveType,
+    models.BackType,
+], TranslationAdmin)
+
+admin.site.register([
+    models.SizeOptions,
+    models.YokeType,
+    models.CollarButtons,
+    models.FabricDesign,
+    models.CuffType,
+    models.FabricType,
+    models.Thickness
+], OrderableTranslationAdmin)

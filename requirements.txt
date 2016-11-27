@@ -14,6 +14,9 @@ django-grappelli==2.7.3
 django-colorful
 django-ordered-model
 
+# localization
+django-modeltranslation
+
 # REST
 djangorestframework
 django-rest-swagger
