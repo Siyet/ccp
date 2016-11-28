@@ -35,7 +35,7 @@ class Collection(OrderedModel):
     contrast_details = models.BooleanField(_(u'Контрастные детали'))
     white_fabric = models.ForeignKey('backend.Fabric',
                                      verbose_name=_(u'Ткань для опции "Воротник и манжеты полностью белые"'), null=True,
-                                     blank=True)
+                                     blank=True, related_name='white_set')
     tuck = models.ManyToManyField('dictionaries.TuckType', verbose_name=_(u'Варианты вытачек'),
                                   related_name='collections')
     sex = models.CharField(_(u'Пол коллекции'), choices=constants.SEX, max_length=6, default=constants.SEX.male,

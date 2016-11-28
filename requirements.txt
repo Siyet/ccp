@@ -18,7 +18,7 @@ django-ordered-model
 django-modeltranslation
 
 # REST
-djangorestframework==3.1.3
+djangorestframework==3.3.3
 django-rest-swagger==0.3.8
 
 # Caching
