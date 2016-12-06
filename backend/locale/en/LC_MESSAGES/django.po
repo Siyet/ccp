@@ -1,0 +1,513 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-05 02:38+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin.py:184
+msgid "Лоскут"
+msgstr ""
+
+#: admin.py:189 models.py:29
+msgid "Описание"
+msgstr ""
+
+#: admin.py:195 models.py:142
+msgid "Цвета"
+msgstr ""
+
+#: admin.py:200 models.py:143
+msgid "Дизайн"
+msgstr ""
+
+#: apps.py:8
+msgid "Конфигуратор"
+msgstr ""
+
+#: forms.py:12
+msgid "Тип содержимого"
+msgstr ""
+
+#: forms.py:14
+msgid "Значение"
+msgstr ""
+
+#: forms.py:61
+msgid "Пожалуйста, укажите тип закругления"
+msgstr ""
+
+#: models.py:24 models.py:71 models.py:114 models.py:186
+msgid "Склад"
+msgstr ""
+
+#: models.py:26 models.py:76 models.py:88 models.py:100 models.py:246
+#: models.py:260 models.py:492
+msgid "Название"
+msgstr ""
+
+#: models.py:27
+msgid "Наименование для фильтра"
+msgstr ""
+
+#: models.py:28
+msgid "Наименование для экрана \"О сорочке\""
+msgstr ""
+
+#: models.py:30 models.py:103 models.py:247 models.py:454 models.py:458
+msgid "Изображение"
+msgstr ""
+
+#: models.py:31 models.py:286
+msgid "Манишка"
+msgstr ""
+
+#: models.py:32 models.py:370
+msgid "Застежка под штифты"
+msgstr ""
+
+#: models.py:33
+msgid "Цельная кокетка"
+msgstr ""
+
+#: models.py:34 models.py:368
+msgid "Платок"
+msgstr ""
+
+#: models.py:35 models.py:483
+msgid "Контрастные детали"
+msgstr ""
+
+#: models.py:37
+msgid "Ткань для опции \"Воротник и манжеты полностью белые\""
+msgstr ""
+
+#: models.py:39
+msgid "Варианты вытачек"
+msgstr ""
+
+#: models.py:41
+msgid "Пол коллекции"
+msgstr ""
+
+#: models.py:43
+msgid "Время пошива и доставки"
+msgstr ""
+
+#: models.py:49 models.py:326
+msgid "Коллекция"
+msgstr ""
+
+#: models.py:50 models.py:77 models.py:89 models.py:101 models.py:493
+msgid "Коллекции"
+msgstr ""
+
+#: models.py:65
+msgid "Страна"
+msgstr ""
+
+#: models.py:72
+msgid "Склады"
+msgstr ""
+
+#: models.py:83 models.py:84 models.py:202 models.py:220
+msgid "Жесткость"
+msgstr ""
+
+#: models.py:95 models.py:96 models.py:201
+msgid "Косточки"
+msgstr ""
+
+#: models.py:102
+msgid "Размеры"
+msgstr ""
+
+#: models.py:106
+msgid "Тип талии"
+msgstr ""
+
+#: models.py:107
+msgid "Типы талии"
+msgstr ""
+
+#: models.py:115
+msgid "Категория тканей"
+msgstr ""
+
+#: models.py:117 models.py:376 models.py:523
+msgid "Цена"
+msgstr ""
+
+#: models.py:123
+msgid "Цена ткани"
+msgstr ""
+
+#: models.py:124
+msgid "Цены тканей"
+msgstr ""
+
+#: models.py:132 models.py:327
+msgid "Артикул"
+msgstr ""
+
+#: models.py:133
+msgid "Категория"
+msgstr ""
+
+#: models.py:135 models.py:204 models.py:221 models.py:248 models.py:275
+#: models.py:532
+msgid "Тип"
+msgstr ""
+
+#: models.py:137
+msgid "Толщина"
+msgstr ""
+
+#: models.py:139
+msgid "Краткое описание"
+msgstr ""
+
+#: models.py:140
+msgid "Полное описание"
+msgstr ""
+
+#: models.py:141
+msgid "Материал"
+msgstr ""
+
+#: models.py:145
+msgid "Текстура"
+msgstr ""
+
+#: models.py:147
+msgid "Используется в манишке"
+msgstr ""
+
+#: models.py:148
+msgid "Активна"
+msgstr ""
+
+#: models.py:181 models.py:187 models.py:276 models.py:330 models.py:475
+msgid "Ткань"
+msgstr ""
+
+#: models.py:182
+msgid "Ткани"
+msgstr ""
+
+#: models.py:188
+msgid "Остаток"
+msgstr ""
+
+#: models.py:191
+msgid "на складе"
+msgstr ""
+
+#: models.py:195
+msgid "Остаток ткани"
+msgstr ""
+
+#: models.py:196
+msgid "Остатки тканей"
+msgstr ""
+
+#: models.py:206
+msgid "Пуговицы"
+msgstr ""
+
+#: models.py:215
+msgid "Воротник"
+msgstr ""
+
+#: models.py:216
+msgid "Воротники"
+msgstr ""
+
+#: models.py:222
+msgid "Тип закругления"
+msgstr ""
+
+#: models.py:241
+msgid "Манжета"
+msgstr ""
+
+#: models.py:242
+msgid "Манжеты"
+msgstr ""
+
+#: models.py:249 models.py:308
+msgid "Цвет"
+msgstr ""
+
+#: models.py:255 models.py:256 models.py:364
+msgid "Кастомные пуговицы"
+msgstr ""
+
+#: models.py:261
+msgid "Добавочная стоимость"
+msgstr ""
+
+#: models.py:267 models.py:268
+msgid "Настройки платка"
+msgstr ""
+
+#: models.py:287
+msgid "Манишки"
+msgstr ""
+
+#: models.py:294
+msgid "Шрифт"
+msgstr ""
+
+#: models.py:298
+msgid "2 пуговица"
+msgstr ""
+
+#: models.py:299
+msgid "3 пуговица"
+msgstr ""
+
+#: models.py:300
+msgid "4 пуговица"
+msgstr ""
+
+#: models.py:301
+msgid "5 пуговица"
+msgstr ""
+
+#: models.py:302
+msgid "Низ (л)"
+msgstr ""
+
+#: models.py:303
+msgid "Карман (л)"
+msgstr ""
+
+#: models.py:304
+msgid "Манжета (л)"
+msgstr ""
+
+#: models.py:306
+msgid "Местоположение"
+msgstr ""
+
+#: models.py:307
+msgid "Текст"
+msgstr ""
+
+#: models.py:314 models.py:315
+msgid "Инициалы"
+msgstr ""
+
+#: models.py:322
+msgid "Не использовать застежку"
+msgstr ""
+
+#: models.py:322
+msgid "Использовать застежку"
+msgstr ""
+
+#: models.py:324
+msgid "Используется как шаблон"
+msgstr ""
+
+#: models.py:325
+msgid "Используется как стандартный вариант"
+msgstr ""
+
+#: models.py:328
+msgid "Индивидуализация"
+msgstr ""
+
+#: models.py:332
+msgid "Изображение для витрины"
+msgstr ""
+
+#: models.py:343
+msgid "Выбранный вариант размера"
+msgstr ""
+
+#: models.py:344
+msgid "Размер"
+msgstr ""
+
+#: models.py:346
+msgid "Низ"
+msgstr ""
+
+#: models.py:347
+msgid "Полочка"
+msgstr ""
+
+#: models.py:348
+msgid "Карман"
+msgstr ""
+
+#: models.py:349
+msgid "Рукав"
+msgstr ""
+
+#: models.py:351
+msgid "Талия"
+msgstr ""
+
+#: models.py:354
+msgid "Длина рукава"
+msgstr ""
+
+#: models.py:357
+msgid "Вытачки"
+msgstr ""
+
+#: models.py:360
+msgid "Спинка"
+msgstr ""
+
+#: models.py:362
+msgid "Тип кастомных пуговиц"
+msgstr ""
+
+#: models.py:369
+msgid "Кокетка"
+msgstr ""
+
+#: models.py:372
+msgid "0 мм (без отстрочки)"
+msgstr ""
+
+#: models.py:372
+msgid "1 мм (только съемные косточки)"
+msgstr ""
+
+#: models.py:373
+msgid "5 мм"
+msgstr ""
+
+#: models.py:374
+msgid "Ширина отстрочки"
+msgstr ""
+
+#: models.py:388 models.py:404 models.py:408 models.py:476
+msgid "Рубашка"
+msgstr ""
+
+#: models.py:389 models.py:405
+msgid "Рубашки"
+msgstr ""
+
+#: models.py:420
+msgid "Шаблон рубашки"
+msgstr ""
+
+#: models.py:421
+msgid "Шаблоны рубашек"
+msgstr ""
+
+#: models.py:424
+msgid "Шаблон"
+msgstr ""
+
+#: models.py:432
+msgid "Стандартный вариант рубашки"
+msgstr ""
+
+#: models.py:433
+msgid "Стандартные варианты рубашек"
+msgstr ""
+
+#: models.py:436
+msgid "Стандартный вариант"
+msgstr ""
+
+#: models.py:450
+msgid "Стандартный вариант для коллекции уже существует"
+msgstr ""
+
+#: models.py:459
+msgid "Изображения"
+msgstr ""
+
+#: models.py:464
+msgid "Воротник лицевая сторона"
+msgstr ""
+
+#: models.py:465
+msgid "Воротник низ"
+msgstr ""
+
+#: models.py:466
+msgid "Воротник внешняя стойка"
+msgstr ""
+
+#: models.py:467
+msgid "Воротник внутрення стойка"
+msgstr ""
+
+#: models.py:470
+msgid "Манжета внешняя"
+msgstr ""
+
+#: models.py:471
+msgid "Манжета внутрення"
+msgstr ""
+
+#: models.py:474
+msgid "Элемент"
+msgstr ""
+
+#: models.py:482 models.py:518
+msgid "Контрастная деталь"
+msgstr ""
+
+#: models.py:499
+msgid "Отстрочка"
+msgstr ""
+
+#: models.py:500
+msgid "Отстрочки"
+msgstr ""
+
+#: models.py:505
+msgid "Цвет отстрочки"
+msgstr ""
+
+#: models.py:512
+msgid "Контрастная отстрочка"
+msgstr ""
+
+#: models.py:513
+msgid "Контрастные отстрочки"
+msgstr ""
+
+#: models.py:518
+msgid "Контрастные ткани"
+msgstr ""
+
+#: models.py:521
+msgid "content type"
+msgstr ""
+
+#: models.py:526
+#, python-format
+msgid "Цена: %s"
+msgstr ""
+
+#: models.py:535
+msgid "Цена надбавки"
+msgstr ""
+
+#: models.py:536
+msgid "Цены надбавок"
+msgstr ""

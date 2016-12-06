@@ -1,0 +1,80 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-05 02:33+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: filters.py:31
+msgid "Ткань"
+msgstr ""
+
+#: filters.py:32
+msgid "Тип ткани"
+msgstr ""
+
+#: filters.py:33
+msgid "Цвет ткани"
+msgstr ""
+
+#: filters.py:34
+msgid "Паттерн ткани"
+msgstr ""
+
+#: filters.py:35
+msgid "Толщина ткани"
+msgstr ""
+
+#: filters.py:36 views/shirts.py:124
+msgid "Коллекция"
+msgstr ""
+
+#: filters.py:37
+msgid "Пол коллекции"
+msgstr ""
+
+#: serializers.py:411
+msgid "Данные клиента обязательны"
+msgstr ""
+
+#: views/shirts.py:86
+#, python-format
+msgid "%s - по возрастанию"
+msgstr ""
+
+#: views/shirts.py:87
+#, python-format
+msgid "%s - по убыванию"
+msgstr ""
+
+#: views/shirts.py:125
+msgid "Цвет"
+msgstr ""
+
+#: views/shirts.py:126
+msgid "Узор"
+msgstr ""
+
+#: views/shirts.py:127
+msgid "Плетение"
+msgstr ""
+
+#: views/shirts.py:128
+msgid "Плотность"
+msgstr ""
+
+#: views/shirts.py:130
+msgid "Сортировка"
+msgstr ""

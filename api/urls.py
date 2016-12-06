@@ -48,6 +48,7 @@ components = [
     url(r'^stitch/$', views.StitchOptionsList.as_view()),
     url(r'^initials/$', views.TemplateInitialsList.as_view()),
     url(r'^dickey/$', views.DickeyList.as_view()),
+    url(r'^prices/$', views.PricesList.as_view())
 ]
 
 urlpatterns = [

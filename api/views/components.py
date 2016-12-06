@@ -14,7 +14,7 @@ from api import serializers
 __all__ = [
     'CollarTypeList', 'CuffTypeList', 'HemTypeList', 'BackTypeList', 'PocketTypeList',
     'PlacketTypeList', 'SleeveTypeList', 'YokeTypeList', 'CustomButtonsTypeList', 'ShawlOptionsList',
-    'ClaspOptionsList', 'StitchOptionsList', 'TemplateInitialsList', 'DickeyList'
+    'ClaspOptionsList', 'StitchOptionsList', 'TemplateInitialsList', 'DickeyList', 'PricesList'
 ]
 
 
@@ -152,3 +152,9 @@ class DickeyList(FilterHelpersMixin, APIView):
             self.build_filter(u'Ткань', 'fabric', fabrics_data),
             self.build_filter(u'Тип манишки', 'type', dickey_types_data),
         ])
+
+
+class PricesList(APIView):
+    """Список добавочных стоимостей для компонентов"""
+    def get(self, request, *args, **kwargs):
+        return Response(data=models.AccessoriesPrice.as_list())

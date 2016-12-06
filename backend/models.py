@@ -2,7 +2,7 @@
 import re
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, F
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
 from django.conf import settings
@@ -530,6 +530,12 @@ class AccessoriesPrice(models.Model):
 
     content_type_title.allow_tags = True
     content_type_title.short_description = _(u'Тип')
+
+    @staticmethod
+    def as_list():
+        prices = AccessoriesPrice.objects.select_related('content_type')
+        prices_list = prices.annotate(model=F('content_type__model')).values_list('model', 'price')
+        return dict(prices_list)
 
     class Meta:
         verbose_name = _(u'Цена надбавки')

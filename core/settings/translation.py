@@ -1,10 +1,8 @@
-from django.utils.translation import ugettext_lazy as _
-
-# Internationalization
+# coding: utf-8
 
 LANGUAGES = [
-    ('ru', _('Russian')),
-    ('en', _('English')),
+    ('ru', u'Русский'),
+    ('en', 'English'),
 ]
 
 LANGUAGE_CODE = 'ru'
