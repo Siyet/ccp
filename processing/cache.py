@@ -8,10 +8,11 @@ from django.contrib.contenttypes.models import ContentType
 
 from scipy import ndimage
 
-from processing.models import SourceCache, CACHE_RESOLUTION, PROJECTION, CuffConfiguration
+from processing.models import SourceCache, CACHE_RESOLUTION, PROJECTION, CuffConfiguration, ButtonsSource
 from processing.male_configs.models import MaleBodyConfiguration
 from processing.female_configs.models import FemaleBodyConfiguration
 from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
+from processing.rendering.compose import apply_srgb
 from core.settings.base import RENDER
 
 EXR_FIELD = 'EXR'
@@ -91,6 +92,11 @@ class CacheBuilder(object):
                     img.size[0] * crop[2], img.size[1] * crop[3],
                 )
                 img = img.crop(w)
+
+                # fix for buttons brightness
+                if isinstance(instance, ButtonsSource) and field == 'image':
+                    img = apply_srgb(img)
+
                 if field_type == L_FIELD or is_preview:
                     resize_factor = preview_scale if is_preview else 1
                     if field_type == L_FIELD:

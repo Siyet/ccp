@@ -27,7 +27,7 @@ class CacheBuilderMock(object):
 
 class BaseShirtBuilder(object):
     cache_builder = CacheBuilderMock
-    # cache_builder = CacheBuilder
+    cache_builder = CacheBuilder
 
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
         self.is_ready = False
