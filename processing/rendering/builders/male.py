@@ -91,9 +91,8 @@ class MaleShirtBuilder(BaseShirtBuilder):
         self.append_model(self.get_compose_configuration(models.MaleBodyConfiguration, {
             'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,
-            'cuff_types__id': self.cuff['type'] if self.cuff else None,
-            'tuck_id': self.tuck
-        }))
+            'cuff_types__id': self.cuff['type'] if self.cuff else None
+        }, source_filters={'tuck_id': self.tuck}))
 
         self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)
         if self.sleeve.cuffs:

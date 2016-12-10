@@ -26,7 +26,7 @@ class MaleConfigurationModel(models.Model):
 
 
 class MaleBodySource(AbstractComposeSource):
-    tuck = models.ForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), null=True, default=None)
+    tuck = models.ForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), null=True, blank=True, default=None)
 
     class Meta(AbstractComposeSource.Meta):
         unique_together = ('content_type', 'object_id', 'projection', 'tuck')

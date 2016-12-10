@@ -248,15 +248,17 @@ class BaseShirtBuilder(object):
             if ao:
                 self.shadows.append(ImageConf.for_cache(ao))
 
-    def get_compose_configuration(self, model, filters):
-        configurations = self.get_compose_configurations(model, filters)
+    def get_compose_configuration(self, model, filters, source_filters=None):
+        configurations = self.get_compose_configurations(model, filters, source_filters)
         return configurations.first() if configurations else None
 
-    def get_compose_configurations(self, model, filters):
+    def get_compose_configurations(self, model, filters, source_filters=None):
         filters = [Q(**{k: v}) | Q(**{"%s__isnull" % k: True}) for k, v in filters.iteritems()]
         try:
             configuration = model.objects.get(*filters)
-            return configuration.sources.filter(projection=self.projection)
+            configurations = configuration.sources.filter(projection=self.projection)
+            return configurations.filter(**source_filters) if source_filters else configurations
+
         except ObjectDoesNotExist:
             return None
 
