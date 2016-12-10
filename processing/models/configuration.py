@@ -1,15 +1,15 @@
 # coding: utf-8
 
-from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.utils.text import ugettext_lazy as _
 
-from dictionaries import models as dictionaries
 from backend import models as backend
-from processing.upload_path import UploadComposingSource
-from processing.storage import overwrite_storage
 from core.constants import SEX
+from dictionaries import models as dictionaries
+from processing.storage import overwrite_storage
+from processing.upload_path import UploadComposingSource
 
 
 class CachedSource(models.Model):
@@ -79,10 +79,8 @@ class YokeConfiguration(UnisexModel, PartConfigurationModel):
 
 
 class BodyButtonsConfiguration(UnisexModel, ButtonsConfigurationModel):
-    buttons = models.ForeignKey(dictionaries.CustomButtonsType, verbose_name=_(u'Пуговицы'))
-
+    plackets = models.ManyToManyField('dictionaries.PlacketType', verbose_name=_(u'Тип полочки'))
     class Meta:
-        unique_together = ('buttons', 'sex')
         verbose_name = _(u'Конфигурация сборки для основных пуговиц')
         verbose_name_plural = _(u'Конфигурации сборки для основных пуговиц')
 
@@ -99,7 +97,7 @@ class CuffButtonsConfiguration(UnisexModel, ButtonsConfigurationModel):
 class StitchColor(models.Model):
     content_type = models.OneToOneField(ContentType, verbose_name=_(u'Тип конфигурации'), limit_choices_to={
         'model__in': ('bodybuttonsconfiguration', 'cuffbuttonsconfiguration', 'malecollarbuttonsconfiguration',
-                    'femalecollarbuttonsconfiguration')
+                      'femalecollarbuttonsconfiguration')
     })
     element = models.ForeignKey(backend.ElementStitch, verbose_name=_(u'Отстрочка'))
 

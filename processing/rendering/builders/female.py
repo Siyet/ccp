@@ -79,8 +79,10 @@ class FemaleShirtBuilder(BaseShirtBuilder):
                 'yoke_id': self.yoke
             }))
 
-        if self.projection != PROJECTION.back and self.placket.show_buttons and not self.clasp:
-            buttons_conf = self.get_buttons_conf(models.FemaleBodyButtonsConfiguration, {})
+        if self.projection != PROJECTION.back:
+            buttons_conf = self.get_buttons_conf(models.FemaleBodyButtonsConfiguration, {
+                'plackets': self.placket.id
+            })
             self.append_buttons_stitches(buttons_conf)
 
         self.append_buttons_stitches(self.get_buttons_conf(models.FemaleCollarButtonsConfiguration, {
