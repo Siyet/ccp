@@ -6,12 +6,14 @@ from django.core.management import BaseCommand
 
 from processing.models import ComposeSource, ButtonsSource, StitchesSource, CuffMask, CollarMask, CuffConfiguration, CACHE_RESOLUTION, Texture
 from processing.female_configs.models import FemaleBodySource
+from processing.male_configs.models import MaleBodySource
 from processing.cache import CacheBuilder, STITCHES
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         self.cache_sources(ComposeSource, ['uv', 'light', 'ao', 'shadow'])
+        self.cache_sources(MaleBodySource, ['uv', 'light', 'ao', 'shadow'])
         self.cache_sources(FemaleBodySource, ['uv', 'light', 'ao', 'shadow'])
         self.cache_sources(ButtonsSource, ['image', 'ao'])
         self.cache_sources(StitchesSource, ['image'], {'image': STITCHES})
@@ -27,9 +29,9 @@ class Command(BaseCommand):
         count = model.objects.count()
         i = 0
         for src in model.objects.all():
-            if src.cache.count() < len(fields) * 2:
+            if src.cache.count() < len(fields):
                 try:
-                    CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.full, field_types)
+                    # CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.full, field_types)
                     CacheBuilder.create_cache(src, fields, CACHE_RESOLUTION.preview, field_types)
                 except Exception as e:
                     raise
