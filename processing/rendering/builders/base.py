@@ -13,6 +13,8 @@ from dictionaries import models as dictionaries
 from processing.cache import STITCHES
 from processing.rendering.compose import Composer, ImageConf
 from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_text
+# noinspection PyUnresolvedReferences
+from processing.cache import CacheBuilder
 
 
 class CacheBuilderMock(object):
@@ -27,7 +29,6 @@ class CacheBuilderMock(object):
 
 class BaseShirtBuilder(object):
     cache_builder = CacheBuilderMock
-
     # cache_builder = CacheBuilder
 
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
@@ -252,12 +253,16 @@ class BaseShirtBuilder(object):
         configurations = self.get_compose_configurations(model, filters, source_filters)
         return configurations.first() if configurations else None
 
+    def filters_from_dict(self, filters):
+        return [Q(**{k: v}) | Q(**{"%s__isnull" % k: True}) for k, v in filters.iteritems()]
+
     def get_compose_configurations(self, model, filters, source_filters=None):
-        filters = [Q(**{k: v}) | Q(**{"%s__isnull" % k: True}) for k, v in filters.iteritems()]
+        filters = self.filters_from_dict(filters)
         try:
             configuration = model.objects.get(*filters)
-            configurations = configuration.sources.filter(projection=self.projection)
-            return configurations.filter(**source_filters) if source_filters else configurations
+            sources = configuration.sources.filter(projection=self.projection)
+            source_filters = self.filters_from_dict(source_filters)
+            return sources.filter(*source_filters) if source_filters else sources
 
         except ObjectDoesNotExist:
             return None
