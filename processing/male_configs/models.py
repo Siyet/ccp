@@ -3,7 +3,7 @@
 from django.utils.text import ugettext_lazy as _
 
 from processing.models.configuration import *
-from processing.models.sources import CachedSource
+from processing.models.sources import CachedSource, AbstractComposeSource
 from dictionaries import models as dictionaries
 from core.constants import SEX
 
@@ -25,10 +25,19 @@ class MaleConfigurationModel(models.Model):
         abstract = True
 
 
-class MaleBodyConfiguration(PartConfigurationModel):
+class MaleBodySource(AbstractComposeSource):
+    tuck = models.ForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), null=True, default=None)
+
+    class Meta(AbstractComposeSource.Meta):
+        unique_together = ('content_type', 'object_id', 'projection', 'tuck')
+
+
+class MaleBodyConfiguration(ConfigurationModel):
     sleeve = models.ForeignKey(dictionaries.SleeveType, verbose_name=_(u'Рукав'))
     hem = models.ForeignKey(dictionaries.HemType, verbose_name=_(u'Низ'))
     cuff_types = models.ManyToManyField(dictionaries.CuffType, verbose_name=_(u'Типы манжет'), blank=True)
+
+    sources = GenericRelation(MaleBodySource)
 
     class Meta:
         verbose_name = _(u'Конфигурация сборки для основы')

@@ -1,16 +1,16 @@
 from time import time
 
-from django.core.exceptions import ObjectDoesNotExist
-from PIL import Image, ImageChops
 import numpy as np
+from PIL import Image, ImageChops
+from django.core.exceptions import ObjectDoesNotExist
 from lazy import lazy
 
-from .base import BaseShirtBuilder
-from processing.male_configs import models
-from processing.rendering.compose import Composer
-from processing.models import PROJECTION
-from processing.rendering.compose import ImageConf
 from backend.models import ContrastDetails
+from processing.male_configs import models
+from processing.models import PROJECTION
+from processing.rendering.compose import Composer
+from processing.rendering.compose import ImageConf
+from .base import BaseShirtBuilder
 
 
 class MaleShirtBuilder(BaseShirtBuilder):
@@ -91,7 +91,8 @@ class MaleShirtBuilder(BaseShirtBuilder):
         self.append_model(self.get_compose_configuration(models.MaleBodyConfiguration, {
             'sleeve_id': self.sleeve.id,
             'hem_id': self.hem,
-            'cuff_types__id': self.cuff['type'] if self.cuff else None
+            'cuff_types__id': self.cuff['type'] if self.cuff else None,
+            'tuck_id': self.tuck
         }))
 
         self.append_contrasting_part(self.collar_conf, self.collar_model, ContrastDetails.COLLAR_ELEMENTS)

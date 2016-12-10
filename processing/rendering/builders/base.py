@@ -1,18 +1,18 @@
-from PIL import Image, ImageChops, ImageColor, ImageFont, ImageOps
 import numpy as np
+from PIL import Image, ImageChops, ImageColor, ImageFont, ImageOps
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
-from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import cached_property
 
-from backend.models import ContrastDetails, Fabric, CustomButtons, Collection
-from dictionaries import models as dictionaries
 import processing.models as compose
-from processing.rendering.compose import Composer, ImageConf
-from core.utils import first
-from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_text
+from backend.models import ContrastDetails, Fabric, CustomButtons, Collection
 from core.settings.base import RENDER
-from processing.cache import CacheBuilder, STITCHES
+from core.utils import first
+from dictionaries import models as dictionaries
+from processing.cache import STITCHES
+from processing.rendering.compose import Composer, ImageConf
+from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_text
 
 
 class CacheBuilderMock(object):
@@ -27,6 +27,7 @@ class CacheBuilderMock(object):
 
 class BaseShirtBuilder(object):
     cache_builder = CacheBuilderMock
+
     # cache_builder = CacheBuilder
 
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
@@ -252,7 +253,7 @@ class BaseShirtBuilder(object):
         return configurations.first() if configurations else None
 
     def get_compose_configurations(self, model, filters):
-        filters = map(lambda (k, v): Q(**{k: v}) | Q(**{"%s__isnull" % k: True}), filters.iteritems())
+        filters = [Q(**{k: v}) | Q(**{"%s__isnull" % k: True}) for k, v in filters.iteritems()]
         try:
             configuration = model.objects.get(*filters)
             return configuration.sources.filter(projection=self.projection)
