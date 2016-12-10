@@ -254,7 +254,9 @@ class BaseShirtBuilder(object):
         return configurations.first() if configurations else None
 
     def filters_from_dict(self, filters):
-        return [Q(**{k: v}) | Q(**{"%s__isnull" % k: True}) for k, v in filters.iteritems()]
+        if filters:
+            return [Q(**{k: v}) | Q(**{"%s__isnull" % k: True}) for k, v in filters.iteritems()]
+        return []
 
     def get_compose_configurations(self, model, filters, source_filters=None):
         filters = self.filters_from_dict(filters)
