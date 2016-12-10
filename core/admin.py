@@ -1,4 +1,7 @@
+# coding: utf-8
+
 from .utils import first
+from django.utils.translation import ugettext_lazy as _
 
 class ManyToManyListFormatter(object):
     def __init__(self, field, description, separator=', '):
@@ -8,7 +11,7 @@ class ManyToManyListFormatter(object):
 
     def __call__(self, obj):
         m2m_manager = getattr(obj, self.field)
-        return self.separator.join([unicode(related) for related in m2m_manager.all()])
+        return self.separator.join([unicode(related) for related in m2m_manager.all()]) or _(u"(Нет)")
 
 
 class ManyToManyMixin(object):

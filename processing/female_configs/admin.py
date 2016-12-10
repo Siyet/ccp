@@ -26,8 +26,9 @@ class FemaleSourceAdmin(SourceAdmin):
     exclude = ['sex']
 
 
-class FemaleButtonsAdmin(ButtonsSourceAdmin):
+class FemaleButtonsAdmin(ManyToManyMixin, ButtonsSourceAdmin):
     exclude = ['sex']
+    m2m_fields = ['plackets']
 
 
 admin.site.register(models.FemaleBodyConfiguration, BodyAdmin)

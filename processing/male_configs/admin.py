@@ -19,6 +19,10 @@ class BodyAdmin(ManyToManyMixin, admin.ModelAdmin):
     m2m_fields = ['cuff_types']
 
 
+class BodyButtonsAdmin(ManyToManyMixin, ButtonsSourceAdmin):
+    m2m_fields = ['plackets']
+    exclude = ['sex']
+
 
 admin.site.register(models.MaleBodyConfiguration, BodyAdmin)
 admin.site.register(models.MaleCollarConfiguration, CollarSourceAdmin)
@@ -28,7 +32,7 @@ admin.site.register(models.MalePocketConfiguration, SourceAdmin)
 admin.site.register(models.MalePlacketConfiguration, PlacketAdmin)
 admin.site.register(models.MaleYokeConfiguration, SourceAdmin)
 admin.site.register(models.DickeyConfiguration, SourceAdmin)
-admin.site.register(models.MaleBodyButtonsConfiguration, ButtonsSourceAdmin)
+admin.site.register(models.MaleBodyButtonsConfiguration, BodyButtonsAdmin)
 admin.site.register(models.MaleCuffButtonsConfiguration, CuffButtonsAdmin)
 admin.site.register(models.MaleInitialsConfiguration, InitialsConfigurationAdmin)
 admin.site.register(models.MaleCollarButtonsConfiguration, ButtonsSourceAdmin)
