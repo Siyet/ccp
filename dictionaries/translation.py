@@ -7,6 +7,7 @@ class DictionaryTranslation(TranslationOptions):
 translator.register([
     models.SizeOptions,
     models.FabricDesign,
+    models.FabricColor,
     models.CollarButtons,
     models.TuckType,
     models.SleeveLength,
