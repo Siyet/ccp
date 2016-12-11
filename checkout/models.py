@@ -21,6 +21,15 @@ logger = logging.getLogger('checkout')
 
 
 class Payment(YandexPayment):
+    @property
+    def order_number(self):
+        if hasattr(self, 'order'):
+            return "{}".format(self.order.number)
+        else:
+            return ""
+    order_number.fget.short_description = _(u'Номер заказа')
+
+
     class Meta:
         proxy = True
         ordering = ('-created',)
@@ -36,6 +45,9 @@ class Payment(YandexPayment):
         self.save(update_fields=['status', 'performed_datetime'])
         self.send_signals()
         return True
+
+    def __unicode__(self):
+        return _(u'Платёж №{}').format(self.order_number)
 
 
 class Customer(models.Model):
@@ -77,23 +89,23 @@ class Order(models.Model):
     )
     ORDER_PDF_TEMPLATE_NAME = 'checkout/payment_completed_customer_pdf_email.html'
 
-    number = models.CharField(_(u'Номер заказа'), max_length=255, unique=True, default=uuid.uuid4)
+    number = models.AutoField(_(u'Номер заказа'), primary_key=True)
     state = models.CharField(_(u'Статус'), max_length=20, choices=STATES, default=STATES.new)
     date_add = models.DateTimeField(verbose_name=_(u'Дата добавления'), auto_now_add=True, null=True)
     customer = models.ForeignKey(Customer, to_field='number', verbose_name=_(u'Клиент'), null=True, blank=True)
     discount_value = models.FloatField(_(u'Номинал скидки'), null=True, default=0)
     checkout_shop = models.ForeignKey(Shop, to_field='index', verbose_name=_(u'Магазин'), null=True, blank=True,
                                       related_name='orders')
-    certificate = models.ForeignKey('checkout.Certificate', to_field='number', null=True, blank=True)
+    certificate = models.ForeignKey('checkout.Certificate', verbose_name=_(u'Сертификат'), to_field='number', null=True, blank=True)
     certificate_value = models.PositiveIntegerField(_(u'Номинал сертификата'), null=True, default=0)
-    payment = models.OneToOneField(Payment, null=True, blank=True, related_name='order')
+    payment = models.OneToOneField(Payment, verbose_name=_(u'Платеж'), null=True, blank=True, related_name='order')
 
     class Meta:
         verbose_name = _(u'Заказ')
         verbose_name_plural = _(u'Заказы')
 
     def __unicode__(self):
-        return self.number
+        return "{}".format(self.number)
 
     @property
     def paid(self):
@@ -108,6 +120,7 @@ class Order(models.Model):
     get_full_amount.allow_tags = True
     get_full_amount.short_description = _(u'Общая стоимость заказа')
 
+
     def get_amount_to_pay(self):
         try:
             return self.payment.order_amount
@@ -121,14 +134,14 @@ class Order(models.Model):
         try:
             return self.payment.shop_amount
         except AttributeError:
-            return None
+            return 0
 
     get_amount_paid.allow_tags = True
     get_amount_paid.short_description = _(u'Оплаченная сумма')
 
     def get_performed_datetime(self):
         try:
-            return self.payment.performed_datetime
+            return self.payment.performed_datetime.strftime("%d.%m.%Y %H:%M")
         except AttributeError:
             return None
 
