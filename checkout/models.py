@@ -232,10 +232,7 @@ class Order(models.Model):
 
     def get_pdf(self):
         t = loader.get_template(self.ORDER_PDF_TEMPLATE_NAME)
-        return render_pdf_from_template(t, None, None, {'order': self}, cmd_options={
-            "margin-left": "0", "margin-right": "0",
-            "margin-top": "0", "margin-bottom": "0",
-        })
+        return render_pdf_from_template(t, None, None, {'order': self})
 
 
 class CustomerData(models.Model):
