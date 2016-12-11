@@ -136,7 +136,7 @@ class FabricResidualAdminInline(admin.TabularInline):
     extra = 0
 
 
-class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
+class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, TranslationAdmin):
     RESIDUAL_KEY = "storehouse_%s"
     list_per_page = 20
     resource_class = FabricResource
@@ -184,7 +184,7 @@ class FabricAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin):
     thumbnail.short_description = _(u'Лоскут')
 
     def has_description(self, fabric):
-        return not (not (fabric.short_description or fabric.long_description))
+        return bool(fabric.short_description or fabric.long_description)
 
     has_description.short_description = _(u'Описание')
     has_description.boolean = True
