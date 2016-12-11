@@ -1,4 +1,4 @@
-{% load staticfiles i18n %}
+{% load i18n %}
 {% load checkout_tags %}
 <html>
 <head>
@@ -6,7 +6,7 @@
     <style type="text/css">
         body {
             color: #494949;
-{#            width: 210mm; /* for mac OS debugging */#}
+            width: 210mm; /* for mac OS debugging */
         }
 
         @font-face {
@@ -227,10 +227,10 @@
 </head>
 <body style="margin:0; border: 0; padding: 0">
 <div class="header">
-    <img src="{% static 'img/cc_logo.png' %}" class="top-logo"/>
+    <img src="{% abs_static 'img/cc_logo.png' %}" class="top-logo"/>
 </div>
 <div class="greeting">
-    <img src="{% static 'img/shopping_cart.png' %}" class="shopping-cart"/>
+    <img src="{% abs_static 'img/shopping_cart.png' %}" class="shopping-cart"/>
     <span class="header-text">
         {% trans 'Спасибо большое за ваш заказ. В этом файле указана подробная информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!' %}
     </span>
@@ -278,7 +278,7 @@
 <footer>
     <div class="questions">
         <div class="phone-wrap">
-            <img src="{% static 'img/phone.png' %}" class="phone-icon"/>
+            <img src="{% abs_static 'img/phone.png' %}" class="phone-icon"/>
         </div>
         <div class="detail ">
             <div class="font-9 medium" style="margin-top: 15px; margin-bottom: 5px">{% trans 'Вопросы' %}</div>
