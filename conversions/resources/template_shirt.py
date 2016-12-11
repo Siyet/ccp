@@ -66,7 +66,7 @@ class TemplateShirtResource(resources.ModelResource):
     size = fields.Field(attribute='size', column_name=_(u'№ размера'),
                         widget=CustomForeignKeyWidget(model=dictionaries.Size, field='size'))
     hem = fields.Field(attribute='hem', column_name=_(u'Низ'),
-                       widget=CustomForeignKeyWidget(model=dictionaries.HemType, field='title', create_missing=False))
+                       widget=CustomForeignKeyWidget(model=dictionaries.HemType, field='title'))
     placket = fields.Field(attribute='placket', column_name=_(u'Полочка'),
                            widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title',
                                                          create_missing=False))
@@ -74,15 +74,15 @@ class TemplateShirtResource(resources.ModelResource):
                           widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title',
                                                         create_missing=False))
     tuck = fields.Field(attribute='tuck', column_name=TUCK_COLUMN_NAME,
-                        widget=CustomForeignKeyWidget(model=dictionaries.TuckType, field='title', create_missing=False))
+                        widget=CustomForeignKeyWidget(model=dictionaries.TuckType, field='title'))
     back = fields.Field(attribute='back', column_name=_(u'Спинка'),
-                        widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title', create_missing=False))
+                        widget=CustomForeignKeyWidget(model=dictionaries.BackType, field='title'))
     collection = TemplateShirtCollectionField(attribute='collection', column_name=_(u'Коллекция'),
                                               widget=TemplateShirtCollectionWidget(Collection, field='title'))
     stitch = fields.Field(attribute='stitch', column_name=_(u'Отстрочка (мм)'),
                           widget=ChoicesWidget(choices=TemplateShirt.STITCH))
     yoke = fields.Field(attribute='yoke', column_name=_(u'Цельная кокетка'),
-                        widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title', create_missing=False))
+                        widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title'))
     clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME, widget=ChoicesWidget(choices=CLASP_USE_DICT))
     sleeve = fields.Field(attribute='sleeve', column_name=_(u'Рукав'),
                           widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title',
@@ -92,9 +92,9 @@ class TemplateShirtResource(resources.ModelResource):
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title',
                                                               create_missing=False))
     collar__hardness = fields.Field(attribute='collar__hardness', column_name=_(u'Жесткость воротника'),
-                                    widget=CustomForeignKeyWidget(model=Hardness, field='title', create_missing=False))
+                                    widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     collar__stays = fields.Field(attribute='collar__stays', column_name=_(u'Косточки'),
-                                 widget=CustomForeignKeyWidget(model=Stays, field='title', create_missing=False))
+                                 widget=CustomForeignKeyWidget(model=Stays, field='title'))
     collar__size = fields.Field(attribute='collar__size', column_name=_(u'Размер воротника'),
                                 widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title',
                                                               create_missing=False))
@@ -107,7 +107,7 @@ class TemplateShirtResource(resources.ModelResource):
                                   widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title',
                                                                 create_missing=False))
     cuff__hardness = fields.Field(attribute='cuff__hardness', column_name=_(u'Жесткость манжеты'),
-                                  widget=CustomForeignKeyWidget(model=Hardness, field='title', create_missing=False))
+                                  widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     # Импорт пуговиц
     custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=_(u'Пуговицы'),
                                        widget=CustomForeignKeyWidget(model=dictionaries.CustomButtonsType,
@@ -121,7 +121,7 @@ class TemplateShirtResource(resources.ModelResource):
                                 widget=CustomForeignKeyWidget(dictionaries.DickeyType, field='title',
                                                               create_missing=False))
     dickey__fabric = fields.Field(attribute='dickey__fabric', column_name=_(u'МА Ткань'),
-                                  widget=CustomForeignKeyWidget(Fabric, field='code', create_missing=False))
+                                  widget=CustomForeignKeyWidget(Fabric, field='code'))
     # импорт инициалов
     initials__font = fields.Field(attribute='initials__font', column_name=_(u'ИН Шрифт'),
                                   widget=ForeignKeyWidget(dictionaries.Font, field='title'))

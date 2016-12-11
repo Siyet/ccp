@@ -25,17 +25,10 @@ class ModelCacheMixin(object):
 
 
 class CustomForeignKeyWidget(ModelCacheMixin, ForeignKeyWidget):
-    def __init__(self, model, field='pk', create_missing=True, *args, **kwargs):
-        self.create_missing = create_missing
-        super(CustomForeignKeyWidget, self).__init__(model, field, *args, **kwargs)
-
     def clean(self, value):
         if value:
             obj = self.get_object(value)
             if not obj:
-                if self.create_missing:
-                    obj = self.add_object(value)
-                else:
                     raise ValueError(u"'%s' with '%s' equal to '%s' was not found" % (
                         self.model._meta.verbose_name,
                         self.model._meta.get_field(self.field).verbose_name,
