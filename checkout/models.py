@@ -232,7 +232,13 @@ class Order(models.Model):
 
     def get_pdf(self):
         t = loader.get_template(self.ORDER_PDF_TEMPLATE_NAME)
-        return render_pdf_from_template(t, None, None, {'order': self})
+        return render_pdf_from_template(t, None, None, {'order': self}, cmd_options={
+            "margin-left": "0", "margin-right": "0",
+            "margin-top": "0", "margin-bottom": "0",
+            "dpi": "200",
+            "page-width" : "1024px",
+            "page-height" : "1448px"
+        })
 
 
 class CustomerData(models.Model):

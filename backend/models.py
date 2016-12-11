@@ -365,7 +365,7 @@ class Shirt(models.Model):
                                        chained_field='custom_buttons_type',
                                        chained_model_field='type', show_all=False, null=True, blank=True)
 
-    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True, default=ResolveDefault(ShawlOptions))
+    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True, related_name='shirts', default=ResolveDefault(ShawlOptions))
     yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 

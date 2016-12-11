@@ -8,7 +8,6 @@ logger = logging.getLogger('checkout')
 
 
 class CheckOrderView(YandexCheckOrderView):
-
     def form_valid(self, form):
         response = super(CheckOrderView, self).form_valid(form)
         payment = form.get_payment()

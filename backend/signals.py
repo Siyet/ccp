@@ -1,6 +1,5 @@
 # coding: utf-8
-from django.db import transaction
-from django.db.models import Q
+from bulk_update.helper import bulk_update
 from django.db.models.signals import post_save, pre_save
 
 from backend import models
@@ -46,17 +45,17 @@ def update_price_for_shirts_with_accessories(sender, instance, **kwargs):
     update_prices_by_shirt_ids(shirt_ids)
 
 
-@transaction.atomic
 def update_prices_by_shirt_ids(shirt_ids):
     calculator = ShirtPriceCalculator()
-    qs = models.Shirt.objects.filter(pk__in=shirt_ids)
-    qs = qs.select_related('fabric', 'shawl', 'collection__storehouse', 'custom_buttons__type', 'cuff', 'collar',
-                           'dickey')
+    qs_init = models.Shirt.objects.filter(pk__in=shirt_ids)
+    qs = qs_init.select_related('fabric', 'shawl', 'collection__storehouse', 'custom_buttons__type', 'cuff', 'collar',
+                                'dickey')
     qs = qs.prefetch_related('collection__storehouse__prices', 'contrast_details')
 
     for shirt in qs:
         shirt.price = calculator.get_price_for_object(shirt)
-        shirt.save(update_fields=['price'])
+
+    bulk_update(qs)
 
 
 # TODO: добавить 2 события для всех связанных моделей с ценой рубашки
