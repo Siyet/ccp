@@ -86,11 +86,17 @@
             top: 8px;
             left: 16px;
         }
+
+        .header {
+            height: 55px;
+            width: 100%;
+            background-color: #D0D9E7
+        }
     </style>
 </head>
 <body style="margin:0; border: 0; padding: 0">
-<div style="height:72px; width:100%; background-color: #D0D9E7">
-    <img src="{% static 'img/cc_logo.jpg' %}" class="top-logo"/>
+<div class="header">
+    <img src="{% static 'img/cc_logo.png' %}" class="top-logo"/>
 </div>
 <p class="text-black">
     {% trans 'Спасибо большое за ваш заказ. В этом файле указана подробная информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!' %}
@@ -110,7 +116,7 @@
     {% for order_item in order.items.all %}
         <tr class="text-black">
             <td>
-{#                <img src="{% shirt_image order_item.shirt %}" height="120" width="120" alt="">#}
+                {#                <img src="{% shirt_image order_item.shirt %}" height="120" width="120" alt="">#}
             </td>
             <td>
                 <p><b>{% trans 'Сорочка' %}</b></p>

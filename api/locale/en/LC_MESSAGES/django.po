@@ -19,62 +19,62 @@ msgstr ""
 
 #: filters.py:31
 msgid "Ткань"
-msgstr ""
+msgstr "Fabric"
 
 #: filters.py:32
 msgid "Тип ткани"
-msgstr ""
+msgstr "Weave"
 
 #: filters.py:33
 msgid "Цвет ткани"
-msgstr ""
+msgstr "Color"
 
 #: filters.py:34
 msgid "Паттерн ткани"
-msgstr ""
+msgstr "Pattern"
 
 #: filters.py:35
 msgid "Толщина ткани"
-msgstr ""
+msgstr "Thickness"
 
 #: filters.py:36 views/shirts.py:124
 msgid "Коллекция"
-msgstr ""
+msgstr "Collection"
 
 #: filters.py:37
 msgid "Пол коллекции"
-msgstr ""
+msgstr "Collection sex"
 
 #: serializers.py:411
 msgid "Данные клиента обязательны"
-msgstr ""
+msgstr "Customer data are required"
 
 #: views/shirts.py:86
 #, python-format
 msgid "%s - по возрастанию"
-msgstr ""
+msgstr "%s - order by ascending"
 
 #: views/shirts.py:87
 #, python-format
 msgid "%s - по убыванию"
-msgstr ""
+msgstr "%s - order by descending"
 
 #: views/shirts.py:125
 msgid "Цвет"
-msgstr ""
+msgstr "Color"
 
 #: views/shirts.py:126
 msgid "Узор"
-msgstr ""
+msgstr "Design"
 
 #: views/shirts.py:127
 msgid "Плетение"
-msgstr ""
+msgstr "Weave"
 
 #: views/shirts.py:128
 msgid "Плотность"
-msgstr ""
+msgstr "Thickness"
 
 #: views/shirts.py:130
 msgid "Сортировка"
-msgstr ""
+msgstr "Order"
