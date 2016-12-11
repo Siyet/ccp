@@ -36,7 +36,7 @@ class SyncEmailSender(object):
         self.attach = attach
         self.from_email = settings.DEFAULT_FROM_EMAIL
 
-    def run(self):
+    def start(self):
         msg = EmailMessage(self.subject, self.body, self.from_email, self.recipient_list)
         msg.content_subtype = "html"
         if self.attach:
