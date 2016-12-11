@@ -281,7 +281,7 @@ class OrderItem(models.Model):
         verbose_name_plural = _(u'Детали заказа')
 
     def __unicode__(self):
-        return self.order.number
+        return "{}".format(self.order.number)
 
     def get_total(self):
         return self.price * self.amount
