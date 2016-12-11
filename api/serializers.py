@@ -372,13 +372,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
             models.Initials.objects.create(shirt=shirt, **initials)
 
         if contrast_details is not None:
-            collection = validated_data.get('collection')
-            if collection.contrast_details:
+            if shirt.collection.contrast_details:
                 for contrast_detail in contrast_details:
                     models.ContrastDetails.objects.create(shirt=shirt, **contrast_detail)
             else:
                 for element in models.ContrastDetails.ELEMENTS:
-                    models.ContrastDetails.objects.create(shirt=shirt, element=element, fabric=collection.white_fabric)
+                    models.ContrastDetails.objects.create(shirt=shirt, element=element, fabric=shirt.collection.white_fabric)
 
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
