@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from core.mail import EmailSender
+from core.mail import SyncEmailSender
 from django.utils.safestring import mark_safe
 from django.utils.text import ugettext_lazy as _
 from django.template.loader import render_to_string
