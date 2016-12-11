@@ -19,12 +19,12 @@ msgstr ""
 
 #: constants.py:7
 msgid "Мужская"
-msgstr ""
+msgstr "Male"
 
 #: constants.py:8
 msgid "Женская"
-msgstr ""
+msgstr "Female"
 
 #: constants.py:9
 msgid "Унисекс"
-msgstr ""
+msgstr "Unisex"
