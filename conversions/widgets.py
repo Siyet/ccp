@@ -1,7 +1,7 @@
 # coding: utf-8
-from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
+from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
 
 from core.constants import SEX
 
@@ -29,11 +29,11 @@ class CustomForeignKeyWidget(ModelCacheMixin, ForeignKeyWidget):
         if value:
             obj = self.get_object(value)
             if not obj:
-                    raise ValueError(u"'%s' with '%s' equal to '%s' was not found" % (
-                        self.model._meta.verbose_name,
-                        self.model._meta.get_field(self.field).verbose_name,
-                        value
-                    ))
+                raise ValueError(u"'%s' with '%s' equal to '%s' was not found" % (
+                    self.model._meta.verbose_name,
+                    self.model._meta.get_field(self.field).verbose_name,
+                    value
+                ))
             return obj
         else:
             return None

@@ -235,9 +235,6 @@ class Order(models.Model):
         return render_pdf_from_template(t, None, None, {'order': self}, cmd_options={
             "margin-left": "0", "margin-right": "0",
             "margin-top": "0", "margin-bottom": "0",
-            "dpi": "200",
-            "page-width" : "1024px",
-            "page-height" : "1448px"
         })
 
 

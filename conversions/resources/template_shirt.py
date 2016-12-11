@@ -68,11 +68,9 @@ class TemplateShirtResource(resources.ModelResource):
     hem = fields.Field(attribute='hem', column_name=_(u'Низ'),
                        widget=CustomForeignKeyWidget(model=dictionaries.HemType, field='title'))
     placket = fields.Field(attribute='placket', column_name=_(u'Полочка'),
-                           widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title',
-                                                         create_missing=False))
+                           widget=CustomForeignKeyWidget(model=dictionaries.PlacketType, field='title'))
     pocket = fields.Field(attribute='pocket', column_name=_(u'Карман'),
-                          widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title',
-                                                        create_missing=False))
+                          widget=CustomForeignKeyWidget(model=dictionaries.PocketType, field='title'))
     tuck = fields.Field(attribute='tuck', column_name=TUCK_COLUMN_NAME,
                         widget=CustomForeignKeyWidget(model=dictionaries.TuckType, field='title'))
     back = fields.Field(attribute='back', column_name=_(u'Спинка'),
@@ -85,41 +83,33 @@ class TemplateShirtResource(resources.ModelResource):
                         widget=CustomForeignKeyWidget(dictionaries.YokeType, field='title'))
     clasp = fields.Field(attribute='clasp', column_name=CLASP_COLUMN_NAME, widget=ChoicesWidget(choices=CLASP_USE_DICT))
     sleeve = fields.Field(attribute='sleeve', column_name=_(u'Рукав'),
-                          widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title',
-                                                        create_missing=False))
+                          widget=CustomForeignKeyWidget(model=dictionaries.SleeveType, field='title'))
     # Импорт воротника
     collar__type = fields.Field(attribute='collar__type', column_name=_(u'Тип воротника'),
-                                widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title',
-                                                              create_missing=False))
+                                widget=CustomForeignKeyWidget(model=dictionaries.CollarType, field='title'))
     collar__hardness = fields.Field(attribute='collar__hardness', column_name=_(u'Жесткость воротника'),
                                     widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     collar__stays = fields.Field(attribute='collar__stays', column_name=_(u'Косточки'),
                                  widget=CustomForeignKeyWidget(model=Stays, field='title'))
     collar__size = fields.Field(attribute='collar__size', column_name=_(u'Размер воротника'),
-                                widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title',
-                                                              create_missing=False))
+                                widget=CustomForeignKeyWidget(model=dictionaries.CollarButtons, field='title'))
 
     # Импорт манжеты
     cuff__type = fields.Field(attribute='cuff__type', column_name=CUFF_COLUMN_NAME,
-                              widget=CustomForeignKeyWidget(model=dictionaries.CuffType, field='title',
-                                                            create_missing=False))
+                              widget=CustomForeignKeyWidget(model=dictionaries.CuffType, field='title'))
     cuff__rounding = fields.Field(attribute='cuff__rounding', column_name=_(u'Вид манжеты'),
-                                  widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title',
-                                                                create_missing=False))
+                                  widget=CustomForeignKeyWidget(model=dictionaries.CuffRounding, field='title'))
     cuff__hardness = fields.Field(attribute='cuff__hardness', column_name=_(u'Жесткость манжеты'),
                                   widget=CustomForeignKeyWidget(model=Hardness, field='title'))
     # Импорт пуговиц
     custom_buttons_type = fields.Field(attribute='custom_buttons_type', column_name=_(u'Пуговицы'),
                                        widget=CustomForeignKeyWidget(model=dictionaries.CustomButtonsType,
-                                                                     field='title',
-                                                                     create_missing=False))
+                                                                     field='title'))
     custom_buttons = fields.Field(attribute='custom_buttons', column_name=_(u'Код цвета пуговицы'),
-                                  widget=CustomForeignKeyWidget(model=CustomButtons, field='title',
-                                                                create_missing=False))
+                                  widget=CustomForeignKeyWidget(model=CustomButtons, field='title'))
     # импорт манишки
     dickey__type = fields.Field(attribute='dickey__type', column_name=_(u'МА Тип'),
-                                widget=CustomForeignKeyWidget(dictionaries.DickeyType, field='title',
-                                                              create_missing=False))
+                                widget=CustomForeignKeyWidget(dictionaries.DickeyType, field='title'))
     dickey__fabric = fields.Field(attribute='dickey__fabric', column_name=_(u'МА Ткань'),
                                   widget=CustomForeignKeyWidget(Fabric, field='code'))
     # импорт инициалов
