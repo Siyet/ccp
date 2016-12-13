@@ -42,7 +42,6 @@ admin.site.register(models.Size, SizeAdmin)
 admin.site.register([
     models.Color,
     models.StitchColor,
-    models.FabricColor,
     models.CollarType
 ], GrappelliOrderableAdmin)
 
@@ -66,6 +65,7 @@ admin.site.register([
     models.YokeType,
     models.CollarButtons,
     models.FabricDesign,
+    models.FabricColor,
     models.CuffType,
     models.FabricType,
     models.Thickness
