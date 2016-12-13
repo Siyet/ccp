@@ -2,7 +2,7 @@
 
 import os
 
-from backend.models import Fabric, FabricPrice
+from backend.models import Fabric, FabricPrice, FabricResidual
 from processing.models import Texture
 from rest_framework_extensions.key_constructor.constructors import DefaultListKeyConstructor
 from rest_framework_extensions.key_constructor.bits import QueryParamsKeyBit
@@ -27,5 +27,5 @@ def get_latest_date(model):
 
 def fabric_last_modified(*args, **kwargs):
     print(args, kwargs)
-    dates = map(lambda model: get_latest_date(model), [Fabric, FabricPrice, Texture])
+    dates = map(lambda model: get_latest_date(model), [Fabric, FabricPrice, FabricResidual, Texture])
     return max(dates)

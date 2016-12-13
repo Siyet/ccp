@@ -182,7 +182,7 @@ class Fabric(TimeStampedModel):
         verbose_name_plural = _(u'Ткани')
 
 
-class FabricResidual(models.Model):
+class FabricResidual(TimeStampedModel):
     storehouse = models.ForeignKey(Storehouse, verbose_name=_(u'Склад'), related_name='residuals')
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'), related_name='residuals')
     amount = models.DecimalField(_(u'Остаток'), max_digits=10, decimal_places=2, default=0)

@@ -274,8 +274,8 @@ class BaseShirtBuilder(object):
 
         configuration = model.objects.filter(*filters).first()
         if not configuration:
-            print('not found: %s' % model._meta.verbose_name)
-            print('params: %s' % filters)
+            print(u'not found: %s' % model._meta.verbose_name)
+            print(u'params: %s' % filters)
             return None
 
         return (configuration.sources.filter(projection=self.projection).first(),

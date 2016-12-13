@@ -1,22 +1,21 @@
 # coding: utf-8
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from last_modified.decorators import last_modified
+from lazy import lazy
+from rest_framework import filters
+from rest_framework import pagination
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import pagination
-from rest_framework import filters
-from django.shortcuts import get_object_or_404
-from django.utils.text import ugettext_lazy as _
 from rest_framework_extensions.cache.decorators import cache_response
-from last_modified.decorators import last_modified
-from lazy import lazy
-from django.db.models import Q
 
-from backend.models import Collection, AccessoriesPrice, ContrastDetails, Dickey
-from dictionaries import models as dictionaries
 from api import serializers
-from .mixins import CollectionMixin
 from api.cache import fabric_last_modified, ListKeyConstructor
 from api.filters import CollectionFabricsFilter
+from backend.models import Collection
+from dictionaries import models as dictionaries
+from .mixins import CollectionMixin
 
 __all__ = [
     'CollectionsListView', 'CollectionFabricDesignsList', 'CollectionFabricsList', 'CollectionFabricColorsList',
@@ -46,15 +45,17 @@ class CollectionFabricsList(CollectionMixin, ListAPIView):
     @lazy
     def collection(self):
         collection = super(CollectionFabricsList, self).collection
-        collection.prices = collection.storehouse.prices.values('fabric_category', 'price')
+        collection.prices = collection.storehouse.prices.values('fabric_category')
         return collection
 
     def get_queryset(self):
-        return self.collection.fabrics().select_related('texture').exclude(texture=None).exclude(
+        return self.collection.fabrics().select_related(
+            'texture').exclude(texture=None).exclude(
             Q(short_description='') & Q(long_description='')
         ).exclude(dickey=True)
 
-    @cache_response(key_func=ListKeyConstructor())
+    # TODO: @cache_response(key_func=ListKeyConstructor())
+
     def list(self, request, *args, **kwargs):
         return super(CollectionFabricsList, self).list(request, *args, **kwargs)
 

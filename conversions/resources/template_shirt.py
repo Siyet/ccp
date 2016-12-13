@@ -16,7 +16,6 @@ from conversions.widgets import CustomForeignKeyWidget, TemplateShirtCollectionW
 from core.utils import first
 from dictionaries import models as dictionaries
 
-from lazy import lazy
 
 class TemplateShirtResource(resources.ModelResource):
     BUTTONS_DEFAULT_DICT = {
