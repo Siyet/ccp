@@ -45,7 +45,7 @@ class CollectionFabricsList(CollectionMixin, ListAPIView):
     @lazy
     def collection(self):
         collection = super(CollectionFabricsList, self).collection
-        collection.prices = collection.storehouse.prices.values('fabric_category')
+        collection.prices = collection.storehouse.prices.values('fabric_category', 'price')
         return collection
 
     def get_queryset(self):
