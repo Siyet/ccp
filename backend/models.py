@@ -1,23 +1,24 @@
 # coding: UTF-8
 import re
 
+from colorful.fields import RGBColorField
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q, F
-from django.contrib.contenttypes.models import ContentType
 from django.utils.text import ugettext_lazy as _
-from django.conf import settings
-from django.core.exceptions import ValidationError
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
-from smart_selects.db_fields import ChainedForeignKey
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from ordered_model.models import OrderedModel
-from colorful.fields import RGBColorField
+from smart_selects.db_fields import ChainedForeignKey
 
-from dictionaries.models import FabricCategory, SleeveType, ResolveDefault
 from backend import managers
 from core import constants
+from dictionaries.models import FabricCategory, SleeveType, ResolveDefault
 
 
 class Collection(OrderedModel):
@@ -129,7 +130,17 @@ class FabricPrice(TimeStampedModel):
 
 
 class Fabric(TimeStampedModel):
-    code = models.CharField(_(u'Артикул'), max_length=20, unique=True)
+    code = models.CharField(
+        _(u'Артикул'),
+        max_length=20,
+        unique=True,
+        validators=[
+            RegexValidator(
+                r'[A-Z]+\d+',
+                message=_(u'Недопустимый код сорочки: может содержать только латинские символы и цифры')
+            )
+        ]
+    )
     category = models.ForeignKey('dictionaries.FabricCategory', verbose_name=_(u'Категория'), related_name='fabrics',
                                  blank=True, null=True)
     type = models.ForeignKey('dictionaries.FabricType', verbose_name=_(u'Тип'), related_name='fabrics',
@@ -365,7 +376,8 @@ class Shirt(models.Model):
                                        chained_field='custom_buttons_type',
                                        chained_model_field='type', show_all=False, null=True, blank=True)
 
-    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True, related_name='shirts', default=ResolveDefault(ShawlOptions))
+    shawl = models.ForeignKey(ShawlOptions, verbose_name=_(u'Платок'), null=True, related_name='shirts',
+                              default=ResolveDefault(ShawlOptions))
     yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 
