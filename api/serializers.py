@@ -32,7 +32,12 @@ class ShirtInfoSerializer(serializers.ModelSerializer):
 
 
 class SizeOptionSerializer(serializers.ModelSerializer):
+    title = serializers.ReadOnlyField()
+    id = serializers.IntegerField(required=False)
+
     class Meta:
+        fields = ['id', 'title', 'show_sizes']
+        read_only_fields = ('title', 'show_sizes')
         model = dictionaries.SizeOptions
 
 
@@ -327,6 +332,7 @@ class ShirtSerializer(serializers.ModelSerializer):
     contrast_stitches = ContrastStitchesSerializer(many=True)
     initials = InitialsSerializer(required=False, allow_null=True)
     fabric_code = serializers.ReadOnlyField(source='fabric.code')
+    size_option = SizeOptionSerializer()
 
     class Meta:
         model = models.Shirt
@@ -361,6 +367,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         initials = shirt.pop('initials', None)
         contrast_details = shirt.pop('contrast_details', None)
         contrast_stitches = shirt.pop('contrast_stitches')
+        shirt['size_option_id'] = shirt.pop('size_option')['id']
         shirt = models.Shirt.objects.create(**shirt)
         models.Collar.objects.create(shirt=shirt, **collar)
         models.Cuff.objects.create(shirt=shirt, **cuff)

@@ -191,7 +191,7 @@ class CacheBuilder(object):
 
         img = Image.open(texture.texture.path)
 
-        save_to_cache(img, CACHE_RESOLUTION.full)
+        # save_to_cache(img, CACHE_RESOLUTION.full)
 
         # img = img.filter(ImageFilter.GaussianBlur(radius=3.5))
 
