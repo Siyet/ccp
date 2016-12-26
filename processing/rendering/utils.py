@@ -4,6 +4,7 @@ import os
 import numpy
 import Imath
 from PIL import Image, ImageDraw
+import numexpr as ne
 
 FLOAT = Imath.PixelType(Imath.PixelType.FLOAT)
 
@@ -139,7 +140,7 @@ def draw_rotated_text(text, font, rotate):
 
 def gamma(src, value=2.2):
     src_array = numpy.asarray(src).astype('float32') / 255.
-    src_array = numpy.power(src_array, value) * 255.0
+    src_array = ne.evaluate("src_array**value") * 255.0
     return Image.fromarray(src_array.astype('uint8'), src.mode)
 
 

@@ -190,10 +190,9 @@ class CacheBuilder(object):
                                 position=(0, 0))
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
-        img = gamma(Image.open(texture.texture.path))
+        img = Image.open(texture.texture.path)
 
-        # save_to_cache(img, CACHE_RESOLUTION.full)
-
-        # img = img.filter(ImageFilter.GaussianBlur(radius=3.5))
+        if texture.gamma_correction:
+            img = gamma(img)
 
         save_to_cache(img, CACHE_RESOLUTION.preview)
