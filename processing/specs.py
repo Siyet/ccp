@@ -22,7 +22,7 @@ class TextureSample(ImageSpec):
     @property
     def processors(self):
         instance, field_name = get_field_info(self.source)
-        cache = instance.cache.filter(resolution=CACHE_RESOLUTION.full).first()
+        cache = instance.cache.filter(resolution=CACHE_RESOLUTION.preview).first()
         if not cache or not path.isfile(cache.file.path):
             return []
 
