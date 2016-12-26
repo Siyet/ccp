@@ -8,6 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from scipy import ndimage
 
+from .rendering.utils import gamma
 from processing.models import SourceCache, CACHE_RESOLUTION, PROJECTION, CuffConfiguration, ButtonsSource
 from processing.male_configs.models import MaleBodyConfiguration
 from processing.female_configs.models import FemaleBodyConfiguration
@@ -189,7 +190,7 @@ class CacheBuilder(object):
                                 position=(0, 0))
             cache.file.save(filename, ContentFile(buffer.getvalue()))
 
-        img = Image.open(texture.texture.path)
+        img = gamma(Image.open(texture.texture.path))
 
         # save_to_cache(img, CACHE_RESOLUTION.full)
 

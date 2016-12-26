@@ -135,3 +135,15 @@ def draw_rotated_text(text, font, rotate):
     draw.text((0, 0), text, font=font, fill=255)
 
     return text_image.rotate(rotate, expand=1)
+
+
+def gamma(src, value=2.2):
+    src_array = numpy.asarray(src).astype('float32') / 255.
+    src_array = numpy.power(src_array, value) * 255.0
+    return Image.fromarray(src_array.astype('uint8'), src.mode)
+
+
+def ungamma(src, value=2.2):
+    src_array = numpy.asarray(src).astype('float32') / 255.
+    src_array = numpy.power(src_array, 1.0 / value) * 255.0
+    return Image.fromarray(src_array.astype('uint8'), src.mode)
