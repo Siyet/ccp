@@ -1,20 +1,19 @@
 from io import BytesIO
 from math import floor, ceil
 
-from django.core.files.base import ContentFile
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 from django.contrib.contenttypes.models import ContentType
-
+from django.core.files.base import ContentFile
 from scipy import ndimage
 
-from .rendering.utils import gamma
-from processing.models import SourceCache, CACHE_RESOLUTION, PROJECTION, CuffConfiguration, ButtonsSource
-from processing.male_configs.models import MaleBodyConfiguration
-from processing.female_configs.models import FemaleBodyConfiguration
-from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
-from processing.rendering.compose import apply_srgb
 from core.settings.base import RENDER
+from processing.female_configs.models import FemaleBodyConfiguration
+from processing.male_configs.models import MaleBodyConfiguration
+from processing.models import SourceCache, CACHE_RESOLUTION, PROJECTION, CuffConfiguration, ButtonsSource
+from processing.rendering.compose import apply_srgb
+from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
+from .rendering.utils import gamma
 
 EXR_FIELD = 'EXR'
 RGBA_FIELD = 'RGBA'
@@ -65,7 +64,6 @@ class CacheBuilder(object):
                 array = exr_to_array(image.path)
             except IOError:
                 array = np.asarray(Image.open(image.path)).astype('float32') / 255.0
-
 
             if field == 'uv':
                 size = array.shape[:2]
@@ -123,7 +121,7 @@ class CacheBuilder(object):
 
         if not matrices:
             print("Failed to cache source: fields %s are not found; source id: %s" % (fields, instance.id))
-            return 
+            return
 
         size_array = []
         for _, matrix, scale in matrices:

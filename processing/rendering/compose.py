@@ -127,12 +127,15 @@ class Composer(object):
         return base
 
     @staticmethod
-    def compose_ambience(sources):
+    def compose_ambience(sources, ao=False):
         base = Image.open(sources[0].file.path)
         for source in sources[1:]:
             source_img = Image.open(source.file.path)
             base.paste(source_img, source.position, mask=source_img)
-
+        if ao:
+            arr = np.asarray(base).astype('float32')
+            arr[..., -1] *= 0.7
+            base = Image.fromarray(arr.astype('uint8'))
         return base.convert("RGB")
 
     @staticmethod
@@ -169,7 +172,7 @@ class Composer(object):
             paste(result, detail)
 
         if ao is not None:
-            result = ImageChops.multiply(result, load_image(ao))
+            result = overlay(load_image(ao), result)
 
         paste(result, dickey)
 

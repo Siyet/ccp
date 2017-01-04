@@ -92,7 +92,7 @@ class BaseShirtBuilder(object):
         light = Composer.compose_ambience(self.lights)
         texture = self.get_fabric_texture(self.fabric)
         if texture.needs_shadow:
-            ao = Composer.compose_ambience(self.ao)
+            ao = Composer.compose_ambience(self.ao, ao=True)
         else:
             ao = None
         alpha = Composer.compose_alpha(self.alphas)
