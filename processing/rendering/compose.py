@@ -183,9 +183,6 @@ class Composer(object):
         if srgb:
             result = apply_srgb(result)
 
-        if alpha:
-            result.putalpha(alpha)
-
         for stitches in lower_stitches:
             paste(result, stitches)
 
@@ -197,6 +194,10 @@ class Composer(object):
 
         for shadow in shadows:
             paste(result, shadow)
+
+        # must be last so that buttons and shadows are rendered correctly
+        if alpha:
+            result.putalpha(alpha)
 
         if base_layer:
             mask = result.split()[-1]
