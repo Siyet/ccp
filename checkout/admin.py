@@ -60,7 +60,7 @@ class DiscountAdmin(TemplateAndFormatMixin, ImportExportMixin, admin.ModelAdmin)
 
 
 class ShopAdmin(GrappelliOrderableAdmin, TranslationAdmin):
-    list_display = ('city', 'street', 'home')
+    list_display = ('city', 'extra', 'street', 'home')
 
 
 class OrderDetailsInline(admin.TabularInline):

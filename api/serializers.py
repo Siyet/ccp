@@ -258,7 +258,7 @@ class TuckSerializer(serializers.ModelSerializer):
 class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = checkout.Shop
-        fields = '__all__'
+        fields = ('id', 'index', 'city', 'street', 'home', 'extra')
 
 
 class CertificateSerializer(serializers.ModelSerializer):
