@@ -13,6 +13,7 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'core', 'locale'),
     os.path.join(BASE_DIR, 'backend', 'locale'),
     os.path.join(BASE_DIR, 'checkout', 'locale'),
+    os.path.join(BASE_DIR, 'dictionaries', 'locale'),
 ]
 
 LANGUAGE_CODE = 'ru'

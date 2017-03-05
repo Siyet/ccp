@@ -35,7 +35,7 @@ def overlay_arrays(A, B):
     res = ne.evaluate("""where(
                             B < 0.5,
                             2. * A * B,
-                            1.0 - 2.0 * (1. - A) * (1. - B)
+                            1.0 - 2. * (1. - A) * (1. - B)
                          )""")
     return res
 
@@ -69,6 +69,28 @@ def apply_srgb(img):
     arr = np.asarray(img).astype('float32') / 255.0
     res = exr_to_srgb(arr)
     return res
+
+
+def revert_srgb(img):
+    arr = np.asarray(img).astype('float32') / 255.0
+    res = exr_from_srgb(arr)
+    return res
+
+
+def exr_from_srgb(array):
+    array = encode_from_srgb(array) * 255.
+    present_channels = ["R", "G", "B", "A"][:array.shape[2]]
+    channels = "".join(present_channels)
+    return Image.fromarray(array.astype('uint8'), channels)
+
+
+def encode_from_srgb(x):
+    a = 0.055
+    return ne.evaluate("""where(
+                            x > 0.04045,
+                            ((x + a) / (1 + a))**2.4,
+                            x / 12.92
+                          )""")
 
 
 def load_texture(texture):
@@ -161,12 +183,21 @@ class Composer(object):
 
         return result
 
+
+
     @staticmethod
     def create(texture, uv, light=None, ao=None, shadows=[], alpha=None, buttons=[], lower_stitches=[],
                upper_stitches=[], dickey=None, extra_details=[], base_layer=[], AA=True, srgb=True):
 
+        def save_with_alpha(r, name):
+            a = r.copy()
+            a.putalpha(alpha)
+            a.save(name)
+
         texture_arr = load_texture(texture)
         result = STMap(uv, texture_arr, AA)
+
+        save_with_alpha(result, "/tmp/stmap.png")
 
         for detail in extra_details:
             paste(result, detail)
@@ -174,14 +205,20 @@ class Composer(object):
         if ao is not None:
             result = overlay(load_image(ao), result)
 
+        save_with_alpha(result, "/tmp/ao.png")
+
         paste(result, dickey)
 
         if light is not None:
-            light = load_image(light)
+            light = apply_srgb(load_image(light))
             result = overlay(light, result)
 
-        if srgb:
-            result = apply_srgb(result)
+        save_with_alpha(result, "/tmp/light.png")
+
+        # if srgb:
+        #     result = apply_srgb(result)
+
+        save_with_alpha(result, "/tmp/srgb.png")
 
         for stitches in lower_stitches:
             paste(result, stitches)

@@ -219,8 +219,6 @@ class CustomButtonsAdmin(GrappelliOrderableAdmin, TranslationAdmin):
 
 class FitAdmin(ManyToManyMixin, GrappelliOrderableAdmin, TranslationAdmin):
     m2m_fields = ['collections']
-    exclude = ['sizes', 'picture']
-
 
 class OrderedTranslationAdmin(GrappelliOrderableAdmin, TranslationAdmin):
     pass

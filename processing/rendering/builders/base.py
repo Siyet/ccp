@@ -20,6 +20,7 @@ from processing.cache import CacheBuilder
 class CacheBuilderMock(object):
     @staticmethod
     def cache_texture(*args, **kwargs):
+        #CacheBuilder.cache_texture(*args, **kwargs)
         pass
 
     @staticmethod

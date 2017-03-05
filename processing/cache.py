@@ -11,9 +11,8 @@ from core.settings.base import RENDER
 from processing.female_configs.models import FemaleBodyConfiguration
 from processing.male_configs.models import MaleBodyConfiguration
 from processing.models import SourceCache, CACHE_RESOLUTION, PROJECTION, CuffConfiguration, ButtonsSource
-from processing.rendering.compose import apply_srgb
+from processing.rendering.compose import apply_srgb, revert_srgb
 from processing.rendering.utils import Matrix, Submatrix, exr_to_array, image_from_array, scale_tuple
-from .rendering.utils import gamma
 
 EXR_FIELD = 'EXR'
 RGBA_FIELD = 'RGBA'
@@ -190,7 +189,7 @@ class CacheBuilder(object):
 
         img = Image.open(texture.texture.path)
 
-        if texture.gamma_correction:
-            img = gamma(img)
+        # if texture.gamma_correction:
+        #     img = revert_srgb(img)
 
         save_to_cache(img, CACHE_RESOLUTION.preview)

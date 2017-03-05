@@ -6,6 +6,9 @@ from backend import models
 class TitleTranslation(TranslationOptions):
     fields = ('title',)
 
+class FitTranslation(TranslationOptions):
+    fields = ('title', 'picture')
+
 
 class CollectionTranslation(TranslationOptions):
     fields = ('title', 'filter_title', 'about_shirt_title', 'text', 'sex', 'tailoring_time')
@@ -19,8 +22,8 @@ translator.register([
     models.CustomButtons,
     models.Stays,
     models.ShawlOptions,
-    models.ElementStitch,
-    models.Fit
+    models.ElementStitch
 ], TitleTranslation)
+translator.register(models.Fit, FitTranslation)
 translator.register(models.Collection, CollectionTranslation)
 translator.register(models.Fabric, FabricTranslation)
