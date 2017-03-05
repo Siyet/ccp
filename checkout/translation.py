@@ -4,7 +4,7 @@ from checkout.models import Shop
 
 
 class ShopTranslation(TranslationOptions):
-    fields = ('city', 'street')
+    fields = ('city', 'street', 'extra')
 
 
 translator.register(Shop, ShopTranslation)

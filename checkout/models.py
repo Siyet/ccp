@@ -71,7 +71,9 @@ class Shop(OrderedModel):
     index = models.IntegerField(verbose_name=_(u'Индекс'), unique=True)
     city = models.CharField(verbose_name=_(u'Город'), max_length=255)
     street = models.CharField(verbose_name=_(u'Улица'), max_length=255)
+    extra = models.CharField(verbose_name=_(u'Дополнительно'), max_length=255, blank=True)
     home = models.CharField(verbose_name=_(u'Дом'), max_length=255)
+
 
     def __unicode__(self):
         return u'{0}, {1}, {2}'.format(self.city, self.street, self.home)
