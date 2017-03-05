@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-05 02:42+0300\n"
+"POT-Creation-Date: 2017-03-02 19:14+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: constants.py:7
+#: core/admin.py:14
+msgid "(Нет)"
+msgstr "(No)"
+
+#: core/constants.py:7
 msgid "Мужская"
 msgstr "Male"
 
-#: constants.py:8
+#: core/constants.py:8
 msgid "Женская"
 msgstr "Female"
 
-#: constants.py:9
+#: core/constants.py:9
 msgid "Унисекс"
 msgstr "Unisex"
