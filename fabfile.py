@@ -4,7 +4,7 @@ from __future__ import with_statement
 from fabric.operations import prompt
 from fabric.api import local, run, cd, env, roles, prefix
 
-env.roledefs['staging'] = ['hello@shirts.wecreateapps.ru']
+env.roledefs['staging'] = ['root@shirts.wecreateapps.ru']
 
 try:
     import credentials
@@ -23,8 +23,8 @@ def staging_env():
         env.gituser = prompt("What is your git user?")
         env.gitpassword = prompt("What is your git password?")
 
-    env.project_root = '/var/webapps/costumecode/costumecode'  # Путь до каталога проекта (на сервере)
-    env.virtualenv = 'source /var/virtualenvs/costumecode/bin/activate'  # Путь до virtualenv (на сервере)
+    env.project_root = '/var/webapps/costumecode/costumecode_configurator'  # Путь до каталога проекта (на сервере)
+    env.virtualenv = 'source /var/venv/costumecode/bin/activate'  # Путь до virtualenv (на сервере)
 
 
 def prepare_deploy():

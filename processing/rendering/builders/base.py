@@ -20,7 +20,6 @@ from processing.cache import CacheBuilder
 class CacheBuilderMock(object):
     @staticmethod
     def cache_texture(*args, **kwargs):
-        #CacheBuilder.cache_texture(*args, **kwargs)
         pass
 
     @staticmethod
@@ -325,7 +324,7 @@ class BaseShirtBuilder(object):
         def sources_for(model):
             uv = np.load(model.cache.get(source_field='uv', resolution=self.resolution).file.path)
             light_conf = model.cache.get(source_field='light', resolution=self.resolution)
-            ao = model.cache.get(source_field='ao', resolution=self.resolution).file.path
+            ao = model.cache.get(source_field='ao', resolution=self.resolution)
             return uv, light_conf, ao
 
         if not self.collection.contrast_details:
