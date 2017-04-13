@@ -250,6 +250,10 @@ msgstr "Shawl"
 msgid "Нет"
 msgstr "Color"
 
+#: views/components.py:136
+msgid "Позиция"
+msgstr "Position"
+
 #: conversions/mixin.py:118 conversions/resources/template_shirt.py:81
 #: conversions/resources/template_shirt.py:149
 msgid "Цельная кокетка"
