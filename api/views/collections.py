@@ -8,10 +8,9 @@ from rest_framework import pagination
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_extensions.cache.decorators import cache_response
 
 from api import serializers
-from api.cache import fabric_last_modified, ListKeyConstructor
+from api.cache import fabric_last_modified
 from api.filters import CollectionFabricsFilter
 from backend.models import Collection
 from dictionaries import models as dictionaries

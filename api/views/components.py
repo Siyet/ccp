@@ -1,15 +1,14 @@
 # coding: utf-8
 from django.conf import settings
-
+from django.utils.text import ugettext_lazy as _
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api import serializers
 from api.views.mixins import FilterHelpersMixin
 from backend import models
 from dictionaries import models as dictionaries
-from api import serializers
-
 
 __all__ = [
     'CollarTypeList', 'CuffTypeList', 'HemTypeList', 'BackTypeList', 'PocketTypeList',
@@ -117,7 +116,6 @@ class StitchOptionsList(APIView):
 
 
 class TemplateInitialsList(APIView):
-
     def build_filter(self, title, name, values):
         return {
             'title': title,
@@ -133,8 +131,10 @@ class TemplateInitialsList(APIView):
         fonts = dictionaries.Font.objects.values('id', 'title', 'font')
         return Response([
             self.build_filter(_(u'Цвет'), 'color', list(colors)),
-            self.build_filter(_(u'Шрифт'), 'font', map(lambda x: {'id': x['id'], 'title': x['title'], 'font': request.build_absolute_uri(x['font'])}, fonts)),
-            self.build_filter(_(u'Позиция'), 'location', [{'key': x[0], 'value': unicode(x[1])} for x in models.Initials.LOCATION]),
+            self.build_filter(_(u'Шрифт'), 'font', map(
+                lambda x: {'id': x['id'], 'title': x['title'], 'font': request.build_absolute_uri(x['font'])}, fonts)),
+            self.build_filter(_(u'Позиция'), 'location',
+                              [{'key': x[0], 'value': unicode(x[1])} for x in models.Initials.LOCATION]),
         ])
 
 
@@ -145,7 +145,8 @@ class DickeyList(FilterHelpersMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         fabrics = models.Fabric.objects.active.filter(residuals__amount__gte=settings.MIN_FABRIC_RESIDUAL, dickey=True)
-        fabrics_data = serializers.BaseFabricSerializer(fabrics.distinct(), many=True, context={'request': request}).data
+        fabrics_data = serializers.BaseFabricSerializer(fabrics.distinct(), many=True,
+                                                        context={'request': request}).data
         dickey_types = dictionaries.DickeyType.objects.all()
         dickey_types_data = serializers.DickeyTypeSerializer(dickey_types, many=True, context={'request': request}).data
         return Response([
@@ -156,5 +157,6 @@ class DickeyList(FilterHelpersMixin, APIView):
 
 class PricesList(APIView):
     """Список добавочных стоимостей для компонентов"""
+
     def get(self, request, *args, **kwargs):
         return Response(data=models.AccessoriesPrice.as_list())

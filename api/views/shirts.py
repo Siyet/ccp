@@ -1,20 +1,19 @@
 # coding: utf-8
 
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework import pagination
-from rest_framework import filters
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.db.models import F
 from django.conf import settings
 from django.utils.text import ugettext_lazy as _
+from rest_framework import filters
+from rest_framework import pagination
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from api import serializers
+from api.filters import TemplateShirtsFilter
 from api.views.mixins import FilterHelpersMixin
 from backend import models
 from backend.pricing import ShirtPriceCalculator
 from dictionaries import models as dictionaries
-from api import serializers
-from api.filters import TemplateShirtsFilter
 from processing.rendering.image_cache import ShirtImageCache
 
 __all__ = [
