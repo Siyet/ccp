@@ -283,19 +283,19 @@ msgstr "Font"
 
 #: backend/models.py:309
 msgid "2 пуговица"
-msgstr "2 button"
+msgstr "2nd button"
 
 #: backend/models.py:310
 msgid "3 пуговица"
-msgstr "3 button"
+msgstr "3rd button"
 
 #: backend/models.py:311
 msgid "4 пуговица"
-msgstr "4 button"
+msgstr "4th button"
 
 #: backend/models.py:312
 msgid "5 пуговица"
-msgstr "5 button"
+msgstr "5th button"
 
 #: backend/models.py:313
 msgid "Низ (л)"
@@ -399,7 +399,7 @@ msgstr "0 mm (without stitching)"
 
 #: backend/models.py:384
 msgid "1 мм (только съемные косточки)"
-msgstr "1 mm (removable bones only)"
+msgstr "1 mm (removable stays only)"
 
 #: backend/models.py:385
 msgid "5 мм"
