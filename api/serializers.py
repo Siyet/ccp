@@ -1,12 +1,12 @@
 # coding: utf-8
 from django.db.transaction import atomic
-from rest_framework import serializers
 from django.utils.text import ugettext_lazy as _
+from rest_framework import serializers
 
 from backend import models
+from checkout import models as checkout
 from core.utils import first
 from dictionaries import models as dictionaries
-from checkout import models as checkout
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -175,29 +175,18 @@ class ShirtCollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Collection
-        fields = ('id', 'title', 'production',)
+        fields = ('id', 'title', 'production')
 
 
 class TemplateShirtListSerializer(serializers.HyperlinkedModelSerializer):
     fabric = serializers.StringRelatedField()
-    fabric_type = serializers.StringRelatedField(source='fabric.type')
-    collection = ShirtCollectionSerializer()
-    thickness = serializers.StringRelatedField(source='fabric.thickness.title')
+    collection = serializers.StringRelatedField(source='collection.showcase_title')
     showcase_image = serializers.ImageField(source='showcase_image_list')
-    sex = serializers.SerializerMethodField()
-    material = serializers.StringRelatedField(source='fabric.material')
     short_description = serializers.StringRelatedField(source='fabric.short_description')
-
-    def get_sex(self, object):
-        try:
-            return object.collection.get_sex_display()
-        except AttributeError:
-            return None
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['id', 'url', 'code', 'material', 'showcase_image', 'fabric', 'fabric_type', 'short_description',
-                  'thickness', 'price', 'sex', 'collection']
+        fields = ['id', 'url', 'code', 'showcase_image', 'fabric', 'short_description', 'price', 'collection']
 
 
 class ShirtImageSerializer(serializers.ModelSerializer):
@@ -221,20 +210,32 @@ class TemplateShirtDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.TemplateShirt
-        fields = ['individualization', 'short_description', 'long_description', 'shirt_images',
-                  'country', 'tailoring_time']
+        fields = ['individualization', 'short_description', 'long_description', 'shirt_images', 'country',
+                  'tailoring_time']
 
 
 class TemplateShirtSerializer(TemplateShirtListSerializer):
     showcase_image_hd = serializers.ImageField(source='showcase_image')
     showcase_image = serializers.ImageField(source='showcase_image_detail')
     details = serializers.SerializerMethodField()
+    fabric_type = serializers.StringRelatedField(source='fabric.type')
+    collection = ShirtCollectionSerializer()
+    thickness = serializers.StringRelatedField(source='fabric.thickness.title')
+    sex = serializers.SerializerMethodField()
+    material = serializers.StringRelatedField(source='fabric.material')
+
+    def get_sex(self, object):
+        try:
+            return object.collection.get_sex_display()
+        except AttributeError:
+            return None
 
     def get_details(self, object):
         return TemplateShirtDetailsSerializer(instance=object, context=self.context).data
 
     class Meta(TemplateShirtListSerializer.Meta):
-        fields = TemplateShirtListSerializer.Meta.fields + ['showcase_image_hd', 'details']
+        fields = TemplateShirtListSerializer.Meta.fields + ['material', 'fabric_type', 'thickness', 'sex',
+                                                            'showcase_image_hd', 'details']
 
 
 class HardnessSerializer(serializers.ModelSerializer):
@@ -384,7 +385,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
                     models.ContrastDetails.objects.create(shirt=shirt, **contrast_detail)
             else:
                 for element in models.ContrastDetails.ELEMENTS:
-                    models.ContrastDetails.objects.create(shirt=shirt, element=element, fabric=shirt.collection.white_fabric)
+                    models.ContrastDetails.objects.create(shirt=shirt, element=element,
+                                                          fabric=shirt.collection.white_fabric)
 
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)

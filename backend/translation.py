@@ -6,16 +6,18 @@ from backend import models
 class TitleTranslation(TranslationOptions):
     fields = ('title',)
 
+
 class FitTranslation(TranslationOptions):
     fields = ('title', 'picture')
 
 
 class CollectionTranslation(TranslationOptions):
-    fields = ('title', 'filter_title', 'about_shirt_title', 'text', 'sex', 'tailoring_time')
+    fields = ('title', 'filter_title', 'about_shirt_title', 'showcase_title', 'text', 'sex', 'tailoring_time')
 
 
 class FabricTranslation(TranslationOptions):
     fields = ('short_description', 'long_description', 'material')
+
 
 translator.register([
     models.Hardness,
