@@ -22,6 +22,11 @@ __all__ = [
 ]
 
 
+class ShowcasePagination(pagination.LimitOffsetPagination):
+    default_limit = 10
+    max_limit = 50
+
+
 class ShirtInfoListView(ListAPIView):
     """
     Информация о рубашках для отображения на экране выборе коллекций
@@ -33,10 +38,11 @@ class ShirtInfoListView(ListAPIView):
 class ShowcaseShirtsListView(ListAPIView):
     serializer_class = serializers.TemplateShirtListSerializer
     queryset = models.TemplateShirt.objects.available().select_related('fabric__type', 'fabric__thickness')
-    pagination_class = pagination.LimitOffsetPagination
+    pagination_class = ShowcasePagination
     filter_class = TemplateShirtsFilter
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend,)
     ordering_fields = ('price',)
+
 
     def get(self, request, *args, **kwargs):
         """
