@@ -431,4 +431,4 @@ class TemplateShirtResource(resources.ModelResource):
             return None
 
     def init_instance(self, row=None):
-        return self._meta.model(self.defaults)
+        return self._meta.model(**self.defaults)
