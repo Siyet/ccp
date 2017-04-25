@@ -71,6 +71,7 @@ class CacheBuilder(object):
 
                 w = (crop[0] * size[1], crop[1] * size[0],
                      crop[2] * size[1], crop[3] * size[0])
+                w = [int(round(i)) for i in w]
                 array = array[w[1]:w[3], w[0]:w[2]]
 
                 alpha = image_from_array(array[..., 3])

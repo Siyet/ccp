@@ -332,9 +332,9 @@ class TemplateShirtResource(resources.ModelResource):
             detail = first(lambda cd: cd.element == element, instance.contrast_details.all())
         if fabric_code:
             fabric = first(lambda f: f.code == fabric_code, self.fabrics)
+            assert fabric is not None, 'Could find fabric with the following fabric code: %s' % fabric_code
             if detail is None:
-                detail = ContrastDetails(shirt=instance, element=element)
-            detail.fabric = fabric
+                detail = ContrastDetails(shirt=instance, element=element, fabric=fabric)
             # ignore pricing for now
             detail.ignore_signals = True
             detail.save()
