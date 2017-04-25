@@ -45,7 +45,7 @@ class Command(BaseCommand):
         count = Texture.objects.count()
         i = 0
         for texture in Texture.objects.all():
-            if texture.cache.count() < 2: # preview + full
+            if texture.cache.count() < 1: # preview + full
                 try:
                     CacheBuilder.cache_texture(texture)
                 except Exception as e:

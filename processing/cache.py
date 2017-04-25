@@ -190,7 +190,4 @@ class CacheBuilder(object):
 
         img = Image.open(texture.texture.path)
 
-        # if texture.gamma_correction:
-        #     img = revert_srgb(img)
-
         save_to_cache(img, CACHE_RESOLUTION.preview)
