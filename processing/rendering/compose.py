@@ -1,8 +1,8 @@
 import os
 
-from PIL import Image, ImageChops, ImageOps
-import numpy as np
 import numexpr as ne
+import numpy as np
+from PIL import Image, ImageOps
 
 
 class ImageConf(object):
@@ -183,21 +183,12 @@ class Composer(object):
 
         return result
 
-
-
     @staticmethod
     def create(texture, uv, light=None, ao=None, shadows=[], alpha=None, buttons=[], lower_stitches=[],
                upper_stitches=[], dickey=None, extra_details=[], base_layer=[], AA=True, srgb=True):
 
-        def save_with_alpha(r, name):
-            a = r.copy()
-            a.putalpha(alpha)
-            a.save(name)
-
         texture_arr = load_texture(texture)
         result = STMap(uv, texture_arr, AA)
-
-        save_with_alpha(result, "/tmp/stmap.png")
 
         for detail in extra_details:
             paste(result, detail)
@@ -205,20 +196,14 @@ class Composer(object):
         if ao is not None:
             result = overlay(load_image(ao), result)
 
-        save_with_alpha(result, "/tmp/ao.png")
-
         paste(result, dickey)
 
         if light is not None:
-            light = apply_srgb(load_image(light))
+            light = load_image(light)
             result = overlay(light, result)
 
-        save_with_alpha(result, "/tmp/light.png")
-
-        # if srgb:
-        #     result = apply_srgb(result)
-
-        save_with_alpha(result, "/tmp/srgb.png")
+        if srgb:
+            result = apply_srgb(result)
 
         for stitches in lower_stitches:
             paste(result, stitches)
