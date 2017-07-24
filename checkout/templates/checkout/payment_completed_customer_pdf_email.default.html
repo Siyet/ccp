@@ -1,6 +1,5 @@
 {% load i18n %}
 {% load checkout_tags %}
-<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -65,7 +64,6 @@
 
         .order-table thead {
             font-family: HelveticaMedium;
-            font-size: 11px;
         }
 
         .order-table tbody tr {
@@ -77,7 +75,7 @@
         }
 
         .order-table td {
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .order-table th, .order-table td {
@@ -100,13 +98,23 @@
             font-family: HelveticaMedium;
         }
 
-        .footer .right .label {
+        footer .left {
+            float: left;
+            width: 50%;
+        }
+
+        footer .right {
+            float: right;
+            width: 49%;
+        }
+
+        footer .right .label {
             display: inline-block;
             width: 50%;
             float: left;
         }
 
-        .footer .right .value {
+        footer .right .value {
             display: inline-block;
             width: 49%;
         }
@@ -117,28 +125,24 @@
 
         .top-logo {
             position: absolute;
-            top: 20px;
-            left: 350px;
+            top: 8px;
+            left: 16px;
         }
 
         .header {
-            height: 70px;
+            height: 55px;
             width: 100%;
-            background-color: #FFF
-        }
-        .header-image-wide {
-            width: 794px;
+            background-color: #D0D9E7
         }
 
         .header-text {
             position: absolute;
-            left: 142px;
+            left: 106px;
             top: 10px;
             font-family: Andale Mono;
             font-size: 11px;
             color: #494949;
-            width: 520px;
-            text-align: center;
+            width: 636px;
         }
 
         .shopping-cart {
@@ -153,11 +157,11 @@
             width: 100%;
             position: relative;
             height: 65px;
+            border-bottom: 1px solid #D0D9E7;
         }
 
         .your-order {
-            font-size: 25px;
-            font-family: HelveticaLight;
+            font-family: Monaco;
         }
 
         .font-7 {
@@ -170,18 +174,6 @@
 
         .font-9 {
             font-size: 9px;
-        }
-
-        .font-10 {
-            font-size: 10px;
-        }
-
-        .font-12 {
-            font-size: 12px;
-        }
-
-        .padding {
-            padding: 15px;
         }
 
         .phone-wrap {
@@ -204,370 +196,123 @@
 
         .questions {
             position: relative;
-            vertical-align: top;
             height: 93px;
             width: 225px;
             border: 1px solid #D0D9E7;
             margin-left: 30px;
-            display: inline-block;
+            float: left;
         }
 
-        .footer {
+        footer {
             font-family: HelveticaLight;
             font-size: 11px;
-            margin-bottom: 45px;
-            padding-top: 20px;
         }
 
         .phone-number {
+            font-size: 11px;
             font-family: HelveticaMedium;
             padding-left: 10px;
             margin-top: 10px;
         }
 
         .summary {
-            width: 45%;
-            display: inline-block;
             margin-right: 30px;
-            float: right;
         }
 
         .summary div {
             padding: 2px 0;
         }
 
-        .delivery-options-wrap {
-            margin-top: 5px;
-            width: 714px;
-            margin-left: 30px;
-        }
-
-        .delivery-options {
-            background: #fff;
-        }
-
-
-        .delivery-options table {
-                        font-family: HelveticaLight;
-        }
-
-        tr, td {
-            page-break-inside: avoid !important;
-        }
-
-        .delivery-options h2 {
-            text-align: left;
-            margin-top: 0px;
-            font-family: HelveticaLight;
-        }
-        .delivery-options td {
-            text-align: left;
-            vertical-align: top;
-        }
-
-        .delivery-options-right-column {
-
-        }
-
-        .delivery-options .image-cell {
-            padding: 0;
-        }
-
-        .delivery-options img {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .row-cell {
-            width: 330px;
-            height: auto;
-            border-radius: 8.5px;
-            background-color: #fff;
-            border: 1px solid #d0d9e7;
-            padding-left: 13px;
-            font-size: 11px;
-            color: #4a4a4a;
-            outline: 0;
-            float: left;
-            line-height: 34px;
-            margin-bottom: 5px;
-            padding-top: 3px;
-            box-sizing: border-box;
-        }
-        .row-cell-center {
-            width: 59px;
-        }
-        .table-header {
-            text-align: center;
-        }
-        .delivery-option {
-            font-size: 11px;
-            margin-bottom: 10px;
-        }
-        .table-text-middle {
-            text-align: center;
-            font-size: 11px;
-            margin-bottom: 20px;
-            font-family: HelveticaLight;
-        }
-        .table-text-h1 {
-            text-align: center;
-            font-size: 25px;
-            font-family: HelveticaLight;
-        }
-        .table-text-h2 {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .border-bottom-middle {
-            border-bottom: 1px solid #d0d9e7;
-            width: 330px;
-            height: 10px;
-            margin-bottom: 20px;
-            margin-top: 10px;
-        }
-        .border-bottom-left, .border-bottom-right {
-            width: 194px;
-            height: auto;
-            padding-left: 13px;
-            font-size: 11px;
-            color: #4a4a4a;
-            outline: 0;
-            float: left;
-            line-height: 34px;
-            margin-bottom: 5px;
-            padding-top: 3px;
-            box-sizing: border-box;
-        }
     </style>
 </head>
-<body style="margin: 0; border: 0; padding: 0">
+<body style="margin:0; border: 0; padding: 0">
+<div class="header">
+    <img src="{% abs_static 'img/cc_logo.png' %}" class="top-logo"/>
+</div>
 <div class="greeting">
+    <img src="{% abs_static 'img/shopping_cart.png' %}" class="shopping-cart"/>
     <span class="header-text">
-       Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. <br>Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. <br>Мы с нетерпением беремся за пошив заказа для вас :)
+        {% trans 'Спасибо большое за ваш заказ. В этом файле указана подробная информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!' %}
     </span>
 </div>
 
-<div class="table-text-h1 padding">Ваш заказ</div>
+<h2 class="text-center your-order">{% trans 'Ваш заказ' %}</h2>
 <table class="order-table">
     <thead>
     <tr>
-        <th class="text-center" width="120px">Изображение</th>
-        <th class="text-left" width="241px">Описание</th>
-        <th class="text-center" width="95px">Количество</th>
-        <th class="text-right" width="120px">Цена</th>
-        <th class="text-right" width="100px">Итого</th>
+        <th class="text-center" width="120px">{% trans 'Изображение' %}</th>
+        <th class="text-left" width="241px">{% trans 'Описание' %}</th>
+        <th class="text-center" width="95px">{% trans 'Количество' %}</th>
+        <th class="text-right" width="120px">{% trans 'Цена' %}</th>
+        <th class="text-right" width="100px">{% trans 'Итого' %}</th>
     </tr>
     </thead>
     <tbody>
-    <tr>
-        <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
-        </td>
-        <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">Сорочка</div>
-            <div class="font-12" style="margin-bottom: 10px">
-                Ткань: E4443
-            </div>
-            <div class="font-12" style="margin-bottom: 8px">Размер:
-                Принять решение во время подтверждения заказа по телефону
-            </div>
-            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
-        </td>
-        <td class="text-center hlv-light valign-center">1</td>
-        <td class="text-right hlv-light">1 x 21900 руб</td>
-        <td class="text-right hlv-light">21900 руб</td>
-    </tr>
-    <tr>
-        <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
-        </td>
-        <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">Сорочка</div>
-            <div class="font-12" style="margin-bottom: 10px">
-                Ткань: E4443
-            </div>
-            <div class="font-12" style="margin-bottom: 8px">Размер:
-                Принять решение во время подтверждения заказа по телефону
-            </div>
-            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
-        </td>
-        <td class="text-center hlv-light valign-center">1</td>
-        <td class="text-right hlv-light">1 x 21900 руб</td>
-        <td class="text-right hlv-light">21900 руб</td>
-    </tr>
+    {% for order_item in order.items.all %}
         <tr>
-        <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
-        </td>
-        <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">Сорочка</div>
-            <div class="font-12" style="margin-bottom: 10px">
-                Ткань: E4443
-            </div>
-            <div class="font-12" style="margin-bottom: 8px">Размер:
-                Принять решение во время подтверждения заказа по телефону
-            </div>
-            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
-        </td>
-        <td class="text-center hlv-light valign-center">1</td>
-        <td class="text-right hlv-light">1 x 21900 руб</td>
-        <td class="text-right hlv-light">21900 руб</td>
-    </tr>
-        <tr>
-        <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
-        </td>
-        <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">Сорочка</div>
-            <div class="font-12" style="margin-bottom: 10px">
-                Ткань: E4443
-            </div>
-            <div class="font-12" style="margin-bottom: 8px">Размер:
-                Принять решение во время подтверждения заказа по телефону
-            </div>
-            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
-        </td>
-        <td class="text-center hlv-light valign-center">1</td>
-        <td class="text-right hlv-light">1 x 21900 руб</td>
-        <td class="text-right hlv-light">21900 руб</td>
-    </tr>
-            <tr>
-        <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
-        </td>
-        <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">Сорочка</div>
-            <div class="font-12" style="margin-bottom: 10px">
-                Ткань: E4443
-            </div>
-            <div class="font-12" style="margin-bottom: 8px">Размер:
-                Принять решение во время подтверждения заказа по телефону
-            </div>
-            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
-        </td>
-        <td class="text-center hlv-light valign-center">1</td>
-        <td class="text-right hlv-light">1 x 21900 руб</td>
-        <td class="text-right hlv-light">21900 руб</td>
-    </tr>
+            <td class="text-center hlv-light">
+                <img src="{% shirt_image order_item.shirt %}" height="120" alt="">
+            </td>
+            <td class="text-left hlv-light">
+                <div style="margin-bottom: 12px">{% trans 'Сорочка' %}</div>
+                <div class="font-9">
+                    {% trans 'Ткань' %}: {{ order_item.shirt.fabric }}
+                </div>
+                <div class="font-7" style="margin-bottom: 8px">{% trans 'Размер' %}:
+                    {% if order_item.shirt.size %}
+                        {{ order_item.shirt.size }}
+                    {% else %}
+                        {{ order_item.shirt.size_option }}
+                    {% endif %}
+                </div>
+                <div class="font-9">{{ order_item.shirt.collection.tailoring_time }}</div>
+            </td>
+            <td class="text-center hlv-light valign-center">{{ order_item.amount }}</td>
+            <td class="text-right hlv-light">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб' %}</td>
+            <td class="text-right hlv-light">{{ order_item.get_total|floatformat:2 }} {% trans 'руб' %}</td>
+        </tr>
+    {% endfor %}
     </tbody>
 </table>
 
-<div class="footer">
+<footer>
     <div class="questions">
         <div class="phone-wrap">
             <img src="{% abs_static 'img/phone.png' %}" class="phone-icon"/>
         </div>
         <div class="detail ">
-            <div class="font-10 medium" style="margin-top: 15px; margin-bottom: 5px">Вопросы</div>
+            <div class="font-9 medium" style="margin-top: 15px; margin-bottom: 5px">{% trans 'Вопросы' %}</div>
 
-            <div class="font-9">Если у вас есть какие-нибудь вопросы, позвоните нам :)    
-            </div>
+            <div class="font-8">{% trans 'Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, позвоните нам!' %}</div>
 
-            <div class="font-10 phone-number">+7 495 777 9360</div>
+            <div class="phone-number">{% trans '+7 495 649-63-77' %}</div>
         </div>
     </div>
     <div class="summary right">
         <div>
-            <span class="font-12 label text-right">Итого:</span>
-            <span class="font-12 value text-right">109500 руб</span>
-            <!-- <span class="font-12 value text-right">43800 руб</span> -->
-            <!-- <span class="font-12 value text-right">65700 руб</span> -->
-            <!-- <span class="font-12 value text-right">87600 руб</span> -->
-            <!-- <span class="font-12 value text-right">109500 руб</span> -->
+            <span class="label text-right">{% trans 'Итого' %}:</span>
+            <span class="value text-right">{{ order.get_full_amount|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="font-12 label text-right">Доставка:</span>
-            <span class="font-12 value text-right">0 руб</span>
+            <span class="label text-right">{% trans 'Доставка' %}:</span>
+            <span class="value text-right">{{ 0|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="font-12 label text-right">Сертификат:</span>
-            <span class="font-12 value text-right">0 руб</span>
+            <span class="label text-right">{% trans 'Сертификат' %}:</span>
+            <span class="value text-right">{{ order.certificate_value|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="font-12 label text-right">Скидка:</span>
-            <span class="font-12 value text-right">0 %</span>
+            <span class="label text-right">{% trans 'Скидка' %}:</span>
+            <span class="value text-right">{{ order.discount_value|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <br>
 
         <div>
-            <span class="label text-right medium">Всего:</span>
-            <span class="value text-right medium">109500 руб</span>
+            <span class="label text-right medium">{% trans 'Всего' %}:</span>
+            <span class="value text-right medium">{{ order.get_amount_to_pay|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
     </div>
-</div>
-<div style="padding-top: 5px; page-break-inside: avoid !important">
-<div class="delivery-options-wrap">
-    <div class="delivery-options">
-        <table>
-            <tr>
-                <td colspan="3"><div class="table-text-h1">Информация о доставке</div></td>
-            </tr>
-            <tr>
-                <td colspan="3"><div class="table-text-middle">Доставка только по России</div></td>
-            </tr>
-            <tr>
-                <td colspan="3"><div class="table-text-h2 table-text-middle">Покупатель</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иван</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">Москва</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иванов</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">ул. Народного ополчения, дом 18, корпус 3</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иванович</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">109387</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">+7(965)233-34-23</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">ivanov.i.i@yandex.ru</div></td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <td><div class="border-bottom-left"></div></td>
-                <td><div class="border-bottom-middle"></div></td>
-                <td><div class="border-bottom-right"></div></td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <td colspan="3"><div class="table-text-h2 table-text-middle">Адрес доставки</div></td>
-            </tr>
-            <tr>
-                <td colspan="3"><div class="delivery-option table-text-middle">Вариант доставки <br> Забрать заказ в одном из наших магазинов</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иван</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">Москва</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иванов</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">Патриаршие пруды, Спиридоньевский переулок, 12/9</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иванович</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">123104</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">+7(495)777-93-60</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">contact@costumecode.ru</div></td>
-            </tr>
-        </table>
-    </div>
-</div>
-    </div>
+    <div class="clear"></div>
+</footer>
 </body>
 </html>
