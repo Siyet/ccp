@@ -1,8 +1,9 @@
 # coding: utf-8
 
 from __future__ import with_statement
-from fabric.operations import prompt
+
 from fabric.api import local, run, cd, env, roles, prefix
+from fabric.operations import prompt
 
 env.roledefs['staging'] = ['root@shirts.wecreateapps.ru']
 
@@ -44,3 +45,13 @@ def deploy():
             run("python manage.py collectstatic --noinput")
 
         run("touch ../uwsgi/ccback.ini")
+
+
+@roles('staging')
+def rebuild_textures():
+    staging_env()
+    with cd(env.project_root):
+        git_credentials = "%s:%s" % (env.gituser, env.gitpassword)
+        run("git pull https://%s@bitbucket.org/wecreateapps/costumecode_configurator.git master" % git_credentials)
+        with prefix(env.virtualenv):
+            run("python manage.py rebuild_textures")
