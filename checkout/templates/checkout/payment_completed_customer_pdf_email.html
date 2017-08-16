@@ -340,6 +340,24 @@
             padding-top: 3px;
             box-sizing: border-box;
         }
+        .radio-cell {
+            width: 330px;
+            height: auto;
+            background-color: #fff;
+            padding-left: 13px;
+            font-size: 11px;
+            color: #4a4a4a;
+            outline: 0;
+            float: left;
+            margin-bottom: 5px;
+            padding-top: 3px;
+            box-sizing: border-box;
+        }
+        .radio-cell li {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
         
     </style>
 </head>
@@ -380,6 +398,42 @@
         <td class="text-right hlv-light">1 x 21900 руб</td>
         <td class="text-right hlv-light">21900 руб</td>
     </tr>
+    <!--<tr>
+        <td class="text-center hlv-light">
+            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
+        </td>
+        <td class="text-left hlv-light">
+            <div style="margin-bottom: 12px">Сорочка</div>
+            <div class="font-12" style="margin-bottom: 10px">
+                Ткань: E4443
+            </div>
+            <div class="font-12" style="margin-bottom: 8px">Размер:
+                Принять решение во время подтверждения заказа по телефону
+            </div>
+            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
+        </td>
+        <td class="text-center hlv-light valign-center">1</td>
+        <td class="text-right hlv-light">1 x 21900 руб</td>
+        <td class="text-right hlv-light">21900 руб</td>
+    </tr>
+        <tr>
+        <td class="text-center hlv-light">
+            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
+        </td>
+        <td class="text-left hlv-light">
+            <div style="margin-bottom: 12px">Сорочка</div>
+            <div class="font-12" style="margin-bottom: 10px">
+                Ткань: E4443
+            </div>
+            <div class="font-12" style="margin-bottom: 8px">Размер:
+                Принять решение во время подтверждения заказа по телефону
+            </div>
+            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
+        </td>
+        <td class="text-center hlv-light valign-center">1</td>
+        <td class="text-right hlv-light">1 x 21900 руб</td>
+        <td class="text-right hlv-light">21900 руб</td>
+    </tr>
     <tr>
         <td class="text-center hlv-light">
             <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
@@ -398,7 +452,7 @@
         <td class="text-right hlv-light">1 x 21900 руб</td>
         <td class="text-right hlv-light">21900 руб</td>
     </tr>
-        <tr>
+    <tr>
         <td class="text-center hlv-light">
             <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
         </td>
@@ -415,43 +469,7 @@
         <td class="text-center hlv-light valign-center">1</td>
         <td class="text-right hlv-light">1 x 21900 руб</td>
         <td class="text-right hlv-light">21900 руб</td>
-    </tr>
-        <tr>
-        <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
-        </td>
-        <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">Сорочка</div>
-            <div class="font-12" style="margin-bottom: 10px">
-                Ткань: E4443
-            </div>
-            <div class="font-12" style="margin-bottom: 8px">Размер:
-                Принять решение во время подтверждения заказа по телефону
-            </div>
-            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
-        </td>
-        <td class="text-center hlv-light valign-center">1</td>
-        <td class="text-right hlv-light">1 x 21900 руб</td>
-        <td class="text-right hlv-light">21900 руб</td>
-    </tr>
-            <tr>
-        <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
-        </td>
-        <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">Сорочка</div>
-            <div class="font-12" style="margin-bottom: 10px">
-                Ткань: E4443
-            </div>
-            <div class="font-12" style="margin-bottom: 8px">Размер:
-                Принять решение во время подтверждения заказа по телефону
-            </div>
-            <div class="font-12">Время пошива и доставки: 5 - 6 недель</div>
-        </td>
-        <td class="text-center hlv-light valign-center">1</td>
-        <td class="text-right hlv-light">1 x 21900 руб</td>
-        <td class="text-right hlv-light">21900 руб</td>
-    </tr>
+    </tr>-->
     </tbody>
 </table>
 
@@ -544,9 +562,25 @@
                 <td colspan="3"><div class="table-text-h2 table-text-middle">Адрес доставки</div></td>
             </tr>
             <tr>
-                <td colspan="3"><div class="delivery-option table-text-middle">Вариант доставки <br> Забрать заказ в одном из наших магазинов</div></td>
+                <!--<td colspan="3"><div class="delivery-option table-text-middle">Вариант доставки <br> Забрать заказ в одном из наших магазинов</div></td>-->
             </tr>
-            <tr>
+        <tr>
+            <td valign="top">
+                <div class="radio-cell">
+                    Забрать заказ в одном из наших магазинов<br>
+                    Доставить по указанному адресу (по России)<br>
+                    Доставить по другому адресу или другому человеку (по России)
+                </div>
+            </td>
+            <td><div class="row-cell-center"></div></td>
+            <td valign="top">
+                <div class="row-cell">Москва, Патриаршие пруды, Спиридоньевский переулок 12/9</div>
+            </td>
+        </tr>
+
+            <!-- #### ЕСЛИ ВАРИАНТ ДОСТАВКИ "ДРУГОЙ АДРЕС" ###
+
+            <!--<tr>
                 <td><div class="row-cell">Иван</div></td>
                 <td><div class="row-cell-center"></div></td>
                 <td><div class="row-cell">Москва</div></td>
@@ -565,16 +599,9 @@
                 <td><div class="row-cell">+7(495)777-93-60</div></td>
                 <td><div class="row-cell-center"></div></td>
                 <td><div class="row-cell">contact@costumecode.ru</div></td>
-            </tr>
-        </table>
+            </tr>-->
+    </table>
     </div>
-<div>
-    <form action="">
-  <input type="radio" name="gender" value="male"> Male<br>
-  <input type="radio" name="gender" value="female"> Female<br>
-  <input type="radio" name="gender" value="other"> Other
-</form>
-</div>
 </div>
     </div>
 </body>
