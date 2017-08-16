@@ -286,13 +286,15 @@
             background-color: #fff;
             border: 1px solid #d0d9e7;
             padding-left: 13px;
+            padding-right: 13px;
+            padding-bottom: 9px;
             font-size: 11px;
             color: #4a4a4a;
             outline: 0;
             float: left;
-            line-height: 34px;
+
             margin-bottom: 5px;
-            padding-top: 3px;
+            padding-top: 10px;
             box-sizing: border-box;
         }
         .row-cell-center {
@@ -340,7 +342,7 @@
             padding-top: 3px;
             box-sizing: border-box;
         }
-        .radio-cell {
+        .delivery-cell {
             width: 330px;
             height: auto;
             background-color: #fff;
@@ -353,11 +355,36 @@
             padding-top: 3px;
             box-sizing: border-box;
         }
-        .radio-cell li {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
+        .delivery-cell-long {
+            width: 350px;
+            height: auto;
+            background-color: #fff;
+            padding-left: 13px;
+            font-size: 11px;
+            color: #4a4a4a;
+            outline: 0;
+            float: left;
+            margin-bottom: 5px;
+            padding-top: 3px;
+            box-sizing: border-box;
         }
+        .delivery-cell-short {
+            width: 310px;
+            height: auto;
+            background-color: #fff;
+            padding-left: 13px;
+            font-size: 11px;
+            color: #4a4a4a;
+            outline: 0;
+            float: left;
+            margin-bottom: 5px;
+            padding-top: 3px;
+            box-sizing: border-box;
+        }
+
+
+
+
         
     </style>
 </head>
@@ -564,23 +591,47 @@
             <tr>
                 <!--<td colspan="3"><div class="delivery-option table-text-middle">Вариант доставки <br> Забрать заказ в одном из наших магазинов</div></td>-->
             </tr>
-        <tr>
+
+
+{% if variant == "Забрать заказ в одном из наших магазинов" %}
+            <tr>
             <td valign="top">
                 <div class="radio-cell">
-                    Забрать заказ в одном из наших магазинов<br>
-                    Доставить по указанному адресу (по России)<br>
-                    Доставить по другому адресу или другому человеку (по России)
+                    <p>&#8226; Забрать заказ в одном из наших магазинов</p><br>
                 </div>
             </td>
             <td><div class="row-cell-center"></div></td>
             <td valign="top">
                 <div class="row-cell">Москва, Патриаршие пруды, Спиридоньевский переулок 12/9</div>
             </td>
-        </tr>
-
-            <!-- #### ЕСЛИ ВАРИАНТ ДОСТАВКИ "ДРУГОЙ АДРЕС" ###
-
-            <!--<tr>
+            </tr>
+{% elif variant == "Доставить по указанному адресу (по России)" %}
+            <tr>
+            <td valign="top">
+                <div class="delivery-cell">
+                    <p>&#8226; Доставить по указанному адресу (по России)</p><br>
+                </div>
+            </td>
+            <td><div class="row-cell-center"></div></td>
+            <td valign="top">
+                <div class="delivery-cell"></div>
+            </td>
+            </tr>
+{% else %}
+            <tr>
+            <td valign="top">
+                <div class="delivery-cell-long">
+                    <p>&#8226; Доставить по другому адресу или другому человеку (по России)</p><br>
+                </div>
+            </td>
+            <td><div class="row-cell-center"></div></td>
+            <td valign="top">
+                <div class="delivery-cell-short"></div>
+            </td>
+            </tr>
+            </table>
+            <table>
+            <tr>
                 <td><div class="row-cell">Иван</div></td>
                 <td><div class="row-cell-center"></div></td>
                 <td><div class="row-cell">Москва</div></td>
@@ -599,10 +650,12 @@
                 <td><div class="row-cell">+7(495)777-93-60</div></td>
                 <td><div class="row-cell-center"></div></td>
                 <td><div class="row-cell">contact@costumecode.ru</div></td>
-            </tr>-->
+            </tr>
+{% endif %}
+
     </table>
     </div>
 </div>
-    </div>
+</div>
 </body>
 </html>
