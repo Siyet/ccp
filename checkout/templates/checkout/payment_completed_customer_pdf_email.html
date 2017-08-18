@@ -588,15 +588,10 @@
             <tr>
                 <td colspan="3"><div class="table-text-h2 table-text-middle">Адрес доставки</div></td>
             </tr>
-            <tr>
-                <!--<td colspan="3"><div class="delivery-option table-text-middle">Вариант доставки <br> Забрать заказ в одном из наших магазинов</div></td>-->
-            </tr>
-
-
 {% if variant == "Забрать заказ в одном из наших магазинов" %}
             <tr>
             <td valign="top">
-                <div class="radio-cell">
+                <div class="delivery-cell">
                     <p>&#8226; Забрать заказ в одном из наших магазинов</p><br>
                 </div>
             </td>
@@ -605,6 +600,7 @@
                 <div class="row-cell">Москва, Патриаршие пруды, Спиридоньевский переулок 12/9</div>
             </td>
             </tr>
+        </table>
 {% elif variant == "Доставить по указанному адресу (по России)" %}
             <tr>
             <td valign="top">
@@ -651,9 +647,8 @@
                 <td><div class="row-cell-center"></div></td>
                 <td><div class="row-cell">contact@costumecode.ru</div></td>
             </tr>
+                </table>
 {% endif %}
-
-    </table>
     </div>
 </div>
 </div>
