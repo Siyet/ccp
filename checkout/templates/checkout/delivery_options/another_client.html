@@ -2,14 +2,14 @@
         &#8226; {% trans 'Доставить по другому адресу или другому человеку (по России)' %}
     </div>
 
-            <div class="row-cell row-cell-left">Иван</div>
-            <div class="row-cell row-cell-right">Москва</div>
+            <div class="row-cell row-cell-left">{{ customer.name }}</div>
+            <div class="row-cell row-cell-right">{{ customer.city }}</div>
 
-            <div class="row-cell row-cell-left">Иванов</div>
-            <div class="row-cell row-cell-right">Патриаршие пруды, Спиридоньевский переулок, 12/9</div>
+            <div class="row-cell row-cell-left">{{ customer.lastname }}</div>
+            <div class="row-cell row-cell-right">{{ customer.address }}</div>
 
-            <div class="row-cell row-cell-left">Иванович</div>
-            <div class="row-cell row-cell-right">123104</div>
+            <div class="row-cell row-cell-left">{{ customer.midname }}</div>
+            <div class="row-cell row-cell-right">{{ customer.index }}</div>
 
-            <div class="row-cell row-cell-left">+7(495)777-93-60</div>
-            <div class="row-cell row-cell-right">contact@costumecode.ru</div>
+            <div class="row-cell row-cell-left">{{ customer.phone }}</div>
+            <div class="row-cell row-cell-right">{{ customer.email }}</div>
