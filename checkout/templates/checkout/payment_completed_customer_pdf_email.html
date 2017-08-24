@@ -104,6 +104,7 @@
             display: inline-block;
             width: 50%;
             float: left;
+
         }
 
         .footer .right .value {
@@ -180,7 +181,7 @@
             font-size: 12px;
         }
 
-        .padding {
+        .padding-15 {
             padding: 15px;
         }
 
@@ -217,6 +218,7 @@
             font-size: 11px;
             margin-bottom: 45px;
             padding-top: 20px;
+            page-break-after: always;
         }
 
         .phone-number {
@@ -238,17 +240,18 @@
 
         .delivery-options-wrap {
             margin-top: 5px;
-            width: 714px;
+            width: 735px;
             margin-left: 30px;
         }
 
         .delivery-options {
             background: #fff;
+            page-break-inside: avoid !important;
         }
 
 
         .delivery-options table {
-                        font-family: HelveticaLight;
+            font-family: HelveticaLight;
         }
 
         tr, td {
@@ -265,10 +268,6 @@
             vertical-align: top;
         }
 
-        .delivery-options-right-column {
-
-        }
-
         .delivery-options .image-cell {
             padding: 0;
         }
@@ -277,6 +276,14 @@
             width: 100%;
             height: 100%;
             display: block;
+        }
+
+        .row-cell-left {
+            float: left;
+        }
+
+        .row-cell-right {
+            float: right;
         }
 
         .row-cell {
@@ -291,11 +298,10 @@
             font-size: 11px;
             color: #4a4a4a;
             outline: 0;
-            float: left;
-
             margin-bottom: 5px;
             padding-top: 10px;
             box-sizing: border-box;
+            display: inline-block;
         }
         .row-cell-center {
             width: 59px;
@@ -312,15 +318,20 @@
             font-size: 11px;
             margin-bottom: 20px;
             font-family: HelveticaLight;
+            display: block;
         }
         .table-text-h1 {
             text-align: center;
             font-size: 25px;
             font-family: HelveticaLight;
+            margin-bottom: 30px
         }
         .table-text-h2 {
             font-size: 18px;
             margin-bottom: 10px;
+        }
+        .margin-top-110 {
+            margin-top: 170px;
         }
         .border-bottom-middle {
             border-bottom: 1px solid #d0d9e7;
@@ -350,42 +361,19 @@
             font-size: 11px;
             color: #4a4a4a;
             outline: 0;
-            float: left;
             margin-bottom: 5px;
             padding-top: 3px;
             box-sizing: border-box;
         }
-        .delivery-cell-long {
+        .delivery-cell.long {
             width: 350px;
-            height: auto;
-            background-color: #fff;
-            padding-left: 13px;
-            font-size: 11px;
-            color: #4a4a4a;
-            outline: 0;
-            float: left;
-            margin-bottom: 5px;
-            padding-top: 3px;
-            box-sizing: border-box;
         }
-        .delivery-cell-short {
+        .delivery-cell.short {
             width: 310px;
-            height: auto;
-            background-color: #fff;
-            padding-left: 13px;
-            font-size: 11px;
-            color: #4a4a4a;
-            outline: 0;
-            float: left;
-            margin-bottom: 5px;
-            padding-top: 3px;
-            box-sizing: border-box;
         }
 
 
 
-
-        
     </style>
 </head>
 <body style="margin: 0; border: 0; padding: 0">
@@ -395,7 +383,7 @@
     </span>
 </div>
 
-<div class="table-text-h1 padding">{% trans 'Ваш заказ' %}</div>
+<div class="table-text-h1 padding-15">{% trans 'Ваш заказ' %}</div>
 <table class="order-table">
     <thead>
     <tr>
@@ -419,9 +407,9 @@
             </div>
             <div class="font-12" style="margin-bottom: 8px">{% trans 'Размер' %}:
                 {% if order_item.shirt.size %}
-                    {{ order_item.shirt.size }}
+                {{ order_item.shirt.size }}
                 {% else %}
-                    {{ order_item.shirt.size_option }}
+                {{ order_item.shirt.size_option }}
                 {% endif %}
             </div>
             <div class="font-12">{{ order_item.shirt.collection.tailoring_time }}</div>
@@ -474,62 +462,41 @@
     </div>
 </div>
 <div style="padding-top: 5px; page-break-inside: avoid !important">
-<div class="delivery-options-wrap">
-    <div class="delivery-options">
-        <table>
-            <tr>
-                <td colspan="3"><div class="table-text-h1">{% trans 'Информация о доставке' %}</div></td>
-            </tr>
-            <tr>
-                <td colspan="3"><div class="table-text-middle"></div></td>
-            </tr>
-            <tr>
-                <td colspan="3"><div class="table-text-h2 table-text-middle">{% trans 'Покупатель' %}</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иван</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">Москва</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иванов</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">ул. Народного ополчения, дом 18, корпус 3</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">Иванович</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">109387</div></td>
-            </tr>
-            <tr>
-                <td><div class="row-cell">+7(965)233-34-23</div></td>
-                <td><div class="row-cell-center"></div></td>
-                <td><div class="row-cell">ivanov.i.i@yandex.ru</div></td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <td><div class="border-bottom-left"></div></td>
-                <td><div class="border-bottom-middle"></div></td>
-                <td><div class="border-bottom-right"></div></td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <td colspan="3"><div class="table-text-h2 table-text-middle">Адрес доставки</div></td>
-            </tr>
-{% if variant == "1" %}
-    {% include 'delivery_options/shop.html' %}
+    <div class="delivery-options-wrap">
+        <div class="delivery-options">
+            {% with customer=order.get_customer_address %}
 
-{% elif variant == "2" %}
-    {% include 'delivery_options/main_adress.html' %}
+            <div class="table-text-h1">{% trans 'Информация о доставке' %}</div>
+            <div class="table-text-h2 table-text-middle">{% trans 'Покупатель' %}</div>
 
-{% else %}
-    {% include 'delivery_options/another_client.html' %}
+                        <div class="row-cell row-cell-left">{{ customer.name }}</div>
+                        <div class="row-cell row-cell-right">{{ customer.city }}</div>
 
-{% endif %}
+                        <div class="row-cell row-cell-left">{{ customer.lastname }}</div>
+                        <div class="row-cell row-cell-right">{{ customer.address }}</div>
+
+                        <div class="row-cell row-cell-left">{{ customer.midname }}</div>
+                        <div class="row-cell row-cell-right">{{ customer.index }}</div>
+
+                        <div class="row-cell row-cell-left">{{ customer.phone }}</div>
+                        <div class="row-cell row-cell-right">{{ customer.email }}</div>
+
+            {% endwith %}
+
+            <div class="table-text-h2 table-text-middle margin-top-110">{% trans "Адрес доставки" %}</div>
+            {% if order.checkout_shop %}
+            {% include 'checkout/delivery_options/shop.html' with shop=order.checkout_shop %}
+            {% else %}
+            {% with another_client=order.get_other_address %}
+            {% if another_client %}
+            {% include 'checkout/delivery_options/another_client.html' %}
+            {% else %}
+            {% include 'checkout/delivery_options/main_adress.html' %}
+            {% endif %}
+            {% endwith %}
+            {% endif %}
+        </div>
     </div>
-</div>
 </div>
 </body>
 </html>
