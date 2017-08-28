@@ -334,7 +334,7 @@ class ShirtSerializer(serializers.ModelSerializer):
     initials = InitialsSerializer(required=False, allow_null=True)
     fabric_code = serializers.ReadOnlyField(source='fabric.code')
     size_option = SizeOptionSerializer()
-    collection_name = serializers.StringRelatedField(source='collection.title')
+    collection_name = serializers.StringRelatedField(source='collection.title_en')
 
     class Meta:
         model = models.Shirt

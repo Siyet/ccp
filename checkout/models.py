@@ -248,7 +248,7 @@ class CustomerData(models.Model):
     lastname = models.CharField(_(u'Фамилия'), max_length=255)
     midname = models.CharField(_(u'Отчество'), max_length=255, blank=True)
     phone = models.CharField(_(u'Телефон'), max_length=255)
-    email = models.EmailField(_(u'Телефон'), max_length=255, null=True)
+    email = models.EmailField(_(u'Email'), max_length=255, null=True)
 
     type = models.CharField(_(u'Тип адреса'), max_length=50, choices=ADDRESS_TYPE,
                             default=ADDRESS_TYPE.customer_address)
