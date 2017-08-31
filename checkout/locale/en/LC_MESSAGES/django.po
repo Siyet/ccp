@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-02 19:14+0300\n"
+"POT-Creation-Date: 2017-08-28 21:43+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,357 +17,464 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: checkout/admin.py:74 checkout/admin.py:78 checkout/models.py:276
+#: admin.py:74 admin.py:78 models.py:280
 msgid "Рубашка"
 msgstr "Shirt"
 
-#: checkout/admin.py:81 checkout/admin.py:84 checkout/admin.py:150
+#: admin.py:81 admin.py:84 admin.py:150
 msgid "Экспорт"
 msgstr "Export"
 
-#: checkout/admin.py:134
+#: admin.py:134
 msgid "PDF"
 msgstr "PDF"
 
-#: checkout/admin.py:137
+#: admin.py:137
 msgid "Распечатать инфо о заказе"
 msgstr "Print order info"
 
-#: checkout/admin.py:145
+#: admin.py:145
 msgid "Платёж"
 msgstr "Payment"
 
-#: checkout/admin.py:153
+#: admin.py:153
 msgid "Сохранить инфо о заказе"
 msgstr "Save order info"
 
-#: checkout/apps.py:9 checkout/models.py:82 checkout/models.py:99
+#: apps.py:9 models.py:82 models.py:101
 msgid "Магазин"
 msgstr "Score"
 
-#: checkout/mail.py:13
+#: mail.py:13
 msgid "НОВЫЙ ЗАКАЗ"
 msgstr "NEW ORDER"
 
-#: checkout/mail.py:14
+#: mail.py:14
 msgid "COSTUME CODE - Ваш заказ подтвержден и оплачен"
 msgstr "COSTUME CODE - Your order has been confirmed and paid for"
 
-#: checkout/models.py:30 checkout/models.py:94
+#: models.py:30 models.py:96
 msgid "Номер заказа"
 msgstr "Order number"
 
-#: checkout/models.py:36 checkout/models.py:103
+#: models.py:36 models.py:105
 msgid "Платеж"
 msgstr "Payment"
 
-#: checkout/models.py:37
+#: models.py:37
 msgid "Платежи"
 msgstr "Payments"
 
-#: checkout/models.py:50
+#: models.py:50
 msgid "Платёж №{}"
 msgstr "Payment №{}"
 
-#: checkout/models.py:54 checkout/models.py:311
+#: models.py:54 models.py:315
 msgid "Уникальный номер пользователя"
 msgstr "Unique user number"
 
-#: checkout/models.py:66 checkout/models.py:97
+#: models.py:66 models.py:99
 msgid "Клиент"
 msgstr "Client"
 
-#: checkout/models.py:67
+#: models.py:67
 msgid "Клиенты"
 msgstr "Clients"
 
-#: checkout/models.py:71 checkout/models.py:257
+#: models.py:71 models.py:261
 msgid "Индекс"
 msgstr "Index"
 
-#: checkout/models.py:72 checkout/models.py:178 checkout/models.py:255
+#: models.py:72 models.py:180 models.py:259
 msgid "Город"
 msgstr "City"
 
-#: checkout/models.py:73
+#: models.py:73
 msgid "Улица"
 msgstr "Street"
 
-#: checkout/models.py:74
+#: models.py:74
 msgid "Дополнительно"
 msgstr "Additionally"
 
-#: checkout/models.py:75
+#: models.py:75
 msgid "Дом"
 msgstr "House"
 
-#: checkout/models.py:83
+#: models.py:83
 msgid "Магазины"
 msgstr "The shops"
 
-#: checkout/models.py:87
+#: models.py:87
 msgid "Сертификат уже был использован"
 msgstr "The certificate has already been used"
 
-#: checkout/models.py:89
+#: models.py:89
 msgid "Ожидает обработки"
 msgstr "Pending processing"
 
-#: checkout/models.py:90
+#: models.py:90
 msgid "Обработан"
 msgstr "Processed"
 
-#: checkout/models.py:95
+#: models.py:97
 msgid "Статус"
 msgstr "Status"
 
-#: checkout/models.py:96
+#: models.py:98
 msgid "Дата добавления"
 msgstr "Date added"
 
-#: checkout/models.py:98
+#: models.py:100
 msgid "Номинал скидки"
 msgstr "Nominal discount"
 
-#: checkout/models.py:101 checkout/models.py:300
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:301
+#: models.py:103 models.py:304
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:301
+#: templates/checkout/payment_completed_customer_pdf_email.html:450
 msgid "Сертификат"
 msgstr "Certificate"
 
-#: checkout/models.py:102
+#: models.py:104
 msgid "Номинал сертификата"
 msgstr "Certificate nominal value"
 
-#: checkout/models.py:106 checkout/models.py:245 checkout/models.py:275
+#: models.py:108 models.py:249 models.py:279
 msgid "Заказ"
 msgstr "Order"
 
-#: checkout/models.py:107
+#: models.py:109
 msgid "Заказы"
 msgstr "Orders"
 
-#: checkout/models.py:123
+#: models.py:125
 msgid "Общая стоимость заказа"
 msgstr "Total order value"
 
-#: checkout/models.py:133
+#: models.py:135
 msgid "Сумма заказа"
 msgstr "Order price"
 
-#: checkout/models.py:142
+#: models.py:144
 msgid "Оплаченная сумма"
 msgstr "Amount paid"
 
-#: checkout/models.py:151
+#: models.py:153
 msgid "Дата обработки заказа"
 msgstr "Order processing date"
 
-#: checkout/models.py:160
+#: models.py:162
 msgid "Статус оплаты"
 msgstr "Payment State"
 
-#: checkout/models.py:169
+#: models.py:171
 msgid "ФИО"
 msgstr "Full name"
 
-#: checkout/models.py:184
+#: models.py:186
 msgid "Количество рубашек в заказе"
 msgstr "Number of shirts in the order"
 
-#: checkout/models.py:242
+#: models.py:246
 msgid "Адрес клиента"
 msgstr "Customer address"
 
-#: checkout/models.py:243
+#: models.py:247
 msgid "Другой адрес (или адрес другого человека)"
 msgstr "Another address (or address of another person)"
 
-#: checkout/models.py:247
+#: models.py:251
 msgid "Имя"
 msgstr "Name"
 
-#: checkout/models.py:248
+#: models.py:252
 msgid "Фамилия"
 msgstr "Surname"
 
-#: checkout/models.py:249
+#: models.py:253
 msgid "Отчество"
 msgstr "Middle name"
 
-#: checkout/models.py:250 checkout/models.py:251
+#: models.py:254 models.py:255
 msgid "Телефон"
 msgstr "Phone"
 
-#: checkout/models.py:253
+#: models.py:257
 msgid "Тип адреса"
 msgstr "Address type"
 
-#: checkout/models.py:256
+#: models.py:260
 msgid "Адрес"
 msgstr "Address"
 
-#: checkout/models.py:260 checkout/models.py:261
+#: models.py:264 models.py:265
 msgid "Данные клиента"
 msgstr "Customer data"
 
-#: checkout/models.py:277
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:245
+#: models.py:281
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:245
+#: templates/checkout/payment_completed_customer_pdf_email.html:393
 msgid "Количество"
 msgstr "Amount"
 
-#: checkout/models.py:278
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:246
+#: models.py:282
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:246
+#: templates/checkout/payment_completed_customer_pdf_email.html:394
 msgid "Цена"
 msgstr "Price"
 
-#: checkout/models.py:282 checkout/models.py:283
+#: models.py:286 models.py:287
 msgid "Детали заказа"
 msgstr "Order details"
 
-#: checkout/models.py:293
+#: models.py:297
 msgid "Уникальный номер сертификата"
 msgstr "Unique certificate number"
 
-#: checkout/models.py:294
+#: models.py:298
 msgid "Стоимость"
 msgstr "Cost"
 
-#: checkout/models.py:301
+#: models.py:305
 msgid "Сертификаты"
 msgstr "Certificates"
 
-#: checkout/models.py:313
+#: models.py:317
 msgid "Процент скидки"
 msgstr "Discount rate"
 
-#: checkout/models.py:319
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:305
+#: models.py:323
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:305
+#: templates/checkout/payment_completed_customer_pdf_email.html:454
 msgid "Скидка"
 msgstr "Discount"
 
-#: checkout/models.py:320
+#: models.py:324
 msgid "Скидки"
 msgstr "Discounts"
 
-#: checkout/templates/checkout/payment_completed_admin_email.html:4
+#: templates/checkout/delivery_options/main_adress.html:3
+msgid "Доставить по указанному адресу (по России)"
+msgstr ""
+
+#: templates/checkout/delivery_options/shop.html:3
+msgid "Забрать заказ в одном из наших магазинов"
+msgstr ""
+
+#: templates/checkout/payment_completed_admin_email.html:4
 msgid "Здравствуйте! На сайте"
 msgstr "Hello! On the web-site"
 
-#: checkout/templates/checkout/payment_completed_admin_email.html:5
+#: templates/checkout/payment_completed_admin_email.html:5
 msgid "был успешно оформлен новый заказ"
 msgstr "a new order was successfully registered"
 
-#: checkout/templates/checkout/payment_completed_admin_email.html:8
-msgid "Для того, что бы ознакомиться с деталями заказа, пожалуйста, пройдите по \"ссылке\""
-msgstr "In order to get acquainted with the details of the order, please go to \"link\""
+#: templates/checkout/payment_completed_admin_email.html:8
+#, fuzzy
+#| msgid ""
+#| "Для того, что бы ознакомиться с деталями заказа, пожалуйста, пройдите по "
+#| "\"ссылке\""
+msgid ""
+"Для того, что бы ознакомиться с деталями заказа, пожалуйста, пройдите по "
+"ссылке"
+msgstr ""
+"In order to get acquainted with the details of the order, please go to \"link"
+"\""
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:4
+#: templates/checkout/payment_completed_customer_email.html:4
 msgid "Спасибо большое за ваш заказ."
 msgstr "Thank you very much for your order."
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:8
+#: templates/checkout/payment_completed_customer_email.html:8
 msgid "Во вложенном PDF-файле вы сможете найти все детали вашего заказа."
 msgstr "In the attached PDF-file you can find all the details of your order."
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:9
-msgid "Прежде чем мы начнем работы по пошиву, в течении 48 часов мы свяжемся с вами по телефону для подтверждения вашего заказа и уточнения размеров."
-msgstr "Before we begin work on tailoring, within 48 hours we will contact you by phone to confirm your order and specify the sizes."
+#: templates/checkout/payment_completed_customer_email.html:9
+msgid ""
+"Прежде чем мы начнем работы по пошиву, в течении 48 часов мы свяжемся с вами "
+"по телефону для подтверждения вашего заказа и уточнения размеров."
+msgstr ""
+"Before we begin work on tailoring, within 48 hours we will contact you by "
+"phone to confirm your order and specify the sizes."
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:12
+#: templates/checkout/payment_completed_customer_email.html:12
 msgid "Мы будем рады пошить данный заказ для вас!"
 msgstr "We will be happy to sew this order for you!"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:17
+#: templates/checkout/payment_completed_customer_email.html:17
 msgid "С уважением,"
 msgstr "Yours faithfully,"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:21
+#: templates/checkout/payment_completed_customer_email.html:21
 msgid "Магазины в Москве:"
 msgstr "Shops in Moscow:"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:23
+#: templates/checkout/payment_completed_customer_email.html:23
 msgid "Спиридоньевский переулок, дом 12/9, телефон: 8 (495) 241-95-03"
-msgstr "Patriarchiy Prudiy, Spiridonyevskiy Pereulok 12/9, phone: 8 (495) 241-95-03"
+msgstr ""
+"Patriarchiy Prudiy, Spiridonyevskiy Pereulok 12/9, phone: 8 (495) 241-95-03"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:24
-msgid "Остоженка, дом 20 (вход с Барыковского переулка), телефон: 8 (495) 266-09-76"
+#: templates/checkout/payment_completed_customer_email.html:24
+msgid ""
+"Остоженка, дом 20 (вход с Барыковского переулка), телефон: 8 (495) 266-09-76"
 msgstr "Ulitsa Ostozhenka 20, phone: 8 (495) 266-09-76"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:25
+#: templates/checkout/payment_completed_customer_email.html:25
 msgid "Москва, Трехгорная Мануфактура, Улица Рочдельская 15, c. 41"
 msgstr "Moscow, Trekhgornaya Manufaktura, Ulitsa Rochdelskaya 15c41"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:27
+#: templates/checkout/payment_completed_customer_email.html:27
 msgid "Магазины в Сургуте:"
 msgstr "Shops in Surgut:"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:29
-msgid "ул. Профсоюзов, дом 11 (Lifestyle mall \"АГОРА\"), телефон: 8 (346) 291-90-00"
-msgstr "Lifestyle Mall \"AGORA\", Ulitsa Provsoyuz 11, phone: 8 (346) 291-90-00"
+#: templates/checkout/payment_completed_customer_email.html:29
+msgid ""
+"ул. Профсоюзов, дом 11 (Lifestyle mall \"АГОРА\"), телефон: 8 (346) 291-90-00"
+msgstr ""
+"Lifestyle Mall \"AGORA\", Ulitsa Provsoyuz 11, phone: 8 (346) 291-90-00"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:33
+#: templates/checkout/payment_completed_customer_email.html:33
 msgid "По всем вопросам:"
 msgstr "For all questions:"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:235
-msgid "Спасибо большое за ваш заказ. В этом файле указана подробная информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!"
-msgstr "Thank you very much for your order. This file contains detailed information about your order. Before we begin work on sewing a shirt, we will contact you by phone within 48 hours to confirm your size and your order. We are looking forward to tailoring the order for you!"
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:235
+msgid ""
+"Спасибо большое за ваш заказ. В этом файле указана подробная информация о "
+"вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с "
+"вами по телефону в течении 48 часов для подтверждения вашего размера и "
+"вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!"
+msgstr ""
+"Thank you very much for your order. This file contains detailed information "
+"about your order. Before we begin work on sewing a shirt, we will contact "
+"you by phone within 48 hours to confirm your size and your order. We are "
+"looking forward to tailoring the order for you!"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:239
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:239
+#: templates/checkout/payment_completed_customer_pdf_email.html:387
 msgid "Ваш заказ"
 msgstr "Your order"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:243
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:243
+#: templates/checkout/payment_completed_customer_pdf_email.html:391
 msgid "Изображение"
 msgstr "Image"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:244
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:244
+#: templates/checkout/payment_completed_customer_pdf_email.html:392
 msgid "Описание"
 msgstr "Description"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:247
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:293
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:247
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:293
+#: templates/checkout/payment_completed_customer_pdf_email.html:395
+#: templates/checkout/payment_completed_customer_pdf_email.html:442
 msgid "Итого"
 msgstr "Total"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:257
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:257
+#: templates/checkout/payment_completed_customer_pdf_email.html:405
 msgid "Сорочка"
 msgstr "Shirt"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:259
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:259
+#: templates/checkout/payment_completed_customer_pdf_email.html:407
 msgid "Ткань"
 msgstr "Fabric"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:261
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:261
+#: templates/checkout/payment_completed_customer_pdf_email.html:409
 msgid "Размер"
 msgstr "Size"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:271
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:272
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:294
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:298
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:302
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:306
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:312
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:271
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:272
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:294
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:298
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:302
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:306
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:312
+#: templates/checkout/payment_completed_customer_pdf_email.html:419
+#: templates/checkout/payment_completed_customer_pdf_email.html:420
+#: templates/checkout/payment_completed_customer_pdf_email.html:443
+#: templates/checkout/payment_completed_customer_pdf_email.html:447
+#: templates/checkout/payment_completed_customer_pdf_email.html:451
+#: templates/checkout/payment_completed_customer_pdf_email.html:461
 msgid "руб"
 msgstr "rub"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:284
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:284
+#: templates/checkout/payment_completed_customer_pdf_email.html:432
 msgid "Вопросы"
 msgstr "Questions"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:286
-msgid "Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, позвоните нам!"
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:286
+msgid ""
+"Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, "
+"позвоните нам!"
 msgstr "If you have any questions before you place an order, call us!"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:288
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:288
 msgid "+7 495 649-63-77"
 msgstr "+7 495 649-63-77"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:297
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:297
+#: templates/checkout/payment_completed_customer_pdf_email.html:446
 msgid "Доставка"
 msgstr "Delivery"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:311
+#: templates/checkout/payment_completed_customer_pdf_email.default.html:311
+#: templates/checkout/payment_completed_customer_pdf_email.html:460
 msgid "Всего"
 msgstr "Total"
+
+#: templates/checkout/payment_completed_customer_pdf_email.html:383
+#, fuzzy
+#| msgid ""
+#| "Спасибо большое за ваш заказ. В этом файле указана подробная информация о "
+#| "вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся "
+#| "с вами по телефону в течении 48 часов для подтверждения вашего размера и "
+#| "вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!"
+msgid ""
+"Спасибо большое за ваш заказ. В этом файле указана информация о вашем "
+"заказе. <br>Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с "
+"вами по телефону в течении 48 часов для подтверждения вашего размера и "
+"вашего заказа. <br>Мы с нетерпением беремся за пошив заказа для вас :)"
+msgstr ""
+"Thank you very much for your order. This file contains detailed information "
+"about your order. Before we begin work on sewing a shirt, we will contact "
+"you by phone within 48 hours to confirm your size and your order. We are "
+"looking forward to tailoring the order for you!"
+
+#: templates/checkout/payment_completed_customer_pdf_email.html:434
+#, fuzzy
+#| msgid ""
+#| "Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, "
+#| "позвоните нам!"
+msgid "Если у вас есть какие-нибудь вопросы, позвоните нам :)"
+msgstr "If you have any questions before you place an order, call us!"
+
+#: templates/checkout/payment_completed_customer_pdf_email.html:437
+msgid "+7 495 777 9360"
+msgstr ""
+
+#: templates/checkout/payment_completed_customer_pdf_email.html:470
+msgid "Информация о доставке"
+msgstr ""
+
+#: templates/checkout/payment_completed_customer_pdf_email.html:471
+#, fuzzy
+#| msgid "Дополнительно"
+msgid "Покупатель"
+msgstr "Additionally"
+
+#: templates/checkout/payment_completed_customer_pdf_email.html:475
+#, fuzzy
+#| msgid "Адрес клиента"
+msgid "Адрес доставки"
+msgstr "Customer address"
+
+#: templates/checkout/payment_completed_customer_pdf_email.html:482
+#, fuzzy
+#| msgid "Другой адрес (или адрес другого человека)"
+msgid "Доставить по другому адресу или другому человеку (по России)"
+msgstr "Another address (or address of another person)"

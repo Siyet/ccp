@@ -302,6 +302,7 @@
             padding-top: 10px;
             box-sizing: border-box;
             display: inline-block;
+            font-family: HelveticaLight;
         }
         .row-cell-center {
             width: 59px;
@@ -451,7 +452,7 @@
         </div>
         <div>
             <span class="font-12 label text-right">{% trans 'Скидка' %}:</span>
-            <span class="font-12 value text-right">{{ order.discount_value|floatformat:2 }} {% trans '%' %}</span>
+            <span class="font-12 value text-right">{{ order.discount_value|floatformat:2 }} %</span>
         </div>
         <br>
 
@@ -468,32 +469,23 @@
 
             <div class="table-text-h1">{% trans 'Информация о доставке' %}</div>
             <div class="table-text-h2 table-text-middle">{% trans 'Покупатель' %}</div>
-
-                        <div class="row-cell row-cell-left">{{ customer.name }}</div>
-                        <div class="row-cell row-cell-right">{{ customer.city }}</div>
-
-                        <div class="row-cell row-cell-left">{{ customer.lastname }}</div>
-                        <div class="row-cell row-cell-right">{{ customer.address }}</div>
-
-                        <div class="row-cell row-cell-left">{{ customer.midname }}</div>
-                        <div class="row-cell row-cell-right">{{ customer.index }}</div>
-
-                        <div class="row-cell row-cell-left">{{ customer.phone }}</div>
-                        <div class="row-cell row-cell-right">{{ customer.email }}</div>
-
+                {% include 'checkout/delivery_options/customer_info.html' with customer=customer only %}
             {% endwith %}
 
             <div class="table-text-h2 table-text-middle margin-top-110">{% trans "Адрес доставки" %}</div>
             {% if order.checkout_shop %}
-            {% include 'checkout/delivery_options/shop.html' with shop=order.checkout_shop %}
+                {% include 'checkout/delivery_options/shop.html' with shop=order.checkout_shop only %}
             {% else %}
-            {% with another_client=order.get_other_address %}
-            {% if another_client %}
-            {% include 'checkout/delivery_options/another_client.html' %}
-            {% else %}
-            {% include 'checkout/delivery_options/main_adress.html' %}
-            {% endif %}
-            {% endwith %}
+                {% with another_client=order.get_other_address %}
+                    {% if another_client %}
+                        <div class="delivery-cell">
+                            &#8226; {% trans 'Доставить по другому адресу или другому человеку (по России)' %}
+                        </div>
+                        {% include 'checkout/delivery_options/customer_info.html' with customer=another_client %}
+                    {% else %}
+                        {% include 'checkout/delivery_options/main_adress.html' %}
+                    {% endif %}
+                {% endwith %}
             {% endif %}
         </div>
     </div>
