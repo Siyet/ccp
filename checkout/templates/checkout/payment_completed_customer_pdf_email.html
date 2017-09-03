@@ -331,16 +331,6 @@
             font-size: 18px;
             margin-bottom: 10px;
         }
-        .margin-top-110 {
-            margin-top: 170px;
-        }
-        .border-bottom-middle {
-            border-bottom: 1px solid #d0d9e7;
-            width: 330px;
-            height: 10px;
-            margin-bottom: 20px;
-            margin-top: 10px;
-        }
         .border-bottom-left, .border-bottom-right {
             width: 194px;
             height: auto;
@@ -363,8 +353,8 @@
             color: #4a4a4a;
             outline: 0;
             margin-bottom: 5px;
-            padding-top: 3px;
             box-sizing: border-box;
+            padding-bottom: 10px;
         }
         .delivery-cell.long {
             width: 350px;
@@ -372,7 +362,16 @@
         .delivery-cell.short {
             width: 310px;
         }
-
+        .border-bottom {
+            border-bottom: 1px solid #d0d9e7;
+            margin-bottom: 20px;
+            width: 325px;
+            margin-left: 28%;
+            margin-top: 210px;
+        }
+        .margin-bottom-20 {
+            margin-bottom: 20px;
+        }
 
 
     </style>
@@ -434,7 +433,7 @@
             <div class="font-9">{% trans 'Если у вас есть какие-нибудь вопросы, позвоните нам :)' %}    
             </div>
 
-            <div class="font-10 phone-number">{% trans '+7 495 777 9360' %}</div>
+            <div class="font-10 phone-number">+7 495 777 9360</div>
         </div>
     </div>
     <div class="summary right">
@@ -468,11 +467,11 @@
             {% with customer=order.get_customer_address %}
 
             <div class="table-text-h1">{% trans 'Информация о доставке' %}</div>
-            <div class="table-text-h2 table-text-middle">{% trans 'Покупатель' %}</div>
+            <div class="table-text-h2 table-text-middle margin-bottom-20">{% trans 'Покупатель' %}</div>
                 {% include 'checkout/delivery_options/customer_info.html' with customer=customer only %}
             {% endwith %}
-
-            <div class="table-text-h2 table-text-middle margin-top-110">{% trans "Адрес доставки" %}</div>
+            <div class="border-bottom"></div>
+            <div class="table-text-h2 table-text-middle margin-bottom-20">{% trans "Адрес доставки" %}</div>
             {% if order.checkout_shop %}
                 {% include 'checkout/delivery_options/shop.html' with shop=order.checkout_shop only %}
             {% else %}

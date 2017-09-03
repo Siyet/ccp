@@ -453,13 +453,10 @@ msgstr ""
 msgid "Если у вас есть какие-нибудь вопросы, позвоните нам :)"
 msgstr "If you have any questions before you place an order, call us!"
 
-#: templates/checkout/payment_completed_customer_pdf_email.html:437
-msgid "+7 495 777 9360"
-msgstr ""
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:470
 msgid "Информация о доставке"
-msgstr ""
+msgstr "Delivery information"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:471
 #, fuzzy
