@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load checkout_tags %}
+<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -64,6 +65,7 @@
 
         .order-table thead {
             font-family: HelveticaMedium;
+            font-size: 11px;
         }
 
         .order-table tbody tr {
@@ -75,7 +77,7 @@
         }
 
         .order-table td {
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .order-table th, .order-table td {
@@ -90,31 +92,18 @@
             font-family: HelveticaLight;
         }
 
-        .light {
-            font-family: HelveticaLight;
-        }
-
         .medium {
             font-family: HelveticaMedium;
         }
 
-        footer .left {
-            float: left;
-            width: 50%;
-        }
-
-        footer .right {
-            float: right;
-            width: 49%;
-        }
-
-        footer .right .label {
+        .footer .right .label {
             display: inline-block;
             width: 50%;
             float: left;
+
         }
 
-        footer .right .value {
+        .footer .right .value {
             display: inline-block;
             width: 49%;
         }
@@ -125,24 +114,28 @@
 
         .top-logo {
             position: absolute;
-            top: 8px;
-            left: 16px;
+            top: 20px;
+            left: 350px;
         }
 
         .header {
-            height: 55px;
+            height: 70px;
             width: 100%;
-            background-color: #D0D9E7
+            background-color: #FFF
+        }
+        .header-image-wide {
+            width: 794px;
         }
 
         .header-text {
             position: absolute;
-            left: 106px;
+            left: 142px;
             top: 10px;
             font-family: Andale Mono;
             font-size: 11px;
             color: #494949;
-            width: 636px;
+            width: 520px;
+            text-align: center;
         }
 
         .shopping-cart {
@@ -157,11 +150,11 @@
             width: 100%;
             position: relative;
             height: 65px;
-            border-bottom: 1px solid #D0D9E7;
         }
 
         .your-order {
-            font-family: Monaco;
+            font-size: 25px;
+            font-family: HelveticaLight;
         }
 
         .font-7 {
@@ -174,6 +167,18 @@
 
         .font-9 {
             font-size: 9px;
+        }
+
+        .font-10 {
+            font-size: 10px;
+        }
+
+        .font-12 {
+            font-size: 12px;
+        }
+
+        .padding-15 {
+            padding: 15px;
         }
 
         .phone-wrap {
@@ -196,47 +201,132 @@
 
         .questions {
             position: relative;
+            vertical-align: top;
             height: 93px;
             width: 225px;
             border: 1px solid #D0D9E7;
             margin-left: 30px;
-            float: left;
+            display: inline-block;
         }
 
-        footer {
+        .footer {
             font-family: HelveticaLight;
             font-size: 11px;
+            margin-bottom: 45px;
+            padding-top: 20px;
+            page-break-after: always;
         }
 
         .phone-number {
-            font-size: 11px;
             font-family: HelveticaMedium;
             padding-left: 10px;
             margin-top: 10px;
         }
 
         .summary {
+            width: 45%;
+            display: inline-block;
             margin-right: 30px;
+            float: right;
         }
 
         .summary div {
             padding: 2px 0;
         }
 
+        .delivery-options-wrap {
+            margin-top: 5px;
+            width: 735px;
+            margin-left: 30px;
+        }
+
+        .delivery-options {
+            background: #fff;
+            page-break-inside: avoid !important;
+        }
+
+        tr, td {
+            page-break-inside: avoid !important;
+        }
+
+        .row-cell-left {
+            float: left;
+        }
+
+        .row-cell-right {
+            float: right;
+        }
+
+        .row-cell {
+            width: 330px;
+            height: auto;
+            border-radius: 8.5px;
+            background-color: #fff;
+            border: 1px solid #d0d9e7;
+            padding: 0px 13px 9px 13px;
+            font-size: 11px;
+            color: #4a4a4a;
+            outline: 0;
+            margin-bottom: 5px;
+            padding-top: 10px;
+            box-sizing: border-box;
+            display: inline-block;
+            font-family: HelveticaLight;
+        }
+        .table-text-middle {
+            text-align: center;
+            font-size: 11px;
+            margin-bottom: 20px;
+            font-family: HelveticaLight;
+            display: block;
+        }
+        .table-text-h1 {
+            text-align: center;
+            font-size: 25px;
+            font-family: HelveticaLight;
+            margin-bottom: 30px
+        }
+        .table-text-h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .delivery-cell {
+            width: 330px;
+            height: auto;
+            background-color: #fff;
+            padding-left: 13px;
+            font-size: 11px;
+            color: #4a4a4a;
+            outline: 0;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+            padding-bottom: 10px;
+        }
+        .delivery-cell.long {
+            width: 350px;
+        }
+        .border-bottom {
+            border-bottom: 1px solid #d0d9e7;
+            margin-bottom: 20px;
+            width: 325px;
+            margin-left: 28%;
+            margin-top: 210px;
+        }
+        .margin-bottom-20 {
+            margin-bottom: 20px;
+        }
+
+
     </style>
 </head>
-<body style="margin:0; border: 0; padding: 0">
-<div class="header">
-    <img src="{% abs_static 'img/cc_logo.png' %}" class="top-logo"/>
-</div>
+<body style="margin: 0; border: 0; padding: 0">
 <div class="greeting">
-    <img src="{% abs_static 'img/shopping_cart.png' %}" class="shopping-cart"/>
     <span class="header-text">
-        {% trans 'Спасибо большое за ваш заказ. В этом файле указана подробная информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!' %}
+       {% trans 'Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. <br>Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. <br>Мы с нетерпением беремся за пошив заказа для вас :)' %}
     </span>
 </div>
 
-<h2 class="text-center your-order">{% trans 'Ваш заказ' %}</h2>
+<div class="table-text-h1 padding-15">{% trans 'Ваш заказ' %}</div>
 <table class="order-table">
     <thead>
     <tr>
@@ -249,61 +339,62 @@
     </thead>
     <tbody>
     {% for order_item in order.items.all %}
-        <tr>
-            <td class="text-center hlv-light">
-                <img src="{% shirt_image order_item.shirt %}" height="120" alt="">
-            </td>
-            <td class="text-left hlv-light">
-                <div style="margin-bottom: 12px">{% trans 'Сорочка' %}</div>
-                <div class="font-9">
-                    {% trans 'Ткань' %}: {{ order_item.shirt.fabric }}
-                </div>
-                <div class="font-7" style="margin-bottom: 8px">{% trans 'Размер' %}:
-                    {% if order_item.shirt.size %}
-                        {{ order_item.shirt.size }}
-                    {% else %}
-                        {{ order_item.shirt.size_option }}
-                    {% endif %}
-                </div>
-                <div class="font-9">{{ order_item.shirt.collection.tailoring_time }}</div>
-            </td>
-            <td class="text-center hlv-light valign-center">{{ order_item.amount }}</td>
-            <td class="text-right hlv-light">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб' %}</td>
-            <td class="text-right hlv-light">{{ order_item.get_total|floatformat:2 }} {% trans 'руб' %}</td>
-        </tr>
+    <tr>
+        <td class="text-center hlv-light">
+            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
+        </td>
+        <td class="text-left hlv-light">
+            <div style="margin-bottom: 12px">{% trans 'Сорочка' %}</div>
+            <div class="font-12" style="margin-bottom: 10px">
+                {% trans 'Ткань' %}: {{ order_item.shirt.fabric }}
+            </div>
+            <div class="font-12" style="margin-bottom: 8px">{% trans 'Размер' %}:
+                {% if order_item.shirt.size %}
+                {{ order_item.shirt.size }}
+                {% else %}
+                {{ order_item.shirt.size_option }}
+                {% endif %}
+            </div>
+            <div class="font-12">{{ order_item.shirt.collection.tailoring_time }}</div>
+        </td>
+        <td class="text-center hlv-light valign-center">{{ order_item.amount }}</td>
+        <td class="text-right hlv-light">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб' %}</td>
+        <td class="text-right hlv-light">{{ order_item.get_total|floatformat:2 }} {% trans 'руб' %}</td>
+    </tr>
     {% endfor %}
     </tbody>
 </table>
 
-<footer>
+<div class="footer">
     <div class="questions">
         <div class="phone-wrap">
             <img src="{% abs_static 'img/phone.png' %}" class="phone-icon"/>
         </div>
         <div class="detail ">
-            <div class="font-9 medium" style="margin-top: 15px; margin-bottom: 5px">{% trans 'Вопросы' %}</div>
+            <div class="font-10 medium" style="margin-top: 15px; margin-bottom: 5px">{% trans 'Вопросы' %}</div>
 
-            <div class="font-8">{% trans 'Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, позвоните нам!' %}</div>
+            <div class="font-9">{% trans 'Если у вас есть какие-нибудь вопросы, позвоните нам :)' %}    
+            </div>
 
-            <div class="phone-number">{% trans '+7 495 649-63-77' %}</div>
+            <div class="font-10 phone-number">+7 495 777 9360</div>
         </div>
     </div>
     <div class="summary right">
         <div>
-            <span class="label text-right">{% trans 'Итого' %}:</span>
-            <span class="value text-right">{{ order.get_full_amount|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="font-12 label text-right">{% trans 'Итого' %}:</span>
+            <span class="font-12 value text-right">{{ order.get_full_amount|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="label text-right">{% trans 'Доставка' %}:</span>
-            <span class="value text-right">{{ 0|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="font-12 label text-right">{% trans 'Доставка' %}:</span>
+            <span class="font-12 value text-right">{{ 0|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="label text-right">{% trans 'Сертификат' %}:</span>
-            <span class="value text-right">{{ order.certificate_value|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="font-12 label text-right">{% trans 'Сертификат' %}:</span>
+            <span class="font-12 value text-right">{{ order.certificate_value|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="label text-right">{% trans 'Скидка' %}:</span>
-            <span class="value text-right">{{ order.discount_value|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="font-12 label text-right">{% trans 'Скидка' %}:</span>
+            <span class="font-12 value text-right">{{ order.discount_value|floatformat:2 }} %</span>
         </div>
         <br>
 
@@ -312,7 +403,34 @@
             <span class="value text-right medium">{{ order.get_amount_to_pay|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
     </div>
-    <div class="clear"></div>
-</footer>
+</div>
+<div style="padding-top: 5px; page-break-inside: avoid !important">
+    <div class="delivery-options-wrap">
+        <div class="delivery-options">
+            {% with customer=order.get_customer_address %}
+
+            <div class="table-text-h1">{% trans 'Информация о доставке' %}</div>
+            <div class="table-text-h2 table-text-middle margin-bottom-20">{% trans 'Покупатель' %}</div>
+                {% include 'checkout/delivery_options/customer_info.html' with customer=customer only %}
+            {% endwith %}
+            <div class="border-bottom"></div>
+            <div class="table-text-h2 table-text-middle margin-bottom-20">{% trans "Адрес доставки" %}</div>
+            {% if order.checkout_shop %}
+                {% include 'checkout/delivery_options/shop.html' with shop=order.checkout_shop only %}
+            {% else %}
+                {% with another_client=order.get_other_address %}
+                    {% if another_client %}
+                        <div class="delivery-cell">
+                            &#8226; {% trans 'Доставить по другому адресу или другому человеку (по России)' %}
+                        </div>
+                        {% include 'checkout/delivery_options/customer_info.html' with customer=another_client %}
+                    {% else %}
+                        {% include 'checkout/delivery_options/main_adress.html' %}
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -90,6 +90,8 @@ class Order(models.Model):
         ('completed', _(u'Обработан', )),
     )
     ORDER_PDF_TEMPLATE_NAME = 'checkout/payment_completed_customer_pdf_email.html'
+    ORDER_PDF_FOOTER_TEMPLATE_NAME = 'checkout/pdf_footer.html'
+    ORDER_PDF_HEADER_TEMPLATE_NAME = 'checkout/pdf_header.html'
 
     number = models.AutoField(_(u'Номер заказа'), primary_key=True)
     state = models.CharField(_(u'Статус'), max_length=20, choices=STATES, default=STATES.new)
@@ -234,7 +236,9 @@ class Order(models.Model):
 
     def get_pdf(self):
         t = loader.get_template(self.ORDER_PDF_TEMPLATE_NAME)
-        return render_pdf_from_template(t, None, None, {'order': self})
+        footer = loader.get_template(self.ORDER_PDF_FOOTER_TEMPLATE_NAME)
+        header = loader.get_template(self.ORDER_PDF_HEADER_TEMPLATE_NAME)
+        return render_pdf_from_template(t, header, footer, {'order': self})
 
 
 class CustomerData(models.Model):

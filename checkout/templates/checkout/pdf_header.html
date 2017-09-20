@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load checkout_tags %}
+<html>
+<head>
+    <style type="text/css">
+        .top-logo {
+            margin-left: 335px;
+            margin-bottom: 15px;
+            width: 126px;
+            height: 27px;
+        }
+        .header {
+            height: 55px;
+            width: 100%;
+            background-color: #fff;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .header-image-wide {
+            width: 794px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="header">
+    <img src="{% abs_static 'img/logo_cc.png' %}" class="top-logo"/>
+</div>
+ <div class="header-image">
+    <img src="{% abs_static 'img/HeaderImage.jpg' %}" class="header-image-wide"/>
+</div>
+</body>
+</html>
