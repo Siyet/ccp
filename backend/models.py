@@ -382,7 +382,7 @@ class Shirt(models.Model):
     yoke = models.ForeignKey('dictionaries.YokeType', verbose_name=_(u'Кокетка'), null=True)
     clasp = models.BooleanField(_(u'Застежка под штифты'), choices=CLASP_OPTIONS, default=False)
 
-    STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только съемные косточки)')),
+    STITCH = Choices(('none', _(u'0 мм (без отстрочки)')), ('1mm', _(u'1 мм (только со съемнными косточками)')),
                      ('5mm', _(u'5 мм')))
     stitch = models.CharField(_(u'Ширина отстрочки'), max_length=10, choices=STITCH)
 

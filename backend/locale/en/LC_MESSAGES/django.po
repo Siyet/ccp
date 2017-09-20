@@ -398,8 +398,8 @@ msgid "0 мм (без отстрочки)"
 msgstr "0 mm (without stitching)"
 
 #: backend/models.py:384
-msgid "1 мм (только съемные косточки)"
-msgstr "1 mm (removable stays only)"
+msgid "1 мм (только со съемнными косточками)"
+msgstr "1 mm (only with removable collar stays)"
 
 #: backend/models.py:385
 msgid "5 мм"
