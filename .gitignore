@@ -8,6 +8,7 @@ core/settings/htmltopdf.py
 
 # Compiled files
 *.pyc
+*.mo
 
 # static
 media

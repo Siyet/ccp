@@ -43,6 +43,7 @@ def deploy():
             run("pip install -r requirements.txt")
             run("python manage.py migrate")
             run("python manage.py collectstatic --noinput")
+            run("python manage.py compilemessages")
 
         run("touch ../uwsgi/ccback.ini")
 

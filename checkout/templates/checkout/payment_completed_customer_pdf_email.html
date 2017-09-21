@@ -341,7 +341,7 @@
     {% for order_item in order.items.all %}
     <tr>
         <td class="text-center hlv-light">
-            <img src="{% abs_static 'img/shirt.jpg' %}" height="120" alt="">
+            <img src="{% shirt_image order_item.shirt %}" height="120" alt="">
         </td>
         <td class="text-left hlv-light">
             <div style="margin-bottom: 12px">{% trans 'Сорочка' %}</div>
