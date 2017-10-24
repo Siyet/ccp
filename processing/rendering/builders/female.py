@@ -40,6 +40,12 @@ class FemaleShirtBuilder(BaseShirtBuilder):
 
         return None
 
+    def base_layer_from_cuffs(self):
+        if not self.uv:
+            uv = self.cuff_model.cache.get(source_field='uv', resolution=self.resolution)
+            self.uv.append(uv)
+        cuffs = self.perform_compose()
+        self.base_layer.append(cuffs)
 
     def build_shirt(self):
         self._setup()
@@ -55,8 +61,7 @@ class FemaleShirtBuilder(BaseShirtBuilder):
             if self.sleeve.cuffs:
                 self.append_contrasting_part(self.cuff_conf, self.cuff_model, ContrastDetails.CUFF_ELEMENTS)
                 self.append_buttons_stitches(self.cuff_buttons)
-                cuffs = self.perform_compose()
-                self.base_layer.append(cuffs)
+                self.base_layer_from_cuffs()
 
             self.append_model(body_models.get(back_id=self.back))
         else:

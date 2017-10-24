@@ -13,6 +13,7 @@ from dictionaries import models as dictionaries
 from processing.cache import STITCHES
 from processing.rendering.compose import Composer, ImageConf
 from processing.rendering.utils import hex_to_rgb, cropped_box, draw_rotated_text
+
 # noinspection PyUnresolvedReferences
 from processing.cache import CacheBuilder
 
@@ -32,7 +33,6 @@ class BaseShirtBuilder(object):
     # cache_builder = CacheBuilder
 
     def __init__(self, shirt_data, projection, resolution=compose.CACHE_RESOLUTION.full):
-        self.is_ready = False
         self.shirt_data = shirt_data
         self.resolution = resolution
         self.projection = projection
@@ -279,14 +279,14 @@ class BaseShirtBuilder(object):
         return (configuration.sources.filter(projection=self.projection).first(),
                 configuration.stitches.filter(projection=self.projection))
 
-    def append_solid_contrasting_part(self, ao, light_conf, model, fabric, uv):
+    def append_solid_contrasting_part(self, model, fabric):
+        (uv, light_conf, ao) = self.sources_for(model)
         texture = self.get_fabric_texture(fabric)
         alpha_cache = model.cache.get(source_field='uv_alpha', resolution=self.resolution)
         self.alphas.append(alpha_cache)
 
         self.ao.append(ao)
         self.lights.append(light_conf)
-
         composed_detail = Composer.create(
             texture=texture.cache.get(resolution=self.resolution).file.path,
             uv=uv,
@@ -296,7 +296,9 @@ class BaseShirtBuilder(object):
 
         self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
-    def append_granular_contrasting_part(self, ao, detail_masks, light_conf, uv):
+
+    def append_granular_contrasting_part(self, model, detail_masks):
+        (uv, light_conf, ao) = self.sources_for(model)
         light_image = Image.open(light_conf.file.path)
         for detail_mask in detail_masks:
             detail, mask = detail_mask
@@ -315,50 +317,47 @@ class BaseShirtBuilder(object):
             )
             self.extra_details.append(ImageConf(composed_detail, light_conf.position))
 
+    def sources_for(self, model):
+        uv = np.load(model.cache.get(source_field='uv', resolution=self.resolution).file.path)
+        light_conf = model.cache.get(source_field='light', resolution=self.resolution)
+        ao = model.cache.get(source_field='ao', resolution=self.resolution)
+        return uv, light_conf, ao
+
     def append_contrasting_part(self, conf, model, elements):
         if self.contrast_details is None:
             return self.append_model(model)
 
         self.cache_builder.create_cache(model, ('uv', 'light', 'ao'), resolution=self.resolution)
 
-        def sources_for(model):
-            uv = np.load(model.cache.get(source_field='uv', resolution=self.resolution).file.path)
-            light_conf = model.cache.get(source_field='light', resolution=self.resolution)
-            ao = model.cache.get(source_field='ao', resolution=self.resolution)
-            return uv, light_conf, ao
-
         if not self.collection.contrast_details:
-            (uv, light_conf, ao) = sources_for(model)
-            self.append_solid_contrasting_part(ao, light_conf, model, self.collection.white_fabric, uv)
-            return
+            return self.append_solid_contrasting_part(model, self.collection.white_fabric)
 
-        part_keys = set([x[0] for x in elements])
-        all_detail_keys = set([x['element'] for x in self.contrast_details])
-        if not all_detail_keys.intersection(part_keys):
+        part_keys = set(dict(elements).keys())
+        part_details = [k for k in self.contrast_details if k['element'] in part_keys]
+        fabrics = {d['fabric'] for d in part_details}
+
+        if not part_details:
             return self.append_model(model)
-        present_part_keys = filter(lambda k: k in part_keys, all_detail_keys)
-        part_details = filter(lambda k: k['element'] in part_keys, self.contrast_details)
-        (uv, light_conf, ao) = sources_for(model)
-        fabrics = set(map(lambda d: d['fabric'], part_details))
-        if sorted(present_part_keys) == sorted(part_keys) and len(fabrics) == 1:
-            self.append_solid_contrasting_part(ao, light_conf, model, fabrics.pop(), uv)
+
+        if len(part_details) == len(part_keys) and len(fabrics) == 1:
+            return self.append_solid_contrasting_part(model, fabrics.pop())
+
+        self.append_model(model)
+        detail_masks = []
+        for detail in part_details:
+            mask = conf.masks.filter(element=detail['element'], projection=self.projection).first()
+            if mask:
+                self.cache_builder.create_cache(mask, ('mask',), resolution=self.resolution)
+                detail_masks.append((detail, mask))
+
+        if detail_masks:
+            self.append_granular_contrasting_part(model, detail_masks)
+
+        # for external cuff part there's no mask: we just replace whole manget
         else:
-            self.append_model(model)
-            detail_masks = []
-            for detail in part_details:
-                mask = conf.masks.filter(element=detail['element'], projection=self.projection).first()
-                if mask:
-                    self.cache_builder.create_cache(mask, ('mask',), resolution=self.resolution)
-                    detail_masks.append((detail, mask))
-
-            if detail_masks:
-                self.append_granular_contrasting_part(ao, detail_masks, light_conf, uv)
-
-            # for external cuff part there's no mask: we just replace whole manget
-            else:
-                cuff_element = first(lambda x: x['element'] == ContrastDetails.CUFF_ELEMENTS.cuff_outer, part_details)
-                if cuff_element:
-                    self.append_solid_contrasting_part(ao, light_conf, model, cuff_element['fabric'], uv)
+            cuff_element = first(lambda x: x['element'] == ContrastDetails.CUFF_ELEMENTS.cuff_outer, part_details)
+            if cuff_element:
+                self.append_solid_contrasting_part(model, cuff_element['fabric'])
 
     @classmethod
     def get_initials_configuration(cls, initials, pocket):

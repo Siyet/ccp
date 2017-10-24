@@ -86,7 +86,6 @@ class MaleShirtBuilder(BaseShirtBuilder):
 
     def build_shirt(self):
         self._setup()
-        total = time()
 
         self.append_model(self.get_compose_configuration(models.MaleBodyConfiguration, {
             'sleeve_id': self.sleeve.id,
@@ -128,10 +127,7 @@ class MaleShirtBuilder(BaseShirtBuilder):
             'buttons': self.collar_buttons
         }))
 
-        res = self.perform_compose()
-
-        print("total", time() - total)
-        return res
+        return self.perform_compose()
 
     def get_back(self):
         if not self.back:
