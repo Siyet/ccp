@@ -348,12 +348,7 @@
             <div class="font-10" style="margin-bottom: 10px">
                 {% trans 'Ткань' %}: {{ order_item.shirt.fabric }}
             </div>
-            <div class="font-10" style="margin-bottom: 8px">{% trans 'Размер' %}:
-                {% if order_item.shirt.size %}
-                {{ order_item.shirt.size }}
-                {% else %}
-                    {% trans 'Размер: Принять решение во время подтверждения заказа по телефону' %}
-                {% endif %}
+            <div class="font-10" style="margin-bottom: 8px">{% trans 'Размер: Принять решение во время подтверждения заказа по телефону' %}
             </div>
             <div class="font-12">{{ order_item.shirt.collection.tailoring_time }}</div>
         </td>
