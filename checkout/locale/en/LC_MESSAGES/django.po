@@ -289,6 +289,9 @@ msgstr "Thank you very much for your order."
 msgid "Во вложенном PDF-файле вы сможете найти все детали вашего заказа."
 msgstr "In the attached PDF-file you can find all the details of your order."
 
+msgid "Размер: Принять решение во время подтверждения заказа по телефону"
+msgstr "Size: Make the decision during the confirmation phone call"
+
 #: templates/checkout/payment_completed_customer_email.html:9
 msgid ""
 "Прежде чем мы начнем работы по пошиву, в течении 48 часов мы свяжемся с вами "

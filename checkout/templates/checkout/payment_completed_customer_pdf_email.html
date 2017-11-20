@@ -344,16 +344,11 @@
             <img src="{% shirt_image order_item.shirt %}" height="120" alt="">
         </td>
         <td class="text-left hlv-light">
-            <div style="margin-bottom: 12px">{% trans 'Сорочка' %}</div>
-            <div class="font-12" style="margin-bottom: 10px">
+            <div style="margin-bottom: 12px" class="font-10">{% trans 'Сорочка' %}</div>
+            <div class="font-10" style="margin-bottom: 10px">
                 {% trans 'Ткань' %}: {{ order_item.shirt.fabric }}
             </div>
-            <div class="font-12" style="margin-bottom: 8px">{% trans 'Размер' %}:
-                {% if order_item.shirt.size %}
-                {{ order_item.shirt.size }}
-                {% else %}
-                {{ order_item.shirt.size_option }}
-                {% endif %}
+            <div class="font-10" style="margin-bottom: 8px">{% trans 'Размер: Принять решение во время подтверждения заказа по телефону' %}
             </div>
             <div class="font-12">{{ order_item.shirt.collection.tailoring_time }}</div>
         </td>
@@ -373,7 +368,7 @@
         <div class="detail ">
             <div class="font-10 medium" style="margin-top: 15px; margin-bottom: 5px">{% trans 'Вопросы' %}</div>
 
-            <div class="font-9">{% trans 'Если у вас есть какие-нибудь вопросы, позвоните нам :)' %}    
+            <div class="font-10">{% trans 'Если у вас есть какие-нибудь вопросы, позвоните нам :)' %}    
             </div>
 
             <div class="font-10 phone-number">+7 495 777 9360</div>
@@ -381,20 +376,20 @@
     </div>
     <div class="summary right">
         <div>
-            <span class="font-12 label text-right">{% trans 'Итого' %}:</span>
-            <span class="font-12 value text-right">{{ order.get_full_amount|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="font-10 label text-right">{% trans 'Итого' %}:</span>
+            <span class="font-10 value text-right">{{ order.get_full_amount|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="font-12 label text-right">{% trans 'Доставка' %}:</span>
-            <span class="font-12 value text-right">{{ 0|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="font-10 label text-right">{% trans 'Доставка' %}:</span>
+            <span class="font-10 value text-right">{{ 0|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="font-12 label text-right">{% trans 'Сертификат' %}:</span>
-            <span class="font-12 value text-right">{{ order.certificate_value|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="font-10 label text-right">{% trans 'Сертификат' %}:</span>
+            <span class="font-10 value text-right">{{ order.certificate_value|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
         <div>
-            <span class="font-12 label text-right">{% trans 'Скидка' %}:</span>
-            <span class="font-12 value text-right">{{ order.discount_value|floatformat:2 }} %</span>
+            <span class="font-10 label text-right">{% trans 'Скидка' %}:</span>
+            <span class="font-10 value text-right">{{ order.discount_value|floatformat:2 }} %</span>
         </div>
         <br>
 
