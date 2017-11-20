@@ -292,14 +292,6 @@ msgstr "In the attached PDF-file you can find all the details of your order."
 msgid "Размер: Принять решение во время подтверждения заказа по телефону"
 msgstr "Size: Make the decision during the confirmation phone call"
 
-#: templates/checkout/payment_completed_customer_email.html:9
-msgid ""
-"Прежде чем мы начнем работы по пошиву, в течении 48 часов мы свяжемся с вами "
-"по телефону для подтверждения вашего заказа и уточнения размеров."
-msgstr ""
-"Before we begin work on tailoring, within 48 hours we will contact you by "
-"phone to confirm your order and specify the sizes."
-
 #: templates/checkout/payment_completed_customer_email.html:12
 msgid "Мы будем рады пошить данный заказ для вас!"
 msgstr "We will be happy to sew this order for you!"
@@ -339,12 +331,6 @@ msgid "По всем вопросам:"
 msgstr "For all questions:"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:325
-#, fuzzy
-#| msgid ""
-#| "Спасибо большое за ваш заказ. В этом файле указана подробная информация о "
-#| "вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся "
-#| "с вами по телефону в течении 48 часов для подтверждения вашего размера и "
-#| "вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!"
 msgid "Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас :)"
 msgstr "Thank you very much for your order. This file contains detailed information about your order. Before we begin work on sewing a shirt, we will contact you by phone within 48 hours to confirm your size and your order. We are looking forward to tailoring the order for you!"
 
@@ -407,8 +393,6 @@ msgid "Информация о доставке"
 msgstr "Delivery information"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:413
-#, fuzzy
-#| msgid "Дополнительно"
 msgid "Покупатель"
 msgstr "Customer data"
 
@@ -419,41 +403,3 @@ msgstr "Customer address"
 #: templates/checkout/payment_completed_customer_pdf_email.html:424
 msgid "Доставить по другому адресу или другому человеку (по России)"
 msgstr "Another address (or address of another person)"
-
-#~ msgid "Магазины в Москве:"
-#~ msgstr "Shops in Moscow:"
-
-#~ msgid "Спиридоньевский переулок, дом 12/9, телефон: 8 (495) 241-95-03"
-#~ msgstr ""
-#~ "Patriarchiy Prudiy, Spiridonyevskiy Pereulok 12/9, phone: 8 (495) "
-#~ "241-95-03"
-
-#~ msgid ""
-#~ "Остоженка, дом 20 (вход с Барыковского переулка), телефон: 8 (495) "
-#~ "266-09-76"
-#~ msgstr "Ulitsa Ostozhenka 20, phone: 8 (495) 266-09-76"
-
-#~ msgid "Москва, Трехгорная Мануфактура, Улица Рочдельская 15, c. 41"
-#~ msgstr "Moscow, Trekhgornaya Manufaktura, Ulitsa Rochdelskaya 15c41"
-
-#~ msgid "Магазины в Сургуте:"
-#~ msgstr "Shops in Surgut:"
-
-#~ msgid ""
-#~ "Спасибо большое за ваш заказ. В этом файле указана подробная информация о "
-#~ "вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся "
-#~ "с вами по телефону в течении 48 часов для подтверждения вашего размера и "
-#~ "вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!"
-#~ msgstr ""
-#~ "Thank you very much for your order. This file contains detailed "
-#~ "information about your order. Before we begin work on sewing a shirt, we "
-#~ "will contact you by phone within 48 hours to confirm your size and your "
-#~ "order. We are looking forward to tailoring the order for you!"
-
-#~ msgid ""
-#~ "Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, "
-#~ "позвоните нам!"
-#~ msgstr "If you have any questions before you place an order, call us!"
-
-#~ msgid "+7 495 649-63-77"
-#~ msgstr "+7 495 649-63-77"
