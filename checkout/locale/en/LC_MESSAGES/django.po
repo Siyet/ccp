@@ -345,8 +345,8 @@ msgstr "For all questions:"
 #| "вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся "
 #| "с вами по телефону в течении 48 часов для подтверждения вашего размера и "
 #| "вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!"
-msgid "Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. <br>Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. <br>Мы с нетерпением беремся за пошив заказа для вас :)"
-msgstr "Thank you very much for your order. This file contains detailed information about your order. <br>Before we begin work on sewing a shirt, we will contact you by phone within 48 hours to confirm your size and your order. <br>We are looking forward to tailoring the order for you!"
+msgid "Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас :)"
+msgstr "Thank you very much for your order. This file contains detailed information about your order. Before we begin work on sewing a shirt, we will contact you by phone within 48 hours to confirm your size and your order. We are looking forward to tailoring the order for you!"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:329
 msgid "Ваш заказ"
@@ -410,17 +410,13 @@ msgstr "Delivery information"
 #, fuzzy
 #| msgid "Дополнительно"
 msgid "Покупатель"
-msgstr "Additionally"
+msgstr "Customer data"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:417
-#, fuzzy
-#| msgid "Адрес клиента"
 msgid "Адрес доставки"
 msgstr "Customer address"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:424
-#, fuzzy
-#| msgid "Другой адрес (или адрес другого человека)"
 msgid "Доставить по другому адресу или другому человеку (по России)"
 msgstr "Another address (or address of another person)"
 
