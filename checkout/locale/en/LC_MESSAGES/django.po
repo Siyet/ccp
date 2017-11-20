@@ -255,11 +255,11 @@ msgstr "Discounts"
 
 #: templates/checkout/delivery_options/main_adress.html:3
 msgid "Доставить по указанному адресу (по России)"
-msgstr ""
+msgstr "Delivery to the address (in Russian)"
 
 #: templates/checkout/delivery_options/shop.html:3
 msgid "Забрать заказ в одном из наших магазинов"
-msgstr ""
+msgstr "Pick up your order in one of our stores"
 
 #: templates/checkout/payment_completed_admin_email.html:4
 msgid "Здравствуйте! На сайте"
@@ -345,16 +345,8 @@ msgstr "For all questions:"
 #| "вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся "
 #| "с вами по телефону в течении 48 часов для подтверждения вашего размера и "
 #| "вашего заказа. Мы с нетерпением беремся за пошив заказа для вас!"
-msgid ""
-"Спасибо большое за ваш заказ. В этом файле указана информация о вашем "
-"заказе. <br>Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с "
-"вами по телефону в течении 48 часов для подтверждения вашего размера и "
-"вашего заказа. <br>Мы с нетерпением беремся за пошив заказа для вас :)"
-msgstr ""
-"Thank you very much for your order. This file contains detailed information "
-"about your order. Before we begin work on sewing a shirt, we will contact "
-"you by phone within 48 hours to confirm your size and your order. We are "
-"looking forward to tailoring the order for you!"
+msgid "Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. <br>Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. <br>Мы с нетерпением беремся за пошив заказа для вас :)"
+msgstr "Thank you very much for your order. This file contains detailed information about your order. <br>Before we begin work on sewing a shirt, we will contact you by phone within 48 hours to confirm your size and your order. <br>We are looking forward to tailoring the order for you!"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:329
 msgid "Ваш заказ"
@@ -399,12 +391,8 @@ msgid "Вопросы"
 msgstr "Questions"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:376
-#, fuzzy
-#| msgid ""
-#| "Если у вас есть какие-нибудь вопросы перед тем, как вы разместите заказ, "
-#| "позвоните нам!"
 msgid "Если у вас есть какие-нибудь вопросы, позвоните нам :)"
-msgstr "If you have any questions before you place an order, call us!"
+msgstr "If you have any questions before you place an order, call us :)"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:388
 msgid "Доставка"

@@ -350,11 +350,11 @@
             </div>
             <div class="font-10" style="margin-bottom: 8px">{% trans 'Размер: Принять решение во время подтверждения заказа по телефону' %}
             </div>
-            <div class="font-12">{{ order_item.shirt.collection.tailoring_time }}</div>
+            <div class="font-10">{{ order_item.shirt.collection.tailoring_time }}</div>
         </td>
-        <td class="text-center hlv-light valign-center">{{ order_item.amount }}</td>
-        <td class="text-right hlv-light">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб' %}</td>
-        <td class="text-right hlv-light">{{ order_item.get_total|floatformat:2 }} {% trans 'руб' %}</td>
+        <td class="text-center hlv-light valign-center font-10">{{ order_item.amount }}</td>
+        <td class="text-right hlv-light font-10">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб' %}</td>
+        <td class="text-right hlv-light font-10">{{ order_item.get_total|floatformat:2 }} {% trans 'руб' %}</td>
     </tr>
     {% endfor %}
     </tbody>
@@ -368,7 +368,7 @@
         <div class="detail ">
             <div class="font-10 medium" style="margin-top: 15px; margin-bottom: 5px">{% trans 'Вопросы' %}</div>
 
-            <div class="font-10">{% trans 'Если у вас есть какие-нибудь вопросы, позвоните нам :)' %}    
+            <div class="font-10" style="padding-right: 5px;">{% trans 'Если у вас есть какие-нибудь вопросы, позвоните нам :)' %}    
             </div>
 
             <div class="font-10 phone-number">+7 495 777 9360</div>
