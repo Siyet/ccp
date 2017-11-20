@@ -322,7 +322,7 @@
 <body style="margin: 0; border: 0; padding: 0">
 <div class="greeting">
     <span class="header-text">
-       {% trans 'Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. <br>Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. <br>Мы с нетерпением беремся за пошив заказа для вас :)' %}
+       {% trans 'Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас :)' %}
     </span>
 </div>
 
@@ -394,8 +394,8 @@
         <br>
 
         <div>
-            <span class="label text-right medium">{% trans 'Всего' %}:</span>
-            <span class="value text-right medium">{{ order.get_amount_to_pay|floatformat:2 }} {% trans 'руб' %}</span>
+            <span class="label text-right medium font-10">{% trans 'Всего' %}:</span>
+            <span class="value text-right medium font-10">{{ order.get_amount_to_pay|floatformat:2 }} {% trans 'руб' %}</span>
         </div>
     </div>
 </div>
@@ -409,7 +409,7 @@
                 {% include 'checkout/delivery_options/customer_info.html' with customer=customer only %}
             {% endwith %}
             <div class="border-bottom"></div>
-            <div class="table-text-h2 table-text-middle margin-bottom-20">{% trans "Адрес доставки" %}</div>
+            <div class="table-text-h2 table-text-middle margin-bottom-20">{% trans 'Адрес доставки' %}</div>
             {% if order.checkout_shop %}
                 {% include 'checkout/delivery_options/shop.html' with shop=order.checkout_shop only %}
             {% else %}
