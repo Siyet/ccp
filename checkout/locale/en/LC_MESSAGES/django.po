@@ -331,8 +331,8 @@ msgid "По всем вопросам:"
 msgstr "For all questions:"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:325
-msgid "Спасибо большое за ваш заказ. В этом файле указана информация о вашем заказе. Прежде чем мы начнем работы по пошиву сорочки, мы свяжемся с вами по телефону в течении 48 часов для подтверждения вашего размера и вашего заказа. Мы с нетерпением беремся за пошив заказа для вас :)"
-msgstr "Thank you very much for your order. This file contains detailed information about your order. Before we begin work on sewing a shirt, we will contact you by phone within 48 hours to confirm your size and your order. We are looking forward to tailoring the order for you!"
+msgid "Спасибо большое за ваш заказ. Во этом PDF-файле вы сможете найти все детали вашего заказа. Прежде чем мы начнем работы по пошиву, в течении 48 часов мы свяжемся с вами по телефону для подтверждения вашего заказа и уточнения размеров. Мы будем рады пошить данный заказ для вас :)"
+msgstr "Thank you very much for your order. In this PDF-file you can find all detail information about your order. Before we begin work on sewing a shirt, we will contact you by phone within 48 hours to confirm your size and your order. We are looking forward to tailoring the order for you :)"
 
 #: templates/checkout/payment_completed_customer_pdf_email.html:329
 msgid "Ваш заказ"
