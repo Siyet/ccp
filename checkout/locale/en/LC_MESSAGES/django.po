@@ -293,8 +293,8 @@ msgid "Размер: Принять решение во время подтве�
 msgstr "Size: Make the decision during the confirmation phone call"
 
 #: templates/checkout/payment_completed_customer_email.html:12
-msgid "Мы будем рады пошить данный заказ для вас!"
-msgstr "We will be happy to sew this order for you!"
+msgid "Мы будем рады пошить данный заказ для вас :)"
+msgstr "We will be happy to sew this order for you :)"
 
 #: templates/checkout/payment_completed_customer_email.html:17
 msgid "С уважением,"
