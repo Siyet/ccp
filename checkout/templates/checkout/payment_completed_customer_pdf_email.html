@@ -352,9 +352,9 @@
             </div>
             <div class="font-10">{{ order_item.shirt.collection.tailoring_time }}</div>
         </td>
-        <td class="font-9 text-center hlv-light valign-center">{{ order_item.amount }}</td>
-        <td class="font-9 text-right hlv-light">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб' %}</td>
-        <td class="font-9 text-right hlv-light">{{ order_item.get_total|floatformat:2 }} {% trans 'руб' %}</td>
+        <td class="text-center hlv-light valign-center"><div class="font-10">{{ order_item.amount }}</div></td>
+        <td class="text-right hlv-light"><div class="font-10">{{ order_item.amount }} x {{ order_item.price }} {% trans 'руб' %}</div></td>
+        <td class="text-right hlv-light"><div class="font-10">{{ order_item.get_total|floatformat:2 }} {% trans 'руб' %}</div></td>
     </tr>
     {% endfor %}
     </tbody>
