@@ -188,8 +188,8 @@ class ShirtInfo(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = _(u'Информация о рубашках')
-        verbose_name_plural = _(u'Информация о рубашках')
+        verbose_name = _(u'Информация о сорочках')
+        verbose_name_plural = _(u'Информация о сорочках')
 
 
 class ShirtInfoImage(models.Model):
@@ -221,8 +221,8 @@ class Size(OrderedModel):
         return "%s" % self.size
 
     class Meta(OrderedModel.Meta):
-        verbose_name = _(u'Размер рубашки')
-        verbose_name_plural = _(u'Размеры рубашек')
+        verbose_name = _(u'Размер сорочки')
+        verbose_name_plural = _(u'Размеры сорочек')
 
 
 class HemType(ComponentModel):

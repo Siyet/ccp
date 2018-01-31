@@ -12,7 +12,7 @@ class FitTranslation(TranslationOptions):
 
 
 class CollectionTranslation(TranslationOptions):
-    fields = ('title', 'filter_title', 'about_shirt_title', 'showcase_title', 'text', 'sex', 'tailoring_time')
+    fields = ('title', 'filter_title', 'about_shirt_title', 'showcase_title', 'sex', 'tailoring_time')
 
 
 class FabricTranslation(TranslationOptions):

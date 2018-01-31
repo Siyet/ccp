@@ -46,7 +46,7 @@ class AccessoriesPriceAdminForm(forms.ModelForm):
     def clean_content_type(self):
         content_type = self.cleaned_data.get('content_type')
         if not hasattr(content_type.model_class(), 'get_shirts'):
-            raise forms.ValidationError(u'Модель "%s" не связана с ценой рубашки' % content_type)
+            raise forms.ValidationError(u'Модель "%s" не связана с ценой сорочки' % content_type)
 
         return content_type
 

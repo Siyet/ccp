@@ -835,7 +835,7 @@ msgid "Текст под заголовком"
 msgstr "Text under the heading"
 
 #: dictionaries/models.py:191 dictionaries/models.py:192
-msgid "Информация о рубашках"
+msgid "Информация о сорочках"
 msgstr "Information about shirts"
 
 #: dictionaries/models.py:196
@@ -863,11 +863,11 @@ msgid "Варианты размеров"
 msgstr "Size options"
 
 #: dictionaries/models.py:224
-msgid "Размер рубашки"
+msgid "Размер сорочки"
 msgstr "Size of shirt"
 
 #: dictionaries/models.py:225
-msgid "Размеры рубашек"
+msgid "Размеры сорочек"
 msgstr "Size of shirt"
 
 #: dictionaries/models.py:230
