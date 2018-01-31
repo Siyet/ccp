@@ -350,7 +350,6 @@ class ShirtSerializer(serializers.ModelSerializer):
 
 class ShirtDetailsSerializer(ShirtSerializer):
     fit = serializers.StringRelatedField(source='fit.title')
-    sleeve_length = serializers.StringRelatedField(source='sleeve_length.title')
     tailoring_time = serializers.ReadOnlyField(source='collection.tailoring_time')
 
 

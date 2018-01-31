@@ -141,7 +141,6 @@ class ShirtDetails(RetrieveAPIView):
     Получение информации о рубашке
     """
     serializer_class = serializers.ShirtDetailsSerializer
-
     queryset = models.Shirt.objects.select_related("fabric")
 
 
