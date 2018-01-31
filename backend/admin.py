@@ -96,7 +96,7 @@ class CustomShirtAdmin(admin.ModelAdmin):
 class TemplateShirtAdmin(TemplateAndFormatMixin, ImportExportMixin, BaseShirtAdmin):
     resource_class = TemplateShirtResource
     exclude = ['is_template']
-    inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, InitialsInline]
+    inlines = [CollarInline, CuffInline, DickeyInline, ContrastDetailsInline, ContrastStitchInline, InitialsInline, ShirtImageInline]
     readonly_fields = ('price',)
     list_select_related = ('hem', 'placket', 'pocket', 'cuff__type', 'collar__type', 'dickey__type', 'collar__hardness')
     list_display = ('code', 'cuff', 'collar', 'hem', 'placket', 'pocket', 'dickey')
