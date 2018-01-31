@@ -183,7 +183,7 @@ class Order(models.Model):
         return sum([x.amount for x in self.items.all()])
 
     get_count.allow_tags = True
-    get_count.short_description = _(u'Количество рубашек в заказе')
+    get_count.short_description = _(u'Количество сорочек в заказе')
 
     def set_discount(self, amount):
         if self.customer:

@@ -419,11 +419,11 @@ msgid "Рубашки"
 msgstr "Shirts"
 
 #: backend/models.py:432
-msgid "Шаблон рубашки"
+msgid "Шаблон сорочки"
 msgstr "Shirt template"
 
 #: backend/models.py:433
-msgid "Шаблоны рубашек"
+msgid "Шаблоны сорочек"
 msgstr "Shirt templates"
 
 #: backend/models.py:436
@@ -431,11 +431,11 @@ msgid "Шаблон"
 msgstr "Template"
 
 #: backend/models.py:444
-msgid "Стандартный вариант рубашки"
+msgid "Стандартный вариант сорочки"
 msgstr "Standard shirt version"
 
 #: backend/models.py:445
-msgid "Стандартные варианты рубашек"
+msgid "Стандартные варианты сорочек"
 msgstr "Standard shirt options"
 
 #: backend/models.py:448

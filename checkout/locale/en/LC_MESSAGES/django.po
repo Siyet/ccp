@@ -171,7 +171,7 @@ msgid "ФИО"
 msgstr "Full name"
 
 #: models.py:186
-msgid "Количество рубашек в заказе"
+msgid "Количество сорочек в заказе"
 msgstr "Number of shirts in the order"
 
 #: models.py:246

@@ -28,13 +28,11 @@ class OrderableTranslationAdmin(GrappelliOrderableAdmin, TranslationAdmin):
 
 # regular models
 
-admin.site.register(models.ShirtInfo, ShirtInfoAdmin)
 admin.site.register(models.DefaultElement, DefaultElementAdmin)
 
 admin.site.register([
     models.Font,
-    models.FabricCategory,
-    models.FAQ
+    models.FabricCategory
 ])
 
 admin.site.register(models.Size, SizeAdmin)
@@ -49,7 +47,6 @@ admin.site.register([
 
 admin.site.register([
     models.TuckType,
-    models.SleeveLength,
     models.CuffRounding,
     models.PocketType,
     models.DickeyType,
