@@ -180,28 +180,6 @@ class DickeyType(ComponentModel):
         verbose_name_plural = _(u'Типы манишки')
 
 
-class ShirtInfo(models.Model):
-    title = models.CharField(_(u'Заголовок'), max_length=255, unique=True)
-    text = models.TextField(_(u'Текст под заголовком'))
-
-    def __unicode__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = _(u'Информация о сорочках')
-        verbose_name_plural = _(u'Информация о сорочках')
-
-
-class ShirtInfoImage(models.Model):
-    image = models.ImageField(_(u'Файл'), upload_to='shirtinfo')
-    text = models.TextField(_(u'Текст под изображением'))
-    shirt_info = models.ForeignKey(ShirtInfo, related_name='images')
-
-    class Meta:
-        verbose_name = _(u'Изображение')
-        verbose_name_plural = _(u'Изображения')
-
-
 class SizeOptions(OrderedModel):
     title = models.CharField(_(u'Название'), max_length=255)
     show_sizes = models.BooleanField(_(u'Показывать размеры'), default=True)
@@ -274,20 +252,6 @@ class Thickness(OrderedModel):
 
     def __unicode__(self):
         return self.title
-
-
-class FAQ(models.Model):
-    date_add = models.DateTimeField(verbose_name=_(u'Дата добавления'), auto_now_add=True)
-    question = models.TextField(verbose_name=_(u'Вопрос'), max_length=1000)
-    answer = models.TextField(verbose_name=_(u'Ответ'), max_length=1000)
-
-    class Meta:
-        verbose_name = _(u'Вопрос')
-        verbose_name_plural = _(u'Вопросы и ответы')
-        ordering = ('-date_add',)
-
-    def __unicode__(self):
-        return self.question
 
 
 class SleeveLength(OrderedModel):

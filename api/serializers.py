@@ -17,20 +17,6 @@ class CollectionSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'tailoring_time',)
 
 
-class ShirtInfoImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = dictionaries.ShirtInfoImage
-        fields = ('text', 'image')
-
-
-class ShirtInfoSerializer(serializers.ModelSerializer):
-    images = ShirtInfoImageSerializer(many=True)
-
-    class Meta:
-        model = dictionaries.ShirtInfo
-        fields = ('title', 'text', 'images')
-
-
 class SizeOptionSerializer(serializers.ModelSerializer):
     title = serializers.ReadOnlyField()
     id = serializers.IntegerField(required=False)
@@ -272,12 +258,6 @@ class DiscountSerializer(serializers.ModelSerializer):
     class Meta:
         model = checkout.Discount
         fields = '__all__'
-
-
-class FAQSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = dictionaries.FAQ
-        fields = ('question', 'answer',)
 
 
 class ShirtCollarSerializer(serializers.ModelSerializer):

@@ -6,14 +6,6 @@ from dictionaries.forms import DefaultElementAdminForm
 from grappelli_orderable.admin import GrappelliOrderableAdmin
 
 
-class ShirtInfoImageInline(admin.TabularInline):
-    model = models.ShirtInfoImage
-    extra = 0
-
-
-class ShirtInfoAdmin(admin.ModelAdmin):
-    inlines = [ShirtInfoImageInline]
-
 
 class SizeAdmin(GrappelliOrderableAdmin):
     list_display = ('size',)

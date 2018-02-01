@@ -30,16 +30,18 @@ class OrderExportMixin(object):
         ]
 
     def get_delivery(self, instance):
+        empty = '---'
+
         if instance.checkout_shop:
             return [
-                (_(u'Фамилия'), '---', ),
-                (_(u'Имя'), '---', ),
-                (_(u'Отчество'), '---', ),
+                (_(u'Фамилия'), empty, ),
+                (_(u'Имя'), empty, ),
+                (_(u'Отчество'), empty, ),
                 (_(u'Город'), instance.checkout_shop.city, ),
                 (_(u'Адрес'), u'%s, %s' % (instance.checkout_shop.street, instance.checkout_shop.home), ),
                 (_(u'Индекс'), instance.checkout_shop.index, ),
-                (_(u'Телефон'), '---', ),
-                (_(u'E-mail'), '---', ),
+                (_(u'Телефон'), empty, ),
+                (_(u'E-mail'), empty, ),
             ]
         other_address = instance.get_other_address()
         customer_address = instance.get_customer_address()
@@ -47,10 +49,11 @@ class OrderExportMixin(object):
         return self.get_address_data(address)
 
     def get_shirt_data(self, shirt):
+        empty = '---'
         data = [[
             _(u'СОРОЧКА'), [
-                (_(u'Размер'), shirt.size.size if shirt.size else '---'),
-                (_(u'Талия'), shirt.fit.title if shirt.fit else '---'),
+                (_(u'Размер'), shirt.size.size if shirt.size else empty),
+                (_(u'Талия'), shirt.fit.title if shirt.fit else empty),
             ]
         ]]
         try:
@@ -73,11 +76,12 @@ class OrderExportMixin(object):
                 ]]
             )
         except ObjectDoesNotExist:
+            empty = '---'
             data.append(
                 [_(u'МАНЖЕТЫ'), [
-                    (_(u'Тип'), '---'),
-                    (_(u'Углы'), '---'),
-                    (_(u'Жесткость манжета'), '---'),
+                    (_(u'Тип'), empty),
+                    (_(u'Углы'), empty),
+                    (_(u'Жесткость манжета'), empty),
                 ]]
             )
         try:
@@ -112,10 +116,11 @@ class OrderExportMixin(object):
         except ObjectDoesNotExist:
             pass
 
+        empty = '---'
         contrast_stitches = {x.element.title: x.color.title for x in shirt.contrast_stitches.all()}
         detail_rows = []
         for element in ElementStitch.objects.filter(collections=shirt.collection):
-            detail_rows.append((element.title, contrast_stitches.get(element.title, '---')))
+            detail_rows.append((element.title, contrast_stitches.get(element.title, empty)))
         detail_rows += [
             (_(u'Платок'), achain(shirt, _(u'Нет'), 'shawl', 'title')),
             (_(u'Цельная кокетка'), achain(shirt, _(u'Нет'), 'yoke', 'title')),
@@ -125,12 +130,12 @@ class OrderExportMixin(object):
         data.append([_(u'ДЕТАЛИ 2'), detail_rows])
 
         contrast_details = {x.element: x.fabric.code for x in shirt.contrast_details.all()}
-        contrast_detail_rows = [(_(u'Воротник'), '---',)]
+        contrast_detail_rows = [(_(u'Воротник'), empty,)]
         for element in ContrastDetails.COLLAR_ELEMENTS:
-            contrast_detail_rows.append((element[1], contrast_details.get(element[0], '---')))
-        contrast_detail_rows.append((_(u'Манжета'), '---',))
+            contrast_detail_rows.append((element[1], contrast_details.get(element[0], empty)))
+        contrast_detail_rows.append((_(u'Манжета'), empty,))
         for element in ContrastDetails.CUFF_ELEMENTS:
-            contrast_detail_rows.append((element[1], contrast_details.get(element[0], '---')))
+            contrast_detail_rows.append((element[1], contrast_details.get(element[0], empty)))
         data.append([_(u'КОНТРАСТНЫЕ ДЕТАЛИ'), contrast_detail_rows])
         return data
 

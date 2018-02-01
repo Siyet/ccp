@@ -17,7 +17,7 @@ from dictionaries import models as dictionaries
 from processing.rendering.image_cache import ShirtImageCache
 
 __all__ = [
-    'ShirtInfoListView', 'ShowcaseShirtsListView', 'TemplateShirtDetails', 'TemplateShirtsFiltersList', 'ShirtDetails',
+    'ShowcaseShirtsListView', 'TemplateShirtDetails', 'TemplateShirtsFiltersList', 'ShirtDetails',
     'ShirtImage', 'ShirtPrice'
 ]
 
@@ -25,14 +25,6 @@ __all__ = [
 class ShowcasePagination(pagination.LimitOffsetPagination):
     default_limit = 10
     max_limit = 50
-
-
-class ShirtInfoListView(ListAPIView):
-    """
-    Информация о рубашках для отображения на экране выборе коллекций
-    """
-    queryset = dictionaries.ShirtInfo.objects.all()
-    serializer_class = serializers.ShirtInfoSerializer
 
 
 class ShowcaseShirtsListView(ListAPIView):
