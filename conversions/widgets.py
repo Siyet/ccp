@@ -93,7 +93,7 @@ class TemplateShirtCollectionWidget(ForeignKeyWidget):
 
     def clean(self, value, sex=None):
         val = super(ForeignKeyWidget, self).clean(value)
-        sex = self.SEX_DICT.get(sex, SEX.unisex)
+        sex = self.SEX_DICT.get(sex, None)
         if val:
             return self.get_object((val, sex))
 
