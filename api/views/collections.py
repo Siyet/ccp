@@ -17,19 +17,11 @@ from dictionaries import models as dictionaries
 from .mixins import CollectionMixin
 
 __all__ = [
-    'CollectionsListView', 'CollectionFabricDesignsList', 'CollectionFabricsList', 'CollectionFabricColorsList',
+    'CollectionFabricDesignsList', 'CollectionFabricsList', 'CollectionFabricColorsList',
     'CollectionHardnessList', 'CollectionStaysList', 'CollectionStitchesList',
     'CollectionThicknessList', 'CollectionFabricTypeList', 'CollectionTuckList',
     'CollectionFitList',
 ]
-
-
-class CollectionsListView(ListAPIView):
-    """
-    Список коллекций рубашек
-    """
-    queryset = Collection.objects.all()
-    serializer_class = serializers.CollectionSerializer
 
 
 class CollectionFabricsList(CollectionMixin, ListAPIView):

@@ -8,6 +8,7 @@ from django.utils.text import ugettext_lazy as _
 from backend.models import ElementStitch, ContrastDetails
 from core.utils import achain
 
+empty = '---'
 
 class TemplateAndFormatMixin(object):
     formats = settings.IMPORT_EXPORT_FORMATS
@@ -30,7 +31,6 @@ class OrderExportMixin(object):
         ]
 
     def get_delivery(self, instance):
-        empty = '---'
 
         if instance.checkout_shop:
             return [
@@ -49,7 +49,6 @@ class OrderExportMixin(object):
         return self.get_address_data(address)
 
     def get_shirt_data(self, shirt):
-        empty = '---'
         data = [[
             _(u'СОРОЧКА'), [
                 (_(u'Размер'), shirt.size.size if shirt.size else empty),
@@ -76,7 +75,6 @@ class OrderExportMixin(object):
                 ]]
             )
         except ObjectDoesNotExist:
-            empty = '---'
             data.append(
                 [_(u'МАНЖЕТЫ'), [
                     (_(u'Тип'), empty),
@@ -116,7 +114,6 @@ class OrderExportMixin(object):
         except ObjectDoesNotExist:
             pass
 
-        empty = '---'
         contrast_stitches = {x.element.title: x.color.title for x in shirt.contrast_stitches.all()}
         detail_rows = []
         for element in ElementStitch.objects.filter(collections=shirt.collection):

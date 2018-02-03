@@ -53,7 +53,6 @@ components = [
 
 urlpatterns = [
     url(r'^checkout/', include(checkout_urls)),
-    url(r'^collection/$', views.CollectionsListView.as_view()),
     url(r'^collection/(?P<pk>[0-9]+)/', include(collection_urls)),
     url(r'^components/', include(components)),
     url(r'^shirt/', include(shirt_urls)),

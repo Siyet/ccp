@@ -9,14 +9,6 @@ from core.utils import first
 from dictionaries import models as dictionaries
 
 
-class CollectionSerializer(serializers.ModelSerializer):
-    title = serializers.ReadOnlyField(source='__unicode__')
-
-    class Meta:
-        model = models.Collection
-        fields = ('id', 'title', 'tailoring_time',)
-
-
 class SizeOptionSerializer(serializers.ModelSerializer):
     title = serializers.ReadOnlyField()
     id = serializers.IntegerField(required=False)
