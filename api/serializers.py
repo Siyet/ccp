@@ -9,28 +9,6 @@ from core.utils import first
 from dictionaries import models as dictionaries
 
 
-class CollectionSerializer(serializers.ModelSerializer):
-    title = serializers.ReadOnlyField(source='__unicode__')
-
-    class Meta:
-        model = models.Collection
-        fields = ('id', 'title', 'text', 'image', 'tailoring_time',)
-
-
-class ShirtInfoImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = dictionaries.ShirtInfoImage
-        fields = ('text', 'image')
-
-
-class ShirtInfoSerializer(serializers.ModelSerializer):
-    images = ShirtInfoImageSerializer(many=True)
-
-    class Meta:
-        model = dictionaries.ShirtInfo
-        fields = ('title', 'text', 'images')
-
-
 class SizeOptionSerializer(serializers.ModelSerializer):
     title = serializers.ReadOnlyField()
     id = serializers.IntegerField(required=False)
@@ -274,12 +252,6 @@ class DiscountSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FAQSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = dictionaries.FAQ
-        fields = ('question', 'answer',)
-
-
 class ShirtCollarSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Collar
@@ -350,7 +322,6 @@ class ShirtSerializer(serializers.ModelSerializer):
 
 class ShirtDetailsSerializer(ShirtSerializer):
     fit = serializers.StringRelatedField(source='fit.title')
-    sleeve_length = serializers.StringRelatedField(source='sleeve_length.title')
     tailoring_time = serializers.ReadOnlyField(source='collection.tailoring_time')
 
 

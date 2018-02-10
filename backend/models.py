@@ -28,8 +28,6 @@ class Collection(OrderedModel):
     filter_title = models.CharField(_(u'Наименование для фильтра'), max_length=255)
     about_shirt_title = models.CharField(_(u'Наименование для экрана "О сорочке"'), max_length=255)
     showcase_title = models.CharField(_(u'Наименование для витрины'), max_length=255)
-    text = models.TextField(_(u'Описание'))
-    image = models.ImageField(_(u'Изображение'), upload_to='collection')
     dickey = models.BooleanField(_(u'Манишка'))
     clasp = models.BooleanField(_(u'Застежка под штифты'))
     solid_yoke = models.BooleanField(_(u'Цельная кокетка'))
@@ -363,9 +361,6 @@ class Shirt(models.Model):
     fit = ChainedForeignKey(Fit, verbose_name=_(u'Талия'), chained_field='collection',
                             chained_model_field='collections', show_all=False, blank=True, null=True)
 
-    sleeve_length = models.ForeignKey('dictionaries.SleeveLength', verbose_name=_(u'Длина рукава'), blank=True,
-                                      null=True)
-
     tuck = ChainedForeignKey('dictionaries.TuckType', verbose_name=_(u'Вытачки'), chained_field='collection',
                              chained_model_field='collections', show_all=False)
 
@@ -398,8 +393,8 @@ class Shirt(models.Model):
 
     class Meta:
         ordering = ('code',)
-        verbose_name = _(u'Рубашка')
-        verbose_name_plural = _(u'Рубашки')
+        verbose_name = _(u'Сорочка')
+        verbose_name_plural = _(u'Сорочки')
 
     def __unicode__(self):
         return self.code if self.code else self.id
@@ -414,11 +409,11 @@ class CustomShirt(Shirt):
 
     class Meta:
         proxy = True
-        verbose_name = _(u'Рубашка')
-        verbose_name_plural = _(u'Рубашки')
+        verbose_name = _(u'Сорочка')
+        verbose_name_plural = _(u'Сорочки')
 
     def __unicode__(self):
-        return u"%s #%s" % (_(u"Рубашка"), self.id)
+        return u"%s #%s" % (_(u"Сорочка"), self.id)
 
 
 class TemplateShirt(Shirt):
@@ -430,8 +425,8 @@ class TemplateShirt(Shirt):
 
     class Meta:
         proxy = True
-        verbose_name = _(u'Шаблон рубашки')
-        verbose_name_plural = _(u'Шаблоны рубашек')
+        verbose_name = _(u'Шаблон сорочки')
+        verbose_name_plural = _(u'Шаблоны сорочек')
 
     def __unicode__(self):
         return u"%s #%s" % (_(u"Шаблон"), self.code)
@@ -442,8 +437,8 @@ class StandardShirt(Shirt):
 
     class Meta:
         proxy = True
-        verbose_name = _(u'Стандартный вариант рубашки')
-        verbose_name_plural = _(u'Стандартные варианты рубашек')
+        verbose_name = _(u'Стандартный вариант сорочки')
+        verbose_name_plural = _(u'Стандартные варианты сорочек')
 
     def __unicode__(self):
         return u"%s #%s" % (_(u"Стандартный вариант"), self.code)
@@ -486,7 +481,7 @@ class ContrastDetails(models.Model):
     ELEMENTS = COLLAR_ELEMENTS + CUFF_ELEMENTS
     element = models.CharField(_(u'Элемент'), choices=ELEMENTS, max_length=20)
     fabric = models.ForeignKey(Fabric, verbose_name=_(u'Ткань'))
-    shirt = models.ForeignKey(Shirt, verbose_name=_(u'Рубашка'), related_name='contrast_details')
+    shirt = models.ForeignKey(Shirt, verbose_name=_(u'Сорочка'), related_name='contrast_details')
 
     def __unicode__(self):
         return self.get_element_display()
