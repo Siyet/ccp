@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-02 19:14+0300\n"
+"POT-Creation-Date: 2018-03-05 09:37+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,27 +17,27 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: api/filters.py:31 conversions/mixin.py:83
+#: api/filters.py:31 conversions/mixin.py:88
 msgid "Ткань"
 msgstr "Fabric"
 
-#: api/filters.py:32 dictionaries/models.py:85
+#: api/filters.py:32
 msgid "Тип ткани"
 msgstr "Weave"
 
-#: api/filters.py:33 dictionaries/models.py:58
+#: api/filters.py:33
 msgid "Цвет ткани"
 msgstr "Color"
 
-#: api/filters.py:34 dictionaries/models.py:91
+#: api/filters.py:34
 msgid "Паттерн ткани"
 msgstr "Pattern"
 
-#: api/filters.py:35 dictionaries/models.py:272 dictionaries/models.py:273
+#: api/filters.py:35
 msgid "Толщина ткани"
 msgstr "Thickness"
 
-#: api/filters.py:36 api/views/shirts.py:124
+#: api/filters.py:36 api/views/shirts.py:121
 #: conversions/resources/template_shirt.py:77
 #: conversions/resources/template_shirt.py:141
 msgid "Коллекция"
@@ -47,143 +47,138 @@ msgstr "Collection"
 msgid "Пол коллекции"
 msgstr "Collection sex"
 
-#: api/serializers.py:417
+#: api/serializers.py:391
 msgid "Данные клиента обязательны"
 msgstr "Customer data are required"
 
-#: api/views/shirts.py:86
+#: api/views/components.py:133 api/views/shirts.py:122 conversions/mixin.py:110
+msgid "Цвет"
+msgstr "Color"
+
+#: api/views/components.py:134 conversions/mixin.py:109
+#: processing/models/configuration.py:113
+msgid "Шрифт"
+msgstr "Font"
+
+#: api/views/components.py:136
+msgid "Позиция"
+msgstr "Position"
+
+#: api/views/shirts.py:83
 #, python-format
 msgid "%s - по возрастанию"
 msgstr "%s - order by ascending"
 
-#: api/views/shirts.py:87
+#: api/views/shirts.py:84
 #, python-format
 msgid "%s - по убыванию"
 msgstr "%s - order by descending"
 
-#: api/views/shirts.py:125 conversions/mixin.py:105 dictionaries/models.py:167
-msgid "Цвет"
-msgstr "Color"
-
-#: api/views/shirts.py:126
+#: api/views/shirts.py:123
 msgid "Узор"
 msgstr "Design"
 
-#: api/views/shirts.py:127
+#: api/views/shirts.py:124
 msgid "Плетение"
 msgstr "Weave"
 
-#: api/views/shirts.py:128
+#: api/views/shirts.py:125
 msgid "Плотность"
 msgstr "Thickness"
 
-#: api/views/shirts.py:130
+#: api/views/shirts.py:127
 msgid "Сортировка"
 msgstr "Order"
 
-#: conversions/mixin.py:22 conversions/mixin.py:35
+#: conversions/mixin.py:23 conversions/mixin.py:37
 msgid "Фамилия"
 msgstr "Surname"
 
-#: conversions/mixin.py:23 conversions/mixin.py:36
+#: conversions/mixin.py:24 conversions/mixin.py:38
 msgid "Имя"
 msgstr "Name"
 
-#: conversions/mixin.py:24 conversions/mixin.py:37
+#: conversions/mixin.py:25 conversions/mixin.py:39
 msgid "Отчество"
 msgstr "Middle name"
 
-#: conversions/mixin.py:25 conversions/mixin.py:38
+#: conversions/mixin.py:26 conversions/mixin.py:40
 msgid "Город"
 msgstr "City"
 
-#: conversions/mixin.py:26 conversions/mixin.py:39
+#: conversions/mixin.py:27 conversions/mixin.py:41
 msgid "Адрес"
 msgstr "Address"
 
-#: conversions/mixin.py:27 conversions/mixin.py:40
+#: conversions/mixin.py:28 conversions/mixin.py:42
 msgid "Индекс"
 msgstr "Index"
 
-#: conversions/mixin.py:28 conversions/mixin.py:41
+#: conversions/mixin.py:29 conversions/mixin.py:43
 msgid "Телефон"
 msgstr "Phone"
 
-#: conversions/mixin.py:29 conversions/mixin.py:42
+#: conversions/mixin.py:30 conversions/mixin.py:44
 msgid "E-mail"
 msgstr "E-mail"
 
-#: conversions/mixin.py:51
+#: conversions/mixin.py:53
 msgid "СОРОЧКА"
 msgstr "SHIRT"
 
-#: conversions/mixin.py:52 conversions/mixin.py:60
+#: conversions/mixin.py:54 conversions/mixin.py:62
 #: conversions/resources/template_shirt.py:63
-#: conversions/resources/template_shirt.py:141 dictionaries/models.py:218
+#: conversions/resources/template_shirt.py:141
 msgid "Размер"
 msgstr "Size"
 
-#: conversions/mixin.py:53
+#: conversions/mixin.py:55
 msgid "Талия"
 msgstr "Waist"
 
-#: conversions/mixin.py:58
+#: conversions/mixin.py:60
 msgid "ВОРОТНИК"
 msgstr "COLLAR"
 
-#: conversions/mixin.py:59 conversions/mixin.py:70 dictionaries/models.py:79
+#: conversions/mixin.py:61 conversions/mixin.py:72 conversions/mixin.py:80
 msgid "Тип"
 msgstr "Type"
 
-#: conversions/mixin.py:61 conversions/resources/template_shirt.py:89
+#: conversions/mixin.py:63 conversions/resources/template_shirt.py:89
 #: conversions/resources/template_shirt.py:143
 msgid "Жесткость воротника"
 msgstr "Stiffness of the collar"
 
-#: conversions/mixin.py:62 conversions/resources/template_shirt.py:91
+#: conversions/mixin.py:64 conversions/resources/template_shirt.py:91
 #: conversions/resources/template_shirt.py:143
 msgid "Косточки"
-msgstr "Bones"
+msgstr "Collar stays"
 
-#: conversions/mixin.py:69
+#: conversions/mixin.py:71 conversions/mixin.py:79
 msgid "МАНЖЕТЫ"
 msgstr "CUFF"
 
-#: conversions/mixin.py:71
+#: conversions/mixin.py:73 conversions/mixin.py:81
 msgid "Углы"
 msgstr "Corners"
 
-#: conversions/mixin.py:72
+#: conversions/mixin.py:74 conversions/mixin.py:82
 msgid "Жесткость манжета"
 msgstr "Hardness of the cuff"
 
-#: conversions/mixin.py:73
-msgid "Планка рукава"
-msgstr "Sleeve Plank"
-
-#: conversions/mixin.py:74
-msgid "Складки на рукаве"
-msgstr "Folds on the sleeve"
-
-#: conversions/mixin.py:75 conversions/resources/template_shirt.py:84
-#: conversions/resources/template_shirt.py:144
-#: processing/female_configs/models.py:40 processing/male_configs/models.py:36
-msgid "Рукав"
-msgstr "Sleeve"
-
-#: conversions/mixin.py:82
+#: conversions/mixin.py:87
 msgid "ТКАНЬ"
 msgstr "FABRIC"
 
-#: conversions/mixin.py:84 dictionaries/models.py:68 dictionaries/models.py:71
+#: conversions/mixin.py:89
 msgid "Категория"
 msgstr "Category"
 
-#: conversions/mixin.py:90
+#: conversions/mixin.py:95
 msgid "ДЕТАЛИ 1"
 msgstr "DETAILS 1"
 
-#: conversions/mixin.py:91 conversions/resources/template_shirt.py:67
+#: conversions/mixin.py:96 conversions/resources/template_shirt.py:67
 #: conversions/resources/template_shirt.py:145
 #: processing/female_configs/models.py:41
 #: processing/female_configs/models.py:76 processing/male_configs/models.py:37
@@ -192,17 +187,17 @@ msgstr "DETAILS 1"
 msgid "Низ"
 msgstr "Bottom"
 
-#: conversions/mixin.py:92 conversions/resources/template_shirt.py:69
+#: conversions/mixin.py:97 conversions/resources/template_shirt.py:69
 #: conversions/resources/template_shirt.py:145
 msgid "Полочка"
 msgstr "Shelf"
 
-#: conversions/mixin.py:93 conversions/resources/template_shirt.py:71
+#: conversions/mixin.py:98 conversions/resources/template_shirt.py:71
 #: conversions/resources/template_shirt.py:145
 msgid "Карман"
 msgstr "Pocket"
 
-#: conversions/mixin.py:94 conversions/resources/template_shirt.py:54
+#: conversions/mixin.py:99 conversions/resources/template_shirt.py:54
 #: conversions/resources/template_shirt.py:145
 #: processing/female_configs/models.py:43
 #: processing/female_configs/models.py:77 processing/male_configs/models.py:29
@@ -210,69 +205,61 @@ msgstr "Pocket"
 msgid "Вытачки"
 msgstr "Taps"
 
-#: conversions/mixin.py:95 conversions/resources/template_shirt.py:75
+#: conversions/mixin.py:100 conversions/resources/template_shirt.py:75
 #: conversions/resources/template_shirt.py:145
 #: processing/female_configs/models.py:14 processing/male_configs/models.py:48
 msgid "Спинка"
 msgstr "Back"
 
-#: conversions/mixin.py:96 conversions/resources/template_shirt.py:104
+#: conversions/mixin.py:101 conversions/resources/template_shirt.py:104
 #: conversions/resources/template_shirt.py:147
 msgid "Пуговицы"
 msgstr "Buttons"
 
-#: conversions/mixin.py:102
+#: conversions/mixin.py:107
 msgid "ИНИЦИАЛЫ"
 msgstr "INITIALS"
 
-#: conversions/mixin.py:103
+#: conversions/mixin.py:108
 msgid "Текст"
 msgstr "Text"
 
-#: conversions/mixin.py:104 processing/models/configuration.py:113
-msgid "Шрифт"
-msgstr "Font"
-
-#: conversions/mixin.py:106 processing/models/sources.py:95
+#: conversions/mixin.py:111 processing/models/sources.py:95
 #, fuzzy
 #| msgid "Плетение"
 msgid "Расположение"
 msgstr "Weave"
 
-#: conversions/mixin.py:117
+#: conversions/mixin.py:122
 msgid "Платок"
 msgstr "Shawl"
 
-#: conversions/mixin.py:117 conversions/mixin.py:118 conversions/mixin.py:148
-#: conversions/mixin.py:159
+#: conversions/mixin.py:122 conversions/mixin.py:123 conversions/mixin.py:153
+#: conversions/mixin.py:164
 #, fuzzy
 #| msgid "Цвет"
 msgid "Нет"
 msgstr "Color"
 
-#: views/components.py:136
-msgid "Позиция"
-msgstr "Position"
-
-#: conversions/mixin.py:118 conversions/resources/template_shirt.py:81
+#: conversions/mixin.py:123 conversions/resources/template_shirt.py:81
 #: conversions/resources/template_shirt.py:149
 msgid "Цельная кокетка"
 msgstr "One-piece coquette"
 
-#: conversions/mixin.py:119 conversions/resources/template_shirt.py:55
+#: conversions/mixin.py:124 conversions/resources/template_shirt.py:55
 #: conversions/resources/template_shirt.py:150
 msgid "Застежка под штифты"
 msgstr "Clasp for pins"
 
-#: conversions/mixin.py:120
+#: conversions/mixin.py:125
 msgid "Отстрочка (воротник и манжеты)"
 msgstr "Stitching (collar and cuffs)"
 
-#: conversions/mixin.py:122
+#: conversions/mixin.py:127
 msgid "ДЕТАЛИ 2"
 msgstr "DETAILS 2"
 
-#: conversions/mixin.py:125 conversions/resources/template_shirt.py:263
+#: conversions/mixin.py:130 conversions/resources/template_shirt.py:263
 #: conversions/resources/template_shirt.py:376
 #: processing/female_configs/models.py:52
 #: processing/female_configs/models.py:99 processing/male_configs/models.py:59
@@ -280,80 +267,80 @@ msgstr "DETAILS 2"
 msgid "Воротник"
 msgstr "Collar"
 
-#: conversions/mixin.py:128 conversions/resources/template_shirt.py:262
+#: conversions/mixin.py:133 conversions/resources/template_shirt.py:262
 #: conversions/resources/template_shirt.py:375
 msgid "Манжета"
 msgstr "Cuff"
 
-#: conversions/mixin.py:131
+#: conversions/mixin.py:136
 msgid "КОНТРАСТНЫЕ ДЕТАЛИ"
 msgstr "CONTRAST DETAILS"
 
-#: conversions/mixin.py:136 conversions/mixin.py:175
+#: conversions/mixin.py:141 conversions/mixin.py:180
 msgid "Номер заказа"
 msgstr "Order number"
 
-#: conversions/mixin.py:137
+#: conversions/mixin.py:142
 msgid "Общая стоимость заказа"
 msgstr "Total order value"
 
-#: conversions/mixin.py:138
+#: conversions/mixin.py:143
 msgid "Дата оплаты заказа"
 msgstr "Order payment date"
 
-#: conversions/mixin.py:142 conversions/mixin.py:148
+#: conversions/mixin.py:147 conversions/mixin.py:153
 msgid "Использование сертификата"
 msgstr "Using the certificate"
 
-#: conversions/mixin.py:142 conversions/mixin.py:152
+#: conversions/mixin.py:147 conversions/mixin.py:157
 msgid "Да"
 msgstr "Yes"
 
-#: conversions/mixin.py:143
+#: conversions/mixin.py:148
 msgid "Номер сертификата"
 msgstr "Certificate number"
 
-#: conversions/mixin.py:144
+#: conversions/mixin.py:149
 msgid "Номинал сертификата"
 msgstr "Certificate Nominal Value"
 
-#: conversions/mixin.py:152 conversions/mixin.py:159
+#: conversions/mixin.py:157 conversions/mixin.py:164
 msgid "Использование скидки"
 msgstr "Using the discount"
 
-#: conversions/mixin.py:153
+#: conversions/mixin.py:158
 msgid "Номинал скидки"
 msgstr "Nominal discount"
 
-#: conversions/mixin.py:154
+#: conversions/mixin.py:159
 msgid "Размер скидки"
 msgstr "Amount of discount"
 
-#: conversions/mixin.py:155
+#: conversions/mixin.py:160
 msgid "Номер скидочной карты"
 msgstr "Number of discount card"
 
-#: conversions/mixin.py:176
+#: conversions/mixin.py:181
 msgid "Позиция в заказе"
 msgstr "Position in the order"
 
-#: conversions/mixin.py:177
+#: conversions/mixin.py:182
 msgid "ДАННЫЕ"
 msgstr "DATA"
 
-#: conversions/mixin.py:187
+#: conversions/mixin.py:192
 msgid "ДОСТАВКА"
 msgstr "DELIVERY"
 
-#: conversions/mixin.py:202
+#: conversions/mixin.py:207
 msgid "Заказ"
 msgstr "Order"
 
-#: conversions/mixin.py:207
+#: conversions/mixin.py:212
 msgid "ДАННЫЕ КЛИЕНТА"
 msgstr "CUSTOMER DATA"
 
-#: conversions/mixin.py:211
+#: conversions/mixin.py:216
 msgid "АДРЕС ДОСТАВКИ"
 msgstr "DELIVERY ADDRESS"
 
@@ -412,7 +399,7 @@ msgid "Манишка"
 msgstr "Plastron"
 
 #: conversions/resources/template_shirt.py:57
-#: conversions/resources/template_shirt.py:143 dictionaries/models.py:235
+#: conversions/resources/template_shirt.py:143
 msgid "Манжеты"
 msgstr "Cuffs"
 
@@ -438,8 +425,14 @@ msgstr "№ of size"
 msgid "Отстрочка (мм)"
 msgstr "Stitching (mm)"
 
+#: conversions/resources/template_shirt.py:84
+#: conversions/resources/template_shirt.py:144
+#: processing/female_configs/models.py:40 processing/male_configs/models.py:36
+msgid "Рукав"
+msgstr "Sleeve"
+
 #: conversions/resources/template_shirt.py:87
-#: conversions/resources/template_shirt.py:142 dictionaries/models.py:104
+#: conversions/resources/template_shirt.py:142
 #, fuzzy
 #| msgid "Тип ткани"
 msgid "Тип воротника"
@@ -593,8 +586,12 @@ msgid "Export"
 msgstr "Export"
 
 #: conversions/templates/admin/conversions/import.html:19
-msgid "Below is a preview of data to be imported. If you are satisfied with the results, click 'Confirm import'"
-msgstr "Below is a preview of data to be imported. If you are satisfied with the results, click 'Confirm import'"
+msgid ""
+"Below is a preview of data to be imported. If you are satisfied with the "
+"results, click 'Confirm import'"
+msgstr ""
+"Below is a preview of data to be imported. If you are satisfied with the "
+"results, click 'Confirm import'"
 
 #: conversions/templates/admin/conversions/import.html:23
 msgid "Confirm import"
@@ -648,325 +645,6 @@ msgstr "MAN"
 msgid "ЖЕН"
 msgstr "WOMAN"
 
-#: dictionaries/apps.py:8
-msgid "Справочники"
-msgstr "Directories"
-
-#: dictionaries/forms.py:13 dictionaries/models.py:307
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип элемента"
-msgstr "Weave"
-
-#: dictionaries/forms.py:17
-#, fuzzy
-#| msgid "%s - по убыванию"
-msgid "По умолчанию"
-msgstr "%s - order by descending"
-
-#: dictionaries/models.py:15 dictionaries/models.py:26
-#: dictionaries/models.py:38 dictionaries/models.py:50
-#: dictionaries/models.py:111 dictionaries/models.py:133
-#: dictionaries/models.py:145 dictionaries/models.py:166
-#: dictionaries/models.py:206 dictionaries/models.py:269
-#: dictionaries/models.py:294
-msgid "Название"
-msgstr "Название"
-
-#: dictionaries/models.py:16 dictionaries/models.py:52
-#: dictionaries/models.py:201 processing/models/sources.py:51
-#, fuzzy
-#| msgid "Плетение"
-msgid "Изображение"
-msgstr "Weave"
-
-#: dictionaries/models.py:27 dictionaries/models.py:51
-#, fuzzy
-#| msgid "Плетение"
-msgid "Значение"
-msgstr "Weave"
-
-#: dictionaries/models.py:33
-msgid "Цвет (для инициалов)"
-msgstr "Color (for initials)"
-
-#: dictionaries/models.py:34
-msgid "Цвета (для инициалов)"
-msgstr "Colors (for initials)"
-
-#: dictionaries/models.py:39
-msgid "Файл шрифта"
-msgstr "Font File"
-
-#: dictionaries/models.py:45
-msgid "Шрифт (для инициалов)"
-msgstr "Font (for initials)"
-
-#: dictionaries/models.py:46
-msgid "Шрифты (для инициалов)"
-msgstr "Fonts (for initials)"
-
-#: dictionaries/models.py:59
-#, fuzzy
-#| msgid "Цвет ткани"
-msgid "Цвета тканей"
-msgstr "Color"
-
-#: dictionaries/models.py:74
-#, fuzzy
-#| msgid "Паттерн ткани"
-msgid "Категория ткани"
-msgstr "Pattern"
-
-#: dictionaries/models.py:75
-#, fuzzy
-#| msgid "Паттерн ткани"
-msgid "Категории тканей"
-msgstr "Pattern"
-
-#: dictionaries/models.py:86
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Типы тканей"
-msgstr "Weave"
-
-#: dictionaries/models.py:92
-#, fuzzy
-#| msgid "Паттерн ткани"
-msgid "Паттерны тканей"
-msgstr "Pattern"
-
-#: dictionaries/models.py:101
-msgid "Варианты пуговиц"
-msgstr "Variants of buttons"
-
-#: dictionaries/models.py:105 dictionaries/models.py:112
-msgid "Типы воротников"
-msgstr "Types of collars"
-
-#: dictionaries/models.py:114 processing/female_configs/models.py:100
-#: processing/male_configs/models.py:60 processing/male_configs/models.py:119
-msgid "Количество пуговиц"
-msgstr "Number of buttons"
-
-#: dictionaries/models.py:120 dictionaries/models.py:121
-msgid "Пуговицы воротника"
-msgstr "Buttons of the collar"
-
-#: dictionaries/models.py:125
-msgid "Варианты закругления"
-msgstr "Rounding options"
-
-#: dictionaries/models.py:128
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип манжеты"
-msgstr "Weave"
-
-#: dictionaries/models.py:129 processing/female_configs/models.py:42
-#: processing/male_configs/models.py:38 processing/models/configuration.py:53
-msgid "Типы манжет"
-msgstr "Types of cuffs"
-
-#: dictionaries/models.py:134
-msgid "Типы"
-msgstr "Types"
-
-#: dictionaries/models.py:140
-msgid "Тип закругления манжеты"
-msgstr "Cuff rounding type"
-
-#: dictionaries/models.py:141
-msgid "Типы закругления манжеты"
-msgstr "Types of cuffing"
-
-#: dictionaries/models.py:146
-msgid "Добавочная стоимость"
-msgstr "Added Value"
-
-#: dictionaries/models.py:152
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип пуговиц"
-msgstr "Weave"
-
-#: dictionaries/models.py:153
-msgid "Типы пуговиц"
-msgstr "Type of buttons"
-
-#: dictionaries/models.py:161 processing/models/configuration.py:73
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип кокетки"
-msgstr "Weave"
-
-#: dictionaries/models.py:162
-msgid "Типы кокетки"
-msgstr "Types of coquette"
-
-#: dictionaries/models.py:173
-#, fuzzy
-#| msgid "Цвет ткани"
-msgid "Цвет отстрочки"
-msgstr "Color"
-
-#: dictionaries/models.py:174
-#, fuzzy
-#| msgid "Цвет ткани"
-msgid "Цвета отстрочки"
-msgstr "Color"
-
-#: dictionaries/models.py:179 processing/male_configs/models.py:94
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип манишки"
-msgstr "Weave"
-
-#: dictionaries/models.py:180
-msgid "Типы манишки"
-msgstr "Types of plastron"
-
-#: dictionaries/models.py:184
-msgid "Заголовок"
-msgstr "Header"
-
-#: dictionaries/models.py:185
-msgid "Текст под заголовком"
-msgstr "Text under the heading"
-
-#: dictionaries/models.py:191 dictionaries/models.py:192
-msgid "Информация о сорочках"
-msgstr "Information about shirts"
-
-#: dictionaries/models.py:196
-msgid "Файл"
-msgstr "File"
-
-#: dictionaries/models.py:197
-msgid "Текст под изображением"
-msgstr "Text below the image"
-
-#: dictionaries/models.py:202
-msgid "Изображения"
-msgstr "Images"
-
-#: dictionaries/models.py:207
-msgid "Показывать размеры"
-msgstr "Show dimensions"
-
-#: dictionaries/models.py:213
-msgid "Вариант размера"
-msgstr "Size option"
-
-#: dictionaries/models.py:214
-msgid "Варианты размеров"
-msgstr "Size options"
-
-#: dictionaries/models.py:224
-msgid "Размер сорочки"
-msgstr "Size of shirt"
-
-#: dictionaries/models.py:225
-msgid "Размеры сорочек"
-msgstr "Size of shirt"
-
-#: dictionaries/models.py:230
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип низа"
-msgstr "Weave"
-
-#: dictionaries/models.py:231
-msgid "Типы низа"
-msgstr "Types of bottom"
-
-#: dictionaries/models.py:238
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип рукава"
-msgstr "Weave"
-
-#: dictionaries/models.py:239
-msgid "Типы рукавов"
-msgstr "Types of sleeves"
-
-#: dictionaries/models.py:243
-msgid "Пуговицы видны"
-msgstr "The buttons are visible"
-
-#: dictionaries/models.py:246 processing/female_configs/models.py:75
-#: processing/male_configs/models.py:85 processing/models/configuration.py:82
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип полочки"
-msgstr "Weave"
-
-#: dictionaries/models.py:247
-msgid "Типы полочек"
-msgstr "Types of shelves"
-
-#: dictionaries/models.py:252 processing/models/configuration.py:64
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип кармана"
-msgstr "Weave"
-
-#: dictionaries/models.py:253
-msgid "Типы карманов"
-msgstr "Types of pockets"
-
-#: dictionaries/models.py:258
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип спинки"
-msgstr "Weave"
-
-#: dictionaries/models.py:259
-msgid "Типы спинок"
-msgstr "Types of backs"
-
-#: dictionaries/models.py:264
-#, fuzzy
-#| msgid "Тип ткани"
-msgid "Тип вытачек"
-msgstr "Weave"
-
-#: dictionaries/models.py:265
-msgid "Типы вытачек"
-msgstr "Types of darts"
-
-#: dictionaries/models.py:280
-msgid "Дата добавления"
-msgstr "Date added"
-
-#: dictionaries/models.py:281 dictionaries/models.py:285
-msgid "Вопрос"
-msgstr "Question"
-
-#: dictionaries/models.py:282
-msgid "Ответ"
-msgstr "Answer"
-
-#: dictionaries/models.py:286
-msgid "Вопросы и ответы"
-msgstr "Questions and answers"
-
-#: dictionaries/models.py:297
-msgid "Тип длины рукава"
-msgstr "Type of sleeve length"
-
-#: dictionaries/models.py:298
-msgid "Типы длины рукава"
-msgstr "Types of sleeve length"
-
-#: dictionaries/models.py:308 dictionaries/models.py:312
-msgid "Элемент по умолчанию"
-msgstr "Default item"
-
-#: dictionaries/models.py:313
-msgid "Элементы по умолчанию"
-msgstr "Default elements"
-
 #: processing/admin.py:80
 msgid "Лоскут"
 msgstr "Flap"
@@ -991,6 +669,11 @@ msgstr "Base assembly model"
 msgid "Модели сборки основы"
 msgstr "Base assembly models"
 
+#: processing/female_configs/models.py:42 processing/male_configs/models.py:38
+#: processing/models/configuration.py:53
+msgid "Типы манжет"
+msgstr "Types of cuffs"
+
 #: processing/female_configs/models.py:47 processing/male_configs/models.py:43
 msgid "Конфигурация сборки для основы"
 msgstr "Assembly configuration for the base"
@@ -1007,6 +690,13 @@ msgstr "Configure the collar assembly"
 msgid "Конфигурации сборки для воротника"
 msgstr "Collar assembly configurations"
 
+#: processing/female_configs/models.py:75 processing/male_configs/models.py:85
+#: processing/models/configuration.py:82
+#, fuzzy
+#| msgid "Тип ткани"
+msgid "Тип полочки"
+msgstr "Weave"
+
 #: processing/female_configs/models.py:80 processing/male_configs/models.py:89
 msgid "Конфигурация сборки для полочки"
 msgstr "Configuring the shelf assembly"
@@ -1020,6 +710,11 @@ msgstr "Assembly configurations for shelves"
 #: processing/female_configs/models.py:112
 msgid "(Ж)"
 msgstr "(WOMAN)"
+
+#: processing/female_configs/models.py:100 processing/male_configs/models.py:60
+#: processing/male_configs/models.py:119
+msgid "Количество пуговиц"
+msgstr "Number of buttons"
 
 #: processing/female_configs/models.py:105
 #: processing/male_configs/models.py:124
@@ -1038,6 +733,12 @@ msgstr "Assembly configuration for backrest"
 #: processing/male_configs/models.py:55
 msgid "Конфигурации сборки для спинки"
 msgstr "Assembly configurations for backrest"
+
+#: processing/male_configs/models.py:94
+#, fuzzy
+#| msgid "Тип ткани"
+msgid "Тип манишки"
+msgstr "Weave"
 
 #: processing/male_configs/models.py:99
 msgid "Конфигурация сборки для манишки"
@@ -1065,6 +766,12 @@ msgstr "Assembly configuration for cuffs"
 msgid "Конфигурации сборки для манжет"
 msgstr "Assembly configurations for cuffs"
 
+#: processing/models/configuration.py:64
+#, fuzzy
+#| msgid "Тип ткани"
+msgid "Тип кармана"
+msgstr "Weave"
+
 #: processing/models/configuration.py:68
 msgid "Конфигурация сборки для кармана"
 msgstr "Assembly configuration for pocket"
@@ -1072,6 +779,12 @@ msgstr "Assembly configuration for pocket"
 #: processing/models/configuration.py:69
 msgid "Конфигурации сборки для кармана"
 msgstr "Assembly configurations for the pocket"
+
+#: processing/models/configuration.py:73
+#, fuzzy
+#| msgid "Тип ткани"
+msgid "Тип кокетки"
+msgstr "Weave"
 
 #: processing/models/configuration.py:77
 msgid "Конфигурация сборки для кокетки"
@@ -1156,10 +869,8 @@ msgid "Задняя"
 msgstr "Back"
 
 #: processing/models/sources.py:23
-#, fuzzy
-#| msgid "Коллекция"
 msgid "Проекция"
-msgstr "Collection"
+msgstr "View type"
 
 #: processing/models/sources.py:30
 msgid "UV"
@@ -1184,6 +895,12 @@ msgstr "Assembly model"
 #: processing/models/sources.py:43
 msgid "Модели сборки"
 msgstr "Assembly models"
+
+#: processing/models/sources.py:51
+#, fuzzy
+#| msgid "Плетение"
+msgid "Изображение"
+msgstr "Weave"
 
 #: processing/models/sources.py:62
 msgid "Модель сборки пуговиц"
@@ -1276,3 +993,221 @@ msgstr "Initial position"
 #: processing/models/sources.py:137
 msgid "Позиции инициалов"
 msgstr "Initial position"
+
+#~ msgid "Планка рукава"
+#~ msgstr "Sleeve Plank"
+
+#~ msgid "Складки на рукаве"
+#~ msgstr "Folds on the sleeve"
+
+#~ msgid "Справочники"
+#~ msgstr "Directories"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Тип элемента"
+#~ msgstr "Weave"
+
+#, fuzzy
+#~| msgid "%s - по убыванию"
+#~ msgid "По умолчанию"
+#~ msgstr "%s - order by descending"
+
+#~ msgid "Название"
+#~ msgstr "Название"
+
+#, fuzzy
+#~| msgid "Плетение"
+#~ msgid "Значение"
+#~ msgstr "Weave"
+
+#~ msgid "Цвет (для инициалов)"
+#~ msgstr "Color (for initials)"
+
+#~ msgid "Цвета (для инициалов)"
+#~ msgstr "Colors (for initials)"
+
+#~ msgid "Файл шрифта"
+#~ msgstr "Font File"
+
+#~ msgid "Шрифт (для инициалов)"
+#~ msgstr "Font (for initials)"
+
+#~ msgid "Шрифты (для инициалов)"
+#~ msgstr "Fonts (for initials)"
+
+#, fuzzy
+#~| msgid "Цвет ткани"
+#~ msgid "Цвета тканей"
+#~ msgstr "Color"
+
+#, fuzzy
+#~| msgid "Паттерн ткани"
+#~ msgid "Категория ткани"
+#~ msgstr "Pattern"
+
+#, fuzzy
+#~| msgid "Паттерн ткани"
+#~ msgid "Категории тканей"
+#~ msgstr "Pattern"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Типы тканей"
+#~ msgstr "Weave"
+
+#, fuzzy
+#~| msgid "Паттерн ткани"
+#~ msgid "Паттерны тканей"
+#~ msgstr "Pattern"
+
+#~ msgid "Варианты пуговиц"
+#~ msgstr "Variants of buttons"
+
+#~ msgid "Типы воротников"
+#~ msgstr "Types of collars"
+
+#~ msgid "Пуговицы воротника"
+#~ msgstr "Button on the collar"
+
+#~ msgid "Варианты закругления"
+#~ msgstr "Rounding options"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Тип манжеты"
+#~ msgstr "Weave"
+
+#~ msgid "Типы"
+#~ msgstr "Types"
+
+#~ msgid "Тип закругления манжеты"
+#~ msgstr "Cuff rounding type"
+
+#~ msgid "Типы закругления манжеты"
+#~ msgstr "Types of cuff angle"
+
+#~ msgid "Добавочная стоимость"
+#~ msgstr "Added Value"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Тип пуговиц"
+#~ msgstr "Weave"
+
+#~ msgid "Типы пуговиц"
+#~ msgstr "Type of buttons"
+
+#~ msgid "Типы кокетки"
+#~ msgstr "Types of yoke"
+
+#, fuzzy
+#~| msgid "Цвет ткани"
+#~ msgid "Цвет отстрочки"
+#~ msgstr "Color"
+
+#, fuzzy
+#~| msgid "Цвет ткани"
+#~ msgid "Цвета отстрочки"
+#~ msgstr "Color"
+
+#~ msgid "Типы манишки"
+#~ msgstr "Types of plastron"
+
+#~ msgid "Заголовок"
+#~ msgstr "Header"
+
+#~ msgid "Текст под заголовком"
+#~ msgstr "Text under the heading"
+
+#~ msgid "Информация о сорочках"
+#~ msgstr "Information about shirts"
+
+#~ msgid "Файл"
+#~ msgstr "File"
+
+#~ msgid "Текст под изображением"
+#~ msgstr "Text below the image"
+
+#~ msgid "Изображения"
+#~ msgstr "Images"
+
+#~ msgid "Показывать размеры"
+#~ msgstr "Show dimensions"
+
+#~ msgid "Вариант размера"
+#~ msgstr "Size option"
+
+#~ msgid "Варианты размеров"
+#~ msgstr "Size options"
+
+#~ msgid "Размер сорочки"
+#~ msgstr "Size of shirt"
+
+#~ msgid "Размеры сорочек"
+#~ msgstr "Size of shirt"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Тип низа"
+#~ msgstr "Weave"
+
+#~ msgid "Типы низа"
+#~ msgstr "Types of bottom"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Тип рукава"
+#~ msgstr "Weave"
+
+#~ msgid "Типы рукавов"
+#~ msgstr "Types of sleeves"
+
+#~ msgid "Пуговицы видны"
+#~ msgstr "The buttons are visible"
+
+#~ msgid "Типы полочек"
+#~ msgstr "Types of plackets"
+
+#~ msgid "Типы карманов"
+#~ msgstr "Types of pockets"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Тип спинки"
+#~ msgstr "Weave"
+
+#~ msgid "Типы спинок"
+#~ msgstr "Types of backs"
+
+#, fuzzy
+#~| msgid "Тип ткани"
+#~ msgid "Тип вытачек"
+#~ msgstr "Weave"
+
+#~ msgid "Типы вытачек"
+#~ msgstr "Types of darts"
+
+#~ msgid "Дата добавления"
+#~ msgstr "Date added"
+
+#~ msgid "Вопрос"
+#~ msgstr "Question"
+
+#~ msgid "Ответ"
+#~ msgstr "Answer"
+
+#~ msgid "Вопросы и ответы"
+#~ msgstr "Questions and answers"
+
+#~ msgid "Тип длины рукава"
+#~ msgstr "Type of sleeve length"
+
+#~ msgid "Типы длины рукава"
+#~ msgstr "Types of sleeve length"
+
+#~ msgid "Элемент по умолчанию"
+#~ msgstr "Default item"
+
+#~ msgid "Элементы по умолчанию"
+#~ msgstr "Default elements"

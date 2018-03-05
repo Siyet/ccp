@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-02 19:14+0300\n"
+"POT-Creation-Date: 2018-03-05 09:37+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: backend/admin.py:184
+#: backend/admin.py:183
 msgid "Лоскут"
 msgstr "Flap"
 
-#: backend/admin.py:189 backend/models.py:30
+#: backend/admin.py:188
 msgid "Описание"
-msgstr ""
-
-#: backend/admin.py:195 backend/models.py:153
-msgid "Цвета"
 msgstr "Description"
 
-#: backend/admin.py:200 backend/models.py:154
+#: backend/admin.py:194 backend/models.py:152
+msgid "Цвета"
+msgstr "Colors"
+
+#: backend/admin.py:199 backend/models.py:153
 msgid "Дизайн"
 msgstr "Design"
 
@@ -49,14 +49,14 @@ msgstr "Value"
 msgid "Пожалуйста, укажите тип закругления"
 msgstr "Please specify the type of curvature"
 
-#: backend/models.py:25 backend/models.py:72 backend/models.py:115
-#: backend/models.py:197
+#: backend/models.py:25 backend/models.py:71 backend/models.py:114
+#: backend/models.py:196
 msgid "Склад"
 msgstr "Stock"
 
-#: backend/models.py:27 backend/models.py:77 backend/models.py:89
-#: backend/models.py:101 backend/models.py:257 backend/models.py:271
-#: backend/models.py:504
+#: backend/models.py:27 backend/models.py:76 backend/models.py:88
+#: backend/models.py:100 backend/models.py:256 backend/models.py:270
+#: backend/models.py:500
 msgid "Название"
 msgstr "Title"
 
@@ -68,457 +68,469 @@ msgstr "Title for the filter"
 msgid "Наименование для экрана \"О сорочке\""
 msgstr "Title for the screen \"About the shirt\""
 
-#: backend/models.py:31 backend/models.py:104 backend/models.py:258
-#: backend/models.py:466 backend/models.py:470
-msgid "Изображение"
-msgstr "Image"
+#: backend/models.py:30
+#, fuzzy
+#| msgid "Наименование для фильтра"
+msgid "Наименование для витрины"
+msgstr "Title for the filter"
 
-#: backend/models.py:32 backend/models.py:297
+#: backend/models.py:31 backend/models.py:296
 msgid "Манишка"
 msgstr "Plastron"
 
-#: backend/models.py:33 backend/models.py:382
+#: backend/models.py:32 backend/models.py:378
 msgid "Застежка под штифты"
 msgstr "Clasp for pins"
 
-#: backend/models.py:34
+#: backend/models.py:33
 msgid "Цельная кокетка"
 msgstr "One-piece coquette"
 
-#: backend/models.py:35 backend/models.py:379
+#: backend/models.py:34 backend/models.py:375
 msgid "Платок"
 msgstr "Shawl"
 
-#: backend/models.py:36 backend/models.py:495
+#: backend/models.py:35 backend/models.py:491
 msgid "Контрастные детали"
 msgstr "Contrast details"
 
-#: backend/models.py:38
+#: backend/models.py:37
 msgid "Ткань для опции \"Воротник и манжеты полностью белые\""
 msgstr "Fabric for the option \"Collar and cuffs completely white\""
 
-#: backend/models.py:40
+#: backend/models.py:39
 msgid "Варианты вытачек"
 msgstr "Toss Options"
 
-#: backend/models.py:42
+#: backend/models.py:41
 msgid "Пол коллекции"
 msgstr "Collection sex"
 
-#: backend/models.py:44
+#: backend/models.py:43
 msgid "Время пошива и доставки"
 msgstr "Time for tailoring and delivery"
 
-#: backend/models.py:50 backend/models.py:337
+#: backend/models.py:49 backend/models.py:336
 msgid "Коллекция"
 msgstr "Collection"
 
-#: backend/models.py:51 backend/models.py:78 backend/models.py:90
-#: backend/models.py:102 backend/models.py:505
+#: backend/models.py:50 backend/models.py:77 backend/models.py:89
+#: backend/models.py:101 backend/models.py:501
 msgid "Коллекции"
 msgstr "Collections"
 
-#: backend/models.py:66
+#: backend/models.py:65
 msgid "Страна"
 msgstr "A country"
 
-#: backend/models.py:73
+#: backend/models.py:72
 msgid "Склады"
-msgstr "Warehouses"
+msgstr "Countries"
 
-#: backend/models.py:84 backend/models.py:85 backend/models.py:213
-#: backend/models.py:231
+#: backend/models.py:83 backend/models.py:84 backend/models.py:212
+#: backend/models.py:230
 msgid "Жесткость"
-msgstr "Hardness"
+msgstr "Stiffness"
 
-#: backend/models.py:96 backend/models.py:97 backend/models.py:212
+#: backend/models.py:95 backend/models.py:96 backend/models.py:211
 msgid "Косточки"
-msgstr "Bones"
+msgstr "Collar stays"
 
-#: backend/models.py:103
+#: backend/models.py:102
 msgid "Размеры"
 msgstr "Measurements"
 
-#: backend/models.py:107
+#: backend/models.py:103 backend/models.py:257 backend/models.py:462
+#: backend/models.py:466
+msgid "Изображение"
+msgstr "Image"
+
+#: backend/models.py:106
 msgid "Тип талии"
-msgstr "Waist type"
+msgstr "Types of fit"
 
-#: backend/models.py:108
+#: backend/models.py:107
 msgid "Типы талии"
-msgstr "Waist Type"
+msgstr "Types of fit"
 
-#: backend/models.py:116
+#: backend/models.py:115
 msgid "Категория тканей"
 msgstr "Category of tissues"
 
-#: backend/models.py:118 backend/models.py:388 backend/models.py:535
+#: backend/models.py:117 backend/models.py:384 backend/models.py:531
 msgid "Цена"
 msgstr "Price"
 
-#: backend/models.py:124
+#: backend/models.py:123
 msgid "Цена ткани"
 msgstr "Price of fabric"
 
-#: backend/models.py:125
+#: backend/models.py:124
 msgid "Цены тканей"
 msgstr "Prices of fabrics"
 
-#: backend/models.py:134 backend/models.py:338
+#: backend/models.py:133 backend/models.py:337
 msgid "Артикул"
 msgstr "Vendor code"
 
-#: backend/models.py:140
-msgid "Недопустимый код сорочки: может содержать только латинские символы и цифры"
+#: backend/models.py:139
+msgid ""
+"Недопустимый код сорочки: может содержать только латинские символы и цифры"
 msgstr "Invalid shirt code: can contain only Latin characters and digits"
 
-#: backend/models.py:144
+#: backend/models.py:143
 msgid "Категория"
 msgstr "Category"
 
-#: backend/models.py:146 backend/models.py:215 backend/models.py:232
-#: backend/models.py:259 backend/models.py:286 backend/models.py:544
+#: backend/models.py:145 backend/models.py:214 backend/models.py:231
+#: backend/models.py:258 backend/models.py:285 backend/models.py:540
 msgid "Тип"
 msgstr "Type"
 
-#: backend/models.py:148
+#: backend/models.py:147
 msgid "Толщина"
 msgstr "Thickness"
 
-#: backend/models.py:150
+#: backend/models.py:149
 msgid "Краткое описание"
 msgstr "Short description"
 
-#: backend/models.py:151
+#: backend/models.py:150
 msgid "Полное описание"
 msgstr "Full description"
 
-#: backend/models.py:152
+#: backend/models.py:151
 msgid "Материал"
 msgstr "Material"
 
-#: backend/models.py:156
+#: backend/models.py:155
 msgid "Текстура"
 msgstr "Texture"
 
-#: backend/models.py:158
+#: backend/models.py:157
 msgid "Используется в манишке"
 msgstr "Used in the front loader"
 
-#: backend/models.py:159
+#: backend/models.py:158
 msgid "Активна"
 msgstr "Active"
 
-#: backend/models.py:192 backend/models.py:198 backend/models.py:287
-#: backend/models.py:341 backend/models.py:487
+#: backend/models.py:191 backend/models.py:197 backend/models.py:286
+#: backend/models.py:340 backend/models.py:483
 msgid "Ткань"
 msgstr "Fabric"
 
-#: backend/models.py:193
+#: backend/models.py:192
 msgid "Ткани"
 msgstr "Fabrics"
 
-#: backend/models.py:199
+#: backend/models.py:198
 msgid "Остаток"
 msgstr "Balance"
 
-#: backend/models.py:202
+#: backend/models.py:201
 msgid "на складе"
 msgstr "in stock"
 
-#: backend/models.py:206
+#: backend/models.py:205
 msgid "Остаток ткани"
-msgstr ""
+msgstr "Fabric status"
 
-#: backend/models.py:207
+#: backend/models.py:206
 msgid "Остатки тканей"
-msgstr "The remainder of the tissue"
+msgstr "Fabric status"
 
-#: backend/models.py:217
+#: backend/models.py:216
 msgid "Пуговицы"
 msgstr "Buttons"
 
-#: backend/models.py:226
+#: backend/models.py:225
 msgid "Воротник"
 msgstr "Collar"
 
-#: backend/models.py:227
+#: backend/models.py:226
 msgid "Воротники"
 msgstr "Collars"
 
-#: backend/models.py:233
+#: backend/models.py:232
 msgid "Тип закругления"
 msgstr "Rounding type"
 
-#: backend/models.py:252
+#: backend/models.py:251
 msgid "Манжета"
 msgstr "Cuff"
 
-#: backend/models.py:253
+#: backend/models.py:252
 msgid "Манжеты"
 msgstr "Cuffs"
 
-#: backend/models.py:260 backend/models.py:319
+#: backend/models.py:259 backend/models.py:318
 msgid "Цвет"
 msgstr "Color"
 
-#: backend/models.py:266 backend/models.py:267 backend/models.py:375
+#: backend/models.py:265 backend/models.py:266 backend/models.py:371
 msgid "Кастомные пуговицы"
 msgstr "Custom buttons"
 
-#: backend/models.py:272
+#: backend/models.py:271
 msgid "Добавочная стоимость"
 msgstr "Added Value"
 
-#: backend/models.py:278 backend/models.py:279
+#: backend/models.py:277 backend/models.py:278
 msgid "Настройки платка"
-msgstr "Shawl settings"
+msgstr "Pocket square"
 
-#: backend/models.py:298
+#: backend/models.py:297
 msgid "Манишки"
 msgstr "Plastron"
 
-#: backend/models.py:305
+#: backend/models.py:304
 msgid "Шрифт"
 msgstr "Font"
 
-#: backend/models.py:309
+#: backend/models.py:308
 msgid "2 пуговица"
 msgstr "2nd button"
 
-#: backend/models.py:310
+#: backend/models.py:309
 msgid "3 пуговица"
 msgstr "3rd button"
 
-#: backend/models.py:311
+#: backend/models.py:310
 msgid "4 пуговица"
 msgstr "4th button"
 
-#: backend/models.py:312
+#: backend/models.py:311
 msgid "5 пуговица"
 msgstr "5th button"
 
-#: backend/models.py:313
+#: backend/models.py:312
 msgid "Низ (л)"
 msgstr "Bottom (L)"
 
-#: backend/models.py:314
+#: backend/models.py:313
 msgid "Карман (л)"
 msgstr "Pocket (L)"
 
-#: backend/models.py:315
+#: backend/models.py:314
 msgid "Манжета (л)"
 msgstr "Cuff (L)"
 
-#: backend/models.py:317
+#: backend/models.py:316
 msgid "Местоположение"
 msgstr "Position"
 
-#: backend/models.py:318
+#: backend/models.py:317
 msgid "Текст"
 msgstr "Text"
 
-#: backend/models.py:325 backend/models.py:326
+#: backend/models.py:324 backend/models.py:325
 msgid "Инициалы"
 msgstr "Initials"
 
-#: backend/models.py:333
+#: backend/models.py:332
 msgid "Не использовать застежку"
 msgstr "Do not use the clasp"
 
-#: backend/models.py:333
+#: backend/models.py:332
 msgid "Использовать застежку"
 msgstr "Use the clasp"
 
-#: backend/models.py:335
+#: backend/models.py:334
 msgid "Используется как шаблон"
 msgstr "Used as a template"
 
-#: backend/models.py:336
+#: backend/models.py:335
 msgid "Используется как стандартный вариант"
 msgstr "Used as a standard option"
 
-#: backend/models.py:339
+#: backend/models.py:338
 msgid "Индивидуализация"
 msgstr "Individualization"
 
-#: backend/models.py:343
+#: backend/models.py:342
 msgid "Изображение для витрины"
 msgstr "Display image"
 
-#: backend/models.py:354
+#: backend/models.py:353
 msgid "Выбранный вариант размера"
 msgstr "Selected size option"
 
-#: backend/models.py:355
+#: backend/models.py:354
 msgid "Размер"
 msgstr "Size"
 
-#: backend/models.py:357
+#: backend/models.py:356
 msgid "Низ"
 msgstr "Bottom"
 
-#: backend/models.py:358
+#: backend/models.py:357
 msgid "Полочка"
 msgstr "Shelf"
 
-#: backend/models.py:359
+#: backend/models.py:358
 msgid "Карман"
 msgstr "Pocket"
 
-#: backend/models.py:360
+#: backend/models.py:359
 msgid "Рукав"
 msgstr "Sleeve"
 
-#: backend/models.py:362
+#: backend/models.py:361
 msgid "Талия"
 msgstr "Waist"
 
-#: backend/models.py:365
-msgid "Длина рукава"
-msgstr "The length of the sleeve"
-
-#: backend/models.py:368
+#: backend/models.py:364
 msgid "Вытачки"
 msgstr "Taps"
 
-#: backend/models.py:371
+#: backend/models.py:367
 msgid "Спинка"
 msgstr "Back"
 
-#: backend/models.py:373
+#: backend/models.py:369
 msgid "Тип кастомных пуговиц"
 msgstr "Type of custom buttons"
 
-#: backend/models.py:381
+#: backend/models.py:377
 msgid "Кокетка"
 msgstr "Yoke"
 
-#: backend/models.py:384
+#: backend/models.py:380
 msgid "0 мм (без отстрочки)"
 msgstr "0 mm (without stitching)"
 
-#: backend/models.py:384
+#: backend/models.py:380
 msgid "1 мм (только со съемными косточками)"
 msgstr "1 mm (only with removable collar stays)"
 
-#: backend/models.py:385
+#: backend/models.py:381
 msgid "5 мм"
 msgstr "5 mm"
 
-#: backend/models.py:386
+#: backend/models.py:382
 msgid "Ширина отстрочки"
 msgstr "Width of stitching"
 
-#: backend/models.py:400 backend/models.py:416 backend/models.py:420
-#: backend/models.py:488
-msgid "Рубашка"
+#: backend/models.py:396 backend/models.py:412 backend/models.py:416
+#: backend/models.py:484
+msgid "Сорочка"
 msgstr "Shirt"
 
-#: backend/models.py:401 backend/models.py:417
-msgid "Рубашки"
+#: backend/models.py:397 backend/models.py:413
+msgid "Сорочки"
 msgstr "Shirts"
 
-#: backend/models.py:432
+#: backend/models.py:428
 msgid "Шаблон сорочки"
 msgstr "Shirt template"
 
-#: backend/models.py:433
+#: backend/models.py:429
 msgid "Шаблоны сорочек"
 msgstr "Shirt templates"
 
-#: backend/models.py:436
+#: backend/models.py:432
 msgid "Шаблон"
 msgstr "Template"
 
-#: backend/models.py:444
+#: backend/models.py:440
 msgid "Стандартный вариант сорочки"
 msgstr "Standard shirt version"
 
-#: backend/models.py:445
+#: backend/models.py:441
 msgid "Стандартные варианты сорочек"
 msgstr "Standard shirt options"
 
-#: backend/models.py:448
+#: backend/models.py:444
 msgid "Стандартный вариант"
 msgstr "Standard version"
 
-#: backend/models.py:462
+#: backend/models.py:458
 msgid "Стандартный вариант для коллекции уже существует"
 msgstr "Standard collection option already exists"
 
-#: backend/models.py:471
+#: backend/models.py:467
 msgid "Изображения"
 msgstr "Images"
 
-#: backend/models.py:476
+#: backend/models.py:472
 msgid "Воротник лицевая сторона"
 msgstr "Collar front"
 
-#: backend/models.py:477
+#: backend/models.py:473
 msgid "Воротник низ"
 msgstr "Collar bottom"
 
-#: backend/models.py:478
+#: backend/models.py:474
 msgid "Воротник внешняя стойка"
 msgstr "Collar outer stand"
 
-#: backend/models.py:479
+#: backend/models.py:475
 msgid "Воротник внутрення стойка"
 msgstr "Collar inner stand"
 
-#: backend/models.py:482
+#: backend/models.py:478
 msgid "Манжета внешняя"
 msgstr "Outer cuff"
 
-#: backend/models.py:483
+#: backend/models.py:479
 msgid "Манжета внутрення"
 msgstr "Inner cuff"
 
-#: backend/models.py:486
+#: backend/models.py:482
 msgid "Элемент"
 msgstr "Element"
 
-#: backend/models.py:494 backend/models.py:530
+#: backend/models.py:490 backend/models.py:526
 msgid "Контрастная деталь"
 msgstr "Contrast detail"
 
-#: backend/models.py:511
+#: backend/models.py:507
 msgid "Отстрочка"
 msgstr "Stitching"
 
-#: backend/models.py:512
+#: backend/models.py:508
 msgid "Отстрочки"
 msgstr "Stitching"
 
-#: backend/models.py:517
+#: backend/models.py:513
 msgid "Цвет отстрочки"
 msgstr "Color of stitch"
 
-#: backend/models.py:524
+#: backend/models.py:520
 msgid "Контрастная отстрочка"
 msgstr "Contrast stitching"
 
-#: backend/models.py:525
+#: backend/models.py:521
 msgid "Контрастные отстрочки"
 msgstr "Contrast stitching"
 
-#: backend/models.py:530
+#: backend/models.py:526
 msgid "Контрастные ткани"
 msgstr "Contrasting fabrics"
 
-#: backend/models.py:533
+#: backend/models.py:529
 msgid "content type"
 msgstr "сontent type"
 
-#: backend/models.py:538
+#: backend/models.py:534
 #, python-format
 msgid "Цена: %s"
 msgstr "Price: %s"
 
-#: backend/models.py:553
+#: backend/models.py:549
 msgid "Цена надбавки"
 msgstr "The price of the surcharge"
 
-#: backend/models.py:554
+#: backend/models.py:550
 msgid "Цены надбавок"
 msgstr "Prices of surcharges"
+
+#~ msgid "Длина рукава"
+#~ msgstr "The length of the sleeve"
+
+#~ msgid "Рубашка"
+#~ msgstr "Shirt"
+
+#~ msgid "Рубашки"
+#~ msgstr "Shirts"

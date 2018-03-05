@@ -1,0 +1,291 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-05 09:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: dictionaries/apps.py:8
+msgid "Справочники"
+msgstr "Dictionaries"
+
+#: dictionaries/forms.py:13 dictionaries/models.py:271
+msgid "Тип элемента"
+msgstr "Type of element"
+
+#: dictionaries/forms.py:17
+msgid "По умолчанию"
+msgstr "By default"
+
+#: dictionaries/models.py:15 dictionaries/models.py:26
+#: dictionaries/models.py:38 dictionaries/models.py:50
+#: dictionaries/models.py:111 dictionaries/models.py:133
+#: dictionaries/models.py:145 dictionaries/models.py:166
+#: dictionaries/models.py:184 dictionaries/models.py:247
+#: dictionaries/models.py:258
+msgid "Название"
+msgstr "Title"
+
+#: dictionaries/models.py:16 dictionaries/models.py:52
+msgid "Изображение"
+msgstr "Image"
+
+#: dictionaries/models.py:27 dictionaries/models.py:51
+msgid "Значение"
+msgstr "Value"
+
+#: dictionaries/models.py:33
+msgid "Цвет (для инициалов)"
+msgstr "Color (for initials)"
+
+#: dictionaries/models.py:34
+msgid "Цвета (для инициалов)"
+msgstr "Colors (for initials)"
+
+#: dictionaries/models.py:39
+msgid "Файл шрифта"
+msgstr "Font document"
+
+#: dictionaries/models.py:45
+msgid "Шрифт (для инициалов)"
+msgstr "Font (for initials)"
+
+#: dictionaries/models.py:46
+msgid "Шрифты (для инициалов)"
+msgstr "Fonts (for initials)"
+
+#: dictionaries/models.py:58
+msgid "Цвет ткани"
+msgstr "Color of fabric"
+
+#: dictionaries/models.py:59
+msgid "Цвета тканей"
+msgstr "Color of fabrics"
+
+#: dictionaries/models.py:68 dictionaries/models.py:71
+msgid "Категория"
+msgstr "Category"
+
+#: dictionaries/models.py:74
+msgid "Категория ткани"
+msgstr "Category of fabric"
+
+#: dictionaries/models.py:75
+msgid "Категории тканей"
+msgstr "Category of fabrics"
+
+#: dictionaries/models.py:79
+msgid "Тип"
+msgstr "Type"
+
+#: dictionaries/models.py:85
+msgid "Тип ткани"
+msgstr "Weave of fabric"
+
+#: dictionaries/models.py:86
+msgid "Типы тканей"
+msgstr "Weave of fabrics"
+
+#: dictionaries/models.py:91
+msgid "Паттерн ткани"
+msgstr "Design of fabric"
+
+#: dictionaries/models.py:92
+msgid "Паттерны тканей"
+msgstr "Design of fabrics"
+
+#: dictionaries/models.py:101
+msgid "Варианты пуговиц"
+msgstr "Variants of buttons"
+
+#: dictionaries/models.py:104
+msgid "Тип воротника"
+msgstr "Type of collar"
+
+#: dictionaries/models.py:105 dictionaries/models.py:112
+msgid "Типы воротников"
+msgstr "Types of collars"
+
+#: dictionaries/models.py:114
+msgid "Количество пуговиц"
+msgstr "Number of buttons"
+
+#: dictionaries/models.py:120 dictionaries/models.py:121
+msgid "Пуговицы воротника"
+msgstr "Buttons of the collar"
+
+#: dictionaries/models.py:125
+msgid "Варианты закругления"
+msgstr "Rounding angle options"
+
+#: dictionaries/models.py:128
+msgid "Тип манжеты"
+msgstr "Type of cuff"
+
+#: dictionaries/models.py:129
+msgid "Типы манжет"
+msgstr "Types of cuff"
+
+#: dictionaries/models.py:134
+msgid "Типы"
+msgstr "Types"
+
+#: dictionaries/models.py:140
+msgid "Тип закругления манжеты"
+msgstr "Type of cuff angle"
+
+#: dictionaries/models.py:141
+msgid "Типы закругления манжеты"
+msgstr "Types of cuff angle"
+
+#: dictionaries/models.py:146
+msgid "Добавочная стоимость"
+msgstr "Additional value"
+
+#: dictionaries/models.py:152
+msgid "Тип пуговиц"
+msgstr "Type of buttons"
+
+#: dictionaries/models.py:153
+msgid "Типы пуговиц"
+msgstr "Types of buttons"
+
+#: dictionaries/models.py:161
+msgid "Тип кокетки"
+msgstr "Type of yoke"
+
+#: dictionaries/models.py:162
+msgid "Типы кокетки"
+msgstr "Types of yoke"
+
+#: dictionaries/models.py:167
+msgid "Цвет"
+msgstr "Color"
+
+#: dictionaries/models.py:173
+msgid "Цвет отстрочки"
+msgstr "Color of stitching threads"
+
+#: dictionaries/models.py:174
+msgid "Цвета отстрочки"
+msgstr "Colors of stitching threads"
+
+#: dictionaries/models.py:179
+msgid "Тип манишки"
+msgstr "Type of plastron"
+
+#: dictionaries/models.py:180
+msgid "Типы манишки"
+msgstr "Types of plastron"
+
+#: dictionaries/models.py:185
+msgid "Показывать размеры"
+msgstr "Show sizes"
+
+#: dictionaries/models.py:191
+msgid "Вариант размера"
+msgstr "Size option"
+
+#: dictionaries/models.py:192
+msgid "Варианты размеров"
+msgstr "Size options"
+
+#: dictionaries/models.py:196
+msgid "Размер"
+msgstr "Size"
+
+#: dictionaries/models.py:202
+msgid "Размер сорочки"
+msgstr "Size of shirt"
+
+#: dictionaries/models.py:203
+msgid "Размеры сорочек"
+msgstr "Size of shirts"
+
+#: dictionaries/models.py:208
+msgid "Тип низа"
+msgstr "Type of bottom"
+
+#: dictionaries/models.py:209
+msgid "Типы низа"
+msgstr "Types of bottom"
+
+#: dictionaries/models.py:213
+msgid "Манжеты"
+msgstr "Cuffs"
+
+#: dictionaries/models.py:216
+msgid "Тип рукава"
+msgstr "Type of sleeve"
+
+#: dictionaries/models.py:217
+msgid "Типы рукавов"
+msgstr "Types of sleeves"
+
+#: dictionaries/models.py:221
+msgid "Пуговицы видны"
+msgstr "The buttons are visible"
+
+#: dictionaries/models.py:224
+msgid "Тип полочки"
+msgstr "Type of plackets"
+
+#: dictionaries/models.py:225
+msgid "Типы полочек"
+msgstr "Types of plackets"
+
+#: dictionaries/models.py:230
+msgid "Тип кармана"
+msgstr "Type of pocket"
+
+#: dictionaries/models.py:231
+msgid "Типы карманов"
+msgstr "Types of pocket"
+
+#: dictionaries/models.py:236
+msgid "Тип спинки"
+msgstr "Type of back"
+
+#: dictionaries/models.py:237
+msgid "Типы спинок"
+msgstr "Types of backs"
+
+#: dictionaries/models.py:242
+msgid "Тип вытачек"
+msgstr "Type of darts"
+
+#: dictionaries/models.py:243
+msgid "Типы вытачек"
+msgstr "Types of darts"
+
+#: dictionaries/models.py:250 dictionaries/models.py:251
+msgid "Толщина ткани"
+msgstr "Thickness of fabric"
+
+#: dictionaries/models.py:261
+msgid "Тип длины рукава"
+msgstr "Type of sleeve length"
+
+#: dictionaries/models.py:262
+msgid "Типы длины рукава"
+msgstr "Types of sleeve length"
+
+#: dictionaries/models.py:272 dictionaries/models.py:276
+msgid "Элемент по умолчанию"
+msgstr "Default elements"
+
+#: dictionaries/models.py:277
+msgid "Элементы по умолчанию"
+msgstr "Default elements"
