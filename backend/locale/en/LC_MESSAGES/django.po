@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-05 09:37+0300\n"
+"POT-Creation-Date: 2018-03-29 20:56+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -174,8 +174,7 @@ msgid "Артикул"
 msgstr "Vendor code"
 
 #: backend/models.py:139
-msgid ""
-"Недопустимый код сорочки: может содержать только латинские символы и цифры"
+msgid "Недопустимый код сорочки: может содержать только латинские символы и цифры"
 msgstr "Invalid shirt code: can contain only Latin characters and digits"
 
 #: backend/models.py:143

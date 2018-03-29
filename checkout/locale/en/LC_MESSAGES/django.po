@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-05 09:37+0300\n"
+"POT-Creation-Date: 2018-03-29 20:56+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -255,7 +255,7 @@ msgstr "Discounts"
 
 #: checkout/templates/checkout/delivery_options/main_adress.html:3
 msgid "Доставить по указанному адресу (по России)"
-msgstr "Delivery to the address (in Russian)"
+msgstr "Deliver to the specified address (in Russia)"
 
 #: checkout/templates/checkout/delivery_options/shop.html:3
 msgid "Забрать заказ в одном из наших магазинов"
@@ -270,16 +270,8 @@ msgid "был успешно оформлен новый заказ"
 msgstr "a new order was successfully registered"
 
 #: checkout/templates/checkout/payment_completed_admin_email.html:8
-#, fuzzy
-#| msgid ""
-#| "Для того, что бы ознакомиться с деталями заказа, пожалуйста, пройдите по "
-#| "\"ссылке\""
-msgid ""
-"Для того, что бы ознакомиться с деталями заказа, пожалуйста, пройдите по "
-"ссылке"
-msgstr ""
-"In order to get acquainted with the details of the order, please go to \"link"
-"\""
+msgid "Для того, что бы ознакомиться с деталями заказа, пожалуйста, пройдите по \"ссылке\""
+msgstr "In order to get acquainted with the details of the order, please go to \"link\""
 
 #: checkout/templates/checkout/payment_completed_customer_email.html:4
 msgid "Спасибо большое за ваш заказ."
@@ -287,51 +279,51 @@ msgstr "Thank you very much for your order."
 
 #: checkout/templates/checkout/payment_completed_customer_email.html:8
 msgid "Во вложенном PDF-файле вы сможете найти все детали вашего заказа."
-msgstr "In the attached PDF-file you can find all the details of your order."
+msgstr "In the attached PDF-file you can find all the details."
 
 #: checkout/templates/checkout/payment_completed_customer_email.html:9
-msgid "Прежде чем мы начнем работы по пошиву, мы свяжемся с вами по телефону для подтверждения вашего заказа и уточнения размеров. Мы обязательно сделаем это в течение следующих 48 часов."
-msgstr "Before we will start the tailoring work, we will contact you by phone to confirm your size and your order. We aim to do this within the next 48 hours."
+msgid "Прежде чем мы начнем работы по пошиву, мы свяжемся с вами по телефону для подтверждения вашего заказа и уточнения размеров."
+msgstr "Before we will start the tailoring work, we will contact you by phone to confirm your size and your order."
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:12
+#: checkout/templates/checkout/payment_completed_customer_email.html:10
+msgid "Мы обязательно сделаем это в течение следующих 48 часов."
+msgstr "We aim to do this within the next 48 hours."
+
+#: checkout/templates/checkout/payment_completed_customer_email.html:13
 msgid "Мы будем рады пошить данный заказ для вас :)"
 msgstr "We look forward to tailoring this order for you :)"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:17
+#: checkout/templates/checkout/payment_completed_customer_email.html:18
 msgid "С уважением,"
 msgstr "Kind regards,"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:18
-msgid "команда"
-msgstr "Team of"
-
-#: checkout/templates/checkout/payment_completed_customer_email.html:21
+#: checkout/templates/checkout/payment_completed_customer_email.html:22
 msgid "По всем вопросам:"
 msgstr "For questions:"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:27
-msgid "МАГАЗИНЫ COSTUME CODE В МОСКВЕ"
-msgstr "COSTUME CODE SHOPS IN MOSCOW"
-
 #: checkout/templates/checkout/payment_completed_customer_email.html:28
+msgid "МАГАЗИНЫ COSTUME CODE В МОСКВЕ"
+msgstr "COSTUME CODE STORES IN MOSCOW"
+
+#: checkout/templates/checkout/payment_completed_customer_email.html:29
 msgid "Ул. Рочдельская 15с41  |  Спиридоньевский пер. 12/9  |  Ул. Остоженка 20"
 msgstr "Ulitsa Rochdelskaya 15/41  |  Spiridonyevskiy Pereulok 12/9  |  Ulitsa Ostozhenka 20"
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:31
-msgid "МАГАЗИН COSTUME CODE В СУРГУТЕ"
-msgstr "COSTUME CODE SHOP AT SURGUT"
-
 #: checkout/templates/checkout/payment_completed_customer_email.html:32
+msgid "МАГАЗИН COSTUME CODE В СУРГУТЕ"
+msgstr "COSTUME CODE STORE AT SURGUT"
+
+#: checkout/templates/checkout/payment_completed_customer_email.html:33
 msgid "Ул. Профсоюзов 11, Lifestyle Mall «АГОРА»"
 msgstr "Ulitsa Provsoyuz 11, Lifestyle Mall \"AGORA\", "
 
-#: checkout/templates/checkout/payment_completed_customer_email.html:36
+#: checkout/templates/checkout/payment_completed_customer_email.html:37
 msgid "#персональныйпошив #медленнаямода #эко-френдли #сделаемвашмирпрекраснее"
 msgstr "#персональныйпошив #медленнаямода #эко-френдли #сделаемвашмирпрекраснее"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:325
 msgid "Спасибо большое за ваш заказ. В этом PDF-файле вы сможете найти все детали вашего заказа. Прежде чем мы начнем работы по пошиву, мы свяжемся с вами по телефону для подтверждения вашего заказа и уточнения размеров. Мы обязательно сделаем это в течение следующих 48 часов. Мы будем рады пошить данный заказ для вас :)"
-msgstr "Thank you very much for your order. In this PDF-file you can find all the details of your order. Before we will start the tailoring work, we will contact you by phone to confirm your size and your order. We aim to do this within the next 48 hours. We look forward to tailoring this order for you :)"
+msgstr "Thank you very much for your order. In this PDF-file you can find all the details. Before we will start the tailoring work, we will contact you by phone to confirm your size and your order. We aim to do this within the next 48 hours. We look forward to tailoring this order for you :)"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:329
 msgid "Ваш заказ"
@@ -393,7 +385,7 @@ msgstr "Delivery information"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:408
 msgid "Покупатель"
-msgstr "Client"
+msgstr "Client information"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:412
 msgid "Адрес доставки"
