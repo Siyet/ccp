@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-05 09:37+0300\n"
+"POT-Creation-Date: 2018-03-29 20:56+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -705,12 +705,6 @@ msgstr "Configuring the shelf assembly"
 msgid "Конфигурации сборки для полочки"
 msgstr "Assembly configurations for shelves"
 
-#: processing/female_configs/models.py:94
-#: processing/female_configs/models.py:105
-#: processing/female_configs/models.py:112
-msgid "(Ж)"
-msgstr "(WOMAN)"
-
 #: processing/female_configs/models.py:100 processing/male_configs/models.py:60
 #: processing/male_configs/models.py:119
 msgid "Количество пуговиц"
@@ -993,6 +987,9 @@ msgstr "Initial position"
 #: processing/models/sources.py:137
 msgid "Позиции инициалов"
 msgstr "Initial position"
+
+#~ msgid "(Ж)"
+#~ msgstr "(WOMAN)"
 
 #~ msgid "Планка рукава"
 #~ msgstr "Sleeve Plank"
