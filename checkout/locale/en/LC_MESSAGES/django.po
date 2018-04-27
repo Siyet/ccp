@@ -351,8 +351,8 @@ msgid "Ткань"
 msgstr "Fabric"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:351
-msgid "Размер: Принять решение во время подтверждения заказа по телефону"
-msgstr "Size: Make the decision during the confirmation phone call"
+msgid "Размер: Окончательный выбор размера всегда осуществляется по телефону"
+msgstr "Size: Make the final decision during the confirmation phone call (always)"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:356
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:357
