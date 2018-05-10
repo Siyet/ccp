@@ -1,15 +1,26 @@
 # coding: utf-8
 from django.utils.encoding import smart_text
-from django.utils.translation import ugettext_lazy as _
-from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
-
+from django.utils.translation import ugettext_lazy as _, override
+from import_export.widgets import ForeignKeyWidget, ManyToManyWidget, Widget
+from django.conf import settings
 from core.constants import SEX
 
 
 class ModelCacheMixin(object):
     def _cache_objects(self):
         objects = list(self.model.objects.all())
-        self._objects = dict((unicode(getattr(obj, self.field)), obj) for obj in objects)
+        self._objects = {}
+        # make sure objects are accessible with localized fields value
+        # e.g. something with
+        #   title_ru = 'foo'
+        #   title_en = 'bar'
+        # should be accessible by both 'foo' and 'bar'
+        for lang_code, _ in settings.LANGUAGES:
+            with override(lang_code):
+                self._objects.update(dict(
+                    (unicode(getattr(obj, self.field)), obj) for obj in objects
+                ))
+
 
     def get_object(self, key):
         if not hasattr(self, "_objects"):
