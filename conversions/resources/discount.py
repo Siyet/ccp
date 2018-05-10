@@ -16,7 +16,7 @@ class DiscountResource(BatchReplaceableResource):
     PK_COLUMN_NAME = 'Client number'
 
     customer = fields.Field(attribute=PK_ATTRIBUTE_NAME, column_name=PK_COLUMN_NAME,
-                            widget=CustomForeignKeyWidget(Customer, field='number'))
+                            widget=CustomForeignKeyWidget(Customer, field='number', add_missing=True))
     discount_value = fields.Field(attribute='discount_value', column_name='Discount', default=0)
 
     class Meta:
