@@ -9,6 +9,7 @@ from backend.models import ElementStitch, ContrastDetails
 from core.utils import achain
 
 EMPTY = '---'
+EMPTY_ROW = ''
 
 class TemplateAndFormatMixin(object):
     formats = settings.IMPORT_EXPORT_FORMATS
@@ -28,6 +29,7 @@ class OrderExportMixin(object):
             (_(u'Индекс'), address.index, ),
             (_(u'Телефон'), address.phone, ),
             (_(u'E-mail'), address.email, ),
+            (EMPTY_ROW),
         ]
 
     def get_delivery(self, instance):
@@ -42,6 +44,7 @@ class OrderExportMixin(object):
                 (_(u'Индекс'), instance.checkout_shop.index, ),
                 (_(u'Телефон'), EMPTY, ),
                 (_(u'E-mail'), EMPTY, ),
+                (EMPTY_ROW),
             ]
         other_address = instance.get_other_address()
         customer_address = instance.get_customer_address()
@@ -51,8 +54,11 @@ class OrderExportMixin(object):
     def get_shirt_data(self, shirt):
         data = [[
             _(u'СОРОЧКА'), [
+                (_(u'Код рубашки (базовый)'), shirt.id, ), # не могу понять, как сюда вернуть артикул типа S0003
+                (_(u'Коллекция'), shirt.collection, ),
                 (_(u'Размер'), shirt.size.size if shirt.size else EMPTY),
                 (_(u'Талия'), shirt.fit.title if shirt.fit else EMPTY),
+                (EMPTY_ROW),
             ]
         ]]
         try:
@@ -62,6 +68,7 @@ class OrderExportMixin(object):
                     (_(u'Размер'), shirt.collar.size.title),
                     (_(u'Жесткость воротника'), shirt.collar.hardness.title),
                     (_(u'Косточки'), shirt.collar.stays.title),
+                    (EMPTY_ROW),
                 ]]
             )
         except ObjectDoesNotExist:
@@ -72,6 +79,7 @@ class OrderExportMixin(object):
                     (_(u'Тип'), shirt.cuff.type.title),
                     (_(u'Углы'), achain(shirt, 'N/A', 'cuff', 'rounding', 'title')),
                     (_(u'Жесткость манжета'), shirt.cuff.hardness.title),
+                    (EMPTY_ROW),
                 ]]
             )
         except ObjectDoesNotExist:
@@ -80,6 +88,7 @@ class OrderExportMixin(object):
                     (_(u'Тип'), EMPTY),
                     (_(u'Углы'), EMPTY),
                     (_(u'Жесткость манжета'), EMPTY),
+                    (EMPTY_ROW),
                 ]]
             )
         try:
@@ -87,6 +96,7 @@ class OrderExportMixin(object):
                 [_(u'ТКАНЬ'), [
                     (_(u'Ткань'), shirt.fabric.code),
                     (_(u'Категория'), shirt.fabric.category.title),
+                    (EMPTY_ROW),
                 ]]
             )
         except ObjectDoesNotExist:
@@ -99,6 +109,7 @@ class OrderExportMixin(object):
                 (_(u'Вытачки'), achain(shirt, 'N/A', 'tuck', 'title')),
                 (_(u'Спинка'), achain(shirt, 'N/A', 'back', 'title')),
                 (_(u'Пуговицы'), achain(shirt, 'N/A', 'custom_buttons', 'title')),
+                (EMPTY_ROW),
             ]]
         )
 
@@ -109,6 +120,7 @@ class OrderExportMixin(object):
                     (_(u'Шрифт'), achain(shirt.initials, 'N/A', 'font', 'title')),
                     (_(u'Цвет'), achain(shirt.initials, 'N/A', 'color', 'title')),
                     (_(u'Расположение'), shirt.initials.get_location_display()),
+                    (EMPTY_ROW),
                 ]]
             )
         except ObjectDoesNotExist:
@@ -123,6 +135,7 @@ class OrderExportMixin(object):
             (_(u'Цельная кокетка'), achain(shirt, _(u'Нет'), 'yoke', 'title')),
             (_(u'Застежка под штифты'), shirt.get_clasp_display()),
             (_(u'Отстрочка (воротник и манжеты)'), shirt.get_stitch_display()),
+            (EMPTY_ROW),
         ]
         data.append([_(u'ДЕТАЛИ 2'), detail_rows])
 
@@ -179,6 +192,7 @@ class OrderExportMixin(object):
         lines = [
             [u'%s' % _(u'Номер заказа'), order.number],
             [u'%s' % _(u'Позиция в заказе'), '#%i' % number],
+            [EMPTY_ROW],
             [u'%s' % _(u'ДАННЫЕ'), order.number]
         ]
         for line in self.get_address_data(order.get_customer_address()):
@@ -189,6 +203,7 @@ class OrderExportMixin(object):
             for line in cat[1]:
                 lines.append(map(unicode, line))
 
+        lines.append([EMPTY_ROW])
         lines.append([u'%s' % _(u'ДОСТАВКА')])
         for line in self.get_delivery(order):
             lines.append(map(unicode, line))
@@ -209,10 +224,12 @@ class OrderExportMixin(object):
         for line in self.get_order_data(order):
             lines.append(map(unicode, line))
 
+        lines.append([EMPTY_ROW])
         lines.append([u'%s' % _(u'ДАННЫЕ КЛИЕНТА'), order.number])
         for line in self.get_address_data(order.get_customer_address()):
             lines.append(map(unicode, line))
 
+        lines.append([EMPTY_ROW])
         lines.append([u'%s' % _(u'АДРЕС ДОСТАВКИ')])
         for line in self.get_delivery(order):
             lines.append(map(unicode, line))
