@@ -54,7 +54,6 @@ class OrderExportMixin(object):
     def get_shirt_data(self, shirt):
         data = [[
             _(u'СОРОЧКА'), [
-                (_(u'Код рубашки (базовый)'), shirt.id, ), # не могу понять, как сюда вернуть артикул типа S0003
                 (_(u'Коллекция'), shirt.collection, ),
                 (_(u'Размер'), shirt.size.size if shirt.size else EMPTY),
                 (_(u'Талия'), shirt.fit.title if shirt.fit else EMPTY),
