@@ -17,7 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: checkout/admin.py:74 checkout/admin.py:78 checkout/models.py:280
+
+#: checkout/models.py:280
 msgid "Рубашка"
 msgstr "Shirt"
 
@@ -342,7 +343,7 @@ msgstr "Description"
 msgid "Итого"
 msgstr "Total"
 
-#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:347
+#: checkout/templates/checkout/payment_completed_customer_pdf_email.html:347 checkout/admin.py:74 checkout/admin.py:78
 msgid "Сорочка"
 msgstr "Shirt"
 
