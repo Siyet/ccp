@@ -15,10 +15,10 @@ from dictionaries import models as dictionaries
 
 class FabricResource(resources.ModelResource):
     code = fields.Field(column_name='Code', attribute='code')
-    material = fields.Field(column_name='Fabric', attribute='material')
+    material = fields.Field(column_name='Weave', attribute='material')
     colors = fields.Field(column_name='Color', attribute='colors', default=[],
                           widget=CachedManyToManyWidget(dictionaries.FabricColor, field='title'))
-    design = fields.Field(column_name='Design', attribute='designs', default=[],
+    design = fields.Field(column_name='Pattern', attribute='designs', default=[],
                           widget=CachedManyToManyWidget(dictionaries.FabricDesign, field='title'))
     short_description = fields.Field(column_name='Short fabric description', attribute='short_description')
     long_description = fields.Field(column_name='Long fabric description', attribute='long_description')
