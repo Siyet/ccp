@@ -166,6 +166,10 @@ msgstr "Corners"
 msgid "Жесткость манжета"
 msgstr "Hardness of the cuff"
 
+#: conversions/mixin.py:78 conversions/mixin.py:88
+msgid "Длина рукава"
+msgstr "Sleeve type"
+
 #: conversions/mixin.py:87
 msgid "ТКАНЬ"
 msgstr "FABRIC"
