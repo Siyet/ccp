@@ -75,6 +75,7 @@ class OrderExportMixin(object):
         try:
             data.append(
                 [_(u'МАНЖЕТЫ'), [
+                    (_(u'Длина рукава'), shirt.sleeve),
                     (_(u'Тип'), shirt.cuff.type.title),
                     (_(u'Углы'), achain(shirt, 'N/A', 'cuff', 'rounding', 'title')),
                     (_(u'Жесткость манжета'), shirt.cuff.hardness.title),
@@ -84,6 +85,7 @@ class OrderExportMixin(object):
         except ObjectDoesNotExist:
             data.append(
                 [_(u'МАНЖЕТЫ'), [
+                    (_(u'Длина рукава'), shirt.sleeve),
                     (_(u'Тип'), EMPTY),
                     (_(u'Углы'), EMPTY),
                     (_(u'Жесткость манжета'), EMPTY),
@@ -123,7 +125,15 @@ class OrderExportMixin(object):
                 ]]
             )
         except ObjectDoesNotExist:
-            pass
+            data.append(
+                [_(u'ИНИЦИАЛЫ'), [
+                    (_(u'Текст'), EMPTY),
+                    (_(u'Шрифт'), EMPTY),
+                    (_(u'Цвет'), EMPTY),
+                    (_(u'Расположение'), EMPTY),
+                    EMPTY_ROW
+                ]]
+            )
 
         contrast_stitches = {x.element.title: x.color.title for x in shirt.contrast_stitches.all()}
         detail_rows = []
