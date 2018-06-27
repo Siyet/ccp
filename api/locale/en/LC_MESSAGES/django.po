@@ -87,8 +87,8 @@ msgid "Плотность"
 msgstr "Thickness"
 
 #: api/views/shirts.py:127
-msgid "Сортировка"
-msgstr "Order"
+msgid "Цена"
+msgstr "Price"
 
 #: conversions/mixin.py:23 conversions/mixin.py:37
 msgid "Фамилия"

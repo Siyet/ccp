@@ -124,7 +124,7 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
             self.build_filter(_(u'Плетение'), 'fabric__type', list(fabric_types.values('id', 'title').distinct())),
             self.build_filter(_(u'Плотность'), 'fabric__thickness',
                               list(thickness.values('id', 'title').distinct())),
-            self.build_filter(_(u'Сортировка'), 'ordering', self.get_ordering_options())
+            self.build_filter(_(u'Цена'), 'ordering', self.get_ordering_options())
         ])
 
 
