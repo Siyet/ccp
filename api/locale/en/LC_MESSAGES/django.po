@@ -76,7 +76,7 @@ msgstr "%s - order by descending"
 
 #: api/views/shirts.py:123
 msgid "Узор"
-msgstr "Design"
+msgstr "Pattern"
 
 #: api/views/shirts.py:124
 msgid "Плетение"
