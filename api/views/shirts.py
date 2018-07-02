@@ -79,9 +79,8 @@ class TemplateShirtsFiltersList(FilterHelpersMixin, APIView):
         ordering_fields = ShowcaseShirtsListView.ordering_fields
         ordering_options = []
         for field_key in ordering_fields:
-            field = models.Shirt._meta.get_field(field_key)
-            ordering_options.append({'id': field_key, 'title': _(u'%s - по возрастанию' % field.verbose_name)})
-            ordering_options.append({'id': '-' + field_key, 'title': _(u'%s - по убыванию' % field.verbose_name)})
+            ordering_options.append({'id': field_key, 'title': _(u'Цена - по возрастанию')})
+            ordering_options.append({'id': '-' + field_key, 'title': _(u'Цена - по убыванию')})
 
         return ordering_options
 
