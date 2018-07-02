@@ -65,14 +65,12 @@ msgid "Позиция"
 msgstr "Position"
 
 #: api/views/shirts.py:83
-#, python-format
-msgid "%s - по возрастанию"
-msgstr "%s - order by ascending"
+msgid "Цена - по возрастанию"
+msgstr "Price - low to high"
 
 #: api/views/shirts.py:84
-#, python-format
-msgid "%s - по убыванию"
-msgstr "%s - order by descending"
+msgid "Цена - по убыванию"
+msgstr "Price - high to low"
 
 #: api/views/shirts.py:123
 msgid "Узор"
