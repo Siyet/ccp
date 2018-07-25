@@ -51,8 +51,8 @@ msgid "НОВЫЙ ЗАКАЗ"
 msgstr "NEW ORDER"
 
 #: checkout/mail.py:14
-msgid "COSTUME CODE - Ваш заказ подтвержден и оплачен"
-msgstr "COSTUME CODE - Your order and payment have been confirmed"
+msgid "Ваш заказ подтвержден и оплачен"
+msgstr "Your order and payment have been confirmed"
 
 #: checkout/models.py:30 checkout/models.py:96
 msgid "Номер заказа"
@@ -287,8 +287,8 @@ msgid "Прежде, чем мы начнем работы по пошиву, м
 msgstr "Before we will start the tailoring work, we will contact you by phone to confirm your size and your order."
 
 #: checkout/templates/checkout/payment_completed_customer_email.html:10
-msgid "Мы планируем сделать это в течение следующих 48 часов."
-msgstr "We aim to do this within the next 48 hours."
+msgid "Мы планируем сделать это в течение одного рабочего дня."
+msgstr "We aim to do this within one working day."
 
 #: checkout/templates/checkout/payment_completed_customer_email.html:13
 msgid "Мы будем рады пошить данный заказ для вас :)"
@@ -323,8 +323,8 @@ msgid "#персональныйпошив #медленнаямода #эко-�
 msgstr "#персональныйпошив #медленнаямода #эко-френдли #сделаемвашмирпрекраснее"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:325
-msgid "Спасибо большое за ваш заказ. В этом PDF-файле вы сможете найти все детали вашего заказа. Прежде, чем мы начнем работы по пошиву, мы свяжемся с вами по телефону для подтверждения вашего заказа и уточнения размеров. Мы планируем сделать это в течение следующих 48 часов. Мы будем рады пошить данный заказ для вас :)"
-msgstr "Thank you very much for your order. In this PDF-file you can find all the details. Before we will start the tailoring work, we will contact you by phone to confirm your size and your order. We aim to do this within the next 48 hours. We look forward to tailoring this order for you :)"
+msgid "Спасибо большое за ваш заказ. В этом PDF-файле вы сможете найти все детали вашего заказа. Прежде, чем мы начнем работы по пошиву, мы свяжемся с вами по телефону для подтверждения вашего заказа и уточнения размеров. Мы планируем сделать это в течение одного рабочего дня. Мы будем рады пошить данный заказ для вас :)"
+msgstr "Thank you very much for your order. In this PDF-file you can find all the details. Before we will start the tailoring work, we will contact you by phone to confirm your size and your order. We aim to do this within one working day. We look forward to tailoring this order for you :)"
 
 #: checkout/templates/checkout/payment_completed_customer_pdf_email.html:329
 msgid "Ваш заказ"
