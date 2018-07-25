@@ -11,7 +11,7 @@ from wkhtmltopdf import render_pdf_from_template
 class CheckoutMailer(object):
     sender_class = SyncEmailSender
     order_subject = _(u'НОВЫЙ ЗАКАЗ')
-    order_customer_subject = _(u'COSTUME CODE - Ваш заказ подтвержден и оплачен')
+    order_customer_subject = _(u'Ваш заказ подтвержден и оплачен')
     order_admin_template_name = 'checkout/payment_completed_admin_email.html'
     order_customer_template_name = 'checkout/payment_completed_customer_email.html'
 
