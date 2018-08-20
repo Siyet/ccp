@@ -3,7 +3,7 @@ from django.db.transaction import atomic
 from django.utils.text import ugettext_lazy as _
 from rest_framework import serializers
 
-from backend import models
+from backend import models, pricing
 from checkout import models as checkout
 from core.utils import first
 from dictionaries import models as dictionaries
@@ -362,8 +362,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
-
-        return checkout.OrderItem.objects.create(shirt=shirt, price=shirt.price, **validated_data)
+        try:
+            price = pricing.ShirtPriceCalculator.get_price_for_object(shirt)
+        except Exception as e:
+            print(e)
+            price = shirt.price
+        return checkout.OrderItem.objects.create(shirt=shirt, price=price, **validated_data)
 
 
 class CustomerDataSerializer(serializers.ModelSerializer):
