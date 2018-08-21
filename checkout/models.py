@@ -119,7 +119,7 @@ class Order(models.Model):
 
         result = 0
         for detail in self.items.all():
-            logger.info('[Order.get_full_amount] detail.price: ' + detail.price)
+            logger.error('[Order.get_full_amount] detail.price: ' + detail.price)
             result += float(detail.price) * detail.amount
         return result
 
@@ -130,7 +130,7 @@ class Order(models.Model):
     def get_amount_to_pay(self):
         
         try:
-            logger.info('[Order.get_amount_to_pay] self.payment.order_amount: ' + self.payment.order_amount)
+            logger.error('[Order.get_amount_to_pay] self.payment.order_amount: ' + self.payment.order_amount)
             return self.payment.order_amount
         except AttributeError:
             return None

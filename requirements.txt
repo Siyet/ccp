@@ -34,7 +34,7 @@ django-cors-headers
 django-smart-selects==1.3.2
 
 # filters
-django-filter
+django-filter==1.1
 #fancy forms for filters in the administration panel and django filter forms
 django-crispy-forms
 
@@ -55,4 +55,4 @@ django-yandex-kassa
 django-wkhtmltopdf
 
 # deploy
-fabric
+fabric<2
