@@ -21,3 +21,22 @@ YANDEX_KASSA_DEBUG = True
 YANDEX_KASSA_SCID = 123
 YANDEX_KASSA_SHOP_ID = 123
 YANDEX_KASSA_SHOP_PASSWORD = 'password'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/webapps/costumecode/logs/ccback-django-dev.log',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}
