@@ -38,7 +38,7 @@ def deploy():
     staging_env()
     with cd(env.project_root):
         git_credentials = "%s:%s" % (env.gituser, env.gitpassword)
-        run("git pull https://%s@bitbucket.org/wecreateapps/costumecode_configurator.git master" % git_credentials)
+        run("git pull https://%s@bitbucket.org/rjytw/costumecode_configurator_production.git master" % git_credentials)
         with prefix(env.virtualenv):
             run("pip install -r requirements.txt")
             run("python manage.py migrate")
