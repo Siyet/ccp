@@ -363,7 +363,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
         try:
-            price = pricing.ShirtPriceCalculator.get_price_for_object(shirt)
+            price = pricing.ShirtPriceCalculator().get_price_for_object(shirt)
         except Exception as e:
             print(e)
             price = shirt.price
