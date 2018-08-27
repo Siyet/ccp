@@ -1,5 +1,6 @@
 # IDE Settings
 .idea/
+.vscode/
 
 # default settings
 core/settings/database.py
