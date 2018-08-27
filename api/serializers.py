@@ -362,11 +362,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
         for contrast_stitche in contrast_stitches:
             models.ContrastStitch.objects.create(shirt=shirt, **contrast_stitche)
-        try:
-            price = pricing.ShirtPriceCalculator().get_price_for_object(shirt)
-        except Exception as e:
-            print(e)
-            price = shirt.price
+        # try:
+        #     price = pricing.ShirtPriceCalculator().get_price_for_object(shirt)
+        # except Exception as e:
+        #     print(e)
+        price = shirt.price
         return checkout.OrderItem.objects.create(shirt=shirt, price=price, **validated_data)
 
 
