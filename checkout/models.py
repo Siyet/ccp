@@ -142,7 +142,6 @@ class Order(models.Model):
         try:
             return self.payment.shop_amount
         except AttributeError as e:
-            raise e
             return 0
 
     get_amount_paid.allow_tags = True
